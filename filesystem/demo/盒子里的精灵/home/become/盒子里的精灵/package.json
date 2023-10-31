@@ -1,0 +1,12 @@
+{
+  "name": "become-model",
+  "version": "1.0.0",
+  "become": {
+    "uuid": "a0ecc79a-0001-4773-90e2-072af0e26121",
+    "title": "这个模型还没有名字",
+    "desc": "",
+    "createtime": 1609778322221,
+    "modifytime": 1609831708128,
+    "parts": 4
+  }
+}

@@ -1,0 +1,7 @@
+emsdk
+build
+CMakeCache.txt
+CMakeFiles
+demo
+test
+tmp

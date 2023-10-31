@@ -1,0 +1,1 @@
+在加载 beshell wasm 之前，可能需要先创建 emscripen 的运行环境，例如 FS api，一遍准备容器的文件系统 (IDBFS)

@@ -1,0 +1,12 @@
+{
+  "name": "become-model",
+  "version": "1.0.0",
+  "become": {
+    "uuid": "7d16ec87-4fa5-4f38-904d-a4147988ec1f",
+    "title": "麦克纳姆全向车",
+    "desc": "",
+    "createtime": 1609923966121,
+    "modifytime": 1609935189101,
+    "parts": 5
+  }
+}

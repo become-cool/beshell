@@ -1,0 +1,58 @@
+Introduction
+============
+
+This is a very small untar (TAR archive reader) utility written in C. It's 
+meant to be embedded within code. I wrote this because the only other option 
+seemed to be zlib, which was overkill. There are no library dependencies
+other than the "math" library (for some standard math calls).
+
+
+How it Works
+============
+
+You pass three callbacks to the read_tar() routine:
+
+  Header callback
+
+    Receives a header struct, and an entry index. 
+
+    Identifies the beginning of a file. This callback is always invoked before 
+    the other two.
+
+  Data callback
+
+    Receives a header struct, entry index, a block of data, and the length of 
+    the block.
+  
+    Called one or more times for each block of data. This callback is always
+    invoked after the header callback, and before the end callback.
+
+  End callback: 
+
+    Receives a header struct, and an entry index.
+
+    This callback is always invoked after all of the data for an entry has been
+    reported.
+
+
+Running the Example
+==================
+
+1) Run 'make'.
+2) Run 'build/untar <TAR file>'
+
+The example will expand all normal (non-links, non-special, non-directory..) 
+entries into /tmp. It will not create directories, so you'll have to create the
+directories mentioned in the "can't write" error messages.
+
+
+Notes
+=====
+
+This utility supports both the primitive and USTAR formats (this should be a 
+majority of the TAR files), but none of the vendor-specific formats that may 
+exist. I wrote it according to the specifications that I had available.
+
+If a TAR file isn't being successfully read, submit a bug and I'll try to adopt 
+it, if there's a simple fix.
+

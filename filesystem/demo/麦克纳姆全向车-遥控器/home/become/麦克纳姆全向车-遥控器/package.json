@@ -1,0 +1,12 @@
+{
+  "name": "become-model",
+  "version": "1.0.0",
+  "become": {
+    "uuid": "a79205bf-22a3-4f23-b488-e310cc64930c",
+    "title": "麦克纳姆全向车-遥控器",
+    "desc": "",
+    "createtime": 1608580125897,
+    "modifytime": 1609935751748,
+    "parts": 9
+  }
+}

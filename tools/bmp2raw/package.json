@@ -1,0 +1,14 @@
+{
+  "name": "bmp2raw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bmp2raw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jpeg-js": "^0.4.4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+    "sta": {
+        "ssid": "BE-MECANUM-CONTROLLER",
+        "password": "43215678",
+        "useDHCP": true,
+        "gateway": "",
+        "netmask": "",
+        "ip": "",
+        "retry_dur": 2000
+    },
+    "ap": {
+        "ssid": "BE-MECANUM-${UUID}",
+        "password": ""
+    }
+}
