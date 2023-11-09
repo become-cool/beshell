@@ -237,7 +237,7 @@ static JSValue js_driver_release_dma(JSContext *ctx, JSValueConst this_val, int 
 
 
 void be_module_driver_init() {
-    be_module_driver_camera_init() ;
+    // be_module_driver_camera_init() ;
     // be_module_driver_stepper_mcpwm_init() ;
     be_module_driver_stepper_timer_init() ;
     be_module_driver_rainbow_init() ;
@@ -254,7 +254,7 @@ void be_module_driver_require(JSContext *ctx) {
     JS_SetPropertyStr(ctx, driver, "holdDMA", JS_NewCFunction(ctx, js_driver_hold_dma, "holdDMA", 1));
     JS_SetPropertyStr(ctx, driver, "releaseDMA", JS_NewCFunction(ctx, js_driver_release_dma, "releaseDMA", 1));
 
-    be_module_driver_camera_require(ctx, driver) ;    
+    // be_module_driver_camera_require(ctx, driver) ;
 
     // be_module_driver_stepper_mcpwm_require(ctx, driver) ;
     be_module_driver_stepper_timer_require(ctx, driver) ;
@@ -269,7 +269,7 @@ void be_module_driver_require(JSContext *ctx) {
 void be_module_driver_loop(JSContext *ctx) {}
 
 void be_module_driver_reset(JSContext *ctx) {
-    be_module_driver_camera_reset(ctx) ;   
+    // be_module_driver_camera_reset(ctx) ;   
     // be_module_driver_stepper_mcpwm_reset(ctx) ;
     be_module_driver_stepper_timer_reset(ctx) ;
 }

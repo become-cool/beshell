@@ -17,7 +17,7 @@ list(APPEND include_dirs src/modules/driver)
 list(APPEND include_dirs src/modules/media)
 
 # c 源码目录
-set(src_dirs .)
+set(src_dirs src)
 list(APPEND src_dirs src/telnet)
 list(APPEND src_dirs src/libb64)
 
@@ -65,7 +65,7 @@ list(APPEND src_dirs deps/esp32-perfmon)
 idf_component_register(
     SRC_DIRS ${src_dirs}
     INCLUDE_DIRS ${include_dirs}
-    REQUIRES driver mbedtls vfs fatfs esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc 
+    REQUIRES driver mbedtls vfs fatfs esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc
     # EMBED_FILES root.raw
 )
 

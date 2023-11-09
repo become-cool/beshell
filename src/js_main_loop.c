@@ -34,7 +34,7 @@
 #include "module_serial.h"
 #include "module_socks.h"
 #include "module_driver.h"
-#include "driver_camera.h"
+// #include "driver_camera.h"
 
 // #include "indev_i2c.h"
 
