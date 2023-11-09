@@ -65,7 +65,7 @@ list(APPEND src_dirs deps/esp32-perfmon)
 idf_component_register(
     SRC_DIRS ${src_dirs}
     INCLUDE_DIRS ${include_dirs}
-    REQUIRES esp_netif mbedtls esp32-camera-2.0.2
+    REQUIRES driver mbedtls vfs fatfs esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc 
     # EMBED_FILES root.raw
 )
 

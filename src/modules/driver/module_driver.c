@@ -1,5 +1,5 @@
 #include "module_driver.h"
-#include "driver_camera.h"
+// #include "driver_camera.h"
 // #include "driver_stepper_mcpwm.h"
 #include "driver_stepper_timer.h"
 #include "driver_rmt.h"

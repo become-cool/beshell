@@ -4,11 +4,11 @@
 
 #ifdef PLATFORM_ESP32
 #include "module_wifi.h"
-#include "driver_camera.h"
-#include "esp_camera.h"
+//#include "driver_camera.h"
+//#include "esp_camera.h"
 #endif
 
-#include "img_converters.h"
+//#include "img_converters.h"
 
 #include "beshell.h"
 #include "js_main_loop.h"

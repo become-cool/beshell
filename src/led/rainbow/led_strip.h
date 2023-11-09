@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 #include "esp_err.h"
+#include "esp_timer.h"
 #include "driver/rmt.h"
 #include "be_list.h"
 #include "ease.h"
