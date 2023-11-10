@@ -607,9 +607,9 @@ bool telnet_ws_response(struct mg_connection *c, int ev, void *ev_data, void *fn
     
 #ifdef PLATFORM_ESP32
     // camera
-    if(be_module_driver_camera_response(c,ev,ev_data)) {
-        return true ;
-    }
+    // if(be_module_driver_camera_response(c,ev,ev_data)) {
+    //     return true ;
+    // }
 #endif
 
     if (ev == MG_EV_HTTP_MSG) {

@@ -27,7 +27,7 @@
 
 #include "psram.h"
 #include "js_main_loop.h"
-#include "http_server.h"
+// #include "http_server.h"
 
 #ifdef CONFIG_IDF_TARGET_ESP32S2
 #include "tinyusb.h"
