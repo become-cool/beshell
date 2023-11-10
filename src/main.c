@@ -112,31 +112,7 @@ void init_usb_cdc() {
 
 
 
-void app_main(void)
-{
-    //Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());
-      ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+// void app_main(void)
+// {
 
-
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-
-    printf("Heap  (free/total): %d/%d\n", getHeapUsed(),getHeapTotal());
-    printf("DMA   (free/total): %d/%d\n", getDMAUsed(),getDMATotal());
-    printf("PSRAM (free/total): %d/%d\n", getPsramUsed(),getPsramTotal());
-
-#ifdef CONFIG_IDF_TARGET_ESP32S2
-    init_usb_cdc() ;
-#endif
-
-    // js_main_loop(NULL) ;
-
-    // 优先级 tskIDLE_PRIORITY 可以避免触发看门狗
-    printf("tskIDLE_PRIORITY=%d\n", tskIDLE_PRIORITY);
-    xTaskCreatePinnedToCore(&js_main_loop, "js_main_loop", 20*1024, NULL, tskIDLE_PRIORITY, NULL, 0);
-
-}
+// }
