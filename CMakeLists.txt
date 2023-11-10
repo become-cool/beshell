@@ -76,7 +76,6 @@ add_definitions(-DMG_ENABLE_MBEDTLS)
 # add_definitions(-DMG_ENABLE_OPENSSL)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
-# add_definitions(-DMG_ARCH_ESP32)
 
 add_definitions(-DGNUBOY_NO_MINIZIP)
 add_definitions(-DGNUBOY_NO_SCREENSHOT)

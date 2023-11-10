@@ -10,6 +10,6 @@ JSContext * task_current_context() ;
 uint8_t task_boot_level() ;
 void task_reset(int level) ;
 
-void beshell_main() ;
+void be_main() ;
 
 #endif

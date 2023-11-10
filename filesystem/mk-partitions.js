@@ -2,8 +2,9 @@
 const fs = require("fs")
 
 // 计算 beshell.bin 文件的大小，按 128 取整做为分区的尺寸
-const [appsize, rootsize] = require('./app-partition-size.js')
-
+// const [appsize, rootsize] = require('./app-partition-size.js')
+const appsize = 2*1024*1024
+const rootsize = 0
 
 // nvs,      data, nvs,      0x9000,      0x6000
 // phy_init, data, phy,      0xf000,      0x1000
@@ -123,10 +124,12 @@ function generatePartitionsTable(parts, flashSize) {
 
     let offset = 0
     for(let partinfo of parts) {
+        if(!partinfo.size) {
+            continue
+        }
         if(partinfo.offset!=undefined) {
             offset = partinfo.offset
         }
-
         let size = partinfo.size
         if(size==undefined) {
             size = flashSize - offset
@@ -159,4 +162,4 @@ fs.writeFileSync(__dirname+'/partitions-8MB.csv',csv8MB)
 fs.writeFileSync(__dirname+'/partitions-16MB.csv',csv16MB)
 
 
-require(__dirname+"/mk-firmware-json.js")
+// require(__dirname+"/mk-firmware-json.js")

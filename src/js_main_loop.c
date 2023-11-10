@@ -486,7 +486,7 @@ void js_main_loop(const char * script){
 }
 
 
-void beshell_main() {
+void be_main() {
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {

@@ -8,6 +8,7 @@ idf_component_register(
 component_compile_options(-DMG_ENABLE_MBEDTLS)
 # component_compile_options(-DMG_ENABLE_LINES)
 # component_compile_options(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
+
 component_compile_options(-DMG_ARCH_ESP32)
 
 

@@ -164,8 +164,13 @@ static JSValue js_process_stat_nop(JSContext *ctx, JSValueConst this_val, int ar
 
 extern volatile uint32_t CPU_RunTime; 
 
+#ifndef portCONFIGURE_TIMER_FOR_RUN_TIME_STATS
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (CPU_RunTime = 0ul) 
+#endif
+
+#ifndef portGET_RUN_TIME_COUNTER_VALUE
 #define portGET_RUN_TIME_COUNTER_VALUE() CPU_RunTime
+#endif
 
 static JSValue js_process_print_tasks(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
@@ -176,13 +181,21 @@ static JSValue js_process_print_tasks(JSContext *ctx, JSValueConst this_val, int
         THROW_EXCEPTION("out of memory?")
     }
 
+#ifdef FREERTOS_VTASKLIST_INCLUDE_COREID
     vTaskList(buff) ;
     printf("TaskName      Stat Priority   Stack Number\r\n");
     printf(buff) ;
+#else
+    printf("not enable FREERTOS_VTASKLIST_INCLUDE_COREID\r\n");
+#endif
 
+#ifdef FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
     vTaskGetRunTimeStats(buff) ;
     printf("\r\nTaskName       RTCounter         Usage\r\n");
     printf(buff) ;
+#else
+    printf("not enable FREERTOS_USE_STATS_FORMATTING_FUNCTIONS\r\n");
+#endif
 
     free(buff) ;
     return JS_UNDEFINED ;
