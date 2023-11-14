@@ -3,7 +3,7 @@ const fs = require("fs")
 
 // 计算 beshell.bin 文件的大小，按 128 取整做为分区的尺寸
 // const [appsize, rootsize] = require('./app-partition-size.js')
-const appsize = 2*1024*1024
+const appsize = 3*1024*1024
 const rootsize = 0
 
 // nvs,      data, nvs,      0x9000,      0x6000

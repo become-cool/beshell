@@ -4595,7 +4595,7 @@ static int bf_pow_int(bf_t *r, const bf_t *x, limb_t prec, void *opaque)
     bf_t T_s, *T = &T_s;
     limb_t prec1;
     int ret;
-    slimb_t y1;
+    slimb_t y1 = 0;
     
     bf_get_limb(&y1, y, 0);
     if (y1 < 0)
@@ -4753,7 +4753,7 @@ int bf_pow(bf_t *r, const bf_t *x, const bf_t *y, limb_t prec, bf_flags_t flags)
         }
         
         if (y_is_int) {
-            slimb_t T_bits, e;
+            slimb_t T_bits, e=0;
         int_pow:
             T_bits = T->expn - bf_get_exp_min(T);
             if (T_bits == 1) {
@@ -4763,7 +4763,7 @@ int bf_pow(bf_t *r, const bf_t *x, const bf_t *y, limb_t prec, bf_flags_t flags)
                 bf_set_ui(r, 1);
                 ret = bf_mul_2exp(r, e, prec, flags);
             } else if (prec == BF_PREC_INF) {
-                slimb_t y1;
+                slimb_t y1=0;
                 /* specific case for infinite precision (integer case) */
                 bf_get_limb(&y1, y, 0);
                 assert(!y->sign);
@@ -4844,7 +4844,7 @@ static int bf_sincos(bf_t *s, bf_t *c, const bf_t *a, limb_t prec)
     bf_t T_s, *T = &T_s;
     bf_t U_s, *U = &U_s;
     bf_t r_s, *r = &r_s;
-    slimb_t K, prec1, i, l, mod, prec2;
+    slimb_t K, prec1, i, l, prec2, mod=0;
     int is_neg;
     
     assert(c != a && s != a);

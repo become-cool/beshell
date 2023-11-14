@@ -62,13 +62,20 @@ list(APPEND src_dirs deps/helix/src)
 list(APPEND include_dirs deps/esp32-perfmon/include)
 list(APPEND src_dirs deps/esp32-perfmon)
 
+
+if(IDF_VERSION_MAJOR LESS 5)
+    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc_cal)
+else()
+    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc)
+endif()
+
+
 idf_component_register(
     SRC_DIRS ${src_dirs}
     INCLUDE_DIRS ${include_dirs}
-    REQUIRES driver mbedtls vfs fatfs esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc
-    # EMBED_FILES root.raw
+    REQUIRES ${requires}
+    EMBED_FILES fs-root.img
 )
-
 
 
 # # for mongoose tls/ssl
@@ -96,4 +103,4 @@ component_compile_options(-Wno-cpp)
 component_compile_options(-Wno-type-limits)
 component_compile_options(-Wno-int-to-pointer-cast)
 component_compile_options(-Wno-implicit-function-declaration)
-
+# component_compile_options(-Wno-error=maybe-uninitialized)

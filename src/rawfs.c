@@ -17,10 +17,12 @@
 #include "debug.h"
 
 
+#define FS_ROOT_USE_EMBED_FILE
 
-// extern const uint8_t rawfs_root_start[] asm("_binary_root_raw_start");
-// extern const uint8_t rawfs_root_end[] asm("_binary_root_raw_end");
-
+#ifdef FS_ROOT_USE_EMBED_FILE
+extern const uint8_t fs_root_img_start[] asm("_binary_fs_root_img_start");
+extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
+#endif
 
 
 static vfs_node_t * vfs_node_malloc(vfs_node_t * parent) {  
@@ -358,9 +360,20 @@ static vfs_rawfs_t * fs_root = NULL ;
 void be_rawfs_mount(const char * mntPoint) {
 
 	char * romdata = NULL ;
+    fs_root = malloc(sizeof(vfs_rawfs_t)) ;
 
 #ifdef PLATFORM_ESP32
 
+#ifdef FS_ROOT_USE_EMBED_FILE
+
+    romdata = fs_root_img_start ;
+    fs_root->raw = fs_root_img_start ;
+    fs_root->size = fs_root_img_end - fs_root_img_start ;
+    fs_root->partition_size = fs_root->size ;
+
+    fs_root->root = parse_tree(romdata, NULL, &fs_root->raw_data, NULL) ;
+
+#else
 	const esp_partition_t * part = esp_partition_find_first(0x01, 0x81, "fsroot");
     if(!part) {
         printf("not found partition: fsroot.\n") ;
@@ -370,7 +383,6 @@ void be_rawfs_mount(const char * mntPoint) {
     printf("root addr: 0x%x\n",(unsigned int)part->address) ;
     dn(part->size)
     ds(part->label)
-
 
     romdata = NULL ;
     
@@ -386,15 +398,16 @@ void be_rawfs_mount(const char * mntPoint) {
         printf("mmap failed: %d\n", ret) ;
         return ;
     }
-
-    // print_block(romdata, 16, 8) ;
     
-    fs_root = malloc(sizeof(vfs_rawfs_t)) ;
     fs_root->partition_size = part->size ;
     fs_root->size = 0 ;
     fs_root->raw = romdata ;
+    
     fs_root->root = parse_tree(romdata, NULL, &fs_root->raw_data, &fs_root->size) ;
     fs_root->size+= (fs_root->raw_data-(void*)romdata) ; // raw header size
+
+#endif
+
 
     memset(fs_root->fds, 0, sizeof(vfs_rawfs_fd_t)*MAX_OPEN_FD) ;
 
