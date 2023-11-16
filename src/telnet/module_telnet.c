@@ -196,7 +196,7 @@ void be_telnet_require(JSContext *ctx) {
 #endif
 
 }
-inline void be_telnet_loop(JSContext *ctx) {
+void be_telnet_loop(JSContext *ctx) {
 	// printf("be_telnet_loop()\n") ;
 
 #ifdef PLATFORM_LINUX

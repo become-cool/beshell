@@ -4,10 +4,17 @@
 
 #include "quickjs-libc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void be_telnet_serial_init() ;
 void be_telnet_serial_loop(JSContext *ctx) ;
 void be_telnet_serial_reset(JSContext *ctx) ;
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -2,6 +2,7 @@
 #include "telnet_serial.h"
 #include "module_telnet.h"
 #include "telnet_protocal.h"
+#include "telnet_protocal.hpp"
 #include "module_fs.h"
 #include "driver/uart.h"
 #include <stdio.h>
@@ -15,6 +16,7 @@
 #include <sys/types.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+
 
 LOG_TAG("telnet")
 
@@ -50,6 +52,7 @@ static uint8_t telnet_buffer[127] ;
 
 SemaphoreHandle_t sema ;
 
+static beprotocal::Parser parser ;
 
 static void task_uart_receive(void * data) {
 
@@ -74,7 +77,7 @@ static void task_uart_receive(void * data) {
 			} else if (s == 0) {
 				// ESP_LOGI(TAG, "Timeout has been reached and nothing has been received");
 				break ;
-			} 
+			}
 
 			// UART 接收
 			if (FD_ISSET(uart_fd, &telnet_rfds)) {
@@ -83,7 +86,8 @@ static void task_uart_receive(void * data) {
 
 				xSemaphoreTake( sema, portMAX_DELAY ) ;
 
-				be_telnet_proto_receive(telnet_buffer, chunklen) ;
+				parser.parse(telnet_buffer, chunklen) ;
+				// be_telnet_proto_receive(telnet_buffer, chunklen) ;
 
 				xSemaphoreGive( sema ) ;
 			}
@@ -93,9 +97,8 @@ static void task_uart_receive(void * data) {
 
 void be_telnet_serial_init() {
 
-	be_telnet_proto_init(send_pkg_func) ;
-
-	telnet_prot_func_reset = task_reset ;
+	// be_telnet_proto_init(send_pkg_func) ;
+	// telnet_prot_func_reset = task_reset ;
 
 	// uart telnet ----------
     uart_driver_install(UART_NUM_0, 2*1024, 0, 0, NULL, 0);
@@ -109,8 +112,14 @@ void be_telnet_serial_init() {
 }
 
 
-inline void be_telnet_serial_loop(JSContext *ctx) {
+#ifdef __cplusplus
+extern "C" {
+#endif
+void be_telnet_serial_loop(JSContext *ctx) {
 	xSemaphoreTake( sema, 0 ) ;
-	be_telnet_proto_loop(ctx) ;
+	// be_telnet_proto_loop(ctx) ;
 	xSemaphoreGive( sema ) ;
 }
+#ifdef __cplusplus
+}
+#endif

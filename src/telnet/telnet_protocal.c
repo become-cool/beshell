@@ -260,13 +260,18 @@ void telnet_proto_process_pkg (telnet_pkg_t * pkg, void * ctx){
 static telnet_pkg_t * pkg_uncompleted = NULL ;
 
 
-inline static int detect_header(uint8_t * bytes, size_t length) {
+// 返回：
+// 1: 行数据的结束位置
+// 2: 包数据的包头位置
+// 0: 无可识别内容
+inline static int detect_header(uint8_t * bytes, size_t length, size_t * idx) {
 	for(int i=0;i<length-1;i++) {
 		if(bytes[i]==PKG_HEAD1 && bytes[i+1]==PKG_HEAD2) {
-			return i ;
+			*idx = i ;
+			return 2 ;
 		}
 	}
-	return -1 ;
+	return 0 ;
 }
 
 
@@ -308,6 +313,9 @@ inline static int read_body_length(uint8_t * bytes, size_t length, size_t * data
 	return 4 ;
 }
 
+// 返回:
+// true: 完成
+// false: 未完成，等待后续
 inline static bool receive_body(uint8_t * body, size_t * length, telnet_pkg_t * pkg) {
 
 	size_t body_unread = pkg->data_len - pkg->data_received ;
@@ -374,10 +382,14 @@ static void push_pkg(telnet_pkg_t * pkg) {
 	be_list_append( lst_pendings, pkg ) ;
 }
 
-// 返回 true 表示完成一个包
+// 返回:
+//  2: 接收完一个包
+//  1: 等待后续
+//  0: 不是有效的包
+// -1: 遇到错误
 // length 参数为 in/out ，处理完以后 length 表示剩余数据
 // 调用 telnet_prot_receive 的地方负责保留剩余数据
-static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
+static int telnet_prot_receive(uint8_t * bytes, size_t * length) {
 
 	// 未完成包
 	if(pkg_uncompleted) {
@@ -385,21 +397,30 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 			// printf("-pkg body compiled, body:%d, remain:%d, @%p\n", pkg_uncompleted->data_len,* length,pkg_uncompleted) ;
 			push_pkg(pkg_uncompleted) ;
 			pkg_uncompleted = NULL ;
-			return true ;
+			return 2 ;
 		}
-		return false ;
+		return 1 ;
 	}
 
-	int idx = detect_header(bytes,*length) ;
-	if(idx<0) {
-		// 最后一个字节 可能是前半个包头
-		if(bytes[(*length)-1]==PKG_HEAD1) {
-			(*length) = 1 ;
-		}
-		else {
-			(*length) = 0 ;
-		}
-		return false ;
+	size_t idx = 0 ;
+	int res = detect_header(bytes,*length, &idx) ;
+	// 行数据
+	if(res==1) {
+		bytes[idx] = 0 ;
+		printf("cmd:%s\n", bytes) ;
+		(*length)-= idx ;
+		return 0;
+
+	} else if (res==0) {
+		// 最后一个字节 可能是前半个包头,等待后续
+		// if(bytes[(*length)-1]==PKG_HEAD1) {
+		// 	(*length) = 1 ;
+		// }
+		// else {
+		// 	(*length) = 0 ;
+		// }
+		// 未发现包头
+		return 0 ;
 	}
 
 	// 包头以前的数据可清空
@@ -407,7 +428,7 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 
 	// 后续长度不够，等待后文
     if((*length)<PKG_MIN_SIZE) {
-		return false ;
+		return 1 ;
     }
 
 	bytes+= idx ;
@@ -416,7 +437,7 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 
 	// 长度未接收完，等待后文
 	if(lenBytes<-1) {
-		return false ;
+		return 1 ;
 	}
 
 	// h1, h2, pkgId, cmd, lenBytes
@@ -425,7 +446,7 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 	pkg_uncompleted = malloc(sizeof(telnet_pkg_t)) ;
 	if(!pkg_uncompleted) {
 		printf("out of memory?\n") ;
-		return false ;
+		return -1 ;
 	}
 	// printf("malloc pkg:%p, prev:%p,next:%p\n",pkg_uncompleted,pkg_uncompleted->base.prev,pkg_uncompleted->base.next) ;
 	memset(pkg_uncompleted, 0, sizeof(telnet_pkg_t)) ;
@@ -440,7 +461,7 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 		free(pkg_uncompleted) ;
 		pkg_uncompleted = NULL ;
 		printf("out of memory?\n") ;
-		return false ;
+		return -1 ;
 	}
 
 	pkg_uncompleted->pkgid = bytes[2] ;
@@ -463,19 +484,21 @@ static bool telnet_prot_receive(uint8_t * bytes, size_t * length) {
 
 	if((*length)>0) {
 		if(!receive_body(bytes,length,pkg_uncompleted)) {
-			return false ;
+			return 1 ;
 		}
 	}
-	
+
 	push_pkg(pkg_uncompleted) ;
 	pkg_uncompleted = NULL ;
-	return true ;
+	return 2 ;
 }
+
+
 
 void be_telnet_proto_receive(uint8_t * data, size_t datalen) {
 	size_t remain = datalen ;
 	size_t chunklen = 0 ;
-	bool pkgFinished = false ;
+	int res = 0 ;
 	do {
 		size_t freelen = sizeof(buff_recv)-buff_recv_used ;
 		chunklen = freelen ;
@@ -491,15 +514,14 @@ void be_telnet_proto_receive(uint8_t * data, size_t datalen) {
 
 		chunklen = buff_recv_used ;
 	
-		pkgFinished = telnet_prot_receive(buff_recv, &chunklen) ;
-
+		res = telnet_prot_receive(buff_recv, &chunklen) ;
 		if(chunklen>0) {
 			memcpy(buff_recv, buff_recv+(buff_recv_used-chunklen), chunklen) ;
 		}
 
 		buff_recv_used = chunklen ;
 
-	} while(remain>0 || (chunklen && pkgFinished)) ;
+	} while(remain>0 || (chunklen && res)) ;
 }
 
 inline void be_telnet_proto_loop(void * ctx) {
@@ -512,3 +534,5 @@ inline void be_telnet_proto_loop(void * ctx) {
 		telnet_proto_free_pkg(pkg) ;
 	}
 }
+
+

@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include "be_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * 0518
@@ -67,3 +70,8 @@ void telnet_proto_process_pkg (telnet_pkg_t * pkg, void * ctx) ;
 void be_telnet_proto_init() ;
 void be_telnet_proto_loop(void * ctx) ;
 void be_telnet_proto_receive(uint8_t * bytes, size_t length) ;
+
+
+#ifdef __cplusplus
+}
+#endif
