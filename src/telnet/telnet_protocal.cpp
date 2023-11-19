@@ -31,14 +31,19 @@ namespace beprotocal {
                 // 到达行尾
                 if( bytes[i] == '\n' ) {
                     pkg_t * pkg = new pkg_t() ;
+                    memset(pkg,0,sizeof(pkg_t)) ;
+                    pkg->cmd = LINE ;
                     pkg->data_len = pending_len + i+1 ;
-                    pkg->data = malloc(pkg->data_len+1) ;
+                    pkg->data = (uint8_t*) malloc(pkg->data_len+1) ;
                     memcpy(pkg->data, pending, pending_len) ;
                     memcpy(pkg->data+pending_len, bytes, i+1) ;
                     pkg->data[pkg->data_len-1] = 0 ;
 
                     bytes+= i+1 ;
                     len-= i+1 ;
+
+                    parser->handler(pkg) ;
+
                     break ;
                 }
                 // 遇到包头
@@ -50,13 +55,10 @@ namespace beprotocal {
 
                 }
             }
-
-
-
         }
     }
     
-    uint8_t StateLine::savePendingData(uint8_t * data, size_t len) {
+    void StateLine::savePendingData(uint8_t * data, size_t len) {
         if(pending_len+len > sizeof(pending)-1) {
             len = sizeof(pending)-1 - pending_len ;
         }
@@ -79,9 +81,10 @@ namespace beprotocal {
     }
     
     // 上下文类
-    Parser::Parser(uint8_t _H1,uint8_t _H2)
+    Parser::Parser(PackageProcFunc _handler, uint8_t _H1,uint8_t _H2)
         : stateLine(new StateLine(this))
-        , statePkg(new StatePkg(this,H1,H2))
+        , statePkg(new StatePkg(this))
+        , handler(_handler)
         , H1(_H1), H2(_H2)
     {
         current = stateLine ;
@@ -97,6 +100,12 @@ namespace beprotocal {
     void Parser::setPkgHead(uint8_t _H1,uint8_t _H2) {
         H1 = _H1 ;
         H2 = _H2 ;
+    }
+    void Parser::setProcessHandler(PackageProcFunc _handler) {
+        handler = _handler ;
+    }
+    void defaultPkgProcFunc(pkg_t * pkg) {
+        printf("receive package, pkgid:%d, cmd:%d\n",pkg->pkgid,pkg->cmd) ;
     }
 }
 

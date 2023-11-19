@@ -10,7 +10,8 @@ namespace beprotocal {
 		HEAD2 = 18 ,
 	} ;
 	enum Cmd {
-		RUN = 1					// 执行js代码，无返回值
+		LINE = 0					// 行数数据
+		, RUN = 1					// 执行js代码，无返回值
 		, CALL = 2					// 执行js代码，有返回值
 		, CALL_ASYNC = 3			// 执行js代码，有异步返回值
 		, RSPN = 4					// CMD_CALL 的返回
@@ -41,6 +42,8 @@ namespace beprotocal {
 
 	uint8_t verifysum(uint8_t * data, size_t len, uint8_t base=0) ;
 	
+	typedef void (*PackageProcFunc)(pkg_t * pkg);
+	void defaultPkgProcFunc(pkg_t * pkg) ;
 
     class Parser ;
     class State {
@@ -56,7 +59,7 @@ namespace beprotocal {
 		private:
 			uint8_t pending[256] ;
 			uint8_t pending_len = 0 ;
-			uint8_t savePendingData(uint8_t * data, size_t len) ;
+			void savePendingData(uint8_t * data, size_t len) ;
 		public:
 			StateLine(Parser * parser) ;
 			~StateLine() ;
@@ -85,13 +88,17 @@ namespace beprotocal {
 			State * current ;
 			StateLine * stateLine ;
 			StatePkg * statePkg ;
+
+			PackageProcFunc handler ;
+
 		public:
 			uint8_t H1 = HEAD1 ;
 			uint8_t H2 = HEAD2 ;
-			Parser(uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
+			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
 			~Parser() ;
 			void parse(uint8_t * bytes, size_t len) ;
 			void setPkgHead(uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
+			void setProcessHandler(PackageProcFunc handler) ;
 
 		friend class StateLine ;
 		friend class StatePkg ;
