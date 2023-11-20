@@ -30,66 +30,96 @@ namespace beprotocal {
 		, READY = 31				// 系统准备就绪事件
 	} ;
 
-	typedef struct {
-		uint8_t pkgid ;
-		uint8_t cmd ;
-
-		uint8_t * data ;
-		size_t data_len ;
-
+	class Package {
+	public:
+		uint8_t pkgid = 0;
+		uint8_t cmd = 0;
+		uint8_t * data = 0;
+		size_t data_len = 0;
 		uint8_t verifysum ;
-	} pkg_t ;
+		
+		Package(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
+		~Package() ;
+	} ;
 
 	uint8_t verifysum(uint8_t * data, size_t len, uint8_t base=0) ;
 	
-	typedef void (*PackageProcFunc)(pkg_t * pkg);
-	void defaultPkgProcFunc(pkg_t * pkg) ;
+	typedef void (*PackageProcFunc)(Package * pkg);
+	void defaultPkgProcFunc(Package * pkg) ;
 
     class Parser ;
     class State {
-		protected:
-			Parser * parser ;
-		public:
-			State(Parser * parser);
-			virtual ~State() ;
-        	virtual void parse(uint8_t * bytes, size_t len) = 0 ;
+	protected:
+		Parser * parser ;
+	public:
+		State(Parser * parser);
+		virtual ~State() ;
+		virtual void parse(uint8_t * bytes, size_t * len) = 0 ;
+		virtual void enter() ;
     } ;
     
     class StateLine: public State {
-		private:
-			uint8_t pending[256] ;
-			uint8_t pending_len = 0 ;
-			void savePendingData(uint8_t * data, size_t len) ;
-		public:
-			StateLine(Parser * parser) ;
-			~StateLine() ;
-			void parse(uint8_t * bytes, size_t len) ;
+	private:
+		uint8_t buff[256] ;
+		uint8_t received = 0 ;
+		void savePendingData(uint8_t * data, size_t len) ;
+	public:
+		StateLine(Parser * parser) ;
+		~StateLine() ;
+		void parse(uint8_t * bytes, size_t * len) ;
     } ;
     
-    class StatePkg: public State {
+	// 包头:固定长度区(4字节)
+    class StatePkgHeadFixed: public State {
+	private:
+		uint8_t buff[2] ;
+		uint8_t received= 0 ;
 
-			pkg_t * pkg = nullptr ;
-			size_t pkg_received = 0 ;
-
-		public:
-
-			StatePkg(Parser * parser) ;
-			~StatePkg() ;
-			void parse(uint8_t * bytes, size_t len) ;
+		bool receivePkgLen(uint8_t ** bytes, size_t * len) ;
+	public:
+		using State::State ;
+		void parse(uint8_t * bytes, size_t * len) ;
+		void enter() ;
     } ;
 
-    class StatePkgStream: public StatePkg {
-		public:
-			void parse(uint8_t * bytes, size_t len) ;
-    } ;
+	// 包头:包长部分(1-4字节)
+    class StatePkgHeadLength: public State {
+	private:
+		uint8_t buff[4] ;
+		uint8_t received = 0 ;
+	public:
+		using State::State ;
+		void parse(uint8_t * bytes, size_t * len) ;
+		void enter() ;
+	} ;
+
+	// 包身
+    class StatePkgBody: public State {
+	private:
+		uint8_t received = 0 ;
+		// bool verifysum_received = false ;
+	public:
+		using State::State ;
+		void parse(uint8_t * bytes, size_t * len) ;
+		void enter() ;
+	} ;
 
     class Parser {
 		private:
-			State * current ;
+			Package * pkg = nullptr ;
+			State * current = nullptr ;
+
 			StateLine * stateLine ;
-			StatePkg * statePkg ;
+			StatePkgHeadFixed * statePkgHeadFixed ;
+			StatePkgHeadLength * statePkgHeadLength ;
+			StatePkgBody * statePkgBody ;
 
 			PackageProcFunc handler ;
+
+			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
+			void commitPackage() ;
+
+			void changeState(State * state, uint8_t * bytes, size_t * len) ;
 
 		public:
 			uint8_t H1 = HEAD1 ;
@@ -101,6 +131,8 @@ namespace beprotocal {
 			void setProcessHandler(PackageProcFunc handler) ;
 
 		friend class StateLine ;
-		friend class StatePkg ;
+		friend class StatePkgHeadFixed ;
+		friend class StatePkgHeadLength ;
+		friend class StatePkgBody ;
     } ;
 }
