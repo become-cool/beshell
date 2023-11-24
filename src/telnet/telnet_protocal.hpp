@@ -8,6 +8,7 @@ namespace beprotocal {
 	enum PkgDef {
 		HEAD1 = 5 ,
 		HEAD2 = 18 ,
+		HEAD2_V = 19 ,
 	} ;
 	enum Cmd {
 		LINE = 0					// 行数数据
@@ -34,9 +35,12 @@ namespace beprotocal {
 	public:
 		uint8_t pkgid = 0;
 		uint8_t cmd = 0;
-		uint8_t * data = 0;
-		size_t data_len = 0;
+		uint8_t * body = 0;
+		size_t body_len = 0;
 		uint8_t verifysum ;
+		
+		uint8_t head[8] ;
+		uint8_t head_len ;
 		
 		Package(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 		~Package() ;
@@ -52,6 +56,7 @@ namespace beprotocal {
 	protected:
 		Parser * parser ;
 	public:
+		uint8_t label ;
 		State(Parser * parser);
 		virtual ~State() ;
 		virtual void parse(uint8_t * bytes, size_t * len) = 0 ;
@@ -62,10 +67,9 @@ namespace beprotocal {
 	private:
 		uint8_t buff[256] ;
 		uint8_t received = 0 ;
-		void savePendingData(uint8_t * data, size_t len) ;
+		void saveToBuff(uint8_t * data, size_t len) ;
 	public:
-		StateLine(Parser * parser) ;
-		~StateLine() ;
+		using State::State ;
 		void parse(uint8_t * bytes, size_t * len) ;
     } ;
     
@@ -96,12 +100,13 @@ namespace beprotocal {
 	// 包身
     class StatePkgBody: public State {
 	private:
-		uint8_t received = 0 ;
+		size_t received = 0 ;
 		// bool verifysum_received = false ;
 	public:
 		using State::State ;
 		void parse(uint8_t * bytes, size_t * len) ;
 		void enter() ;
+		bool checkVerifysum() ;
 	} ;
 
     class Parser {
@@ -124,11 +129,13 @@ namespace beprotocal {
 		public:
 			uint8_t H1 = HEAD1 ;
 			uint8_t H2 = HEAD2 ;
-			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
+			uint8_t H2V = HEAD2 ;
+			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2,uint8_t H2V=HEAD2) ;
 			~Parser() ;
 			void parse(uint8_t * bytes, size_t len) ;
 			void setPkgHead(uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
 			void setProcessHandler(PackageProcFunc handler) ;
+			void test() {}
 
 		friend class StateLine ;
 		friend class StatePkgHeadFixed ;

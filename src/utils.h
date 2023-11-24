@@ -5,6 +5,10 @@
 #include "quickjs-libc.h"
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef PLATFORM_LINUX
 
 void echo_error(JSContext *) ;
@@ -438,3 +442,8 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
             JS_FreeValue(ctx,jslen) ; \
         }\
     }
+
+
+#ifdef __cplusplus
+}
+#endif
