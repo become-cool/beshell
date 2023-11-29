@@ -57,7 +57,14 @@
     }
 #define necho_alloc(msg, codes, ...)  codes
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void print_block(uint8_t * block, int columns, int rows) ;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

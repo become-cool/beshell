@@ -2,8 +2,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <functional>
 
-namespace beprotocal {
+namespace beshell {
 
 	enum PkgDef {
 		HEAD1 = 5 ,
@@ -35,22 +36,24 @@ namespace beprotocal {
 	public:
 		uint8_t pkgid = 0;
 		uint8_t cmd = 0;
-		uint8_t * body = 0;
+		uint8_t body = 0;
 		size_t body_len = 0;
 		uint8_t verifysum ;
 		
 		uint8_t head[8] ;
 		uint8_t head_len ;
+
+		
 		
 		Package(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 		~Package() ;
+
+		size_t calculateSize() ;
+		void pack(uint8_t * buff) ;
 	} ;
 
 	uint8_t verifysum(uint8_t * data, size_t len, uint8_t base=0) ;
 	
-	typedef void (*PackageProcFunc)(Package * pkg);
-	void defaultPkgProcFunc(Package * pkg) ;
-
     class Parser ;
     class State {
 	protected:
@@ -109,9 +112,13 @@ namespace beprotocal {
 		bool checkVerifysum() ;
 	} ;
 
+	// 上下文类
+	typedef std::function<void(Package & pkg)> PackageProcFunc;
+	void defaultPkgProcFunc(Package & pkg) ;
+
     class Parser {
 		private:
-			Package * pkg = nullptr ;
+			Package pkg ;
 			State * current = nullptr ;
 
 			StateLine * stateLine ;
@@ -121,7 +128,7 @@ namespace beprotocal {
 
 			PackageProcFunc handler ;
 
-			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
+			// Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 			void commitPackage() ;
 
 			void changeState(State * state, uint8_t * bytes, size_t * len) ;

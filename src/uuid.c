@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static void random(uint8_t * data, size_t len) {
+static void random_(uint8_t * data, size_t len) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     srand((unsigned) tv.tv_usec);
@@ -27,7 +27,7 @@ void uuid_generate(uuid_t out) {
 #ifdef PLATFORM_ESP32
     esp_fill_random((uint8_t *)out, sizeof(uuid_t));
 #else
-    random((uint8_t *)out, sizeof(uuid_t));
+    random_((uint8_t *)out, sizeof(uuid_t));
 #endif
     out[6] = 0x40 | (out[6] & 0xF);
     out[8] = (0x80 | out[8]) & ~0x40;

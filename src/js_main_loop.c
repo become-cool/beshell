@@ -19,7 +19,7 @@
 #include "module_utils.h"
 
 
-#ifndef PLATFORM_WASM
+#ifdef PLATFORM_ESP32
 #include "module_mg.h"
 #endif
 #include "module_fs.h"
@@ -105,7 +105,7 @@ static bool nowifi = false ;
 
 
     
-#define ENABLE_MONITOR_LOOP 1
+#define ENABLE_MONITOR_LOOP 0
 
 #if ENABLE_MONITOR_LOOP
 static struct timespec __tm = {0, 0} ;
@@ -215,7 +215,7 @@ static JSContext * init_custom_context(JSRuntime *rt) {
 #endif
     // be_module_gameplayer_require(ctx) ;
 #ifndef PLATFORM_WASM
-    be_module_mg_require(ctx) ;
+    // be_module_mg_require(ctx) ;
 #endif
     be_telnet_require(ctx) ;
     // be_module_lvgl_require(ctx) ;
@@ -333,7 +333,7 @@ void js_main_loop_tick() {
 
         be_module_eventloop_reset(ctx) ;
 #ifndef PLATFORM_WASM
-        be_module_mg_reset(ctx) ;
+        // be_module_mg_reset(ctx) ;
 #endif
         // be_module_lvgl_reset(ctx) ;
         be_telnet_reset(ctx) ;
@@ -374,7 +374,7 @@ void js_main_loop_tick() {
     })
 #ifndef PLATFORM_WASM
     monitor("mg", {
-        be_module_mg_loop(ctx) ;
+        // be_module_mg_loop(ctx) ;
     })
 #endif
         
@@ -406,7 +406,7 @@ void js_main_loop_tick() {
 }
 
 void js_main_loop(const char * script){
-    printf("tskIDLE_PRIORITY=%d\n", tskIDLE_PRIORITY);
+    // printf("tskIDLE_PRIORITY=%d\n", tskIDLE_PRIORITY);
 
     boot_level = 5 ;
     nvs_read_onetime("rst-lv", &boot_level) ;
@@ -435,12 +435,12 @@ void js_main_loop(const char * script){
     be_module_fs_init() ;
     vTaskDelay(1) ;
 #else
-    be_rawfs_mount(NULL) ;
+    // be_rawfs_mount(NULL) ;
 #endif
 
     be_module_process_init() ;
 #ifndef PLATFORM_WASM
-    be_module_mg_init() ;
+    // be_module_mg_init() ;
 #endif
     // be_module_lvgl_init() ;
     be_telnet_init() ;
@@ -487,6 +487,7 @@ void js_main_loop(const char * script){
 
 
 void be_main() {
+#ifdef PLATFORM_ESP32
     //Initialize NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -506,10 +507,13 @@ void be_main() {
     init_usb_cdc() ;
 #endif
 
+#endif
+
     // js_main_loop(NULL) ;
 
     // 优先级 tskIDLE_PRIORITY 可以避免触发看门狗
-    printf("tskIDLE_PRIORITY=%d\n", tskIDLE_PRIORITY);
+#ifdef PLATFORM_ESP32
     xTaskCreatePinnedToCore(&js_main_loop, "js_main_loop", 20*1024, NULL, tskIDLE_PRIORITY, NULL, 0);
+#endif
 
 }

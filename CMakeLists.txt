@@ -1,5 +1,6 @@
 # c 头文件目录
 set(include_dirs ./src)
+list(APPEND include_dirs src/fs)
 list(APPEND include_dirs src/telnet)
 list(APPEND include_dirs src/libb64)
 list(APPEND include_dirs src/media)
@@ -18,6 +19,7 @@ list(APPEND include_dirs src/modules/media)
 
 # c 源码目录
 set(src_dirs src)
+list(APPEND src_dirs src/fs)
 list(APPEND src_dirs src/telnet)
 list(APPEND src_dirs src/libb64)
 
@@ -89,18 +91,30 @@ add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)
 add_definitions(-DPLATFORM_ESP32)
 
+set(CMAKE_CXX_STANDARD 11)
+
+# for c
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-discarded-qualifiers")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-conversion")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
+
+# for c++
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-permissive")
+
+# both c and c++
 component_compile_options(-Wno-error=format=)
 component_compile_options(-Wno-format)
-component_compile_options(-Wno-incompatible-pointer-types)
 component_compile_options(-Wno-unused-function)
 component_compile_options(-Wno-unused-variable)
 component_compile_options(-Wno-unused-but-set-variable)
 component_compile_options(-Wno-cast-function-type)
 component_compile_options(-Wno-implicit-fallthrough)
-component_compile_options(-Wno-discarded-qualifiers)
-component_compile_options(-Wno-int-conversion)
 component_compile_options(-Wno-cpp)
 component_compile_options(-Wno-type-limits)
 component_compile_options(-Wno-int-to-pointer-cast)
-component_compile_options(-Wno-implicit-function-declaration)
-# component_compile_options(-Wno-error=maybe-uninitialized)
+component_compile_options(-Wno-error=switch)
+component_compile_options(-Wno-switch)
+

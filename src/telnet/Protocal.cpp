@@ -1,4 +1,4 @@
-#include "telnet_protocal.hpp"
+#include "Protocal.hpp"
 #include "debug.h"
 #include <cstdio>
 #include <cstdlib>
@@ -25,14 +25,7 @@
 #define RECEIVE_TO_BUFF(buff, received, data, datalen)  \
             RECEIVE_TO_BUFF_PTR(buff, sizeof(buff), received, data, datalen)
 
-namespace beprotocal {
-
-    uint8_t verifysum(uint8_t * data, size_t len, uint8_t base) {
-        for(uint16_t i=0; i<len; i++) {
-            base^= data[i] ;
-        }
-        return base ;
-    }
+namespace beshell {
     
     Package::Package(uint8_t _cmd, uint8_t _pkgid, size_t _data_len)
         : pkgid(_pkgid)
@@ -47,6 +40,11 @@ namespace beprotocal {
             delete body ;
             body = nullptr ;
         }
+    }
+    size_t Package::calculateSize() {
+        return 0 ;
+    }
+    void Package::pack(uint8_t * buff) {
     }
 
     State::State(Parser * parser): parser(parser) {}
@@ -63,6 +61,8 @@ namespace beprotocal {
                 memcpy(pkg->body, buff, received) ;
                 memcpy(pkg->body+received, bytes, i+1) ;
                 pkg->body[pkg->body_len-1] = 0 ;
+
+                printf((char *)pkg->body) ;
 
                 bytes+= i+1 ;
                 (*len)-= i+1 ;
@@ -321,8 +321,6 @@ namespace beprotocal {
     void defaultPkgProcFunc(Package * pkg) {
         printf("receive package, pkgid:%d, cmd:%d, length:%d\n",pkg->pkgid,pkg->cmd,pkg->body_len) ;
     }
-
-    
 
 }
 

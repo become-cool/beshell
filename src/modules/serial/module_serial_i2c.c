@@ -328,7 +328,8 @@ static JSValue js_i2c_bus_setup(JSContext *ctx, JSValueConst this_val, int argc,
 		.scl_io_num = sclpin,
 		.sda_pullup_en = GPIO_PULLUP_ENABLE,
 		.scl_pullup_en = GPIO_PULLUP_ENABLE,
-		.master.clk_speed = freq
+		.master.clk_speed = freq ,
+        .clk_flags = 0
 	};
 	if(i2c_param_config(busnum, &i2c_config)!=ESP_OK) {
         return JS_FALSE ;

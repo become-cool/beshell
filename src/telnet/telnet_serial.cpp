@@ -2,7 +2,7 @@
 #include "telnet_serial.h"
 #include "module_telnet.h"
 #include "telnet_protocal.h"
-#include "telnet_protocal.hpp"
+#include "Protocal.hpp"
 #include "module_fs.h"
 #include "driver/uart.h"
 #include <stdio.h>
@@ -52,7 +52,7 @@ static uint8_t telnet_buffer[127] ;
 
 SemaphoreHandle_t sema ;
 
-static beprotocal::Parser parser ;
+static beshell::Parser parser ;
 
 static void task_uart_receive(void * data) {
 

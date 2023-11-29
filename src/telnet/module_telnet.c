@@ -4,7 +4,7 @@
 #ifdef PLATFORM_WASM
 #include "telnet_wasm.h"
 #else
-#include "telnet_ws.h"
+// #include "telnet_ws.h"
 #include "module_fs.h"
 #endif
 #include "telnet_serial.h"
@@ -50,7 +50,7 @@ void telnet_output(uint8_t cmd, int pkgid, const char * data, size_t datalen) {
 	
 	// for serial(usb) or stdio(simulators)
 #ifdef PLATFORM_LINUX
-    telnet_ws_output(cmd, pkgid, data, datalen) ;
+    // telnet_ws_output(cmd, pkgid, data, datalen) ;
 
 	printf(data) ;
 	printf("\n") ;
@@ -183,7 +183,7 @@ void be_telnet_require(JSContext *ctx) {
 	JS_FreeValue(ctx, global);
 	
 #ifndef PLATFORM_WASM
-	be_telnet_ws_require(ctx, telnet) ;
+	// be_telnet_ws_require(ctx, telnet) ;
 #endif
 
 

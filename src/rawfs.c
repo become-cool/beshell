@@ -373,6 +373,9 @@ void be_rawfs_mount(const char * mntPoint) {
 
     fs_root->root = parse_tree(romdata, NULL, &fs_root->raw_data, NULL) ;
 
+    dp(fs_root->raw)
+    dp(fs_root->raw_data)
+
 #else
 	const esp_partition_t * part = esp_partition_find_first(0x01, 0x81, "fsroot");
     if(!part) {
