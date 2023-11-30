@@ -182,7 +182,7 @@ namespace beshell {
             static const JSMallocFunctions def_malloc_funcs = {
                 js_def_malloc,
                 js_def_free,
-                js_def_realloc,
+            js_def_realloc,
                 malloc_usable_size,
             };
             rt = JS_NewRuntime2(&def_malloc_funcs, NULL);

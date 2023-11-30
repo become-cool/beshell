@@ -5,6 +5,7 @@
 #include "esp_vfs_dev.h"
 #include "esp_vfs.h"
 #include "debug.h"
+#include "utils.h"
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/types.h>
@@ -22,6 +23,8 @@ namespace beshell {
     void TelnetSerial::task(void * argv) {
         
         Parser parser([argv](Package * pkg){
+            xQueueSend(((TelnetSerial*)argv)->pkg_queue, pkg, 0) ;
+            pkg->body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
         }) ;
 
         uart_event_t event;
@@ -109,11 +112,18 @@ namespace beshell {
         //Reset the pattern queue length to record at most 20 pattern positions.
         uart_pattern_queue_reset(UART_NUM, 20);
 
-        xQueue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
+        pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
     }
 
     void TelnetSerial::loop () {
+        Package pkg ;
+        if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
+            // @todo
+            // ds(pkg.body)
 
+            delete pkg.body ;
+            pkg.body = nullptr ;
+        }
     }
 }

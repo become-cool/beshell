@@ -36,7 +36,7 @@ namespace beshell {
 	public:
 		uint8_t pkgid = 0;
 		uint8_t cmd = 0;
-		uint8_t body = 0;
+		uint8_t * body = nullptr;
 		size_t body_len = 0;
 		uint8_t verifysum ;
 		
@@ -113,12 +113,12 @@ namespace beshell {
 	} ;
 
 	// 上下文类
-	typedef std::function<void(Package & pkg)> PackageProcFunc;
-	void defaultPkgProcFunc(Package & pkg) ;
+	typedef std::function<void(Package * pkg)> PackageProcFunc;
+	void defaultPkgProcFunc(Package * pkg) ;
 
     class Parser {
 		private:
-			Package pkg ;
+			Package * pkg = nullptr ;
 			State * current = nullptr ;
 
 			StateLine * stateLine ;
@@ -128,7 +128,7 @@ namespace beshell {
 
 			PackageProcFunc handler ;
 
-			// Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
+			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 			void commitPackage() ;
 
 			void changeState(State * state, uint8_t * bytes, size_t * len) ;
