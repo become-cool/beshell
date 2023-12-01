@@ -5,6 +5,10 @@
 
 #define PATH_PREFIX "/fs"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef PLATFORM_ESP32
 #include "esp_vfs.h"
 bool be_module_fs_init() ;
@@ -49,3 +53,7 @@ int mkdir_p(char* file_path, mode_t mode) ;
 
 void be_module_fs_require(JSContext *ctx) ;
 
+
+#ifdef __cplusplus
+}
+#endif

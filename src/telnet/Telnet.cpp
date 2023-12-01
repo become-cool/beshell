@@ -6,21 +6,18 @@
 namespace beshell {
     Telnet::Telnet(BeShell * _beshell)
         : beshell(_beshell)
-        , onPackage([this](Package * pkg){
-            
-            switch (pkg->cmd)
+        , onPackage([this](Package & pkg){
+            switch (pkg.head.fields.cmd)
             {
             case LINE:
             case RUN:
             case CALL:
                 // beshell->eval((const char *)pkg->body) ;
-
                 // JSValue ret = JS_Eval(beshell->ctx, (const char *)pkg->body, pkg->body_len-1, "repl", JS_EVAL_TYPE_GLOBAL) ;
                 // if(JS_IsException(ret)) {
                 //     echo_error(beshell->ctx) ;
                 // }
                 // JS_FreeValue(beshell->ctx, ret) ;
-
                 break;
             }
         })
@@ -36,9 +33,7 @@ namespace beshell {
 
     void Telnet::output(int pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
         Package pkg(pkgid,cmd,data,datalen) ;
-        pkg.encodeBodyLength() ;
-        pkg.verifysum = pkg.calculateVerifysum() ;
-
+        pkg.pack() ;
         channelSeiral.send(pkg) ;
     }
     

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <functional>
 
+#define PKG_LINE_BUFFSIZE 256
+
 namespace beshell {
 
 	enum PkgDef {
@@ -34,27 +36,49 @@ namespace beshell {
 
 	class Package {
 	public:
-		uint8_t pkgid = 0;
-		uint8_t cmd = 0;
+
+		union {
+			uint8_t raw[8] ;
+			struct {
+				uint8_t h1;
+				uint8_t h2;
+				uint8_t pkgid;
+				uint8_t cmd;
+				uint8_t len1;
+				uint8_t len2;
+				uint8_t len3;
+				uint8_t len4;
+			} fields ;
+		} head ;
+		uint8_t head_len ;
+
 		uint8_t * body = nullptr;
-		size_t body_len = 0;
+		size_t body_len ;
+
 		uint8_t verifysum ;
 		
-		uint8_t head[8] ;
-		uint8_t head_len ;
-		
-		Package(uint8_t _pkgid=0, uint8_t _cmd=0, uint8_t * _body=nullptr, size_t _body_len=0) ;
+		Package(uint8_t pkgid=0, uint8_t cmd=0, uint8_t * body=nullptr, size_t body_len=0, uint8_t h1=HEAD1, uint8_t h2=HEAD2) ;
 		~Package() ;
+		
+		size_t decodeBodyLength() ;
 		void encodeBodyLength() ;
+
 		uint8_t calculateVerifysum() ;
+		
 		size_t calculateSize() ;
 		void pack() ;
+		void reset(uint8_t pkgid=0, uint8_t cmd=0,size_t bodylen=0);
+		void mallocBody() ;
+		void freeBody() ;
 	} ;
 	
     class Parser ;
     class State {
 	protected:
 		Parser * parser ;
+
+		uint8_t received = 0 ;
+		bool receiveToBuff(uint8_t ** bytes, size_t * len, uint8_t * buff, size_t buffsize) ;
 	public:
 		uint8_t label ;
 		State(Parser * parser);
@@ -65,9 +89,8 @@ namespace beshell {
     
     class StateLine: public State {
 	private:
-		uint8_t buff[256] ;
-		uint8_t received = 0 ;
-		void saveToBuff(uint8_t * data, size_t len) ;
+		uint8_t buff[PKG_LINE_BUFFSIZE] ;
+		// void saveToBuff(uint8_t * data, size_t len) ;
 	public:
 		using State::State ;
 		void parse(uint8_t * bytes, size_t * len) ;
@@ -76,8 +99,7 @@ namespace beshell {
 	// 包头:固定长度区(4字节)
     class StatePkgHeadFixed: public State {
 	private:
-		uint8_t buff[2] ;
-		uint8_t received= 0 ;
+		// uint8_t received= 0 ;
 
 		bool receivePkgLen(uint8_t ** bytes, size_t * len) ;
 	public:
@@ -89,8 +111,8 @@ namespace beshell {
 	// 包头:包长部分(1-4字节)
     class StatePkgHeadLength: public State {
 	private:
-		uint8_t buff[4] ;
-		uint8_t received = 0 ;
+		// uint8_t buff[4] ;
+		// uint8_t received = 0 ;
 	public:
 		using State::State ;
 		void parse(uint8_t * bytes, size_t * len) ;
@@ -100,7 +122,7 @@ namespace beshell {
 	// 包身
     class StatePkgBody: public State {
 	private:
-		size_t received = 0 ;
+		// size_t received = 0 ;
 		// bool verifysum_received = false ;
 	public:
 		using State::State ;
@@ -110,12 +132,12 @@ namespace beshell {
 	} ;
 
 	// 上下文类
-	typedef std::function<void(Package * pkg)> PackageProcFunc;
-	void defaultPkgProcFunc(Package * pkg) ;
+	typedef std::function<void(Package & pkg)> PackageProcFunc;
+	void defaultPkgProcFunc(Package & pkg) ;
 
     class Parser {
 		private:
-			Package * pkg = nullptr ;
+			Package pkg ;
 			State * current = nullptr ;
 
 			StateLine * stateLine ;

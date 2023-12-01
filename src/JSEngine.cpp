@@ -137,7 +137,7 @@ namespace beshell {
     }
 
     JSValue JSEngine::evalSync(const char * code, const char * filename, int flags) {
-        
+        return JS_UNDEFINED ;
     }
 
 }

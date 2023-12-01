@@ -102,7 +102,6 @@ JSValue js_get_glob_prop(JSContext *ctx, int depth, ...) {
 	return JS_GetPropertyStr(ctx,obj,name) ;
 }
 
-void echo_error(JSContext * ctx) ;
 void eval_code_len(JSContext *ctx,const char * str,size_t len,const char * filename, bool es6Module) {
 	
     JSValue ret = JS_Eval(ctx, str, len, filename, es6Module? JS_EVAL_TYPE_MODULE: JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP

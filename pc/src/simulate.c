@@ -3,8 +3,8 @@
 #include "module_telnet.h"
 
 
-unsigned char ___src_beapi_simulate_js[] ;
-unsigned int ___src_beapi_simulate_js_len ;
+extern unsigned char ___src_beapi_simulate_js[] ;
+extern unsigned int ___src_beapi_simulate_js_len ;
 
 
 void be_simulate_require(JSContext *ctx) {

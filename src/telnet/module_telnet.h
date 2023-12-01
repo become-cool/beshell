@@ -30,7 +30,6 @@ void telnet_output(uint8_t cmd, int pkgid, const char * data, size_t datalen) ;
 			free(str) ;													\
 		}																\
 	}
-void echo_error(JSContext * ctx) ;
 
 
 #endif

@@ -21,9 +21,10 @@ namespace beshell {
 
     void TelnetSerial::task(void * argv) {
         
-        Parser parser([argv](Package * pkg){
-            xQueueSend(((TelnetSerial*)argv)->pkg_queue, pkg, 0) ;
-            pkg->body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
+        Parser parser([argv](Package & pkg){
+            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &pkg, 0) ;
+            pkg.body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
+            pkg.body_len = 0 ;
         }) ;
 
         uart_event_t event;
@@ -120,7 +121,7 @@ namespace beshell {
         if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
 
             if(packageHandler){
-                packageHandler(&pkg) ;
+                packageHandler(pkg) ;
             }
 
             // @todo
@@ -132,7 +133,7 @@ namespace beshell {
     }
 
     void TelnetSerial::send (Package & pkg) {
-        uart_write_bytes(UART_NUM, pkg.head, pkg.head_len);
+        uart_write_bytes(UART_NUM, pkg.head.raw, pkg.head_len);
         uart_write_bytes(UART_NUM, pkg.body, pkg.body_len);
     }
 
