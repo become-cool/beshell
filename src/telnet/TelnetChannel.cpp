@@ -3,7 +3,7 @@
 
 
 namespace beshell {
-    TelnetChannel::TelnetChannel() {
-
-    }
+    TelnetChannel::TelnetChannel(PackageProcFunc _packageHandler)
+        : packageHandler(_packageHandler)
+    {}
 }

@@ -42,17 +42,14 @@ namespace beshell {
 		
 		uint8_t head[8] ;
 		uint8_t head_len ;
-
 		
-		
-		Package(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
+		Package(uint8_t _pkgid=0, uint8_t _cmd=0, uint8_t * _body=nullptr, size_t _body_len=0) ;
 		~Package() ;
-
+		void encodeBodyLength() ;
+		uint8_t calculateVerifysum() ;
 		size_t calculateSize() ;
-		void pack(uint8_t * buff) ;
+		void pack() ;
 	} ;
-
-	uint8_t verifysum(uint8_t * data, size_t len, uint8_t base=0) ;
 	
     class Parser ;
     class State {
@@ -126,7 +123,7 @@ namespace beshell {
 			StatePkgHeadLength * statePkgHeadLength ;
 			StatePkgBody * statePkgBody ;
 
-			PackageProcFunc handler ;
+			PackageProcFunc handler = nullptr ;
 
 			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 			void commitPackage() ;

@@ -8,14 +8,18 @@
 namespace beshell {
     class TelnetSerial: public TelnetChannel {
     private:
+        
+
         TaskHandle_t taskHandle = nullptr ;
         QueueHandle_t uart_queue;
         QueueHandle_t pkg_queue;
 
         static void task(void * argv) ;
+
     public:
-        TelnetSerial() ;
+        using TelnetChannel::TelnetChannel ;
         void setup() ;
         void loop () ;
+        void send (Package & pkg) ;
     } ;
 }

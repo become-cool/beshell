@@ -18,7 +18,6 @@
 #define PKG_QUEUE_LEN 5
 
 namespace beshell {
-    TelnetSerial::TelnetSerial() {}
 
     void TelnetSerial::task(void * argv) {
         
@@ -119,6 +118,11 @@ namespace beshell {
     void TelnetSerial::loop () {
         Package pkg ;
         if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
+
+            if(packageHandler){
+                packageHandler(&pkg) ;
+            }
+
             // @todo
             // ds(pkg.body)
 
@@ -126,4 +130,10 @@ namespace beshell {
             pkg.body = nullptr ;
         }
     }
+
+    void TelnetSerial::send (Package & pkg) {
+        uart_write_bytes(UART_NUM, pkg.head, pkg.head_len);
+        uart_write_bytes(UART_NUM, pkg.body, pkg.body_len);
+    }
+
 }

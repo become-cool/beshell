@@ -27,11 +27,18 @@
 
 namespace beshell {
     
-    Package::Package(uint8_t _cmd, uint8_t _pkgid, size_t _data_len)
+    static uint8_t _verifysum(uint8_t base, uint8_t * data, size_t len) {
+        for(uint16_t i=0; i<len; i++) {
+            base^= data[i] ;
+        }
+        return base ;
+    }
+    
+    Package::Package(uint8_t _pkgid, uint8_t _cmd, uint8_t * _body, size_t _body_len)
         : pkgid(_pkgid)
         , cmd(_cmd)
-        , body(nullptr)
-        , body_len(_data_len)
+        , body(_body)
+        , body_len(_body_len)
         , verifysum(0)
     {}
 
@@ -41,10 +48,49 @@ namespace beshell {
             body = nullptr ;
         }
     }
+    
+    void Package::encodeBodyLength() {
+        if(body_len<=0xFF) {
+            head[4] = 0xFF & body_len ;
+            head_len = 5 ;
+        }
+        else {
+            // *(len_bytes+0) = (len>>(7*0)) & 0x7F ;
+            // *(len_bytes+1) = (len>>(7*1)) & 0x7F ;
+            // *(len_bytes+2) = (len>>(7*2)) & 0x7F ;
+            // *(len_bytes+3) = (len>>(7*3)) & 0xFF ;  // 最高位字节可以用满8位
+
+            // if( *(len_bytes+3)>0 ) {
+            //     *(len_bytes+0) |= 0x80 ;
+            //     *(len_bytes+1) |= 0x80 ;
+            //     *(len_bytes+2) |= 0x80 ;
+            //     return 4 ;
+            // }
+            // else if( *(len_bytes+2)>0 ) {
+            //     *(len_bytes+0) |= 0x80 ;
+            //     *(len_bytes+1) |= 0x80 ;
+            //     return 3 ;
+            // }
+            // else if( *(len_bytes+1)>0 ) {
+            //     *(len_bytes+0) |= 0x80 ;
+            //     return 2 ;
+            // }
+            // return 1 ;
+        }
+    }
+
+    uint8_t Package::calculateVerifysum() {
+        uint8_t sum = _verifysum(0,head,head_len) ;
+        if(body) {
+            sum = _verifysum(sum,body,body_len) ;
+        }
+        return sum ;
+    }
+        
     size_t Package::calculateSize() {
         return 0 ;
     }
-    void Package::pack(uint8_t * buff) {
+    void Package::pack() {
     }
 
     State::State(Parser * parser): parser(parser) {}
@@ -56,13 +102,11 @@ namespace beshell {
         for(int i=0;i<(*len);i++) {
             // 到达行尾
             if( bytes[i] == '\n' ) {
-                Package * pkg = parser->newPackage(LINE,0,received+i+2) ;
+                Package * pkg = parser->newPackage(0,LINE,received+i+2) ;
 
                 memcpy(pkg->body, buff, received) ;
                 memcpy(pkg->body+received, bytes, i+1) ;
                 pkg->body[pkg->body_len-1] = 0 ;
-
-                printf((char *)pkg->body) ;
 
                 bytes+= i+1 ;
                 (*len)-= i+1 ;
@@ -237,17 +281,7 @@ namespace beshell {
         if(!parser->pkg) {
             return false ;
         }
-        if(!parser->pkg->body) {
-            return true ;
-        }
-        uint8_t sum = 0 ;
-        for(int i=0; i<parser->pkg->head_len; i++) {
-            sum^= parser->pkg->head[i] ;
-        }
-        for(int i=0; i<parser->pkg->body_len; i++) {
-            sum^= parser->pkg->body[i] ;
-        }
-        return sum == parser->pkg->verifysum ;
+        return parser->pkg->calculateVerifysum() == parser->pkg->verifysum ;
     }
 
     // 上下文类
@@ -292,12 +326,12 @@ namespace beshell {
         }
     }
 
-    Package * Parser::newPackage(uint8_t cmd, uint8_t pkgid, size_t data_len) {
+    Package * Parser::newPackage(uint8_t pkgid, uint8_t cmd, size_t data_len) {
         if(pkg) {
             delete pkg ;
             pkg = nullptr ;
         }
-        pkg = new Package(cmd,pkgid,data_len) ;
+        pkg = new Package(cmd,pkgid,nullptr,data_len) ;
         pkg->head[0] = H1 ;
         pkg->head[1] = H2 ;
         pkg->head[2] = pkgid ;
