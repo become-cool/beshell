@@ -30,10 +30,11 @@ namespace beshell {
         static void main(void * argv) ;
     public:
 
-        JSEngine engine ;
         NVS nvs ;
         FS fs ;
         Telnet telnet ;
+
+        JSEngine engine ;
 
         BeShell() ;
         void begin(int coreId=-1);

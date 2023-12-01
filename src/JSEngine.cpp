@@ -1,7 +1,9 @@
 #include "JSEngine.hpp"
 #include "utils.h"
 #include <sys/stat.h>
+#include <string.h>
 #include "runtime.h"
+#include "debug.h"
 
 #ifdef PLATFORM_ESP32
 #include "malloc_funcs.h"
@@ -105,9 +107,10 @@ namespace beshell {
     }
 
 
-    JSEngine::JSEngine() {
+    JSEngine::JSEngine(Telnet * _telnet)
+        : telnet(_telnet)
+    {}
 
-    }
     void JSEngine::initRuntime() {
         if(rt!=NULL) {
             return ;
@@ -136,8 +139,78 @@ namespace beshell {
         ctx = init_custom_context(rt);
     }
 
-    JSValue JSEngine::evalSync(const char * code, const char * filename, int flags) {
-        return JS_UNDEFINED ;
+
+    
+    // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
+    //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
+    //         JSValueConst * argv = malloc(sizeof(JSValue)*4) ;
+    //         argv[0] = JS_NewInt32(ctx, pkgid) ;
+    //         argv[1] = JS_NewInt32(ctx, 0) ;
+    //         argv[2] = JS_NewInt32(ctx, cmd) ;
+    //         argv[3] = JS_NewStringLen(ctx, (char *)data, datalen) ;
+
+    //         // printf(">>> %.*s\n", datalen, data) ;
+
+    //         JSValue ret = JS_Call(ctx, _func_repl_input, JS_NULL, 4, argv) ;
+    //         if( JS_IsException(ret) ) {
+    //             echo_error(ctx) ;
+    //         }
+
+    //         JS_FreeValue(ctx, ret) ;
+    //         JS_FreeValue(ctx, argv[3]) ;
+    //         free(argv) ;
+    //     }
+    //     else {
+    //         printf("_func_repl_input is NULL or not Function\n") ;
+    //     }
+    // }
+
+
+
+    void JSEngine::print(const char * content) {
+        assert(telnet) ;
+        telnet->output(CMD_OUTPUT,(uint8_t*)content,strlen(content)) ;
     }
+    void JSEngine::print(JSValue content) {
+        assert(telnet) ;
+        size_t len ;
+        const char * str = JS_ToCStringLen(ctx, &len, content);
+        ds(str)
+        if (len) {
+            telnet->output(CMD_OUTPUT,(uint8_t*)str, len) ;
+        }
+        JS_FreeCString(ctx, str) ;
+    }
+
+    void JSEngine::dumpError() {
+        JSValue exception_val = JS_GetException(ctx);
+        bool is_error = JS_IsError(ctx, exception_val);
+        print(exception_val);
+        if (is_error) {
+            JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack");
+            if (!JS_IsUndefined(val)) {
+                print(val);
+            }
+            JS_FreeValue(ctx, val);
+        }
+        JS_FreeValue(ctx, exception_val);
+    }
+
+    void JSEngine::evalSync(const char * code, size_t code_len,const char * filename, int flags) {
+        JSValue ret = JS_Eval(ctx, code, code_len, filename, flags) ;   // JS_EVAL_FLAG_STRIP
+        dd
+        if(JS_IsException(ret)) {
+            dumpError() ;
+        }
+        dd
+        print(ret) ;
+        JS_FreeValue(ctx, ret) ;
+    }
+    
+    // void JSEngine::evalAsFileSync(const char * code, size_t code_len, char * filename, int flags) {
+    // }
+    
+    // void JSEngine::evalFileSync(const char * code, size_t code_len, char * filename, int flags) {
+    // }
 
 }

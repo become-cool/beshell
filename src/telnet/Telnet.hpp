@@ -10,8 +10,10 @@ namespace beshell {
 
         BeShell * beshell ;
 
-        PackageProcFunc onPackage ;
+        PackageProcFunc onReceived ;
         TelnetSerial channelSeiral ;
+
+        uint8_t autoIncreasePkgId = 0 ;
 
     public:
         Telnet(BeShell * beshell) ;
@@ -19,6 +21,6 @@ namespace beshell {
         void setup() ;
         void loop() ;
 
-        void output(int pkgid, uint8_t cmd, uint8_t * data, size_t datalen) ;
+        void output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid=-1) ;
     } ;
 }

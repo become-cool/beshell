@@ -36,6 +36,7 @@ namespace beshell {
     BeShell::BeShell()
         : boot_level(5)
         , telnet(this)
+        , engine(&telnet)
     {}
 
     

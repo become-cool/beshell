@@ -124,9 +124,6 @@ namespace beshell {
                 packageHandler(pkg) ;
             }
 
-            // @todo
-            // ds(pkg.body)
-
             delete pkg.body ;
             pkg.body = nullptr ;
         }
@@ -135,6 +132,7 @@ namespace beshell {
     void TelnetSerial::send (Package & pkg) {
         uart_write_bytes(UART_NUM, pkg.head.raw, pkg.head_len);
         uart_write_bytes(UART_NUM, pkg.body, pkg.body_len);
+        uart_write_bytes(UART_NUM, &pkg.verifysum, 1);
     }
 
 }
