@@ -21,5 +21,6 @@ namespace beshell {
         void setup() ;
         void loop () ;
         void send (Package & pkg) ;
+        void send (const char * data, size_t datalen) ;
     } ;
 }

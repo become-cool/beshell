@@ -6,10 +6,10 @@
 #include "module_telnet.h"
 
 #define pf(...) printf(__VA_ARGS__) ;printf("\n") ;
-#define dd printf("@%d\n", __LINE__) ;
+#define dd printf("%d@%s()\n", __LINE__, __FUNCTION__) ;
 #define df(msg) printf("@%d %s\n", __LINE__, msg) ;
 #define dm(msg) printf("%s: %dKB\n", msg, esp_get_free_heap_size()/1024);
-#define dp(p)   printf(#p"@%p\n", p) ;
+#define dp(p)   printf(#p"@%p (%d)\n", p, __LINE__) ;
 #define ds(s)   printf(#s"=%s @%d\n", s, __LINE__) ;
 #define dn(v)   printf(#v"=%d @%d\n", (int)v, __LINE__) ;
 #define dn64(v)   printf(#v"=%lld\n", v) ;
@@ -61,7 +61,7 @@
 extern "C" {
 #endif
 
-void print_block(uint8_t * block, int columns, int rows) ;
+void print_block(uint8_t * data, int length, int columns) ;
 
 #ifdef __cplusplus
 }

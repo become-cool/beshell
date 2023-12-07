@@ -102,6 +102,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
 # for c++
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-permissive")
 
 # both c and c++
@@ -117,4 +118,5 @@ component_compile_options(-Wno-type-limits)
 component_compile_options(-Wno-int-to-pointer-cast)
 component_compile_options(-Wno-error=switch)
 component_compile_options(-Wno-switch)
+component_compile_options(-Wno-missing-field-initializers)
 

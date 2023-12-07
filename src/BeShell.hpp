@@ -1,14 +1,16 @@
 #pragma once
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include <queue>
 
 #include "FS.hpp"
 #include "NVS.hpp"
 #include "debug.h"
 #include "Telnet.hpp"
 #include "JSEngine.hpp"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#include<queue>
+#include "REPL.hpp"
+
 
 namespace beshell {
 
@@ -20,26 +22,27 @@ namespace beshell {
         bool requst_reset = false ;
         bool nowifi = false ;
 
-
         TaskHandle_t handleLoop = nullptr ;
-
 
         SemaphoreHandle_t mutex_code;
 
-
-        static void main(void * argv) ;
     public:
 
         NVS nvs ;
         FS fs ;
         Telnet telnet ;
+        REPL repl ;
 
         JSEngine engine ;
 
         BeShell() ;
-        void begin(int coreId=-1);
+        void setup();
+        inline void loop() ;
+        void main() ;
 
-        void eval(const char * code, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
+        static BeShell * fromJSContext(JSContext *) ;
+        static BeShell * fromJSRuntime(JSRuntime *) ;
+
     } ;
 
 }

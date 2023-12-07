@@ -124,7 +124,7 @@ void echo_error(JSContext *) ;
 
 
 #define ARGV_TO_STRING(i, var)                              \
-    char * var = JS_ToCString(ctx, argv[i]) ;
+    const char * var = JS_ToCString(ctx, argv[i]) ;
 
 #define ARGV_AS_STRING_E(i, var, msg)                       \
     var = NULL ;                                            \

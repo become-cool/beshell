@@ -315,6 +315,7 @@ struct JSRuntime {
     uint32_t operator_count;
 #endif
     void *user_opaque;
+    void *user_opaque2;
 };
 
 struct JSClass {
@@ -27552,8 +27553,6 @@ static int exported_names_cmp(const void *p1, const void *p2, void *opaque)
     return ret;
 }
 
-static JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m);
-
 static int js_module_ns_autoinit(JSContext *ctx, JSObject *p, JSAtom atom,
                                  void *opaque)
 {
@@ -27672,7 +27671,7 @@ static JSValue js_build_module_ns(JSContext *ctx, JSModuleDef *m)
     return JS_EXCEPTION;
 }
 
-static JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m)
+JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m)
 {
     if (JS_IsUndefined(m->module_ns)) {
         JSValue val;
@@ -53639,4 +53638,14 @@ int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) {
 
 void setTimezoneOffset(int minute) {
     timezone_offset = minute ; 
+}
+
+void *JS_GetRuntimeOpaque2(JSRuntime *rt)
+{
+    return rt->user_opaque2;
+}
+
+void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque)
+{
+    rt->user_opaque2 = opaque;
 }

@@ -6,15 +6,14 @@
 namespace beshell {
     Telnet::Telnet(BeShell * _beshell)
         : beshell(_beshell)
-        , onReceived([this](Package & pkg){
+        , onReceived([this](TelnetChannel * ch, Package & pkg){
             switch (pkg.head.fields.cmd)
             {
             case LINE:
             case RUN:
             case CALL:
                 assert(beshell) ;
-                ds(pkg.body)
-                beshell->engine.evalSync((char *)pkg.body, pkg.body_len,"eval") ;
+                beshell->repl.input(pkg) ;
                 break;
             }
         })
@@ -28,7 +27,6 @@ namespace beshell {
         channelSeiral.loop() ;
     }
 
-
     void Telnet::output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid) {
         if(pkgid<0) {
             pkgid = autoIncreasePkgId ++ ;
@@ -38,7 +36,12 @@ namespace beshell {
         }
         Package pkg(pkgid,cmd,data,datalen) ;
         pkg.pack() ;
+
         channelSeiral.send(pkg) ;
+    }
+
+    void Telnet::output(const char * data, size_t datalen) {
+        channelSeiral.send(data,datalen) ;
     }
 
 }

@@ -178,6 +178,15 @@ namespace beshell {
 
     // 行数据
     void StateLine::parse(uint8_t * bytes, size_t * len) {
+        
+        // 遇到断开的包头(H1前一次到达)
+        if( bytes[0]==parser->H2 && received>0 && buff[received-1]==parser->H1 ){
+            (*len)-=1 ;
+            received-=1 ;
+            parser->changeState(STATE_HEAD_FIXED, bytes+1, len) ;
+            return ;
+        }
+
         for(int i=0;i<(*len);i++) {
             // 到达行尾
             if( bytes[i] == '\n' ) {
@@ -201,15 +210,9 @@ namespace beshell {
             }
             // 遇到包头
             else if( i<(*len)-1 && bytes[i]==parser->H1 && bytes[i+1]==parser->H2 ) {
-                (*len)-=2 ;
-                parser->changeState(STATE_HEAD_FIXED, bytes+i+2, len) ;
-                return ;
-            }
-            // 遇到断开的包头(H1前一次到达)
-            else if( bytes[i]==parser->H2 && received>0 && buff[received-1]==parser->H1 ){
-                (*len)-=1 ;
-                received-=1 ;
-                parser->changeState(STATE_HEAD_FIXED, bytes+1, len) ;
+                (*len)-=i+2 ;
+                bytes+=i+2 ;
+                parser->changeState(STATE_HEAD_FIXED, bytes, len) ;
                 return ;
             }
         }
@@ -243,7 +246,7 @@ namespace beshell {
         if(parser->pkg.head.fields.h2==parser->H2) {
             parser->pkg.head_len = 5 ;
             parser->pkg.head.fields.len1 = (*bytes) ;
-            parser->pkg.body_len = parser->pkg.head.fields.len2 ;
+            parser->pkg.body_len = parser->pkg.head.fields.len1 ;
             (*len)-= 1 ;
             parser->changeState(STATE_BODY, bytes+1, len) ;
             return ;

@@ -1,9 +1,11 @@
 #include "JSEngine.hpp"
+#include "BeShell.hpp"
 #include "utils.h"
 #include <sys/stat.h>
 #include <string.h>
 #include "runtime.h"
 #include "debug.h"
+#include "modules/ModuleLoader.hpp"
 
 #ifdef PLATFORM_ESP32
 #include "malloc_funcs.h"
@@ -39,12 +41,52 @@ namespace beshell {
         return NULL ;
     }
 
-    static JSContext * init_custom_context(JSRuntime *rt) {
+
+
+    JSEngine::JSEngine(Telnet * _telnet)
+        : telnet(_telnet)
+    {
+    }
+
+    void JSEngine::setup(BeShell * beshell) {
+        if(rt!=NULL) {
+            return ;
+        }
+        
+#ifdef PLATFORM_ESP32
+        // esp32 平台优先使用 PSRAM内存
+        if( getPsramTotal()>1024 ) {
+            static const JSMallocFunctions def_malloc_funcs = {
+                js_def_malloc,
+                js_def_free,
+            js_def_realloc,
+                malloc_usable_size,
+            };
+            rt = JS_NewRuntime2(&def_malloc_funcs, NULL);
+        }
+        else {
+            rt = JS_NewRuntime();
+        }
+#else
+        rt = JS_NewRuntime();
+#endif
+
+        js_std_set_worker_new_context_func(InitContext);
+        js_std_init_handlers(rt);
+        
+        JS_SetRuntimeOpaque2(rt, beshell) ;
+        ctx = InitContext(rt);
+    }
+
+
+    JSContext * JSEngine::InitContext(JSRuntime *rt) {
+
         JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
         JSContext *ctx;
         ctx = JS_NewContextRaw(rt);
-        if (!ctx)
+        if (!ctx) {
             return NULL;
+        }
 
         JS_AddIntrinsicBaseObjects(ctx);
         JS_AddIntrinsicDate(ctx);
@@ -103,43 +145,12 @@ namespace beshell {
     //     be_simulate_require(ctx) ;
     // #endif
 
+        BeShell * beshell = BeShell::fromJSRuntime(rt) ;
+        assert(beshell) ;
+        beshell->engine.mloader.setup(ctx) ;
+
         return ctx;
     }
-
-
-    JSEngine::JSEngine(Telnet * _telnet)
-        : telnet(_telnet)
-    {}
-
-    void JSEngine::initRuntime() {
-        if(rt!=NULL) {
-            return ;
-        }
-        
-    #ifdef PLATFORM_ESP32
-        // esp32 平台优先使用 PSRAM内存
-        if( getPsramTotal()>1024 ) {
-            static const JSMallocFunctions def_malloc_funcs = {
-                js_def_malloc,
-                js_def_free,
-            js_def_realloc,
-                malloc_usable_size,
-            };
-            rt = JS_NewRuntime2(&def_malloc_funcs, NULL);
-        }
-        else {
-            rt = JS_NewRuntime();
-        }
-    #else
-        rt = JS_NewRuntime();
-    #endif
-
-        js_std_set_worker_new_context_func(init_custom_context);
-        js_std_init_handlers(rt);
-        ctx = init_custom_context(rt);
-    }
-
-
     
     // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
     //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
@@ -165,25 +176,27 @@ namespace beshell {
     //     }
     // }
 
-
-
-    void JSEngine::print(const char * content) {
-        assert(telnet) ;
-        telnet->output(CMD_OUTPUT,(uint8_t*)content,strlen(content)) ;
-    }
-    void JSEngine::print(JSValue content) {
+    void JSEngine::print(JSValue content, bool pack, int pkgId) {
         assert(telnet) ;
         size_t len ;
         const char * str = JS_ToCStringLen(ctx, &len, content);
-        ds(str)
         if (len) {
-            telnet->output(CMD_OUTPUT,(uint8_t*)str, len) ;
+            if(pack) {
+                telnet->output(CMD_OUTPUT,(uint8_t*)str, len, pkgId) ;
+            } else {
+                telnet->output(str, len) ;
+            }
         }
-        JS_FreeCString(ctx, str) ;
+        if(str) {
+            JS_FreeCString(ctx, str) ;
+        }
     }
 
-    void JSEngine::dumpError() {
+    void JSEngine::dumpError(bool pack) {
         JSValue exception_val = JS_GetException(ctx);
+        if(exception_val==JS_NULL) {
+            return ;
+        }
         bool is_error = JS_IsError(ctx, exception_val);
         print(exception_val);
         if (is_error) {
@@ -196,21 +209,11 @@ namespace beshell {
         JS_FreeValue(ctx, exception_val);
     }
 
-    void JSEngine::evalSync(const char * code, size_t code_len,const char * filename, int flags) {
-        JSValue ret = JS_Eval(ctx, code, code_len, filename, flags) ;   // JS_EVAL_FLAG_STRIP
-        dd
-        if(JS_IsException(ret)) {
-            dumpError() ;
+    JSValue JSEngine::eval(const char * code, int code_len,const char * filename, int flags) {
+        if(code_len<0) {
+            code_len = strlen(code) ;
         }
-        dd
-        print(ret) ;
-        JS_FreeValue(ctx, ret) ;
+        return JS_Eval(ctx, code, code_len-1, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
-    
-    // void JSEngine::evalAsFileSync(const char * code, size_t code_len, char * filename, int flags) {
-    // }
-    
-    // void JSEngine::evalFileSync(const char * code, size_t code_len, char * filename, int flags) {
-    // }
 
 }

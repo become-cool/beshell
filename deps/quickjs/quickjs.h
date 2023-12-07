@@ -1042,11 +1042,16 @@ int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
 #undef js_force_inline
 
 
+
+JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m) ;
+
 int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) ;
 
 void JS_FreeLeaks(JSRuntime *rt,JSContext * ctx) ;
 
 void setTimezoneOffset(int hour) ;
+void *JS_GetRuntimeOpaque2(JSRuntime *rt) ;
+void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque) ;
 
 #ifdef __cplusplus
 } /* extern "C" { */

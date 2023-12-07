@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <iostream>
+#include <string>
 #include <memory>
 #include <map>
 #include "FSPartitionRaw.hpp"
@@ -17,6 +18,7 @@ namespace beshell {
     private:
 
         map<const char *, std::unique_ptr<FSPartition>> partitions;
+        string prefix ;
 
     public:
         FS() ;
@@ -24,6 +26,10 @@ namespace beshell {
 #ifdef PLATFORM_ESP32
         void mountRootTar() ;        
 #endif
+        
+        void setPrefix(const char * path) ;
+        std::string toVFSPath(const char * path) ;
+
         void mountRaw(const char * path, void * ptr, size_t size) ;
         void mountPartition(const char * path, uint8_t partion_type, uint8_t partion_id) ;
     } ;

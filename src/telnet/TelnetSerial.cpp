@@ -39,7 +39,7 @@ namespace beshell {
                 switch(event.type) {
                     case UART_DATA:
                         chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 1/portTICK_PERIOD_MS);
-				        parser.parse(dtmp, chunklen) ;
+                        parser.parse(dtmp, chunklen) ;
 
                         break;
                     //Event of HW FIFO overflow detected
@@ -87,6 +87,11 @@ namespace beshell {
     }
 
     void TelnetSerial::setup () {
+
+        fflush(stdout) ;
+        vTaskDelay(10/portTICK_PERIOD_MS) ;
+        uart_flush(UART_NUM) ;
+        vTaskDelay(10/portTICK_PERIOD_MS) ;
         
         /* Configure parameters of an UART driver,
         * communication pins and install the driver */
@@ -112,8 +117,11 @@ namespace beshell {
         //Reset the pattern queue length to record at most 20 pattern positions.
         uart_pattern_queue_reset(UART_NUM, 20);
 
+        vTaskDelay(10/portTICK_PERIOD_MS) ;
+
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
+    
     }
 
     void TelnetSerial::loop () {
@@ -121,7 +129,7 @@ namespace beshell {
         if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
 
             if(packageHandler){
-                packageHandler(pkg) ;
+                packageHandler(this,pkg) ;
             }
 
             delete pkg.body ;
@@ -135,4 +143,7 @@ namespace beshell {
         uart_write_bytes(UART_NUM, &pkg.verifysum, 1);
     }
 
+    void TelnetSerial::send (const char * data, size_t datalen) {
+        uart_write_bytes(UART_NUM, data, datalen);
+    }
 }

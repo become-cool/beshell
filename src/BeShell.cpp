@@ -36,11 +36,14 @@ namespace beshell {
     BeShell::BeShell()
         : boot_level(5)
         , telnet(this)
+        , repl(this)
         , engine(&telnet)
     {}
 
     
-    void BeShell::begin(int coreId) {
+    void BeShell::setup() {
+
+        // ESP_ERROR_CHECK(esp_event_loop_create_default());
         
         nvs.readOneTime("rst-lv", &boot_level) ;
         nvs.readOneTime("rst-nowifi", (uint8_t *)&nowifi) ;
@@ -52,32 +55,43 @@ namespace beshell {
         } else {
             // be_module_wifi_init() ;
         }
-        fs.mountRootTar() ;
+        // fs.setPrefix("/fs") ;
+        // fs.mountRootTar() ;
 #else
 #endif
 
-        engine.initRuntime() ;
-
         telnet.setup() ;
-        
-        if(coreId<0) {
-            coreId = xPortGetCoreID() ;
-        }
-        xTaskCreatePinnedToCore(&BeShell::main, "be-main-loop", 20*1024, this, tskIDLE_PRIORITY, &handleLoop, coreId) ;
+
+        engine.setup(this) ;
     }
 
-    void BeShell::main(void * argv) {
+    void BeShell::loop() {
+
+        telnet.loop() ;
+
+        js_std_loop(engine.ctx) ;
+    }
+
+    void BeShell::main() {
+
+        setup() ;
+
+        engine.eval("require('loader')\n") ;
+
         while(1) {
+            loop() ;
 
-            ((BeShell*)argv)->telnet.loop() ;
-
-            // std::cout << "xxxx\n" ;
-
-            vTaskDelay(0) ;
+#ifdef PLATFORM_ESP32
+            vTaskDelay(1) ;
+#endif
         }
     }
 
-    void eval(const char * code, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) {
-
+    BeShell * BeShell::fromJSContext(JSContext * ctx) {
+        return (BeShell *)JS_GetRuntimeOpaque( JS_GetRuntime(ctx) ) ;
     }
+    BeShell * BeShell::fromJSRuntime(JSRuntime * rt) {
+        return (BeShell *)JS_GetRuntimeOpaque2(rt) ;
+    }
+
 }

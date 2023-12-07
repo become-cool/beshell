@@ -1,9 +1,11 @@
 #pragma once
 
 #include "quickjs-libc.h"
-#include "Telnet.hpp"
+#include "telnet/Telnet.hpp"
+#include "modules/ModuleLoader.hpp"
 
 namespace beshell {
+    class BeShell ;
     class JSEngine {
     private:
 
@@ -11,16 +13,20 @@ namespace beshell {
         JSRuntime *rt = nullptr;
         JSContext *ctx = nullptr;
         Telnet * telnet = nullptr ;
+
+        ModuleLoader mloader ;
         
         JSEngine(Telnet * telnet) ;
 
-        void initRuntime() ;
+        void setup(BeShell *) ;
+        void loop() ;
 
-        void print(const char * content) ;
-        void print(JSValue content) ;
-        void dumpError() ;
+        void print(JSValue content, bool pack=false, int pkgId=-1) ;
+        void dumpError(bool pack=false) ;
 
-        void evalSync(const char * code, size_t code_len, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
-    
+        JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
+        void evalScript(const char * filepath, int flags=JS_EVAL_TYPE_GLOBAL) ;
+
+        static JSContext * InitContext(JSRuntime *rt) ;
     } ;
 }
