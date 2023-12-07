@@ -76,8 +76,6 @@ namespace beshell {
 
         setup() ;
 
-        engine.eval("require('loader')\n") ;
-
         while(1) {
             loop() ;
 
