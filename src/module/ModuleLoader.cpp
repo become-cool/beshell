@@ -1,5 +1,5 @@
 #include "module/ModuleLoader.hpp"
-#include "module/ESModule.hpp"
+#include "module/NativeModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -10,9 +10,9 @@
 
 namespace beshell {
 
-    class JSLoader: public ESModule {
+    class JSLoader: public NativeModule {
     public:
-        JSLoader(): ESModule("loader") {
+        JSLoader(): NativeModule("loader") {
             exportFunction("require",js_require) ;
         };
 
@@ -54,7 +54,7 @@ dd
     ModuleLoader::~ModuleLoader() {
     }
 
-    void ModuleLoader::addModule(ESModule * module) {
+    void ModuleLoader::addModule(NativeModule * module) {
         modules[ module->name ] = module ;
     }
 

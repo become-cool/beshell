@@ -5,7 +5,7 @@
 #include <string>
 
 namespace beshell {
-    class ESModule {
+    class NativeModule {
     private:
         std::vector<JSCFunctionListEntry> funcs ;
 
@@ -13,7 +13,7 @@ namespace beshell {
         std::string name ;
         bool replGlobal = false ;
         
-        ESModule(const char * name) ;
+        NativeModule(const char * name) ;
 
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
         JSValue createGlobalObject(JSContext * ctx, const char * name) ;

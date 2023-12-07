@@ -1,8 +1,8 @@
 #pragma once
-#include "ESModule.hpp"
+#include "NativeModule.hpp"
 
 namespace beshell {
-    class Path: public ESModule {
+    class Path: public NativeModule {
     private:
     public:
         Path() ;

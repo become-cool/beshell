@@ -2,7 +2,7 @@
 
 #include <map>
 #include <string>
-#include "module/ESModule.hpp"
+#include "module/NativeModule.hpp"
 #include "module/Path.hpp"
 #include "module/FSModule.hpp"
 #include "fs/FS.hpp"
@@ -11,7 +11,7 @@ namespace beshell {
     class JSEngine ;
     class ModuleLoader {
     private:
-        std::map<std::string, ESModule *> modules;
+        std::map<std::string, NativeModule *> modules;
         
         JSModuleDef * createModuleDef(JSContext *) ;
         void importModule(JSContext *) ;
@@ -19,7 +19,7 @@ namespace beshell {
     public:
         ModuleLoader() ;
         ~ModuleLoader() ;
-        void addModule(ESModule * module) ;
+        void addModule(NativeModule * module) ;
         void setup(JSContext * ctx) ;
 
         static std::string resovleFS(FS & fs, const char * module_name, const char * base_dir) ;

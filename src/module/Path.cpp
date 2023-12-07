@@ -3,7 +3,7 @@
 
 
 namespace beshell {
-    Path::Path(): ESModule("path") {
+    Path::Path(): NativeModule("path") {
 
     }
 }

@@ -3,7 +3,7 @@
 
 
 namespace beshell {
-    FSModule::FSModule(): ESModule("fs") {
+    FSModule::FSModule(): NativeModule("fs") {
 
     }
 

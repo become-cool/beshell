@@ -39,6 +39,7 @@ namespace beshell {
                 switch(event.type) {
                     case UART_DATA:
                         chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 1/portTICK_PERIOD_MS);
+                        dn(chunklen)
                         parser.parse(dtmp, chunklen) ;
 
                         break;
@@ -115,13 +116,13 @@ namespace beshell {
         //Set uart pattern detect function.
         uart_enable_pattern_det_baud_intr(UART_NUM, '+', PATTERN_CHR_NUM, 9, 0, 0);
         //Reset the pattern queue length to record at most 20 pattern positions.
-        uart_pattern_queue_reset(UART_NUM, 20);
+        // uart_pattern_queue_reset(UART_NUM, 20);
 
         vTaskDelay(10/portTICK_PERIOD_MS) ;
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
-    
+    dd
     }
 
     void TelnetSerial::loop () {

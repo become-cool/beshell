@@ -1,68 +1,36 @@
-# c 头文件目录
+# 头文件目录
 set(include_dirs ./src)
-list(APPEND include_dirs src/fs)
-list(APPEND include_dirs src/telnet)
-list(APPEND include_dirs src/libb64)
-list(APPEND include_dirs src/media)
-list(APPEND include_dirs src/media/TinySoundFont)
-list(APPEND include_dirs src/media/audio_stream)
-list(APPEND include_dirs src/media/tjpgd)
-list(APPEND include_dirs src/encoding)
-list(APPEND include_dirs src/led)
-list(APPEND include_dirs src/led/rainbow)
-list(APPEND include_dirs src/modules)
-# list(APPEND include_dirs src/modules/http)
-list(APPEND include_dirs src/modules/serial)
-list(APPEND include_dirs src/modules/mg)
-list(APPEND include_dirs src/modules/driver)
-list(APPEND include_dirs src/modules/media)
 
-# c 源码目录
+# 源码目录
 set(src_dirs src)
 list(APPEND src_dirs src/fs)
 list(APPEND src_dirs src/telnet)
-list(APPEND src_dirs src/libb64)
+list(APPEND src_dirs src/module)
 
-
-# list(APPEND src_dirs src/media)
-list(APPEND src_dirs src/media/TinySoundFont)
-list(APPEND src_dirs src/media/audio_stream)
-list(APPEND src_dirs src/media/tjpgd)
-list(APPEND src_dirs src/encoding)
-list(APPEND src_dirs src/led)
-list(APPEND src_dirs src/led/rainbow)
-list(APPEND src_dirs src/modules)
-# list(APPEND src_dirs src/modules/http)
-list(APPEND src_dirs src/modules/mg)
-list(APPEND src_dirs src/modules/driver)
-list(APPEND src_dirs src/modules/media)
-list(APPEND src_dirs src/modules/serial)
-
-# little fs
-list(APPEND include_dirs deps/littlefs/src)
-list(APPEND include_dirs deps/littlefs/src/littlefs)
-list(APPEND src_dirs deps/littlefs/src)
-list(APPEND src_dirs deps/littlefs/src/littlefs)
+# # little fs
+# list(APPEND include_dirs deps/littlefs/src)
+# list(APPEND include_dirs deps/littlefs/src/littlefs)
+# list(APPEND src_dirs deps/littlefs/src)
+# list(APPEND src_dirs deps/littlefs/src/littlefs)
 
 # quickjs
-list(APPEND include_dirs deps/quickjs)
-list(APPEND src_dirs deps/quickjs)
+list(APPEND src_dirs src/deps/quickjs)
 
-# TinyUntar
-list(APPEND include_dirs deps/TinyUntar/tinyuntar)
-list(APPEND src_dirs deps/TinyUntar/tinyuntar)
+# # TinyUntar
+# list(APPEND include_dirs deps/TinyUntar/tinyuntar)
+# list(APPEND src_dirs deps/TinyUntar/tinyuntar)
 
-# mongoose
-list(APPEND include_dirs deps/mongoose)
-list(APPEND src_dirs deps/mongoose)
+# # mongoose
+# list(APPEND include_dirs deps/mongoose)
+# list(APPEND src_dirs deps/mongoose)
 
-# helix
-list(APPEND include_dirs deps/helix/include)
-list(APPEND src_dirs deps/helix/src)
+# # helix
+# list(APPEND include_dirs deps/helix/include)
+# list(APPEND src_dirs deps/helix/src)
 
-# esp32-perfmon
-list(APPEND include_dirs deps/esp32-perfmon/include)
-list(APPEND src_dirs deps/esp32-perfmon)
+# # esp32-perfmon
+# list(APPEND include_dirs deps/esp32-perfmon/include)
+# list(APPEND src_dirs deps/esp32-perfmon)
 
 
 if(IDF_VERSION_MAJOR LESS 5)

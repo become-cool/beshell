@@ -3,7 +3,6 @@
 #include "utils.h"
 #include <sys/stat.h>
 #include <string.h>
-#include "runtime.h"
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
 #include <cassert>
@@ -51,19 +50,21 @@ namespace beshell {
         }
         
 #ifdef PLATFORM_ESP32
-        // esp32 平台优先使用 PSRAM内存
-        if( getPsramTotal()>1024 ) {
-            static const JSMallocFunctions def_malloc_funcs = {
-                js_def_malloc,
-                js_def_free,
-            js_def_realloc,
-                malloc_usable_size,
-            };
-            rt = JS_NewRuntime2(&def_malloc_funcs, NULL);
-        }
-        else {
-            rt = JS_NewRuntime();
-        }
+        // // esp32 平台优先使用 PSRAM内存
+        // if( getPsramTotal()>1024 ) {
+        //     static const JSMallocFunctions def_malloc_funcs = {
+        //         js_def_malloc,
+        //         js_def_free,
+        //     js_def_realloc,
+        //         malloc_usable_size,
+        //     };
+        //     rt = JS_NewRuntime2(&def_malloc_funcs, NULL);
+        // }
+        // else {
+        //     rt = JS_NewRuntime();
+        // }
+        
+        rt = JS_NewRuntime();
 #else
         rt = JS_NewRuntime();
 #endif

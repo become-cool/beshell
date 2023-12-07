@@ -1,4 +1,4 @@
-#include "ESModule.hpp"
+#include "NativeModule.hpp"
 #include <string.h>
 #include <functional>
 #include "debug.h"
@@ -6,9 +6,9 @@
 
 namespace beshell {
 
-    ESModule::ESModule(const char * _name): name(_name) {}
+    NativeModule::NativeModule(const char * _name): name(_name) {}
     
-    void ESModule::exportFunction(const char * name, JSCFunction * func, int length) {
+    void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
         JSCFunctionListEntry fe ;
         memset(&fe,0,sizeof(JSCFunctionListEntry)) ;
         fe.name = name ;
@@ -21,7 +21,7 @@ namespace beshell {
         funcs.push_back(fe) ;
     }
 
-    JSModuleDef * ESModule::createModule(JSContext * ctx) {
+    JSModuleDef * NativeModule::createModule(JSContext * ctx) {
 
         std::function<JSModuleInitFunc> import_module([this](JSContext *ctx, JSModuleDef *m)->int {
             // return JS_SetModuleExportList(ctx, m, js_funcs, countof(js_funcs));
@@ -36,7 +36,7 @@ namespace beshell {
         return  m ;
     }
 
-    JSValue ESModule::createGlobalObject(JSContext * ctx, const char * name) {
+    JSValue NativeModule::createGlobalObject(JSContext * ctx, const char * name) {
         JSValue global = JS_GetGlobalObject(ctx) ;
         JSValue object = JS_NewObject(ctx) ;
         JS_SetPropertyStr(ctx, global, name, object);
@@ -45,6 +45,6 @@ namespace beshell {
         return object ;
     }
     
-    void ESModule::load(JSContext * ctx) {
+    void NativeModule::load(JSContext * ctx) {
     }
 }

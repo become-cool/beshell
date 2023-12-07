@@ -35,7 +35,7 @@ set(SRC_LIST
     src/NVS.cpp
     src/path.c
 
-    src/module/ESModule.cpp
+    src/module/NativeModule.cpp
     src/module/FSModule.cpp
     src/module/Path.cpp
     src/module/ModuleLoader.cpp

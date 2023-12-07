@@ -1,6 +1,8 @@
 #ifndef ONCE_H_DEBUG
 #define ONCE_H_DEBUG
 
+#include <stdint.h>
+
 #define pf(...) printf(__VA_ARGS__) ;printf("\n") ;
 #define dd printf("%d@%s()\n", __LINE__, __FUNCTION__) ;
 #define df(msg) printf("@%d %s\n", __LINE__, msg) ;
