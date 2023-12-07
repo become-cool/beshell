@@ -88,11 +88,11 @@ namespace beshell {
 
     void TelnetSerial::setup () {
 
+        printf("reinstall uart%d\n", UART_NUM) ;
+        vTaskDelay(10/portTICK_PERIOD_MS) ;
         fflush(stdout) ;
         vTaskDelay(10/portTICK_PERIOD_MS) ;
-        uart_flush(UART_NUM) ;
-        vTaskDelay(10/portTICK_PERIOD_MS) ;
-        
+
         /* Configure parameters of an UART driver,
         * communication pins and install the driver */
         uart_config_t uart_config = {

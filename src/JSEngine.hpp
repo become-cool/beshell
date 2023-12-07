@@ -1,8 +1,14 @@
 #pragma once
 
-#include "quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include "telnet/Telnet.hpp"
-#include "modules/ModuleLoader.hpp"
+#include "module/ModuleLoader.hpp"
+
+
+#define BESHELL_VERSION "0.3.0"
+#define ESPIDF_VERSION IDF_VER
+#define QUICKJS_VERSION "2021-03-27"
+
 
 namespace beshell {
     class BeShell ;

@@ -1,6 +1,7 @@
 #include "Telnet.hpp"
 #include "debug.h"
 #include "BeShell.hpp"
+#include <cassert>
 
 
 namespace beshell {
@@ -17,14 +18,20 @@ namespace beshell {
                 break;
             }
         })
+#ifdef PLATFORM_ESP32
         , channelSeiral(onReceived)
+#endif
     {}
 
     void Telnet::setup() {
+#ifdef PLATFORM_ESP32
         channelSeiral.setup() ;
+#endif
     }
     void Telnet::loop() {
+#ifdef PLATFORM_ESP32
         channelSeiral.loop() ;
+#endif
     }
 
     void Telnet::output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid) {
@@ -36,12 +43,15 @@ namespace beshell {
         }
         Package pkg(pkgid,cmd,data,datalen) ;
         pkg.pack() ;
-
+#ifdef PLATFORM_ESP32
         channelSeiral.send(pkg) ;
+#endif
     }
 
     void Telnet::output(const char * data, size_t datalen) {
+#ifdef PLATFORM_ESP32
         channelSeiral.send(data,datalen) ;
+#endif
     }
 
 }

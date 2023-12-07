@@ -20,7 +20,6 @@ namespace beshell {
     void FS::mountRootTar() {
         this->mountRaw("/fs", (void*)fs_root_img_start, (size_t)(fs_root_img_end-fs_root_img_start) ) ;
     }
-#endif
 
     void FS::mountRaw(const char * mountPoint, void * ptr, size_t size) {
         partitions[mountPoint] = std::make_unique<FSPartitionRaw>(ptr,size) ;
@@ -31,6 +30,7 @@ namespace beshell {
         
     }
 
+#endif
     
 
     void FS::setPrefix(const char * path) {

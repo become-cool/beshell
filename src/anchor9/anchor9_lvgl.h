@@ -1,7 +1,7 @@
 #ifndef __H_ANCHOR9_LVGL__
 #define __H_ANCHOR9_LVGL__
 
-#include "quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include "anchor9.h"
 
 

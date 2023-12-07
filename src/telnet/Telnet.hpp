@@ -1,7 +1,10 @@
 #pragma once
-#include "telnet/TelnetSerial.hpp"
 
-// #include "BeShell.hpp"
+#include "TelnetChannel.hpp"
+#ifdef PLATFORM_ESP32
+#include "TelnetSerial.hpp"
+#endif 
+
 
 namespace beshell {
     class BeShell ;
@@ -11,7 +14,10 @@ namespace beshell {
         BeShell * beshell ;
 
         TelnetPkgProcFunc onReceived ;
+        
+#ifdef PLATFORM_ESP32
         TelnetSerial channelSeiral ;
+#endif
 
         uint8_t autoIncreasePkgId = 0 ;
 

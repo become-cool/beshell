@@ -2,32 +2,13 @@
 #include <iostream>
 #include <string.h>
 #include "utils.h"
-#include "eventloop.h"
 
-#include "module_telnet.h"
-#include "module_utils.h"
-
-
-#ifndef PLATFORM_WASM
-#include "module_mg.h"
-#endif
-#include "module_fs.h"
 
 #ifdef PLATFORM_ESP32
-#include "psram.h"
-#include "sniffer.h"
-#include "module_bt.h"
-#include "module_wifi.h"
-#include "module_gpio.h"
-#include "module_serial.h"
-#include "module_socks.h"
-#include "module_driver.h"
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <nvs_flash.h>
 #include "esp_vfs_fat.h"
-#include "module_media.h"
 #endif
 
 namespace beshell {

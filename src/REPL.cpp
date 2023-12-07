@@ -1,6 +1,6 @@
 #include "REPL.hpp"
 #include "BeShell.hpp"
-
+#include <cassert>
 
 
 namespace beshell {

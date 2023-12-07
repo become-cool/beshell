@@ -5,7 +5,8 @@
 #include <string.h>
 #include "runtime.h"
 #include "debug.h"
-#include "modules/ModuleLoader.hpp"
+#include "module/ModuleLoader.hpp"
+#include <cassert>
 
 #ifdef PLATFORM_ESP32
 #include "malloc_funcs.h"
@@ -14,32 +15,28 @@
 
 namespace beshell {
     
-    static void eval_rc_script(JSContext *ctx, const char * path) {
+    // static void eval_rc_script(JSContext *ctx, const char * path) {
         
-        const char * fullpath = path ;
-        // char * fullpath = vfspath_to_fs(path) ;
+    //     const char * fullpath = path ;
+    //     // char * fullpath = vfspath_to_fs(path) ;
 
-    #ifdef PLATFORM_ESP32
-        char * binpath = mallocf("%s.bin", fullpath) ;
-        struct stat statbuf;
-        if(stat(binpath,&statbuf)<0) {
-            evalScript(ctx, fullpath, false, false) ;
-        }
-        else {
-            evalScript(ctx, binpath, true, false) ;
-        }
-        free(binpath) ;
-    #else
-        evalScript(ctx, fullpath, false, false) ;
-    #endif
+    // #ifdef PLATFORM_ESP32
+    //     char * binpath = mallocf("%s.bin", fullpath) ;
+    //     struct stat statbuf;
+    //     if(stat(binpath,&statbuf)<0) {
+    //         evalScript(ctx, fullpath, false, false) ;
+    //     }
+    //     else {
+    //         evalScript(ctx, binpath, true, false) ;
+    //     }
+    //     free(binpath) ;
+    // #else
+    //     evalScript(ctx, fullpath, false, false) ;
+    // #endif
 
-        // free(fullpath) ;
+    //     // free(fullpath) ;
 
-    }
-    static JSModuleDef * js_module_loader(JSContext *ctx, const char *module_name, void *opaque) {
-        IS_NULL(opaque)
-        return NULL ;
-    }
+    // }
 
 
 
@@ -81,7 +78,6 @@ namespace beshell {
 
     JSContext * JSEngine::InitContext(JSRuntime *rt) {
 
-        JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
         JSContext *ctx;
         ctx = JS_NewContextRaw(rt);
         if (!ctx) {
@@ -116,10 +112,10 @@ namespace beshell {
         // be_module_process_require(ctx) ;
 
         // base 函数
-        eval_rc_script(ctx, "/lib/base/base.js") ;
-        eval_rc_script(ctx, "/lib/base/console.js") ;
-        eval_rc_script(ctx, "/lib/base/events.js") ;
-        eval_rc_script(ctx, "/lib/base/require.js") ;
+        // eval_rc_script(ctx, "/lib/base/base.js") ;
+        // eval_rc_script(ctx, "/lib/base/console.js") ;
+        // eval_rc_script(ctx, "/lib/base/events.js") ;
+        // eval_rc_script(ctx, "/lib/base/require.js") ;
 
     // #ifdef CONFIG_BT_ENABLED
     //     be_module_bt_require(ctx) ;
@@ -182,7 +178,7 @@ namespace beshell {
         const char * str = JS_ToCStringLen(ctx, &len, content);
         if (len) {
             if(pack) {
-                telnet->output(CMD_OUTPUT,(uint8_t*)str, len, pkgId) ;
+                telnet->output(OUTPUT,(uint8_t*)str, len, pkgId) ;
             } else {
                 telnet->output(str, len) ;
             }
@@ -194,7 +190,7 @@ namespace beshell {
 
     void JSEngine::dumpError(bool pack) {
         JSValue exception_val = JS_GetException(ctx);
-        if(exception_val==JS_NULL) {
+        if(JS_IsNull(exception_val)) {
             return ;
         }
         bool is_error = JS_IsError(ctx, exception_val);

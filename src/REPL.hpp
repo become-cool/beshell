@@ -1,5 +1,5 @@
 #pragma once
-#include "Protocal.hpp"
+#include "telnet/Protocal.hpp"
 
 namespace beshell {
     class BeShell ;

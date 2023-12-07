@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include <stdbool.h>
 
 /*********************

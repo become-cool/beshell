@@ -1,15 +1,19 @@
 #pragma once
+
+#ifdef PLATFORM_ESP32
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#endif 
+
 #include <queue>
 
-#include "FS.hpp"
 #include "NVS.hpp"
 #include "debug.h"
-#include "Telnet.hpp"
 #include "JSEngine.hpp"
 #include "REPL.hpp"
+#include "fs/FS.hpp"
+#include "telnet/Telnet.hpp"
 
 
 namespace beshell {
@@ -21,10 +25,6 @@ namespace beshell {
         uint8_t boot_level = 5 ;
         bool requst_reset = false ;
         bool nowifi = false ;
-
-        TaskHandle_t handleLoop = nullptr ;
-
-        SemaphoreHandle_t mutex_code;
 
     public:
 
