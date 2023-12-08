@@ -11,7 +11,7 @@
 
 
 
-namespace beshell {
+namespace be {
 
     static vfs_node_t * vfs_node_malloc(vfs_node_t * parent) {  
         vfs_node_t * node = (vfs_node_t *)malloc( sizeof(vfs_node_t) ) ;

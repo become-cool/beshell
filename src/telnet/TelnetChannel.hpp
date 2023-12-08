@@ -1,17 +1,19 @@
 #pragma once
 #include "Protocal.hpp"
 
-namespace beshell {
+namespace be {
     
-    class TelnetChannel ;
-	typedef std::function<void(TelnetChannel * ch, Package & pkg)> TelnetPkgProcFunc;
+    class Telnet ;
+    // class TelnetChannel ;
+	// typedef std::function<void(TelnetChannel * ch, Package & pkg)> TelnetPkgProcFunc;
 
     class TelnetChannel {
     private:
     protected:
-        TelnetPkgProcFunc packageHandler = nullptr;
+        // TelnetPkgProcFunc packageHandler = nullptr;
+        Telnet * telnet = nullptr ;
     public:
-        TelnetChannel(TelnetPkgProcFunc packageHandler=nullptr) ;
+        TelnetChannel(Telnet *) ;
         virtual void setup () ;
         virtual void loop () ;
         virtual void send (Package & pkg) ;

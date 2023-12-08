@@ -9,7 +9,7 @@ extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #endif
 
 
-namespace beshell {
+namespace be {
     FS::FS() {
 
     }

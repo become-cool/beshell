@@ -5,7 +5,7 @@
 
 #define MAX_OPEN_FD 16
 
-namespace beshell {
+namespace be {
         
     #define VFS_NODE_DIR 1
     #define VFS_NODE_FILE 2

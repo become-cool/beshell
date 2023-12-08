@@ -4,7 +4,7 @@
 #include "debug.h"
 
 
-namespace beshell {
+namespace be {
 
     NativeModule::NativeModule(const char * _name): name(_name) {}
     

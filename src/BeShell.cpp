@@ -11,7 +11,7 @@
 #include "esp_vfs_fat.h"
 #endif
 
-namespace beshell {
+namespace be {
 
 
     BeShell::BeShell()

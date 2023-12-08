@@ -4,25 +4,14 @@
 #include <cassert>
 
 
-namespace beshell {
+namespace be {
     Telnet::Telnet(BeShell * _beshell)
         : beshell(_beshell)
-        , onReceived([this](TelnetChannel * ch, Package & pkg){
-            switch (pkg.head.fields.cmd)
-            {
-            case LINE:
-            case RUN:
-            case CALL:
-                assert(beshell) ;
-                beshell->repl.input(pkg) ;
-                break;
-            }
-        })
 #ifdef PLATFORM_ESP32
-        , channelSeiral(onReceived)
+        , channelSeiral(this)
 #endif
 #ifdef PLATFORM_LINUX
-        , channelStdIO(onReceived)
+        , channelStdIO(this)
 #endif
     {}
 
@@ -42,6 +31,19 @@ namespace beshell {
         channelStdIO.loop() ;
 #endif
     }
+
+    void Telnet::onReceived(TelnetChannel * ch, Package & pkg){
+        switch (pkg.head.fields.cmd)
+        {
+        case LINE:
+        case RUN:
+        case CALL:
+            assert(beshell) ;
+            beshell->repl.input(pkg) ;
+            break;
+        }
+    }
+
 
     void Telnet::output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid) {
         if(pkgid<0) {

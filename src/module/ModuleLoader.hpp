@@ -7,7 +7,7 @@
 #include "module/FSModule.hpp"
 #include "fs/FS.hpp"
 
-namespace beshell {
+namespace be {
     class JSEngine ;
     class ModuleLoader {
     private:

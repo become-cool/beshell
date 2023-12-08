@@ -4,7 +4,7 @@
 
 #ifdef PLATFORM_LINUX
 
-namespace beshell {
+namespace be {
     class TelnetStdIO: public TelnetChannel {
     private:
     public:

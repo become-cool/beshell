@@ -16,7 +16,7 @@
 #include "telnet/Telnet.hpp"
 
 
-namespace beshell {
+namespace be {
 
     class BeShell {
 

@@ -16,7 +16,7 @@
 
 #endif
 
-namespace beshell {
+namespace be {
     NVS::NVS() {
     }
 

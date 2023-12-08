@@ -1,7 +1,7 @@
 #pragma once
 #include "NativeModule.hpp"
 
-namespace beshell {
+namespace be {
     class FSModule: public NativeModule {
     private:
     public:

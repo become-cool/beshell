@@ -2,5 +2,5 @@
 
 
 
-namespace beshell {
+namespace be {
 }

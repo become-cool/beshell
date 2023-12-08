@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-namespace beshell {
+namespace be {
     REPL::REPL(BeShell * _beshell)
         : beshell(_beshell)
     {

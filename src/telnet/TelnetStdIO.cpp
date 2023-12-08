@@ -3,7 +3,7 @@
 
 #ifdef PLATFORM_LINUX
 
-namespace beshell {
+namespace be {
     void TelnetStdIO::loop () {
 
     }

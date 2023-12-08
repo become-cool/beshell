@@ -2,9 +2,9 @@
 
 
 
-namespace beshell {
-    TelnetChannel::TelnetChannel(TelnetPkgProcFunc _packageHandler)
-        : packageHandler(_packageHandler)
+namespace be {
+    TelnetChannel::TelnetChannel(Telnet * _telnet)
+        : telnet(_telnet)
     {}
     void TelnetChannel::setup () {}
     void TelnetChannel::loop () {}

@@ -2,7 +2,7 @@
 
 #include "FSPartition.hpp"
 
-namespace beshell {
+namespace be {
     class FSPartitionFlash: public FSPartition {
     private:
     public:

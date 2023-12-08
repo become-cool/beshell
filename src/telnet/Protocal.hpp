@@ -6,7 +6,7 @@
 
 #define PKG_LINE_BUFFSIZE 256
 
-namespace beshell {
+namespace be {
 
 	enum PkgDef {
 		HEAD1 = 5 ,

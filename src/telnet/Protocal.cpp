@@ -25,7 +25,7 @@
 #define RECEIVE_TO_BUFF(buff, received, data, datalen)  \
             RECEIVE_TO_BUFF_PTR(buff, sizeof(buff), received, data, datalen)
 
-namespace beshell {
+namespace be {
     
     // Package::Package(uint8_t _pkgid, uint8_t _cmd, uint8_t * _body, size_t _body_len)
     //     : pkgid(_pkgid)

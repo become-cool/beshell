@@ -1,4 +1,5 @@
 #include "TelnetSerial.hpp"
+#include "Telnet.hpp"
 #include "Protocal.hpp"
 #include <iostream>
 #include "driver/uart.h"
@@ -17,7 +18,7 @@
 
 #define PKG_QUEUE_LEN 5
 
-namespace beshell {
+namespace be {
 
     void TelnetSerial::task(void * argv) {        
         Parser parser([argv](Package & pkg){
@@ -106,8 +107,8 @@ namespace beshell {
         Package pkg ;
         if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
 
-            if(packageHandler){
-                packageHandler(this,pkg) ;
+            if(telnet){
+                telnet->onReceived(this,pkg) ;
             }
 
             delete pkg.body ;

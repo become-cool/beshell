@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace beshell {
+namespace be {
     class NativeModule {
     private:
         std::vector<JSCFunctionListEntry> funcs ;

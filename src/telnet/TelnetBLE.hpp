@@ -1,6 +1,6 @@
 #pragma once
 
-namespace beshell {
+namespace be {
     class TelnetBLE {
     private:
     public:

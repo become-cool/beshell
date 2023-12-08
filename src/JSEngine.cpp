@@ -12,7 +12,7 @@
 #endif
 
 
-namespace beshell {
+namespace be {
     
     // static void eval_rc_script(JSContext *ctx, const char * path) {
         

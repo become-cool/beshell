@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace beshell {
+namespace be {
     class NVS {
     private:
     public:

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "telnet/Protocal.hpp"
 using namespace std ;
-using namespace beshell;
+using namespace be;
 
 void print_block(uint8_t * data, int columns, int rows) {
     for(int r=0; r<rows; r++ ) {

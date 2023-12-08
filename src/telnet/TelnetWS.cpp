@@ -2,7 +2,7 @@
 
 
 
-namespace beshell {
+namespace be {
     TelnetWS::TelnetWS() {
 
     }

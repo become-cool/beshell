@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace beshell {
+namespace be {
     class FSPartition {
     private:
     protected:

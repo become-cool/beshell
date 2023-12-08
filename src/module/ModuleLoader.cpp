@@ -8,7 +8,7 @@
 #include "path.h"
 #include "utils.h"
 
-namespace beshell {
+namespace be {
 
     class JSLoader: public NativeModule {
     public:

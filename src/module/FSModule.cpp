@@ -2,7 +2,7 @@
 #include <sys/stat.h>
 
 
-namespace beshell {
+namespace be {
     FSModule::FSModule(): NativeModule("fs") {
 
     }

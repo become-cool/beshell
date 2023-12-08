@@ -1,7 +1,7 @@
 #pragma once
 #include "telnet/Protocal.hpp"
 
-namespace beshell {
+namespace be {
     class BeShell ;
     class REPL {
     private:

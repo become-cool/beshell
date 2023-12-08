@@ -2,7 +2,7 @@
 #include <iostream>
 #include "BeShell.hpp"
 using namespace std ;
-using namespace beshell;
+using namespace be;
 
 
 int main() {

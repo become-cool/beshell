@@ -9,14 +9,14 @@
 #endif 
 
 
-namespace beshell {
+namespace be {
     class BeShell ;
     class Telnet {
     private:
 
         BeShell * beshell ;
 
-        TelnetPkgProcFunc onReceived ;
+        // TelnetPkgProcFunc onReceived ;
         
 #ifdef PLATFORM_ESP32
         TelnetSerial channelSeiral ;
@@ -26,7 +26,6 @@ namespace beshell {
 #endif
 
         uint8_t autoIncreasePkgId = 0 ;
-
     public:
         Telnet(BeShell * beshell) ;
 
@@ -35,5 +34,7 @@ namespace beshell {
 
         void output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid=-1) ;
         void output(const char * data, size_t datalen) ;
+
+        void onReceived(TelnetChannel * , Package &) ;
     } ;
 }

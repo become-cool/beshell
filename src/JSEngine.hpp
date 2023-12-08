@@ -10,7 +10,7 @@
 #define QUICKJS_VERSION "2021-03-27"
 
 
-namespace beshell {
+namespace be {
     class BeShell ;
     class JSEngine {
     private:
