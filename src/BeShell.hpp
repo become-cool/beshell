@@ -40,9 +40,6 @@ namespace beshell {
         inline void loop() ;
         void main() ;
 
-        static BeShell * fromJSContext(JSContext *) ;
-        static BeShell * fromJSRuntime(JSRuntime *) ;
-
     } ;
 
 }

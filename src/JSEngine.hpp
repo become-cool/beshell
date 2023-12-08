@@ -34,5 +34,7 @@ namespace beshell {
         void evalScript(const char * filepath, int flags=JS_EVAL_TYPE_GLOBAL) ;
 
         static JSContext * InitContext(JSRuntime *rt) ;
+        static JSEngine * fromJSContext(JSContext *) ;
+        static JSEngine * fromJSRuntime(JSRuntime *) ;
     } ;
 }

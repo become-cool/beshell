@@ -19,8 +19,7 @@
 
 namespace beshell {
 
-    void TelnetSerial::task(void * argv) {
-        
+    void TelnetSerial::task(void * argv) {        
         Parser parser([argv](Package & pkg){
             xQueueSend(((TelnetSerial*)argv)->pkg_queue, &pkg, 0) ;
             pkg.body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
@@ -39,9 +38,7 @@ namespace beshell {
                 switch(event.type) {
                     case UART_DATA:
                         chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 1/portTICK_PERIOD_MS);
-                        dn(chunklen)
                         parser.parse(dtmp, chunklen) ;
-
                         break;
                     //Event of HW FIFO overflow detected
                     case UART_FIFO_OVF:
@@ -51,17 +48,7 @@ namespace beshell {
                         xQueueReset(((TelnetSerial*)argv)->uart_queue);
                         break;
                     //Event of UART RX break detected
-                    case UART_BREAK:
-                        std::cout << "UART_BREAK\n" << std::endl ;
-                        break;
-                    //Event of UART parity check error
-                    case UART_PARITY_ERR:
-                        std::cout << "UART_PARITY_ERR\n" << std::endl ;
-                        break;
-                    //Event of UART frame error
-                    case UART_FRAME_ERR:
-                        std::cout << "UART_FRAME_ERR\n" << std::endl ;
-                        break;
+
                     //UART_PATTERN_DET
                     case UART_PATTERN_DET:
                         uart_get_buffered_data_len(UART_NUM, &buffered_size);
@@ -89,13 +76,9 @@ namespace beshell {
 
     void TelnetSerial::setup () {
 
-        printf("reinstall uart%d\n", UART_NUM) ;
-        vTaskDelay(10/portTICK_PERIOD_MS) ;
-        fflush(stdout) ;
-        vTaskDelay(10/portTICK_PERIOD_MS) ;
-
-        /* Configure parameters of an UART driver,
-        * communication pins and install the driver */
+        if(!uart_is_driver_installed(UART_NUM)) {
+            uart_driver_install(UART_NUM, BUF_SIZE * 2, BUF_SIZE * 2, 20, &uart_queue, 0);
+        }
         uart_config_t uart_config = {
             .baud_rate = 115200,
             .data_bits = UART_DATA_8_BITS,
@@ -104,25 +87,19 @@ namespace beshell {
             .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
             .source_clk = UART_SCLK_DEFAULT,
         };
-        //Install UART driver, and get the queue.
-        uart_driver_install(0, BUF_SIZE * 2, BUF_SIZE * 2, 20, &uart_queue, 0);
         uart_param_config(UART_NUM, &uart_config);
 
-        //Set UART log level
-        // esp_log_level_set(TAG, ESP_LOG_INFO);
         //Set UART pins (using UART0 default pins ie no changes.)
         uart_set_pin(UART_NUM, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
         //Set uart pattern detect function.
         uart_enable_pattern_det_baud_intr(UART_NUM, '+', PATTERN_CHR_NUM, 9, 0, 0);
-        //Reset the pattern queue length to record at most 20 pattern positions.
-        // uart_pattern_queue_reset(UART_NUM, 20);
 
-        vTaskDelay(10/portTICK_PERIOD_MS) ;
+        //Reset the pattern queue length to record at most 20 pattern positions.
+        uart_pattern_queue_reset(UART_NUM, 20);
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
-    dd
     }
 
     void TelnetSerial::loop () {

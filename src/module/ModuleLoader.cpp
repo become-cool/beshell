@@ -120,43 +120,44 @@ dd
             return js_strdup(ctx, module_name) ;
         }
 
-        // resolve file 
-        // -------------
+        return nullptr ;
 
-        BeShell * beshell = BeShell::fromJSContext(ctx) ;
-        assert(beshell) ;
+        // // resolve file 
+        // // -------------
+        // BeShell * beshell = BeShell::fromJSContext(ctx) ;
+        // assert(beshell) ;
         
-        std::string fullpath ;
-        // 绝对路
-        if(module_name[0]=='/') {
-            fullpath = resovleFS(beshell->fs, module_name, NULL) ;
-        }
+        // std::string fullpath ;
+        // // 绝对路
+        // if(module_name[0]=='/') {
+        //     fullpath = resovleFS(beshell->fs, module_name, NULL) ;
+        // }
 
-        // 相对路径
-        else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
-            char * base_dir = strdup(module_base_name) ;
-            path_dirname(module_base_name, base_dir) ;
-            fullpath = resovleFS(beshell->fs, module_name, base_dir) ;
-            free(base_dir) ;
-        }
+        // // 相对路径
+        // else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
+        //     char * base_dir = strdup(module_base_name) ;
+        //     path_dirname(module_base_name, base_dir) ;
+        //     fullpath = resovleFS(beshell->fs, module_name, base_dir) ;
+        //     free(base_dir) ;
+        // }
 
-        // 系统默认目录
-        else {
-            fullpath = resovleFS(beshell->fs, module_name, "/lib/local") ;
-            if(!fullpath.length()) {
-                fullpath = resovleFS(beshell->fs, module_name, "/opt") ;
-            }
-        }
+        // // 系统默认目录
+        // else {
+        //     fullpath = resovleFS(beshell->fs, module_name, "/lib/local") ;
+        //     if(!fullpath.length()) {
+        //         fullpath = resovleFS(beshell->fs, module_name, "/opt") ;
+        //     }
+        // }
 
-        if(!fullpath.length()) {
-            return NULL ;
-        }
+        // if(!fullpath.length()) {
+        //     return NULL ;
+        // }
 
-        path_normalize(fullpath.c_str()) ;
+        // path_normalize(fullpath.c_str()) ;
 
-        char * jfullpath = js_strdup(ctx, fullpath.c_str()) ;
+        // char * jfullpath = js_strdup(ctx, fullpath.c_str()) ;
 
-        return jfullpath ;
+        // return jfullpath ;
     }
 
     JSModuleDef * ModuleLoader::load(JSContext *ctx, const char *path, void *opaque) {

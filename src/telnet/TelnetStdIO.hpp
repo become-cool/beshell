@@ -1,9 +1,19 @@
 #pragma once
 
+#include "TelnetChannel.hpp"
+
+#ifdef PLATFORM_LINUX
+
 namespace beshell {
-    class TelnetStdIO {
+    class TelnetStdIO: public TelnetChannel {
     private:
     public:
-        TelnetStdIO() ;
+        using TelnetChannel::TelnetChannel ;
+        void setup () ;
+        void loop () ;
+        void send (Package & pkg) ;
+        void send (const char * data, size_t datalen) ;
     } ;
 }
+
+#endif

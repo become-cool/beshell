@@ -12,8 +12,9 @@ namespace beshell {
         TelnetPkgProcFunc packageHandler = nullptr;
     public:
         TelnetChannel(TelnetPkgProcFunc packageHandler=nullptr) ;
-        virtual void setup () = 0 ;
-        virtual void loop () = 0 ;
-        virtual void send (Package & pkg) = 0 ;
+        virtual void setup () ;
+        virtual void loop () ;
+        virtual void send (Package & pkg) ;
+        virtual void send (const char * data, size_t datalen) = 0 ;
     } ;
 }

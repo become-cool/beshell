@@ -21,16 +21,25 @@ namespace beshell {
 #ifdef PLATFORM_ESP32
         , channelSeiral(onReceived)
 #endif
+#ifdef PLATFORM_LINUX
+        , channelStdIO(onReceived)
+#endif
     {}
 
     void Telnet::setup() {
 #ifdef PLATFORM_ESP32
         channelSeiral.setup() ;
 #endif
+#ifdef PLATFORM_LINUX
+        channelStdIO.setup() ;
+#endif
     }
     void Telnet::loop() {
 #ifdef PLATFORM_ESP32
         channelSeiral.loop() ;
+#endif
+#ifdef PLATFORM_LINUX
+        channelStdIO.loop() ;
 #endif
     }
 
@@ -46,11 +55,18 @@ namespace beshell {
 #ifdef PLATFORM_ESP32
         channelSeiral.send(pkg) ;
 #endif
+#ifdef PLATFORM_LINUX
+        channelStdIO.send(pkg) ;
+#endif
     }
 
     void Telnet::output(const char * data, size_t datalen) {
 #ifdef PLATFORM_ESP32
         channelSeiral.send(data,datalen) ;
+#endif
+
+#ifdef PLATFORM_LINUX
+        channelStdIO.send(data,datalen) ;
 #endif
     }
 

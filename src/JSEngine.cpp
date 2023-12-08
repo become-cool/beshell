@@ -69,13 +69,12 @@ namespace beshell {
         rt = JS_NewRuntime();
 #endif
 
-        js_std_set_worker_new_context_func(InitContext);
-        js_std_init_handlers(rt);
+        // js_std_set_worker_new_context_func(InitContext);
+        // js_std_init_handlers(rt);
         
-        JS_SetRuntimeOpaque2(rt, beshell) ;
+        JS_SetRuntimeOpaque2(rt, this) ;
         ctx = InitContext(rt);
     }
-
 
     JSContext * JSEngine::InitContext(JSRuntime *rt) {
 
@@ -86,7 +85,7 @@ namespace beshell {
         }
 
         JS_AddIntrinsicBaseObjects(ctx);
-        JS_AddIntrinsicDate(ctx);
+        // JS_AddIntrinsicDate(ctx);
         JS_AddIntrinsicEval(ctx);
         JS_AddIntrinsicStringNormalize(ctx);
         JS_AddIntrinsicRegExp(ctx);
@@ -95,22 +94,13 @@ namespace beshell {
         JS_AddIntrinsicMapSet(ctx);
         JS_AddIntrinsicTypedArrays(ctx);
         JS_AddIntrinsicPromise(ctx);
-    #ifdef CONFIG_BIGNUM
+#ifdef CONFIG_BIGNUM
         JS_AddIntrinsicBigInt(ctx);
-    #endif
+#endif
 
         // global 对象
         JSValue global = JS_GetGlobalObject(ctx);
         JS_SetPropertyStr(ctx, global, "global", global);
-        
-        // beapi 对象
-        JSValue beapi = JS_NewObject(ctx);
-        JS_SetPropertyStr(ctx, global, "beapi", beapi);
-        JS_FreeValue(ctx, global);
-        
-        // be_module_fs_require(ctx) ;
-        // be_module_utils_require(ctx) ;
-        // be_module_process_require(ctx) ;
 
         // base 函数
         // eval_rc_script(ctx, "/lib/base/base.js") ;
@@ -118,33 +108,10 @@ namespace beshell {
         // eval_rc_script(ctx, "/lib/base/events.js") ;
         // eval_rc_script(ctx, "/lib/base/require.js") ;
 
-    // #ifdef CONFIG_BT_ENABLED
-    //     be_module_bt_require(ctx) ;
-    // #endif
-    //     be_module_wifi_require(ctx) ;
-    //     be_module_gpio_require(ctx) ;  
-    //     be_module_serial_require(ctx) ;
-    //     be_module_socks_require(ctx) ;
-    //     be_module_driver_require(ctx) ;
-    //     // be_module_cron_require(ctx) ;
-    // #endif
-    //     be_module_gameplayer_require(ctx) ;
-    //     be_module_media_require(ctx) ;
-    // #ifndef PLATFORM_WASM
-    //     be_module_mg_require(ctx) ;
-    // #endif
-    //     be_telnet_require(ctx) ;
-    //     be_module_lvgl_require(ctx) ;
-    //     module_metadata_require(ctx) ;
-    //     be_module_nvs_require(ctx) ;
 
-    // #ifdef PLATFORM_LINUX
-    //     be_simulate_require(ctx) ;
-    // #endif
-
-        BeShell * beshell = BeShell::fromJSRuntime(rt) ;
-        assert(beshell) ;
-        beshell->engine.mloader.setup(ctx) ;
+        JSEngine * engine = JSEngine::fromJSRuntime(rt) ;
+        assert(engine) ;
+        engine->mloader.setup(ctx) ;
 
         return ctx;
     }
@@ -172,6 +139,17 @@ namespace beshell {
     //         printf("_func_repl_input is NULL or not Function\n") ;
     //     }
     // }
+
+    void JSEngine::loop() {
+
+    }
+
+    JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
+        return (JSEngine *)JS_GetRuntimeOpaque( JS_GetRuntime(ctx) ) ;
+    }
+    JSEngine * JSEngine::fromJSRuntime(JSRuntime * rt) {
+        return (JSEngine *)JS_GetRuntimeOpaque2(rt) ;
+    }
 
     void JSEngine::print(JSValue content, bool pack, int pkgId) {
         assert(telnet) ;

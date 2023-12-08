@@ -4,6 +4,9 @@
 #ifdef PLATFORM_ESP32
 #include "TelnetSerial.hpp"
 #endif 
+#ifdef PLATFORM_LINUX
+#include "TelnetStdIO.hpp"
+#endif 
 
 
 namespace beshell {
@@ -17,6 +20,9 @@ namespace beshell {
         
 #ifdef PLATFORM_ESP32
         TelnetSerial channelSeiral ;
+#endif
+#ifdef PLATFORM_LINUX
+        TelnetStdIO channelStdIO ;
 #endif
 
         uint8_t autoIncreasePkgId = 0 ;

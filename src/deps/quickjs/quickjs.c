@@ -39,17 +39,6 @@
 #include <malloc.h>
 #endif
 
-// #include "utils.h"
-
-// uint8_t debug = 0 ;
-// #define pf(...) if(debug){ printf(__VA_ARGS__) ;printf("\n") ; }
-// #define dd      if(debug){ printf("@%d\n", __LINE__) ; }
-// #define df(msg) if(debug){ printf("@%d %s\n", __LINE__, msg) ; }
-// #define dm(msg) if(debug){ printf("%s: %dKB\n", msg, esp_get_free_heap_size()/1024); }
-// #define dp(p)   if(debug){ printf(#p"@%p\n", p) ; }
-// #define ds(s)   if(debug){ printf(#s"=%s\n", s) ; }
-// #define dn(v)   if(debug){ printf(#v"=%d\n", v) ; }
-
 #include "cutils.h"
 #include "list.h"
 #include "quickjs.h"
@@ -57,6 +46,8 @@
 #ifdef CONFIG_BIGNUM
 #include "libbf.h"
 #endif
+
+#include "debug.h"
 
 #define OPTIMIZE         1
 #define SHORT_OPCODES    1
@@ -1829,12 +1820,15 @@ int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx)
     JSJobEntry *e;
     JSValue res;
     int i, ret;
-
+dp(rt)
+dp(rt->job_list)
     if (list_empty(&rt->job_list)) {
+        dd
         *pctx = NULL;
+        dd
         return 0;
     }
-
+dd
     /* get the first pending job and execute it */
     e = list_entry(rt->job_list.next, JSJobEntry, link);
     list_del(&e->link);
@@ -1849,6 +1843,7 @@ int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx)
     JS_FreeValue(ctx, res);
     js_free(ctx, e);
     *pctx = ctx;
+
     return ret;
 }
 

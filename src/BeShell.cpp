@@ -50,7 +50,7 @@ namespace beshell {
 
         telnet.loop() ;
 
-        js_std_loop(engine.ctx) ;
+        engine.loop() ;
     }
 
     void BeShell::main() {
@@ -66,11 +66,5 @@ namespace beshell {
         }
     }
 
-    BeShell * BeShell::fromJSContext(JSContext * ctx) {
-        return (BeShell *)JS_GetRuntimeOpaque( JS_GetRuntime(ctx) ) ;
-    }
-    BeShell * BeShell::fromJSRuntime(JSRuntime * rt) {
-        return (BeShell *)JS_GetRuntimeOpaque2(rt) ;
-    }
 
 }
