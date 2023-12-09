@@ -39,7 +39,7 @@ namespace be {
         case RUN:
         case CALL:
             assert(beshell) ;
-            beshell->repl.input(pkg) ;
+            beshell->repl->input(pkg) ;
             break;
         }
     }

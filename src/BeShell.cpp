@@ -11,23 +11,46 @@
 #include "esp_vfs_fat.h"
 #endif
 
+using namespace std ;
+
 namespace be {
 
 
     BeShell::BeShell()
         : boot_level(5)
-        , telnet(this)
-        , repl(this)
-        , engine(&telnet)
-    {}
+    {
+        nvs = new NVS() ;
+        fs = new FS() ;
+        repl = new REPL(this) ;
+        telnet = new Telnet(this) ;
+        engine = new JSEngine(telnet) ;
+
+        p1 = this ;
+        p2 = this ;
+
+        cout << endl ;
+    }
+    BeShell::~BeShell() {
+        delete nvs ;
+        delete fs ;
+        delete repl ;
+        delete telnet ;
+        delete engine ;
+        
+        nvs = nullptr ;
+        fs = nullptr ;
+        repl = nullptr ;
+        telnet = nullptr ;
+        engine = nullptr ;
+    }
 
     
     void BeShell::setup() {
 
         // ESP_ERROR_CHECK(esp_event_loop_create_default());
         
-        nvs.readOneTime("rst-lv", &boot_level) ;
-        nvs.readOneTime("rst-nowifi", (uint8_t *)&nowifi) ;
+        nvs->readOneTime("rst-lv", &boot_level) ;
+        nvs->readOneTime("rst-nowifi", (uint8_t *)&nowifi) ;
 
         // 文件系统
 #ifdef PLATFORM_ESP32   
@@ -41,16 +64,16 @@ namespace be {
 #else
 #endif
 
-        telnet.setup() ;
+        telnet->setup() ;
 
-        engine.setup(this) ;
+        engine->setup(this) ;
     }
 
     void BeShell::loop() {
 
-        telnet.loop() ;
+        telnet->loop() ;
 
-        engine.loop() ;
+        engine->loop() ;
     }
 
     void BeShell::main() {

@@ -28,14 +28,17 @@ namespace be {
 
     public:
 
-        NVS nvs ;
-        FS fs ;
-        Telnet telnet ;
-        REPL repl ;
+        NVS * nvs ;
+        FS * fs ;
+        Telnet * telnet ;
+        REPL * repl ;
+        JSEngine * engine ;
 
-        JSEngine engine ;
+        void * p1 ;
+        void * p2 ;
 
         BeShell() ;
+        ~BeShell() ;
         void setup();
         inline void loop() ;
         void main() ;
