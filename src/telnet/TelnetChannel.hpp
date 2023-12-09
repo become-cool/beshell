@@ -13,10 +13,13 @@ namespace be {
         // TelnetPkgProcFunc packageHandler = nullptr;
         Telnet * telnet = nullptr ;
     public:
+        bool echoInput = false ;
+
         TelnetChannel(Telnet *) ;
         virtual void setup () ;
         virtual void loop () ;
-        virtual void send (Package & pkg) ;
-        virtual void send (const char * data, size_t datalen) = 0 ;
+        virtual void sendData (const char * data, size_t datalen) = 0 ;
+        void send (const char * data, int datalen=-1) ;
+        void send (Package & pkg) ;
     } ;
 }

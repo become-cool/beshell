@@ -151,13 +151,13 @@ namespace be {
         return (JSEngine *)JS_GetRuntimeOpaque2(rt) ;
     }
 
-    void JSEngine::print(JSValue content, bool pack, int pkgId) {
+    void JSEngine::print(JSValue content, int pkgId, TelnetChannel * ch) {
         assert(telnet) ;
         size_t len ;
         const char * str = JS_ToCStringLen(ctx, &len, content);
         if (len) {
-            if(pack) {
-                telnet->output(OUTPUT,(uint8_t*)str, len, pkgId) ;
+            if(ch) {
+                ch->send(str, len) ;
             } else {
                 telnet->output(str, len) ;
             }
@@ -188,7 +188,7 @@ namespace be {
         if(code_len<0) {
             code_len = strlen(code) ;
         }
-        return JS_Eval(ctx, code, code_len-1, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
+        return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
 
 }

@@ -39,7 +39,7 @@ namespace be {
         case RUN:
         case CALL:
             assert(beshell) ;
-            beshell->repl->input(pkg) ;
+            beshell->repl->input(pkg, ch) ;
             break;
         }
     }
@@ -58,7 +58,7 @@ namespace be {
         channelSeiral.send(pkg) ;
 #endif
 #ifdef PLATFORM_LINUX
-        channelStdIO.send(pkg) ;
+        // channelStdIO.send(pkg) ;
 #endif
     }
 

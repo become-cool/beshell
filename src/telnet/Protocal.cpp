@@ -43,7 +43,7 @@ namespace be {
 
         head.fields.h1 = h1 ;
         head.fields.h2 = h2 ;
-        reset(pkgid,cmd) ;
+        reset(pkgid,cmd,body_len) ;
     }
 
     void Package::reset(uint8_t pkgid, uint8_t cmd,size_t bodylen) {

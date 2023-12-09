@@ -17,10 +17,9 @@ namespace be {
         static void task(void * argv) ;
 
     public:
-        using TelnetChannel::TelnetChannel ;
+        TelnetSerial(Telnet *) ;
         void setup() ;
         void loop () ;
-        void send (Package & pkg) ;
-        void send (const char * data, size_t datalen) ;
+        void sendData (const char * data, size_t datalen) ;
     } ;
 }

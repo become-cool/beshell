@@ -27,7 +27,7 @@ namespace be {
         void setup(BeShell *) ;
         void loop() ;
 
-        void print(JSValue content, bool pack=false, int pkgId=-1) ;
+        void print(JSValue content, int pkgId=-1, TelnetChannel * ch=nullptr) ;
         void dumpError(bool pack=false) ;
 
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;

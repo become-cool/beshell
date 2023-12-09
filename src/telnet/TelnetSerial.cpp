@@ -75,6 +75,11 @@ namespace be {
         vTaskDelete(NULL);
     }
 
+    TelnetSerial::TelnetSerial(Telnet * telnet)
+        :TelnetSerial(telnet) 
+        , echoInput(true)
+    {}
+
     void TelnetSerial::setup () {
 
         if(!uart_is_driver_installed(UART_NUM)) {
@@ -116,13 +121,7 @@ namespace be {
         }
     }
 
-    void TelnetSerial::send (Package & pkg) {
-        uart_write_bytes(UART_NUM, pkg.head.raw, pkg.head_len);
-        uart_write_bytes(UART_NUM, pkg.body, pkg.body_len);
-        uart_write_bytes(UART_NUM, &pkg.verifysum, 1);
-    }
-
-    void TelnetSerial::send (const char * data, size_t datalen) {
+    void TelnetSerial::sendData (const char * data, size_t datalen) {
         uart_write_bytes(UART_NUM, data, datalen);
     }
 }
