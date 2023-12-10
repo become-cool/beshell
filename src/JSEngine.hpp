@@ -18,13 +18,13 @@ namespace be {
     public:
         JSRuntime *rt = nullptr;
         JSContext *ctx = nullptr;
-        Telnet * telnet = nullptr ;
 
+        BeShell * beshell ;
         ModuleLoader mloader ;
         
-        JSEngine(Telnet * telnet) ;
+        JSEngine(BeShell *) ;
 
-        void setup(BeShell *) ;
+        void setup() ;
         void loop() ;
 
         void print(JSValue content, int pkgId=-1, TelnetChannel * ch=nullptr) ;

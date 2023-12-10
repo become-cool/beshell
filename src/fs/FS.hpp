@@ -8,10 +8,8 @@
 #include <map>
 
 
-#ifdef PLATFORM_ESP32
-#include "FSPartitionRaw.hpp"
-#include "FSPartitionFlash.hpp"
-#endif
+#include "FSPartition.hpp"
+
 
 using namespace std ;
 
@@ -22,7 +20,7 @@ namespace be {
     private:
 
 #ifdef PLATFORM_ESP32
-        map<const char *, std::unique_ptr<FSPartition>> partitions;
+        map<string, FSPartition *> partitions;
 #endif
         string prefix ;
 
@@ -33,10 +31,10 @@ namespace be {
         void setPrefix(const char * path) ;
         std::string toVFSPath(const char * path) ;
 
-#ifdef PLATFORM_ESP32
-        void mountRootTar() ;     
-        void mountRaw(const char * path, void * ptr, size_t size) ;
-        void mountPartition(const char * path, uint8_t partion_type, uint8_t partion_id) ;   
-#endif
+        void mount(const char * mountPoint, FSPartition * partition) ;
+
+        bool exist(const char * path) ;
+        bool isDir(const char * path) ;
+        bool isFile(const char * path) ;
     } ;
 }

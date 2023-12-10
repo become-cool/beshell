@@ -10,8 +10,8 @@ list(APPEND src_dirs src/module)
 # # little fs
 # list(APPEND include_dirs deps/littlefs/src)
 # list(APPEND include_dirs deps/littlefs/src/littlefs)
-# list(APPEND src_dirs deps/littlefs/src)
-# list(APPEND src_dirs deps/littlefs/src/littlefs)
+list(APPEND src_dirs src/deps/littlefs/src)
+list(APPEND src_dirs src/deps/littlefs/src/littlefs)
 
 # quickjs
 list(APPEND src_dirs src/deps/quickjs)
