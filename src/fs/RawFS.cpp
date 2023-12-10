@@ -40,8 +40,6 @@ namespace be {
 
 
     static vfs_node_t * vfs_node_walk_path(vfs_node_t * parent, const char * path, size_t len) {
-    // ds(path)
-    // dn(len)
 
         // 跳过开头的 /
         if(path[0]=='/') {
@@ -385,4 +383,8 @@ namespace be {
     void RawFS::unmount() {
         cout << "not implements" <<endl ;
     }
+    void RawFS::usage(size_t * total, size_t * used) {
+        *total = 0 ;
+        *used = 0 ;
+    };
 }

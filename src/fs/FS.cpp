@@ -39,7 +39,7 @@ namespace be {
         string point = toVFSPath(mountPoint) ;
         cout << point << endl ;
         partitions[point] = partition ;
-        partition->mount(mountPoint) ;
+        partition->mount(point.c_str()) ;
 #endif
     }
     
@@ -50,7 +50,12 @@ namespace be {
     std::string FS::toVFSPath(const char * path) {
         std::string p(path) ;
         if(path[0]=='/' && strncmp(path,prefix.c_str(),prefix.length())!=0) {
-            p = prefix + p ;
+            if(p.size()>1) {
+                p = prefix + p ;
+            }
+            else {
+                p = prefix ;
+            }
         }
         return p ;
     }

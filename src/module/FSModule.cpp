@@ -146,13 +146,13 @@ namespace be {
 
         CHECK_IS_NOT_DIR(path)
 
-        int readlen = -1 ;
+        int32_t readlen = -1 ;
         if(argc>1) {
             JS_ToInt32(ctx, &readlen, argv[1]) ;
         }
         int offset = 0 ;
         if(argc>2) {
-            JS_ToInt32(ctx, &offset, argv[2]) ;
+            JS_ToInt32(ctx, (int32_t*)&offset, argv[2]) ;
         }
 
         if(readlen<0) {
@@ -163,7 +163,7 @@ namespace be {
             return JS_NewArrayBuffer(ctx, NULL, 0, freeArrayBuffer, NULL, false) ;
         }
 
-        char * buff = (char *)malloc(readlen) ;
+        char * buff = (char *)malloc((int)readlen) ;
 
         if(!buff) {
             THROW_EXCEPTION("Failed to malloc buff");
@@ -268,7 +268,6 @@ namespace be {
         
         CHECK_ARGC(1)
         FETCH_FS
-
         ARGV_PATH(path, 0)
 
         DIR* dir = opendir(path.c_str());
@@ -325,7 +324,7 @@ namespace be {
 
 #ifdef PLATFORM_ESP32
         // esp32 vfs 读取目录时，忽略了挂载点，将已知挂载点补充上
-        if(strcmp(path,"/fs/")==0 || strcmp(path,"/fs")==0) {
+        if(strcmp(path.c_str(),"/fs/")==0 || strcmp(path.c_str(),"/fs")==0) {
             if(detail) {
                 JSValue item = JS_NewObject(ctx) ;
                 JS_SetPropertyStr(ctx, item, "name", JS_NewString(ctx, "home") ) ;
@@ -400,51 +399,50 @@ namespace be {
         size_t used = 0 ;
         size_t free_ = 0 ;
 
-#ifdef PLATFORM_ESP32
-        if(strcmp(jslabel,"/home")==0){
-            // littlefs
-            if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {
-                JS_FreeCString(ctx, jslabel) ;
-                THROW_EXCEPTION("esp_littlefs_info() bad")
-            }
+// #ifdef PLATFORM_ESP32
+//         if(strcmp(jslabel,"/home")==0){
+//             // littlefs
+//             if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {
+//                 JS_FreeCString(ctx, jslabel) ;
+//                 THROW_EXCEPTION("esp_littlefs_info() bad")
+//             }
 
-            // fatfs
-            // size_t free_ = 0 ;
-            // esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-            // if( err != ESP_OK ) {
-            //     JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-            //     JS_FreeCString(ctx, jslabel) ;
-            //     return JS_EXCEPTION ;
-            // }
-            // used = total - free_ ;
-        }
-        else 
-        if(strcmp(jslabel,"/")==0) {
-            vfs_rawfs_t * fs = be_rawfs_root() ;
-            if(fs) {
-                used = fs->size ;
-                total = fs->partition_size ;
-            }
-        }
-        else {
-#if ESP_IDF_VERSION_MAJOR >= 5
-            esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-            if( err != ESP_OK ) {
-                JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-                JS_FreeCString(ctx, jslabel) ;
-                return JS_EXCEPTION ;
-            }
-            used = total - free_ ;
-#else
-            total = 0 ;
-            used = 0 ;
-            free_ = 0 ;
-#endif
-        }
-
+//             // fatfs
+//             // size_t free_ = 0 ;
+//             // esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
+//             // if( err != ESP_OK ) {
+//             //     JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
+//             //     JS_FreeCString(ctx, jslabel) ;
+//             //     return JS_EXCEPTION ;
+//             // }
+//             // used = total - free_ ;
+//         }
+//         // else if(strcmp(jslabel,"/")==0) {
+//         //     vfs_rawfs_t * rootfs = be_rawfs_root() ;
+//         //     if(fs) {
+//         //         used = rootfs->size ;
+//         //         total = rootfs->partition_size ;
+//         //     }
+//         // }
+//         else {
+// #if ESP_IDF_VERSION_MAJOR >= 5
+//             esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
+//             if( err != ESP_OK ) {
+//                 JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
+//                 JS_FreeCString(ctx, jslabel) ;
+//                 return JS_EXCEPTION ;
+//             }
+//             used = total - free_ ;
+// #else
+//             total = 0 ;
+//             used = 0 ;
+//             free_ = 0 ;
+// #endif
+//         }
 
 
-#endif
+
+// #endif
         JS_FreeCString(ctx, jslabel) ;
 
         JSValue obj = JS_NewObject(ctx) ;

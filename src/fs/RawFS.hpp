@@ -44,5 +44,6 @@ namespace be {
         RawFS(void * ptr, size_t size) ;
         bool mount(const char * mountPoint) ;
         void unmount() ;
+        void usage(size_t * total, size_t * used) ;
     } ;
 }

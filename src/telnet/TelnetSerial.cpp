@@ -18,6 +18,8 @@
 
 #define PKG_QUEUE_LEN 5
 
+using namespace std ;
+
 namespace be {
 
     void TelnetSerial::task(void * argv) {        
@@ -83,8 +85,12 @@ namespace be {
 
     void TelnetSerial::setup () {
 
+        cout << flush ;
+        vTaskDelay(15/portTICK_PERIOD_MS) ;
+
         if(!uart_is_driver_installed(UART_NUM)) {
             uart_driver_install(UART_NUM, BUF_SIZE * 2, BUF_SIZE * 2, 20, &uart_queue, 0);
+            vTaskDelay(15/portTICK_PERIOD_MS) ;
         }
         uart_config_t uart_config = {
             .baud_rate = 115200,
