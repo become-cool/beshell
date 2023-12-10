@@ -2,8 +2,10 @@
 #include <string.h>
 #include <cassert>
 #include <functional>
+#include <iostream>
 #include "debug.h"
 
+using namespace std ;
 
 namespace be {
 
@@ -21,9 +23,13 @@ namespace be {
         fe.u.func.cfunc.generic = func ;
         funcs.push_back(fe) ;
     }
+    
+    NativeModule * NativeModule::fromJSModuleDef(JSModuleDef *m) {
+        return (NativeModule *) JS_GetModuleDefOpaque(m) ;
+    }
 
     int NativeModule::importModule(JSContext *ctx, JSModuleDef *m) {
-        NativeModule * nmodule = (NativeModule *) JS_GetModuleDefOpaque(m) ;
+        NativeModule * nmodule = fromJSModuleDef(m) ;
         assert(nmodule) ;
 
         int funcCnt = nmodule->funcs.size() ;
@@ -44,15 +50,6 @@ namespace be {
             JS_AddModuleExport(ctx, m, f.name) ;
         }
         return  m ;
-    }
-
-    JSValue NativeModule::createGlobalObject(JSContext * ctx, const char * name) {
-        JSValue global = JS_GetGlobalObject(ctx) ;
-        JSValue object = JS_NewObject(ctx) ;
-        JS_SetPropertyStr(ctx, global, name, object);
-        // JS_FreeValue(ctx,object) ;
-        JS_FreeValue(ctx,global) ;
-        return object ;
     }
     
     void NativeModule::load(JSContext * ctx) {}

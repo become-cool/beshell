@@ -63,17 +63,20 @@ namespace be {
         JSValue global = JS_GetGlobalObject(ctx) ;
 
         for (const auto & pair : modules) {
-            std::cout << pair.first << endl ;
             JSModuleDef * m = pair.second->createModule(ctx) ;
             pair.second->load(ctx) ;
 
             if(pair.second->replGlobal) {
-                JSValue mi = js_get_module_ns(ctx, m ) ;
+
+                JSModuleDef * mm = JS_RunModule(ctx, "", pair.first.c_str());
+                JSValue mi = js_get_module_ns(ctx, mm ) ;
+
                 if (JS_IsException(mi)){
                     // todo
                 } else {
                     JS_SetPropertyStr(ctx, global, pair.first.c_str(), mi);
                 }
+                JS_FreeValue(ctx, mi) ;
             }
         }
         

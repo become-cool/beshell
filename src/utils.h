@@ -9,12 +9,6 @@
 extern "C" {
 #endif
 
-#ifdef PLATFORM_LINUX
-
-void echo_error(JSContext *) ;
-
-#endif
-
 
 #define JS_IsFalse(ctx, var) (JS_IsBool(var) && !JS_ToBool(ctx, var))
 #define JS_IsTrue(ctx, var) (JS_IsBool(var) && JS_ToBool(ctx, var))
@@ -149,18 +143,6 @@ void echo_error(JSContext *) ;
         THROW_EXCEPTION("argv is not a ArrayBuffer")                                \
     }
 
-#define EVAL_CODE_LEN(str, len, filename)                                           \
-    {                                                                               \
-    JSValue ret = JS_Eval(ctx, str, len, filename, JS_EVAL_TYPE_GLOBAL|JS_EVAL_FLAG_STRIP) ;           \
-	if(JS_IsException(ret)) {                                                       \
-		echo_error(ctx) ;                                                           \
-	}                                                                               \
-	JS_FreeValue(ctx, ret) ;                                                        \
-    }
-
-void eval_code_len(JSContext *ctx, const char * str,size_t len,const char * filename, bool es6Module) ;
-
-#define EVAL_CODE(str, filename) eval_code_len(ctx, str, strlen(str), filename, false) ;
 
 #define CALL_IDF_API(func_invoke)           \
     {                                       \
@@ -243,8 +225,6 @@ void eval_code_len(JSContext *ctx, const char * str,size_t len,const char * file
 uint64_t gettime() ;
 uint64_t gettime_us() ;
 uint64_t gettime_ns() ;
-
-char * mallocf(char * format, ...) ;
 
 void * mallocDMA(size_t size) ;
 

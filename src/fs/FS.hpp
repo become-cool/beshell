@@ -14,7 +14,6 @@
 using namespace std ;
 
 
-
 namespace be {
     class FS {
     private:
@@ -36,5 +35,7 @@ namespace be {
         bool exist(const char * path) ;
         bool isDir(const char * path) ;
         bool isFile(const char * path) ;
+        bool rm(const char * path, bool recursive) ;
+        bool mkdir(const char * path, bool recursive) ;
     } ;
 }

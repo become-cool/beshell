@@ -146,7 +146,7 @@ namespace be {
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
-        return (JSEngine *)JS_GetRuntimeOpaque( JS_GetRuntime(ctx) ) ;
+        return (JSEngine *)JS_GetRuntimeOpaque2( JS_GetRuntime(ctx) ) ;
     }
     JSEngine * JSEngine::fromJSRuntime(JSRuntime * rt) {
         return (JSEngine *)JS_GetRuntimeOpaque2(rt) ;

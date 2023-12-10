@@ -18,12 +18,10 @@ namespace be {
         NativeModule(const char * name) ;
 
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
-        JSValue createGlobalObject(JSContext * ctx, const char * name) ;
 
         JSModuleDef * createModule(JSContext *) ;
         virtual void load(JSContext * ctx) ;
 
-        
-        // std::vector<JSCFunctionListEntry> & allExportedFunctions() ;
+        inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;
     } ;
 }

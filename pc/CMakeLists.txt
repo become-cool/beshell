@@ -34,6 +34,7 @@ set(SRC_LIST
     src/REPL.cpp
     src/NVS.cpp
     src/path.c
+    src/utils.c
 
     src/module/NativeModule.cpp
     src/module/FSModule.cpp

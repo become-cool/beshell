@@ -16,10 +16,10 @@ namespace be {
     private:
 
     public:
+        BeShell * beshell ;
         JSRuntime *rt = nullptr;
         JSContext *ctx = nullptr;
 
-        BeShell * beshell ;
         ModuleLoader mloader ;
         
         JSEngine(BeShell *) ;

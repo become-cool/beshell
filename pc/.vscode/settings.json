@@ -47,6 +47,8 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "map": "cpp",
-        "cassert": "cpp"
-    }
+        "cassert": "cpp",
+        "iomanip": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
