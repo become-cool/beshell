@@ -13,10 +13,18 @@ namespace be {
     {}
 
     void REPL::input(Package & pkg, TelnetChannel * ch) {
-        
         assert(beshell) ;
+        if(pkg.body_len<1) {
+            return ;
+        }
+        size_t content_len = pkg.body_len ;
+        // 字符串末尾的 0
+        if(pkg.body[pkg.body_len-1] == 0){
+            content_len -- ;
+        } ;
         JSValue ret = beshell->engine->eval((char *)pkg.body, pkg.body_len,"eval") ;
         if(JS_IsException(ret)) {
+            dd
             beshell->engine->dumpError(pkg.head.fields.cmd!=LINE) ;
         }
         else {
