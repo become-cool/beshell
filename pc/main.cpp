@@ -8,13 +8,6 @@ using namespace be;
 int main() {
     
     BeShell beshell ;
-    beshell.setup() ;
-
-    
-
-    while(1) {
-        beshell.loop() ;
-    }
-
+    beshell.main() ;
     return 0 ;
 }

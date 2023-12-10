@@ -9,6 +9,8 @@ namespace be {
     private:
         std::vector<JSCFunctionListEntry> funcs ;
 
+        static int importModule(JSContext *ctx, JSModuleDef *m) ;
+
     public:
         std::string name ;
         bool replGlobal = false ;

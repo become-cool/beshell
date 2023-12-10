@@ -87,10 +87,13 @@ namespace be {
     }
 
     void BeShell::main() {
+        // enable basic functions
         useFS() ;
         useREPL() ;
 
         setup() ;
+
+        // main loop
         run() ;
     }
 

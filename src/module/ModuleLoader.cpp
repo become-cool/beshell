@@ -19,13 +19,12 @@ namespace be {
         static JSValue js_require(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             
             CHECK_ARGC(1)
-dd
             ARGV_TO_STRING(0, module_name)
-dd
+
             JSModuleDef * m = JS_RunModule(ctx, "", module_name);
-            dd
+
             JS_FreeCString(ctx, module_name);
-dd
+
             if (!m){
                 return JS_EXCEPTION ;
             }
@@ -35,7 +34,7 @@ dd
             if (JS_IsException(ns)){
                 return JS_EXCEPTION ;
             }
-dd
+
             return ns ;
         }
 
@@ -58,23 +57,32 @@ dd
     }
 
     void ModuleLoader::setup(JSContext * ctx) {
-        
-        JS_SetModuleLoaderFunc(JS_GetRuntime(ctx), normalize, load, NULL);
+
+        JS_SetModuleLoaderFunc(JS_GetRuntime(ctx), normalize, load, this);
+
+        JSValue global = JS_GetGlobalObject(ctx) ;
 
         for (const auto & pair : modules) {
             std::cout << pair.first << endl ;
-            pair.second->createModule(ctx) ;
+            JSModuleDef * m = pair.second->createModule(ctx) ;
             pair.second->load(ctx) ;
 
             if(pair.second->replGlobal) {
-
+                JSValue mi = js_get_module_ns(ctx, m ) ;
+                if (JS_IsException(mi)){
+                    // todo
+                } else {
+                    JS_SetPropertyStr(ctx, global, pair.first.c_str(), mi);
+                }
             }
         }
+        
+        JS_FreeValue(ctx,global) ;
     }
 
     // 返回的字符串，需要由调用者 js_free
     std::string ModuleLoader::resovleFS(FS & fs, const char * module_name, const char * base_dir) {
-dd
+
         std::string fullpath = base_dir ;
         fullpath+= "/" ;
         fullpath+= module_name ;
@@ -105,18 +113,15 @@ dd
     }
 
     char * ModuleLoader::normalize(JSContext *ctx, const char *module_base_name, const char *module_name, void *opaque) {
+        assert(opaque) ;
+        ModuleLoader * mloader = (ModuleLoader *)opaque ;
+
         // 内置模块 
         // -------------
-        if(
-            strcmp(module_name,"fs")==0
-            || strcmp(module_name,"path")==0
-            || strcmp(module_name,"loader")==0
-            || strcmp(module_name,"wifi")==0
-            || strcmp(module_name,"gpio")==0
-            || strcmp(module_name,"utils")==0
-            || strcmp(module_name,"telnet")==0
-        ) {
-            return js_strdup(ctx, module_name) ;
+        for (const auto & pair : mloader->modules) {
+            if( pair.first==module_name ) {
+                return js_strdup(ctx, module_name) ;
+            }
         }
 
         return nullptr ;

@@ -790,6 +790,7 @@ struct JSModuleDef {
     BOOL eval_has_exception : 8; 
     JSValue eval_exception;
     JSValue meta_obj; /* for import.meta */
+    void * user_opaque ;
 };
 
 typedef struct JSJobEntry {
@@ -53643,4 +53644,13 @@ void *JS_GetRuntimeOpaque2(JSRuntime *rt)
 void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque)
 {
     rt->user_opaque2 = opaque;
+}
+
+void *JS_GetModuleDefOpaque(JSModuleDef *m)
+{
+    return m->user_opaque;
+}
+void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque)
+{
+    m->user_opaque = opaque;
 }

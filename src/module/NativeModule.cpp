@@ -1,5 +1,6 @@
 #include "NativeModule.hpp"
 #include <string.h>
+#include <cassert>
 #include <functional>
 #include "debug.h"
 
@@ -21,14 +22,23 @@ namespace be {
         funcs.push_back(fe) ;
     }
 
+    int NativeModule::importModule(JSContext *ctx, JSModuleDef *m) {
+        NativeModule * nmodule = (NativeModule *) JS_GetModuleDefOpaque(m) ;
+        assert(nmodule) ;
+
+        int funcCnt = nmodule->funcs.size() ;
+        JSCFunctionListEntry func_list[funcCnt] ;
+
+        for(int i=0;i<funcCnt;i++) {
+            func_list[i] = nmodule->funcs[i] ;
+        }
+        return JS_SetModuleExportList(ctx, m, func_list, nmodule->funcs.size());
+    }
+
     JSModuleDef * NativeModule::createModule(JSContext * ctx) {
 
-        std::function<JSModuleInitFunc> import_module([this](JSContext *ctx, JSModuleDef *m)->int {
-            // return JS_SetModuleExportList(ctx, m, js_funcs, countof(js_funcs));
-            return 0 ;
-        }) ;
-
-        JSModuleDef * m = JS_NewCModule(ctx, name.c_str(), import_module.target<JSModuleInitFunc>());
+        JSModuleDef * m = JS_NewCModule(ctx, name.c_str(), importModule);
+        JS_SetModuleDefOpaque(m,this) ;
 
         for(auto f: funcs) {
             JS_AddModuleExport(ctx, m, f.name) ;
@@ -45,6 +55,5 @@ namespace be {
         return object ;
     }
     
-    void NativeModule::load(JSContext * ctx) {
-    }
+    void NativeModule::load(JSContext * ctx) {}
 }
