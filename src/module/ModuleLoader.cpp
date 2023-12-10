@@ -17,7 +17,6 @@ namespace be {
         };
 
         static JSValue js_require(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            dd
             
             CHECK_ARGC(1)
 dd
@@ -75,7 +74,7 @@ dd
 
     // 返回的字符串，需要由调用者 js_free
     std::string ModuleLoader::resovleFS(FS & fs, const char * module_name, const char * base_dir) {
-
+dd
         std::string fullpath = base_dir ;
         fullpath+= "/" ;
         fullpath+= module_name ;
@@ -83,24 +82,24 @@ dd
         // to vfs path
         fullpath = fs.toVFSPath(fullpath.c_str()) ;
 
-        if(FSModule::isFile(fullpath.c_str())) {
-            return fullpath ;
-        }
+        // if(FSModule::isFile(fullpath.c_str())) {
+        //     return fullpath ;
+        // }
 
-        if(FSModule::isDir(fullpath.c_str())) {
-            // @todo package
+        // if(FSModule::isDir(fullpath.c_str())) {
+        //     // @todo package
 
-            // index.js
-            fullpath+= "/index.js" ;
-            if(FSModule::isFile(fullpath.c_str())) {
-                return fullpath ;
-            }
-        }
+        //     // index.js
+        //     fullpath+= "/index.js" ;
+        //     if(FSModule::isFile(fullpath.c_str())) {
+        //         return fullpath ;
+        //     }
+        // }
         
-        fullpath = fullpath+= ".bin" ;
-        if(FSModule::isFile(fullpath.c_str())) {
-            return fullpath ;
-        }
+        // fullpath = fullpath+= ".bin" ;
+        // if(FSModule::isFile(fullpath.c_str())) {
+        //     return fullpath ;
+        // }
 
         return std::string("") ;
     }

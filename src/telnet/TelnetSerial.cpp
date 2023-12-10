@@ -76,9 +76,10 @@ namespace be {
     }
 
     TelnetSerial::TelnetSerial(Telnet * telnet)
-        :TelnetSerial(telnet) 
-        , echoInput(true)
-    {}
+        :TelnetChannel(telnet) 
+    {
+        echoInput = true ;
+    }
 
     void TelnetSerial::setup () {
 

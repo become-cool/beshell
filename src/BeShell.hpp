@@ -27,22 +27,22 @@ namespace be {
         bool nowifi = false ;
 
     public:
+        NVS * nvs = nullptr ;
+        FS * fs = nullptr ;
+        Telnet * telnet = nullptr ;
+        REPL * repl = nullptr ;
 
-        NVS * nvs ;
-        FS * fs ;
-        Telnet * telnet ;
-        REPL * repl ;
-        JSEngine * engine ;
-
-        void * p1 ;
-        void * p2 ;
+        JSEngine * engine = nullptr ;
 
         BeShell() ;
         ~BeShell() ;
         void setup();
         inline void loop() ;
+        void run() ;
         void main() ;
 
+        void useFS() ;
+        void useREPL() ;
     } ;
 
 }

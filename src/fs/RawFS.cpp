@@ -1,4 +1,4 @@
-#include "FSPartitionRaw.hpp"
+#include "RawFS.hpp"
 #include <sys/errno.h>
 #include <sys/fcntl.h>
 #include <sys/lock.h>
@@ -9,7 +9,7 @@
 #include <iostream>
 #include "debug.h"
 
-
+using namespace std ;
 
 namespace be {
 
@@ -108,7 +108,7 @@ namespace be {
 
     #define WARNING_READONLY(op) \
         printf("read only FS operation not supported: %s.\n",op) ;
-    #define RAWFS ((FSPartitionRaw *)ctx)
+    #define RAWFS ((RawFS *)ctx)
     
     static int vfs_rawfs_open(void* ctx, const char * path, int flags, int mode) {
         vfs_node_t * node = vfs_node_walk_path(RAWFS->root, path, strlen(path));
@@ -335,11 +335,11 @@ namespace be {
         return node ;
     }
 
-    FSPartitionRaw::FSPartitionRaw(void * _ptr, size_t _size)
+    RawFS::RawFS(void * _ptr, size_t _size)
         : ptr(_ptr)
         , size(_size)
     {}
-    void FSPartitionRaw::mount(const char * _mountPoint) {
+    bool RawFS::mount(const char * _mountPoint) {
 
         root = parse_tree((char *)ptr, NULL, (char**)&data_ptr, NULL) ;
 
@@ -376,9 +376,13 @@ namespace be {
         esp_err_t err = esp_vfs_register(_mountPoint, &vfs, this);
         if (err != ESP_OK) {
             std::cout << "Failed to register tar fs" << std::endl ;
-            return ;
+            return false ;
         }
 
         mountPoint = _mountPoint ;
+        return true ;
+    }
+    void RawFS::unmount() {
+        cout << "not implements" <<endl ;
     }
 }

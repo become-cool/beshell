@@ -34,14 +34,15 @@ namespace be {
     } vfs_rawfs_fd_t;
 
 
-    class FSPartitionRaw: public FSPartition {
+    class RawFS: public FSPartition {
     public:
         void * ptr ;
         void * data_ptr ;
         size_t size ;
         vfs_node_t * root = nullptr ;
         vfs_rawfs_fd_t fds[MAX_OPEN_FD] ;
-        FSPartitionRaw(void * ptr, size_t size) ;
-        void mount(const char * mountPoint) ;
+        RawFS(void * ptr, size_t size) ;
+        bool mount(const char * mountPoint) ;
+        void unmount() ;
     } ;
 }

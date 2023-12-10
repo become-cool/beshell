@@ -1,5 +1,6 @@
 #include "REPL.hpp"
 #include "BeShell.hpp"
+#include "telnet/Telnet.hpp"
 #include "debug.h"
 #include <cassert>
 #include <iomanip>
@@ -21,10 +22,14 @@ namespace be {
         else {
             if(pkg.head.fields.cmd==LINE) {
                 if(ch->echoInput) {
-                    beshell->telnet->output((char *)pkg.body, pkg.body_len) ;
+                    if(beshell->telnet){
+                        beshell->telnet->output((char *)pkg.body, pkg.body_len) ;
+                    }
                 }
                 beshell->engine->print(ret, -1, ch) ;
-                beshell->telnet->output("\n", 1) ;
+                if(beshell->telnet) {
+                    beshell->telnet->output("\n", 1) ;
+                }
             } else {
                 beshell->engine->print(ret, pkg.head.fields.pkgid, ch) ;
             }

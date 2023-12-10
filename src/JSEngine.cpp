@@ -6,6 +6,8 @@
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
 #include <cassert>
+#include <iostream>
+#include <iomanip>
 
 #ifdef PLATFORM_ESP32
 #include "malloc_funcs.h"
@@ -39,12 +41,11 @@ namespace be {
 
 
 
-    JSEngine::JSEngine(Telnet * _telnet)
-        : telnet(_telnet)
-    {
-    }
+    JSEngine::JSEngine(BeShell * _beshell)
+        : beshell(_beshell)
+    {}
 
-    void JSEngine::setup(BeShell * beshell) {
+    void JSEngine::setup() {
         if(rt!=NULL) {
             return ;
         }
@@ -152,14 +153,16 @@ namespace be {
     }
 
     void JSEngine::print(JSValue content, int pkgId, TelnetChannel * ch) {
-        assert(telnet) ;
+        assert(beshell) ;
         size_t len ;
         const char * str = JS_ToCStringLen(ctx, &len, content);
         if (len) {
             if(ch) {
                 ch->send(str, len) ;
+            } else if(beshell->telnet) {
+                beshell->telnet->output(str, len) ;
             } else {
-                telnet->output(str, len) ;
+                cout << setw(len) << str ;
             }
         }
         if(str) {
