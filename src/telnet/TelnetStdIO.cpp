@@ -45,7 +45,7 @@ namespace be {
     }
 
     void TelnetStdIO::sendData (const char * data, size_t datalen) {
-        cout << std::setw(datalen) << data << endl ;
+        cout << std::setw(datalen) << data << flush ;
     }
 }
 

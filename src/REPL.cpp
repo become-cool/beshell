@@ -24,9 +24,7 @@ namespace be {
                     beshell->telnet->output((char *)pkg.body, pkg.body_len) ;
                 }
                 beshell->engine->print(ret, -1, ch) ;
-                if(ch->echoInput) {
-                    beshell->telnet->output("\n", 1) ;
-                }
+                beshell->telnet->output("\n", 1) ;
             } else {
                 beshell->engine->print(ret, pkg.head.fields.pkgid, ch) ;
             }
