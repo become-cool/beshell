@@ -22,9 +22,8 @@ namespace be {
         if(pkg.body[pkg.body_len-1] == 0){
             content_len -- ;
         } ;
-        JSValue ret = beshell->engine->eval((char *)pkg.body, pkg.body_len,"eval") ;
+        JSValue ret = beshell->engine->eval((char *)pkg.body, content_len,"eval") ;
         if(JS_IsException(ret)) {
-            dd
             beshell->engine->dumpError(pkg.head.fields.cmd!=LINE) ;
         }
         else {
