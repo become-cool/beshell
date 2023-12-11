@@ -32,8 +32,7 @@ namespace be {
         void setup() ;
         void loop() ;
 
-        void output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid=-1) ;
-        void output(const char * data, size_t datalen) ;
+        void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
         void onReceived(TelnetChannel * , Package &) ;
     } ;

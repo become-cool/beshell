@@ -27,8 +27,8 @@ namespace be {
         void setup() ;
         void loop() ;
 
-        void print(JSValue content, int pkgId=-1, TelnetChannel * ch=nullptr) ;
-        void dumpError(bool pack=false) ;
+        void print(JSValue content, int pkgId=-1, uint8_t cmd=OUTPUT, TelnetChannel * ch=nullptr) ;
+        void dumpError(int pkgId=-1, uint8_t cmd=OUTPUT) ;
 
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
         void evalScript(const char * filepath, int flags=JS_EVAL_TYPE_GLOBAL) ;

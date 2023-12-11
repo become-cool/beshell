@@ -18,8 +18,8 @@ namespace be {
 		, RUN = 1					// 执行js代码，无返回值
 		, CALL = 2					// 执行js代码，有返回值
 		, CALL_ASYNC = 3			// 执行js代码，有异步返回值
-		, RSPN = 4					// CMD_CALL 的返回
-		, EXCEPTION = 5				// CMD_RUN/CMD_CALL 的异常
+		, RSPN = 4					// CMD_CALL/CALL_ASYNC 的返回
+		, EXCEPTION = 5				// CMD_RUN/CMD_CALL/CALL_ASYNC 的异常
 		, CALLBACK = 6				// 执行本地js代码(远程发起)
 		, OUTPUT = 7				// 远程输出
 		, DATA = 8					// 数据包(用于 CMD_FILE_PULL_REQ 的回应)
@@ -68,7 +68,7 @@ namespace be {
 		size_t calculateSize() ;
 		void pack() ;
 		void reset(uint8_t pkgid=0, uint8_t cmd=0,size_t bodylen=0);
-		void mallocBody() ;
+		void mallocBody(bool endZero=false) ;
 		void freeBody() ;
 	} ;
 	

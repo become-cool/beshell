@@ -152,15 +152,15 @@ namespace be {
         return (JSEngine *)JS_GetRuntimeOpaque2(rt) ;
     }
 
-    void JSEngine::print(JSValue content, int pkgId, TelnetChannel * ch) {
+    void JSEngine::print(JSValue content, int pkgId, uint8_t cmd, TelnetChannel * ch) {
         assert(beshell) ;
         size_t len ;
         const char * str = JS_ToCStringLen(ctx, &len, content);
         if (len) {
             if(ch) {
-                ch->send(str, len) ;
+                ch->send(str, len, pkgId, cmd) ;
             } else if(beshell->telnet) {
-                beshell->telnet->output(str, len) ;
+                beshell->telnet->output(str, len, pkgId, cmd) ;
             } else {
                 cout << setw(len) << str ;
             }
@@ -170,7 +170,7 @@ namespace be {
         }
     }
 
-    void JSEngine::dumpError(bool pack) {
+    void JSEngine::dumpError(int pkgId, uint8_t cmd) {
         JSValue exception_val = JS_GetException(ctx);
         if(JS_IsNull(exception_val)) {
             return ;

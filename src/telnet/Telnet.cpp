@@ -45,31 +45,23 @@ namespace be {
     }
 
 
-    void Telnet::output(uint8_t cmd, uint8_t * data, size_t datalen, int pkgid) {
+    void Telnet::output(const char * data, size_t datalen, int pkgid, uint8_t cmd) {
         if(pkgid<0) {
             pkgid = autoIncreasePkgId ++ ;
         }
         else {
             pkgid%= 255 ;
         }
-        Package pkg(pkgid,cmd,data,datalen) ;
+        Package pkg((uint8_t)pkgid,cmd,(uint8_t *)data,datalen) ;
         pkg.pack() ;
+
 #ifdef PLATFORM_ESP32
         channelSeiral.send(pkg) ;
 #endif
 #ifdef PLATFORM_LINUX
-        // channelStdIO.send(pkg) ;
-#endif
-    }
-
-    void Telnet::output(const char * data, size_t datalen) {
-#ifdef PLATFORM_ESP32
-        channelSeiral.send(data,datalen) ;
-#endif
-
-#ifdef PLATFORM_LINUX
         channelStdIO.send(data,datalen) ;
 #endif
     }
+
 
 }

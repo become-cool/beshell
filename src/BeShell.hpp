@@ -41,7 +41,7 @@ namespace be {
         void run() ;
         void main() ;
 
-        void useFS() ;
+        void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
         void useREPL() ;
     } ;
 

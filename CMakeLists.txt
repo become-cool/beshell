@@ -71,7 +71,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-permissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
+
 
 # both c and c++
 component_compile_options(-Wno-error=format=)

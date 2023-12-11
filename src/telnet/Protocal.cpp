@@ -115,12 +115,19 @@ namespace be {
         }
     }
 
-    void Package::mallocBody() {
+    void Package::mallocBody(bool endZero) {
         if(body) {
             freeBody() ;
         }
-        if(body_len) {
-            body = (uint8_t *)malloc(body_len) ;
+        int len = body_len ;
+        if(endZero) {
+            len = len + 1 ;
+        }
+        if(len) {
+            body = (uint8_t *)malloc(len) ;
+            if(body && endZero) {
+                body[len-1] = 0 ;
+            }
         }
     }
     void Package::freeBody() {
@@ -191,13 +198,12 @@ namespace be {
             // 到达行尾
             if( bytes[i] == '\n' ) {
 
-                parser->pkg.reset(0, LINE, received+i+2) ;
-                parser->pkg.mallocBody() ;
+                parser->pkg.reset(0, LINE, received+i+1) ;
+                parser->pkg.mallocBody(true) ;
                 // Package * pkg = parser->newPackage(LINE,0,received+i+2) ;
 
                 memcpy(parser->pkg.body, buff, received) ;
                 memcpy(parser->pkg.body+received, bytes, i+1) ;
-                parser->pkg.body[parser->pkg.body_len-1] = 0 ; // 字符串结尾0字节
 
                 // printf((char *)parser->pkg.body) ;
 
@@ -283,7 +289,7 @@ namespace be {
     void StatePkgBody::enter() {
         if(parser->pkg.body_len>0) {
             // parser->pkg.body = (uint8_t *)malloc(parser->pkg.body_len) ;
-            parser->pkg.mallocBody() ;
+            parser->pkg.mallocBody(true) ;
         }
         else {
             parser->pkg.body = NULL ;

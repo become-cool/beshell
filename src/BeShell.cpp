@@ -41,12 +41,15 @@ namespace be {
         DELETE_VAR(engine)
     }
     
-    void BeShell::useFS() {
+    void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(fs) {
             return ;            
         }
         fs = new FS() ;
         engine->mloader.addModule(new FSModule()) ;
+        if(mountPath && partition) {
+            fs->mount(mountPath,partition) ;
+        }
     }
     void BeShell::useREPL() {
         if(repl) {
