@@ -5,6 +5,7 @@
 #include <string.h>
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
+#include "module/Console.hpp"
 #include <cassert>
 #include <iostream>
 #include <iomanip>
@@ -12,6 +13,8 @@
 #ifdef PLATFORM_ESP32
 #include "malloc_funcs.h"
 #endif
+
+using namespace std ;
 
 
 namespace be {
@@ -86,7 +89,7 @@ namespace be {
         }
 
         JS_AddIntrinsicBaseObjects(ctx);
-        // JS_AddIntrinsicDate(ctx);
+        JS_AddIntrinsicDate(ctx);
         JS_AddIntrinsicEval(ctx);
         JS_AddIntrinsicStringNormalize(ctx);
         JS_AddIntrinsicRegExp(ctx);
@@ -154,37 +157,58 @@ namespace be {
 
     void JSEngine::print(JSValue content, int pkgId, uint8_t cmd, TelnetChannel * ch) {
         assert(beshell) ;
-        size_t len ;
-        const char * str = JS_ToCStringLen(ctx, &len, content);
-        if (len) {
-            if(ch) {
-                ch->send(str, len, pkgId, cmd) ;
-            } else if(beshell->telnet) {
-                beshell->telnet->output(str, len, pkgId, cmd) ;
-            } else {
-                cout << setw(len) << str ;
-            }
-        }
-        if(str) {
-            JS_FreeCString(ctx, str) ;
+        dd
+        const char * cstr = JS_ToCString(ctx, content) ;
+        dp(cstr)
+        dp(content)
+        string str = cstr ;
+        dd
+        JS_FreeCString(ctx, cstr) ;
+dd
+        if(ch) {
+            dd
+            ch->send(str.c_str(), str.length(), pkgId, cmd) ;
+        } else if(beshell->telnet) {
+            beshell->telnet->output(str.c_str(), str.length(), pkgId, cmd) ;
+        } else {
+            cout << str ;
         }
     }
 
-    void JSEngine::dumpError(int pkgId, uint8_t cmd) {
+    void JSEngine::dumpError(int pkgId, TelnetChannel * ch) {
+        string str = getExceptionStr() ;
+        if(ch) {
+            ch->send(str.c_str(), str.length(), pkgId, EXCEPTION) ;
+        } else if(beshell->telnet) {
+            beshell->telnet->output(str.c_str(), str.length(), pkgId, EXCEPTION) ;
+        }
+    }
+    
+    string JSEngine::getExceptionStr() {
+        string str ;
         JSValue exception_val = JS_GetException(ctx);
         if(JS_IsNull(exception_val)) {
-            return ;
+            return str ;
         }
+
+        const char * cstr = JS_ToCString(ctx, exception_val) ;
+        str = cstr ;
+        JS_FreeCString(ctx,cstr) ;
+
         bool is_error = JS_IsError(ctx, exception_val);
-        print(exception_val);
         if (is_error) {
             JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack");
             if (!JS_IsUndefined(val)) {
-                print(val);
+                cstr = JS_ToCString(ctx, val) ;
+                str+= "\n" ;
+                str+= cstr;
+                JS_FreeCString(ctx,cstr) ;
             }
             JS_FreeValue(ctx, val);
         }
         JS_FreeValue(ctx, exception_val);
+
+        return str ;
     }
 
     JSValue JSEngine::eval(const char * code, int code_len,const char * filename, int flags) {
@@ -194,4 +218,11 @@ namespace be {
         return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
 
+    JSValue JSEngine::globalObject() {
+        return JS_GetGlobalObject(ctx) ;
+    }
+    
+    string JSEngine::stringify(JSValue val) {
+        return string() ;
+    }
 }

@@ -9,6 +9,7 @@
 
 
 namespace be {
+    class Telnet ;
     class TelnetStdIO: public TelnetChannel {
     private:
     
@@ -17,7 +18,9 @@ namespace be {
         uint8_t buf[10240] ;
 
     public:
-        using TelnetChannel::TelnetChannel ;
+        // using TelnetChannel::TelnetChannel ;
+        
+        TelnetStdIO(Telnet *) ;
         void setup () ;
         void loop () ;
         void sendData (const char * data, size_t datalen) ;

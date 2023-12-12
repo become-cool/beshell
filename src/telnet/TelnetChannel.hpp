@@ -13,7 +13,7 @@ namespace be {
         // TelnetPkgProcFunc packageHandler = nullptr;
         Telnet * telnet = nullptr ;
     public:
-        bool echoInput = false ;
+        bool disableEcho = true ;
 
         TelnetChannel(Telnet *) ;
         virtual void setup () ;

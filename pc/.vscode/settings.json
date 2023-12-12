@@ -48,7 +48,8 @@
         "typeinfo": "cpp",
         "map": "cpp",
         "cassert": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "sstream": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

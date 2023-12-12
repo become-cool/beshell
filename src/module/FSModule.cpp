@@ -14,7 +14,7 @@ using namespace std ;
 
 namespace be {
     FSModule::FSModule(): NativeModule("fs") {
-        replGlobal = true ;
+        isReplGlobal = true ;
 
         exportFunction("mkdirSync", mkdirSync) ;
         exportFunction("rmdirSync", rmdirSync) ;

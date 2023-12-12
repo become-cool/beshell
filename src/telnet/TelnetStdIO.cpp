@@ -10,6 +10,13 @@
 using namespace std ;
 
 namespace be {
+    
+    TelnetStdIO::TelnetStdIO(Telnet * telnet)
+        : TelnetChannel(telnet)
+    {
+        disableEcho = true ;
+    }
+
     void TelnetStdIO::setup () {
     }
     void TelnetStdIO::loop () {
@@ -23,9 +30,6 @@ namespace be {
         size_t num_readable = select(STDIN_FILENO  + 1, &readfds, NULL, NULL, &tv);
         if(errno==EINTR) {
             num_readable = select(STDIN_FILENO  + 1, &readfds, NULL, NULL, &tv);
-        }
-        if (num_readable == -1) {
-            // fprintf(stderr, "\nError in select : %s\n", strerror(errno));
         }
         if (num_readable == 0) {
             return ;

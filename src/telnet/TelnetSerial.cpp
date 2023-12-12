@@ -76,13 +76,7 @@ namespace be {
         dtmp = NULL;
         vTaskDelete(NULL);
     }
-
-    TelnetSerial::TelnetSerial(Telnet * telnet)
-        :TelnetChannel(telnet) 
-    {
-        echoInput = true ;
-    }
-
+    
     void TelnetSerial::setup () {
 
         cout << flush ;

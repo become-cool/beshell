@@ -1,5 +1,7 @@
 #include "module/ModuleLoader.hpp"
 #include "module/NativeModule.hpp"
+#include "module/Process.hpp"
+#include "module/Console.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -48,6 +50,8 @@ namespace be {
 
     ModuleLoader::ModuleLoader() {
         addModule(new JSLoader) ;
+        addModule(new Process) ;
+        addModule(new Console) ;
     }
     ModuleLoader::~ModuleLoader() {
     }
@@ -64,9 +68,8 @@ namespace be {
 
         for (const auto & pair : modules) {
             JSModuleDef * m = pair.second->createModule(ctx) ;
-            pair.second->load(ctx) ;
 
-            if(pair.second->replGlobal) {
+            if(pair.second->isReplGlobal) {
 
                 JSModuleDef * mm = JS_RunModule(ctx, "", pair.first.c_str());
                 JSValue mi = js_get_module_ns(ctx, mm ) ;
@@ -78,6 +81,8 @@ namespace be {
                 }
                 JS_FreeValue(ctx, mi) ;
             }
+            
+            pair.second->onAdded(ctx) ;
         }
         
         JS_FreeValue(ctx,global) ;

@@ -373,33 +373,6 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 JSValue js_get_prop(JSContext *ctx, JSValue obj, int depth, ...)  ;
 JSValue js_get_glob_prop(JSContext *ctx, int depth, ...)  ;
 
-JSValue qjs_def_class(
-        JSContext *ctx,
-        const char * className,
-        JSClassID js_class_id,
-        JSClassDef * js_class_p,
-        const char * cotrName,
-        JSCFunction cotr,
-        const JSCFunctionListEntry* funclst,
-        uint16_t funcs,
-        JSValue parentProto ,
-        JSValue pkg
-) ;
-JSValue qjs_def_class2(
-        JSContext *ctx,
-        const char * className,
-        JSClassID js_class_id,
-        JSClassDef * js_class_p,
-        const char * cotrName,
-        JSCFunction cotr,
-        const JSCFunctionListEntry* funcLst,
-        uint16_t funcs,
-        const JSCFunctionListEntry* staticFuncLst,
-        uint16_t staticFuncs,
-        JSValue parentProto ,
-        JSValue pkg
-) ;
-
 bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 #define QJS_DEF_CLASS(typeName, clzName, fullClzName, parentProto, pkgVar)                          \

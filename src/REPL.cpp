@@ -26,12 +26,14 @@ namespace be {
         if(pkg.body[pkg.body_len-1] == 0){
             content_len -- ;
         } ;
+        
         JSValue ret = beshell->engine->eval((char *)pkg.body, content_len,"eval") ;
+
         if(JS_IsException(ret)) {
-            beshell->engine->dumpError(rspnId, EXCEPTION) ;
+            beshell->engine->dumpError(rspnId) ;
         }
         else {
-            if(echo) {
+            if(echo && !ch->disableEcho) {
                 ch->send((char *)pkg.body, pkg.body_len) ;
             }
             beshell->engine->print(ret, rspnId, RSPN, ch) ;

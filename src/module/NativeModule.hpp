@@ -13,14 +13,16 @@ namespace be {
 
     public:
         std::string name ;
-        bool replGlobal = false ;
+
+        bool isGlobal = false ;
+        bool isReplGlobal = false ;
         
         NativeModule(const char * name) ;
 
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
 
         JSModuleDef * createModule(JSContext *) ;
-        virtual void load(JSContext * ctx) ;
+        virtual void onAdded(JSContext * ctx) ;
 
         inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;
     } ;

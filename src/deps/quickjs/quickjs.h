@@ -1050,10 +1050,10 @@ int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) ;
 void JS_FreeLeaks(JSRuntime *rt,JSContext * ctx) ;
 
 void setTimezoneOffset(int hour) ;
-inline void *JS_GetRuntimeOpaque2(JSRuntime *rt) ;
-inline void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque) ;
-inline void * JS_GetModuleDefOpaque(JSModuleDef *m) ;
-inline void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque) ;
+void *JS_GetRuntimeOpaque2(JSRuntime *rt) ;
+void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque) ;
+void * JS_GetModuleDefOpaque(JSModuleDef *m) ;
+void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque) ;
 
 #ifdef __cplusplus
 } /* extern "C" { */

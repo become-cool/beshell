@@ -37,9 +37,11 @@ set(SRC_LIST
     src/utils.c
 
     src/module/NativeModule.cpp
+    src/module/ModuleLoader.cpp
     src/module/FSModule.cpp
     src/module/Path.cpp
-    src/module/ModuleLoader.cpp
+    src/module/Console.cpp
+    src/module/Process.cpp
 
     src/telnet/Protocal.cpp
     src/telnet/Telnet.cpp
