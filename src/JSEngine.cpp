@@ -157,19 +157,17 @@ namespace be {
 
     void JSEngine::print(JSValue content, int pkgId, uint8_t cmd, TelnetChannel * ch) {
         assert(beshell) ;
-        dd
-        const char * cstr = JS_ToCString(ctx, content) ;
-        dp(cstr)
-        dp(content)
+        size_t len ;
+        const char * cstr = JS_ToCStringLen(ctx, &len, content) ;
+        if(!cstr || len==0) {
+            return ;
+        }
         string str = cstr ;
-        dd
         JS_FreeCString(ctx, cstr) ;
-dd
         if(ch) {
-            dd
-            ch->send(str.c_str(), str.length(), pkgId, cmd) ;
+            ch->send(str.c_str(), len, pkgId, cmd) ;
         } else if(beshell->telnet) {
-            beshell->telnet->output(str.c_str(), str.length(), pkgId, cmd) ;
+            beshell->telnet->output(str.c_str(), len, pkgId, cmd) ;
         } else {
             cout << str ;
         }
