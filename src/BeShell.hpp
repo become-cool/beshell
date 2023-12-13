@@ -8,7 +8,6 @@
 
 #include <queue>
 
-#include "NVS.hpp"
 #include "debug.h"
 #include "JSEngine.hpp"
 #include "REPL.hpp"
@@ -27,7 +26,6 @@ namespace be {
         bool nowifi = false ;
 
     public:
-        NVS * nvs = nullptr ;
         FS * fs = nullptr ;
         Telnet * telnet = nullptr ;
         REPL * repl = nullptr ;

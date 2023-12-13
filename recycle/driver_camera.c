@@ -335,7 +335,7 @@ static void task_camera_tcp_stream(void * data) {
 
 static JSValue js_camera_start_tcp_stream(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     CHECK_ARGC(1)
-    ARGV_TO_STRING_E(0, url, "invalid url")
+    ARGV_TO_CSTRING_E(0, url, "invalid url")
     
     if(task_cam_tcp_handle) {
         THROW_EXCEPTION("camera tcp stream has started.\n")

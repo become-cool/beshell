@@ -8,7 +8,6 @@
 #ifdef PLATFORM_ESP32
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include <nvs_flash.h>
 #include "esp_vfs_fat.h"
 #include "esp_event_loop.h"
 #endif
@@ -22,7 +21,6 @@ namespace be {
         : boot_level(5)
         , engine(new JSEngine(this))
     {
-        nvs = new NVS() ;
         telnet = new Telnet(this) ;
 
         cout << endl ;
@@ -34,7 +32,6 @@ namespace be {
         }
 
     BeShell::~BeShell() {
-        DELETE_VAR(nvs)
         DELETE_VAR(fs)
         DELETE_VAR(repl)
         DELETE_VAR(telnet)
@@ -63,9 +60,6 @@ namespace be {
 #ifdef PLATFORM_ESP32   
         ESP_ERROR_CHECK(esp_event_loop_create_default());
 #endif
-        
-        nvs->readOneTime("rst-lv", &boot_level) ;
-        nvs->readOneTime("rst-nowifi", (uint8_t *)&nowifi) ;
 
         telnet->setup() ;
 

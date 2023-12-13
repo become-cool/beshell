@@ -49,9 +49,25 @@ extern "C" {
 #define ARGV_TO_DOUBLE_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToFloat64)
 
 
-#define ARGV_TO_INT_VAR_OPT(i, var, api, dft)       \
+#define ARGV_TO_INT_VAR_OPT(i, var, api)            \
+    if( i<argc ) {                                  \
+        if( api(ctx, &var, argv[i])!=0 ) {          \
+            THROW_EXCEPTION("Invalid param type")   \
+        }                                           \
+    }
+#define  ARGV_TO_UINT8_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32)
+#define   ARGV_TO_INT8_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32)
+#define ARGV_TO_UINT16_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32)
+#define  ARGV_TO_INT16_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32)
+#define ARGV_TO_UINT32_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32)
+#define  ARGV_TO_INT32_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32)
+#define  ARGV_TO_INT64_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt64)
+#define ARGV_TO_DOUBLE_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToFloat64)
+
+
+#define ARGV_TO_INT_VAR_DEF(i, var, api, def)       \
     if( i>=argc ) {                                 \
-        var = dft ;                                 \
+        var = def ;                                 \
     }                                               \
     else {                                          \
         if( api(ctx, &var, argv[i])!=0 ) {          \
@@ -59,14 +75,14 @@ extern "C" {
         }                                           \
     }
 	      
-#define  ARGV_TO_UINT8_VAR_OPT(i,var, dft)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32, dft)
-#define   ARGV_TO_INT8_VAR_OPT(i,var, dft)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32, dft)
-#define ARGV_TO_UINT16_VAR_OPT(i,var, dft)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32, dft)
-#define ARGV_TO_INT16_VAR_OPT(i,var, dft)    ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32, dft)
-#define ARGV_TO_UINT32_VAR_OPT(i,var, dft)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32, dft)
-#define ARGV_TO_INT32_VAR_OPT(i,var, dft)    ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt32, dft)
-#define ARGV_TO_INT64_VAR_OPT(i,var, dft)    ARGV_TO_INT_VAR_OPT(i, var, JS_ToInt64, dft)
-#define ARGV_TO_DOUBLE_VAR_OPT(i,var, dft)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToFloat64, dft)
+#define  ARGV_TO_UINT8_VAR_DEF(i,var, def)   ARGV_TO_INT_VAR_DEF(i, var, JS_ToUint32, def)
+#define   ARGV_TO_INT8_VAR_DEF(i,var, def)   ARGV_TO_INT_VAR_DEF(i, var, JS_ToInt32, def)
+#define ARGV_TO_UINT16_VAR_DEF(i,var, def)   ARGV_TO_INT_VAR_DEF(i, var, JS_ToUint32, def)
+#define ARGV_TO_INT16_VAR_DEF(i,var, def)    ARGV_TO_INT_VAR_DEF(i, var, JS_ToInt32, def)
+#define ARGV_TO_UINT32_VAR_DEF(i,var, def)   ARGV_TO_INT_VAR_DEF(i, var, JS_ToUint32, def)
+#define ARGV_TO_INT32_VAR_DEF(i,var, def)    ARGV_TO_INT_VAR_DEF(i, var, JS_ToInt32, def)
+#define ARGV_TO_INT64_VAR_DEF(i,var, def)    ARGV_TO_INT_VAR_DEF(i, var, JS_ToInt64, def)
+#define ARGV_TO_DOUBLE_VAR_DEF(i,var, def)   ARGV_TO_INT_VAR_DEF(i, var, JS_ToFloat64, def)
 
 
 #define ARGV_TO_INT(i, var, ctype, tmp_type, api)           \
@@ -89,22 +105,22 @@ extern "C" {
 #define ARGV_TO_DOUBLE(i,var)   ARGV_TO_INT(i, var, double,    double,   JS_ToFloat64)
 
 
-#define ARGV_TO_INT_OPT(i, var, ctype, api, dft)    \
-	ctype var = dft ;                               \
+#define ARGV_TO_INT_OPT(i, var, ctype, api, def)    \
+	ctype var = def ;                               \
     if( i<argc ) {                                  \
         if( api(ctx, &var, argv[i])!=0 ) {          \
             THROW_EXCEPTION("Invalid param type")   \
         }                                           \
     }
 
-#define  ARGV_TO_UINT8_OPT(i,var,dft)   ARGV_TO_INT_OPT(i, var, uint32_t,  JS_ToUint32, dft)
-#define   ARGV_TO_INT8_OPT(i,var,dft)   ARGV_TO_INT_OPT(i, var, int32_t,   JS_ToInt32, dft)
-#define ARGV_TO_UINT16_OPT(i,var,dft)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, dft)
-#define ARGV_TO_INT16_OPT(i,var,dft)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, dft)
-#define ARGV_TO_UINT32_OPT(i,var,dft)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, dft)
-#define ARGV_TO_INT32_OPT(i,var,dft)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, dft)
-#define ARGV_TO_INT64_OPT(i,var,dft)    ARGV_TO_INT_OPT(i, var, int64_t,  JS_ToInt64, dft)
-#define ARGV_TO_DOUBLE_OPT(i,var,dft)   ARGV_TO_INT_OPT(i, var, double, JS_ToFloat64, dft)
+#define  ARGV_TO_UINT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t,  JS_ToUint32, def)
+#define   ARGV_TO_INT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, int32_t,   JS_ToInt32, def)
+#define ARGV_TO_UINT16_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, def)
+#define ARGV_TO_INT16_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, def)
+#define ARGV_TO_UINT32_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, def)
+#define ARGV_TO_INT32_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, def)
+#define ARGV_TO_INT64_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int64_t,  JS_ToInt64, def)
+#define ARGV_TO_DOUBLE_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, double, JS_ToFloat64, def)
 
 
 #define ARGV_TO_STRING_LEN(i, var, len)                     \
@@ -118,23 +134,32 @@ extern "C" {
 
 
 #define ARGV_TO_STRING(i, var)                              \
+    std::string var ;                                       \
+    {                                                       \
+        const char * cstr = JS_ToCString(ctx, argv[i]) ;    \
+        var = cstr ;                                        \
+        JS_FreeCString(ctx, cstr) ;                         \
+    }
+
+
+#define ARGV_TO_CSTRING(i, var)                              \
     const char * var = JS_ToCString(ctx, argv[i]) ;
 
-#define ARGV_AS_STRING_E(i, var, msg)                       \
+#define ARGV_AS_CSTRING_E(i, var, msg)                       \
     var = NULL ;                                            \
     if(!JS_IsString(argv[i])) {                             \
         THROW_EXCEPTION(msg)                                \
     }                                                       \
     var = JS_ToCString(ctx, argv[i]) ;
-#define ARGV_TO_STRING_E(i, var, msg)  const char * ARGV_AS_STRING_E(i, var, msg)
+#define ARGV_TO_CSTRING_E(i, var, msg)  const char * ARGV_AS_STRING_E(i, var, msg)
 
-#define ARGV_AS_STRING_C(i, var, err_code)                  \
+#define ARGV_AS_CSTRING_C(i, var, err_code)                  \
     var = NULL ;                                            \
     if(!JS_IsString(argv[i])) {                             \
         err_code                                            \
     }                                                       \
     var = JS_ToCString(ctx, argv[i]) ;
-#define ARGV_TO_STRING_C(i, var, err_code)  char * ARGV_AS_STRING_C(i, var, err_code)
+#define ARGV_TO_CSTRING_C(i, var, err_code)  char * ARGV_AS_CSTRING_C(i, var, err_code)
     
 #define ARGV_TO_ARRAYBUFFER(i, var, varlen)                                         \
     size_t varlen = 0;                                                              \

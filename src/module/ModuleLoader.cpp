@@ -21,7 +21,7 @@ namespace be {
         static JSValue js_require(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             
             CHECK_ARGC(1)
-            ARGV_TO_STRING(0, module_name)
+            ARGV_TO_CSTRING(0, module_name)
 
             JSModuleDef * m = JS_RunModule(ctx, "", module_name);
 

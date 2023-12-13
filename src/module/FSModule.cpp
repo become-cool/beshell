@@ -393,7 +393,7 @@ namespace be {
     JSValue FSModule::info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         CHECK_ARGC(1)
-        ARGV_TO_STRING(0, jslabel)
+        ARGV_TO_CSTRING(0, jslabel)
 
         size_t total = 0 ;
         size_t used = 0 ;
