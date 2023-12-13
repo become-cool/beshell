@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
 #include "module/Console.hpp"
+#include "module/Process.hpp"
 #include <cassert>
 #include <iostream>
 #include <iomanip>
@@ -77,6 +78,9 @@ namespace be {
         // js_std_init_handlers(rt);
         
         JS_SetRuntimeOpaque2(rt, this) ;
+
+        mloader.init(rt) ;
+        
         ctx = InitContext(rt);
     }
 
@@ -112,12 +116,16 @@ namespace be {
         // eval_rc_script(ctx, "/lib/base/events.js") ;
         // eval_rc_script(ctx, "/lib/base/require.js") ;
 
-
         JSEngine * engine = JSEngine::fromJSRuntime(rt) ;
+
         assert(engine) ;
         engine->mloader.setup(ctx) ;
 
         return ctx;
+    }
+    
+    void JSEngine::addModule(NativeModule * m) {
+        mloader.add(m) ;
     }
     
     // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {

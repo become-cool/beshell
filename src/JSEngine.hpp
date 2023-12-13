@@ -24,6 +24,8 @@ namespace be {
         
         JSEngine(BeShell *) ;
 
+        void addModule(NativeModule * m) ;
+
         void setup() ;
         void loop() ;
 

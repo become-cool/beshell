@@ -52,5 +52,6 @@ namespace be {
         return  m ;
     }
     
+    void NativeModule::init(JSRuntime * rt) {}
     void NativeModule::setup(JSContext * ctx) {}
 }

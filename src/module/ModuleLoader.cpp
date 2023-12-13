@@ -49,15 +49,22 @@ namespace be {
     } ;
 
     ModuleLoader::ModuleLoader() {
-        addModule(new JSLoader) ;
-        addModule(new Process) ;
-        addModule(new Console) ;
+        add(new JSLoader) ;
+        add(new Process) ;
+        add(new Console) ;
     }
     ModuleLoader::~ModuleLoader() {
     }
 
-    void ModuleLoader::addModule(NativeModule * module) {
+    void ModuleLoader::add(NativeModule * module) {
         modules[ module->name ] = module ;
+    }
+
+
+    void ModuleLoader::init(JSRuntime * rt) {
+        for (const auto & pair : modules) {
+            pair.second->init(rt) ;
+        }
     }
 
     void ModuleLoader::setup(JSContext * ctx) {

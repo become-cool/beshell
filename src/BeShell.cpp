@@ -44,7 +44,7 @@ namespace be {
             return ;            
         }
         fs = new FS() ;
-        engine->mloader.addModule(new FSModule()) ;
+        engine->addModule(new FSModule()) ;
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;
         }
@@ -56,7 +56,7 @@ namespace be {
         repl = new REPL(this) ;
     }
     void BeShell::useNVS() {
-        engine->mloader.addModule(new NVS) ;
+        engine->addModule(new NVS) ;
     }
 
     void BeShell::useBasic() {

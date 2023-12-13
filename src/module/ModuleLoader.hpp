@@ -19,7 +19,9 @@ namespace be {
     public:
         ModuleLoader() ;
         ~ModuleLoader() ;
-        void addModule(NativeModule * module) ;
+        void add(NativeModule * module) ;
+
+        void init(JSRuntime * rt) ;
         void setup(JSContext * ctx) ;
 
         static std::string resovleFS(FS & fs, const char * module_name, const char * base_dir) ;
