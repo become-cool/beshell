@@ -40,7 +40,7 @@ namespace be {
     //     return JS_UNDEFINED ;
     // }
     
-    void Console::onAdded(JSContext *ctx) {
+    void Console::setup(JSContext *ctx) {
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
 

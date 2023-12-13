@@ -3,6 +3,7 @@
 #include "nvs_flash.h"
 #include "debug.h"
 #include "utils.h"
+#include <iostream>
 
 
 #ifdef PLATFORM_ESP32
@@ -67,26 +68,35 @@
 
 namespace be {
     NVS::NVS(): NativeModule("nvs") {
+
+        isReplGlobal = true ;
         
         exportFunction("jsErase", jsErase) ;
-        exportFunction("jsReadString", jsReadString) ;
-        exportFunction("jsWriteString", jsWriteString) ;
+        // exportFunction("jsReadString", jsReadString) ;
+        // exportFunction("jsWriteString", jsWriteString) ;
 
-        exportFunction("jsReadInt8", jsReadInt8) ;
-        exportFunction("jsReadInt16", jsReadInt16) ;
-        exportFunction("jsReadInt32", jsReadInt32) ;
-        exportFunction("jsReadInt64", jsReadInt64) ;
-        exportFunction("jsReadUint8", jsReadUint8) ;
-        exportFunction("jsReadUint16", jsReadUint16) ;
-        exportFunction("jsReadUint32", jsReadUint32) ;
+        exportFunction("readInt8", jsReadInt8) ;
+        exportFunction("readInt16", jsReadInt16) ;
+        exportFunction("readInt32", jsReadInt32) ;
+        exportFunction("readInt64", jsReadInt64) ;
+        exportFunction("readUint8", jsReadUint8) ;
+        exportFunction("readUint16", jsReadUint16) ;
+        exportFunction("readUint32", jsReadUint32) ;
         
-        exportFunction("jsWriteInt8", jsWriteInt8) ;
-        exportFunction("jsWriteInt16", jsWriteInt16) ;
-        exportFunction("jsWriteInt32", jsWriteInt32) ;
-        exportFunction("jsWriteInt64", jsWriteInt64) ;
-        exportFunction("jsWriteUint8", jsWriteUint8) ;
-        exportFunction("jsWriteUint16", jsWriteUint16) ;
-        exportFunction("jsWriteUint32", jsWriteUint32) ;
+        exportFunction("writeInt8", jsWriteInt8) ;
+        exportFunction("writeInt16", jsWriteInt16) ;
+        exportFunction("writeInt32", jsWriteInt32) ;
+        exportFunction("writeInt64", jsWriteInt64) ;
+        exportFunction("writeUint8", jsWriteUint8) ;
+        exportFunction("writeUint16", jsWriteUint16) ;
+        exportFunction("writeUint32", jsWriteUint32) ;
+    }
+
+    void NVS::setup(JSContext * ctx){
+        esp_err_t ret = nvs_flash_init();
+        if(ret!=ESP_OK) {
+            std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
+        }
     }
     
     // c/c++ helper api

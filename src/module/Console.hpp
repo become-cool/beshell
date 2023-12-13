@@ -10,7 +10,7 @@ namespace be {
     public:
         Console() ;
         ~Console() ;
-        void onAdded(JSContext *ctx) ;
+        void setup(JSContext *ctx) ;
         std::string stringify(JSContext *ctx, JSValue val) ;
 
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

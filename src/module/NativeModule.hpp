@@ -22,7 +22,7 @@ namespace be {
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
 
         JSModuleDef * createModule(JSContext *) ;
-        virtual void onAdded(JSContext * ctx) ;
+        virtual void setup(JSContext * ctx) ;
 
         inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;
     } ;

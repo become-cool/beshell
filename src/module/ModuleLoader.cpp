@@ -82,7 +82,7 @@ namespace be {
                 JS_FreeValue(ctx, mi) ;
             }
             
-            pair.second->onAdded(ctx) ;
+            pair.second->setup(ctx) ;
         }
         
         JS_FreeValue(ctx,global) ;

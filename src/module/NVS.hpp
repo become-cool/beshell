@@ -8,6 +8,8 @@ namespace be {
     private:
     public:
         NVS() ;
+        void setup(JSContext * ctx) ;
+
         void readOneTime(const char * key, uint8_t * value) const ;
         
         static bool readInt8(const char * key, int8_t & value, const char * ns="beshell") ;

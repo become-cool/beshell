@@ -52,5 +52,5 @@ namespace be {
         return  m ;
     }
     
-    void NativeModule::onAdded(JSContext * ctx) {}
+    void NativeModule::setup(JSContext * ctx) {}
 }
