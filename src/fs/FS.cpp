@@ -18,6 +18,55 @@ extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 
 
 namespace be {
+
+    inline static bool isDir(const char * path) {
+        struct stat statbuf;
+        if(stat(path,&statbuf)>=0) {
+            return S_ISDIR(statbuf.st_mode)? true: false ;
+        }
+        return false ;
+    }
+    inline static bool isFile(const char * path) {
+        struct stat statbuf;
+        if(stat(path,&statbuf)>=0) {
+            return S_ISREG(statbuf.st_mode)? true: false ;
+        }
+        return false ;
+    }
+
+    // 递归创建目录
+    int mkdir_p(const char * file_path) {
+        if( !file_path || !(*file_path) )
+            return -1 ;
+        char* p = strchr((char *)(file_path + 1), '/') ;
+        while (p!=NULL) {
+            *p = '\0';
+#ifdef WIN32
+            if (mkdir(file_path) == -1) {
+#else
+            if (mkdir(file_path, ACCESSPERMS) == -1) {
+#endif
+                if (errno != EEXIST) {
+                    *p = '/';
+                    return -1;
+                }
+            }
+            *p = '/';
+            p = strchr(p + 1, '/') ;
+        }
+
+        if( !isDir(file_path) ) {
+#ifdef WIN32
+            return mkdir(file_path) ;
+#else
+            return mkdir(file_path, ACCESSPERMS) ;
+#endif
+        }
+        else 
+            return 0 ;
+    }
+
+
     FS::FS() {
 #ifdef PLATFORM_ESP32
         setPrefix("/fs") ;
@@ -66,20 +115,10 @@ namespace be {
         return stat(_path.c_str(),&statbuf)>=0 ;
     }
     bool FS::isDir(const char * path) {
-        string _path = toVFSPath(path) ;
-        struct stat statbuf;
-        if(stat(_path.c_str(),&statbuf)>=0) {
-            return S_ISDIR(statbuf.st_mode)? true: false ;
-        }
-        return false ;
+        return be::isDir(path) ;
     }
     bool FS::isFile(const char * path) {
-        string _path = toVFSPath(path) ;
-        struct stat statbuf;
-        if(stat(_path.c_str(),&statbuf)>=0) {
-            return S_ISREG(statbuf.st_mode)? true: false ;
-        }
-        return false ;
+        return be::isFile(path) ;
     }
 
     bool FS::rm(const char * _path, bool recursive) {
@@ -124,39 +163,12 @@ namespace be {
         return false ;
     }
 
-//     bool FS::mkdir(const char * _path, bool recursive) {
-//         if( !_path || !(*_path) ) {
-//             return false ;
-//         }
-//         string __path = toVFSPath(_path) ;
-//         const char * path = __path.c_str() ;
-//         const char* p = strchr((const char *)(path + 1), '/') ;
-//         while (p!=NULL) {
-//             *p = '\0';
-// #ifdef WIN32
-//             if (mkdir(path) == -1) {
-// #else
-//             if (mkdir(path, ACCESSPERMS) == -1) {
-// #endif
-//                 if (errno != EEXIST) {
-//                     *p = '/';
-//                     return false;
-//                 }
-//             }
-//             *p = '/';
-//             p = strchr(p + 1, '/') ;
-//         }
-
-//         if( !isDir(path) ) {
-// #ifdef WIN32
-//             return mkdir(path) ;
-// #else
-//             return mkdir(path, ACCESSPERMS) ;
-// #endif
-//         }
-//         else {
-//             return true ;
-//         }
-//     }
+    bool FS::mkdir(const char * _path, bool recursive) {
+        struct stat statbuf;
+        if(stat(_path,&statbuf)>=0) {
+            return S_ISDIR(statbuf.st_mode)? true: false ;
+        }
+        return (recursive? mkdir_p(_path): mkdir(_path, ACCESSPERMS)) == 0 ;
+    }
 }
 

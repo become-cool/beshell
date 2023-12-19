@@ -33,8 +33,8 @@ namespace be {
         void dumpError(int pkgId=-1, TelnetChannel * ch=nullptr) ;
         std::string getExceptionStr() ;
 
-        JSValue globalObject() ;
-        string stringify(JSValue val) ;
+        static void setGlobalValue(JSContext * ctx, const char * name, JSValue) ;
+        static JSValue getGlobalValue(const char * name) ;
 
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
         void evalScript(const char * filepath, int flags=JS_EVAL_TYPE_GLOBAL) ;

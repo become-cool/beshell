@@ -12,6 +12,9 @@ namespace be {
     NativeModule::NativeModule(const char * _name): name(_name) {}
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
+        assert(ctx) ;
+        assert(m) ;
+
         JSCFunctionListEntry fe ;
         memset(&fe,0,sizeof(JSCFunctionListEntry)) ;
         fe.name = name ;
@@ -21,7 +24,17 @@ namespace be {
         fe.u.func.length = length ;
         fe.u.func.cproto = JS_CFUNC_generic ;
         fe.u.func.cfunc.generic = func ;
-        funcs.push_back(fe) ;
+        exportFuncs.push_back(fe) ;
+
+        JS_AddModuleExport(ctx, m, name) ;
+    }
+    void NativeModule::exportValue(const char * name, JSValue value) {
+        assert(m) ;
+        assert(ctx) ;
+
+        exportValues[name] = value ;
+
+        JS_AddModuleExport(ctx, m, name) ;
     }
     
     NativeModule * NativeModule::fromJSModuleDef(JSModuleDef *m) {
@@ -32,23 +45,34 @@ namespace be {
         NativeModule * nmodule = fromJSModuleDef(m) ;
         assert(nmodule) ;
 
-        int funcCnt = nmodule->funcs.size() ;
+        // funcs
+        int funcCnt = nmodule->exportFuncs.size() ;
         JSCFunctionListEntry func_list[funcCnt] ;
-
         for(int i=0;i<funcCnt;i++) {
-            func_list[i] = nmodule->funcs[i] ;
+            func_list[i] = nmodule->exportFuncs[i] ;
         }
-        return JS_SetModuleExportList(ctx, m, func_list, nmodule->funcs.size());
+        JS_SetModuleExportList(ctx, m, func_list, nmodule->exportFuncs.size());
+
+        // values
+        for(auto pair: nmodule->exportValues) {
+            // ds(pair.first.c_str())
+            // dref(pair.second)
+            int ret = JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second);
+            // dref(pair.second)
+        }
+
+        return 0 ;
     }
 
-    JSModuleDef * NativeModule::createModule(JSContext * ctx) {
+    void NativeModule::defineExports() {}
 
-        JSModuleDef * m = JS_NewCModule(ctx, name.c_str(), importModule);
+    JSModuleDef * NativeModule::createModule(JSContext * _ctx) {
+        ctx = _ctx ;
+        m = JS_NewCModule(ctx, name.c_str(), importModule);
         JS_SetModuleDefOpaque(m,this) ;
 
-        for(auto f: funcs) {
-            JS_AddModuleExport(ctx, m, f.name) ;
-        }
+        defineExports() ;
+
         return  m ;
     }
     

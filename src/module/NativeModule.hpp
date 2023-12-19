@@ -3,13 +3,21 @@
 #include "deps/quickjs/quickjs-libc.h"
 #include <vector>
 #include <string>
+#include <set>
+#include <map>
 
 namespace be {
     class NativeModule {
     private:
-        std::vector<JSCFunctionListEntry> funcs ;
+        std::map<std::string,JSValue> exportValues ;
+        std::vector<JSCFunctionListEntry> exportFuncs ;
 
         static int importModule(JSContext *ctx, JSModuleDef *m) ;
+
+    protected:
+        JSModuleDef * m = nullptr ;
+        JSContext * ctx = nullptr ;
+        virtual void defineExports() ;
 
     public:
         std::string name ;
@@ -19,6 +27,7 @@ namespace be {
         
         NativeModule(const char * name) ;
 
+        void exportValue(const char * name, JSValue value) ;
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
 
         JSModuleDef * createModule(JSContext *) ;

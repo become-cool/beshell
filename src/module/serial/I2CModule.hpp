@@ -5,6 +5,8 @@
 namespace be {
     class I2CModule: public NativeModule {
     private:
+    protected:
+        void defineExports() ;
     public:
         I2CClass * classI2C = nullptr ;
 

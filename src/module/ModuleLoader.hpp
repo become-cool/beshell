@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include "module/NativeModule.hpp"
-#include "module/Path.hpp"
+#include "module/PathModule.hpp"
 #include "module/FSModule.hpp"
 #include "fs/FS.hpp"
 

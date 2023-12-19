@@ -1,7 +1,7 @@
 #include "module/ModuleLoader.hpp"
 #include "module/NativeModule.hpp"
-#include "module/Process.hpp"
-#include "module/Console.hpp"
+#include "module/ProcessModule.hpp"
+#include "module/ConsoleModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -13,12 +13,15 @@
 namespace be {
 
     class JSLoader: public NativeModule {
+    protected:
+        void defineExports() {
+            exportFunction("require",jsRequire) ;
+        }
     public:
         JSLoader(): NativeModule("loader") {
-            exportFunction("require",js_require) ;
         };
 
-        static JSValue js_require(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        static JSValue jsRequire(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             
             CHECK_ARGC(1)
             ARGV_TO_CSTRING(0, module_name)
@@ -42,7 +45,7 @@ namespace be {
 
         void load(JSContext *ctx) {
             JSValue global = JS_GetGlobalObject(ctx) ;
-            JS_SetPropertyStr(ctx, global, "require", JS_NewCFunction(ctx, js_require, "require", 1));
+            JS_SetPropertyStr(ctx, global, "require", JS_NewCFunction(ctx, jsRequire, "require", 1));
             JS_FreeValue(ctx,global) ;
 
         }
@@ -50,8 +53,8 @@ namespace be {
 
     ModuleLoader::ModuleLoader() {
         add(new JSLoader) ;
-        add(new Process) ;
-        add(new Console) ;
+        add(new ProcessModule) ;
+        add(new ConsoleModule) ;
     }
     ModuleLoader::~ModuleLoader() {
     }
@@ -71,10 +74,8 @@ namespace be {
 
         JS_SetModuleLoaderFunc(JS_GetRuntime(ctx), normalize, load, this);
 
-        JSValue global = JS_GetGlobalObject(ctx) ;
-
         for (const auto & pair : modules) {
-            JSModuleDef * m = pair.second->createModule(ctx) ;
+            pair.second->createModule(ctx) ;
 
             if(pair.second->isReplGlobal) {
 
@@ -84,7 +85,7 @@ namespace be {
                 if (JS_IsException(mi)){
                     // todo
                 } else {
-                    JS_SetPropertyStr(ctx, global, pair.first.c_str(), mi);
+                    JSEngine::setGlobalValue(ctx, pair.first.c_str(), mi);
                 }
                 JS_FreeValue(ctx, mi) ;
             }
@@ -92,7 +93,6 @@ namespace be {
             pair.second->setup(ctx) ;
         }
         
-        JS_FreeValue(ctx,global) ;
     }
 
     // 返回的字符串，需要由调用者 js_free

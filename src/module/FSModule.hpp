@@ -4,17 +4,19 @@
 namespace be {
     class FSModule: public NativeModule {
     private:
+    protected:
+        void defineExports() ;
     public:
         FSModule() ;
         
-        static JSValue mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsUnlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsReadFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsWriteFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsListDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsRmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsRenameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

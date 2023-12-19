@@ -32,16 +32,16 @@ set(SRC_LIST
     src/BeShell.cpp
     src/JSEngine.cpp
     src/REPL.cpp
-    src/NVS.cpp
     src/path.c
     src/utils.c
 
     src/module/NativeModule.cpp
     src/module/ModuleLoader.cpp
     src/module/FSModule.cpp
-    src/module/Path.cpp
-    src/module/Console.cpp
-    src/module/Process.cpp
+    src/module/PathModule.cpp
+    src/module/ConsoleModule.cpp
+    src/module/ProcessModule.cpp
+    src/module/NVSModule.cpp
 
     src/telnet/Protocal.cpp
     src/telnet/Telnet.cpp

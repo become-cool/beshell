@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "BeShell.hpp"
 #include <cassert>
+#include <string.h>
 
 
 namespace be {
@@ -63,5 +64,18 @@ namespace be {
 #endif
     }
 
+    TelnetChannel * Telnet::channel(const char * name) {
+#ifdef PLATFORM_ESP32
+        if(strcmp(name,"serial")==0){
+            return & channelSeiral ;
+        }
+#endif
+#ifdef PLATFORM_LINUX
+        if(strcmp(name,"stdio")==0){
+            return & channelStdIO ;
+        }
+#endif
+        return nullptr ;
+    }
 
 }

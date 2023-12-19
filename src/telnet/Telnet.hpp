@@ -35,5 +35,7 @@ namespace be {
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
         void onReceived(TelnetChannel * , Package &) ;
+
+        TelnetChannel * channel(const char * name) ;
     } ;
 }

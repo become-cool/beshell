@@ -1,6 +1,6 @@
 #include "BeShell.hpp"
 #include "module/FSModule.hpp"
-#include "module/NVS.hpp"
+#include "module/NVSModule.hpp"
 #include <iostream>
 #include <string.h>
 #include "utils.h"
@@ -40,11 +40,10 @@ namespace be {
     }
     
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
-        if(fs) {
-            return ;            
+        if(!fs) {
+            fs = new FS() ;     
+            engine->addModule(new FSModule()) ;  
         }
-        fs = new FS() ;
-        engine->addModule(new FSModule()) ;
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;
         }
@@ -56,7 +55,7 @@ namespace be {
         repl = new REPL(this) ;
     }
     void BeShell::useNVS() {
-        engine->addModule(new NVS) ;
+        engine->addModule(new NVSModule) ;
     }
 
     void BeShell::useBasic() {

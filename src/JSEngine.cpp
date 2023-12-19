@@ -5,8 +5,8 @@
 #include <string.h>
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
-#include "module/Console.hpp"
-#include "module/Process.hpp"
+#include "module/ConsoleModule.hpp"
+#include "module/ProcessModule.hpp"
 #include <cassert>
 #include <iostream>
 #include <iomanip>
@@ -109,6 +109,7 @@ namespace be {
         // global 对象
         JSValue global = JS_GetGlobalObject(ctx);
         JS_SetPropertyStr(ctx, global, "global", global);
+        // JS_FreeValue(ctx, global) ;
 
         // base 函数
         // eval_rc_script(ctx, "/lib/base/base.js") ;
@@ -127,33 +128,8 @@ namespace be {
     void JSEngine::addModule(NativeModule * m) {
         mloader.add(m) ;
     }
-    
-    // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
-    //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
-    //         JSValueConst * argv = malloc(sizeof(JSValue)*4) ;
-    //         argv[0] = JS_NewInt32(ctx, pkgid) ;
-    //         argv[1] = JS_NewInt32(ctx, 0) ;
-    //         argv[2] = JS_NewInt32(ctx, cmd) ;
-    //         argv[3] = JS_NewStringLen(ctx, (char *)data, datalen) ;
-
-    //         // printf(">>> %.*s\n", datalen, data) ;
-
-    //         JSValue ret = JS_Call(ctx, _func_repl_input, JS_NULL, 4, argv) ;
-    //         if( JS_IsException(ret) ) {
-    //             echo_error(ctx) ;
-    //         }
-
-    //         JS_FreeValue(ctx, ret) ;
-    //         JS_FreeValue(ctx, argv[3]) ;
-    //         free(argv) ;
-    //     }
-    //     else {
-    //         printf("_func_repl_input is NULL or not Function\n") ;
-    //     }
-    // }
 
     void JSEngine::loop() {
-
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -223,12 +199,36 @@ namespace be {
         }
         return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
-
-    JSValue JSEngine::globalObject() {
-        return JS_GetGlobalObject(ctx) ;
-    }
     
-    string JSEngine::stringify(JSValue val) {
-        return string() ;
+    // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
+    //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
+    //         JSValueConst * argv = malloc(sizeof(JSValue)*4) ;
+    //         argv[0] = JS_NewInt32(ctx, pkgid) ;
+    //         argv[1] = JS_NewInt32(ctx, 0) ;
+    //         argv[2] = JS_NewInt32(ctx, cmd) ;
+    //         argv[3] = JS_NewStringLen(ctx, (char *)data, datalen) ;
+
+    //         // printf(">>> %.*s\n", datalen, data) ;
+
+    //         JSValue ret = JS_Call(ctx, _func_repl_input, JS_NULL, 4, argv) ;
+    //         if( JS_IsException(ret) ) {
+    //             echo_error(ctx) ;
+    //         }
+
+    //         JS_FreeValue(ctx, ret) ;
+    //         JS_FreeValue(ctx, argv[3]) ;
+    //         free(argv) ;
+    //     }
+    //     else {
+    //         printf("_func_repl_input is NULL or not Function\n") ;
+    //     }
+    // }
+
+    
+    void JSEngine::setGlobalValue(JSContext * ctx, const char * name, JSValue value) {
+        JSValue global = JS_GetGlobalObject(ctx) ; 
+        JS_SetPropertyStr(ctx, global, name, value) ;
+        JS_FreeValue(ctx,global) ;
     }
+
 }

@@ -5,13 +5,14 @@ using namespace std;
 
 namespace be {
     
-    // I2C::classID = 0 ;
-    // I2C::classDef = {
-    //     "I2C",
-    //     .finalizer = I2C::jsFinalizer,
-    // } ;
+    I2C::I2C(JSContext * ctx, uint8_t _busnum)
+        : NativeObject(ctx, classID, "I2C", defineClass)
+        , busnum(_busnum)
+    {
+    }
 
-    // I2C::I2C() {
+    void I2C::defineClass(NativeClass *) {
 
-    // }
+    }
+
 }

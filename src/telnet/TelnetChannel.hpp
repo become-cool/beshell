@@ -1,5 +1,9 @@
 #pragma once
 #include "Protocal.hpp"
+#ifdef PLATFORM_ESP32
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#endif
 
 namespace be {
     
@@ -9,6 +13,10 @@ namespace be {
 
     class TelnetChannel {
     private:
+#ifdef PLATFORM_ESP32
+        SemaphoreHandle_t mutex;
+#endif
+
     protected:
         // TelnetPkgProcFunc packageHandler = nullptr;
         Telnet * telnet = nullptr ;
@@ -21,5 +29,8 @@ namespace be {
         virtual void sendData (const char * data, size_t datalen) = 0 ;
         void send (const char * data, int datalen=-1, int pkgId=-1, uint8_t cmd=OUTPUT) ;
         void send (Package & pkg) ;
+
+        virtual bool mutexTake();
+        virtual void mutexGive();
     } ;
 }
