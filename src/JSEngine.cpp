@@ -82,6 +82,9 @@ namespace be {
         mloader.init(rt) ;
         
         ctx = InitContext(rt);
+        
+        console = (ConsoleModule *)mloader.moduleByName("console") ;
+        assert(console) ;
     }
 
     JSContext * JSEngine::InitContext(JSRuntime *rt) {
@@ -141,17 +144,17 @@ namespace be {
 
     void JSEngine::print(JSValue content, int pkgId, uint8_t cmd, TelnetChannel * ch) {
         assert(beshell) ;
-        size_t len ;
-        const char * cstr = JS_ToCStringLen(ctx, &len, content) ;
-        if(!cstr || len==0) {
+
+        std::string str = console->stringify(ctx, content) ;
+
+        // const char * cstr = JS_ToCStringLen(ctx, &len, content) ;
+        if(!str.length()) {
             return ;
         }
-        string str = cstr ;
-        JS_FreeCString(ctx, cstr) ;
         if(ch) {
-            ch->send(str.c_str(), len, pkgId, cmd) ;
+            ch->send(str.c_str(), str.length(), pkgId, cmd) ;
         } else if(beshell->telnet) {
-            beshell->telnet->output(str.c_str(), len, pkgId, cmd) ;
+            beshell->telnet->output(str.c_str(), str.length(), pkgId, cmd) ;
         } else {
             cout << str ;
         }
@@ -167,22 +170,19 @@ namespace be {
     }
     
     string JSEngine::getExceptionStr() {
-        string str ;
         JSValue exception_val = JS_GetException(ctx);
         if(JS_IsNull(exception_val)) {
-            return str ;
+            return "" ;
         }
 
-        const char * cstr = JS_ToCString(ctx, exception_val) ;
-        str = cstr ;
-        JS_FreeCString(ctx,cstr) ;
+        std::string str = console->stringify(ctx, exception_val) ;
 
         bool is_error = JS_IsError(ctx, exception_val);
         if (is_error) {
             JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack");
             if (!JS_IsUndefined(val)) {
-                cstr = JS_ToCString(ctx, val) ;
-                str+= "\n" ;
+                const char * cstr = JS_ToCString(ctx, val) ;
+                str+= "\n-----\n" ;
                 str+= cstr;
                 JS_FreeCString(ctx,cstr) ;
             }
@@ -199,7 +199,7 @@ namespace be {
         }
         return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
-    
+
     // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
     //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
     //         JSValueConst * argv = malloc(sizeof(JSValue)*4) ;

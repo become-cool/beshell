@@ -3,6 +3,7 @@
 #include "deps/quickjs/quickjs-libc.h"
 #include "telnet/Telnet.hpp"
 #include "module/ModuleLoader.hpp"
+#include "module/ConsoleModule.hpp"
 
 
 #define BESHELL_VERSION "0.3.0"
@@ -14,6 +15,8 @@ namespace be {
     class BeShell ;
     class JSEngine {
     private:
+
+        ConsoleModule * console = nullptr ;
 
     public:
         BeShell * beshell ;

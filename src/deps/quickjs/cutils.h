@@ -44,7 +44,7 @@
 
 #define xglue(x, y) x ## y
 #define glue(x, y) xglue(x, y)
-#define stringify(s)    tostring(s)
+// #define stringify(s)    tostring(s)
 #define tostring(s)     #s
 
 #ifndef offsetof

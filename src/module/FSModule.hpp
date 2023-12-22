@@ -17,6 +17,10 @@ namespace be {
         static JSValue jsListDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRenameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsStatSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsExistsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsIsFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue jsIsDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

@@ -108,7 +108,7 @@ console.error = console.log
 
     #undef stringify
     string ConsoleModule::stringify(JSContext *ctx, JSValue val) {
-        
+
         const char * cstr ;
         // 简单调用 toString
         if( JS_IsNull(jsStringify) ) {
@@ -120,7 +120,7 @@ console.error = console.log
             cstr = JS_ToCString(ctx,ret) ;
             JS_FreeValue(ctx, ret) ;
         }
-        
+
         string str = cstr ;
         JS_FreeCString(ctx, cstr) ;
 

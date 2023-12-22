@@ -41,8 +41,8 @@ namespace be {
     
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(!fs) {
-            fs = new FS() ;     
-            engine->addModule(new FSModule()) ;  
+            fs = new FS() ;
+            engine->addModule(new FSModule()) ;
         }
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;

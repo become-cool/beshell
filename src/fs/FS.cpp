@@ -168,7 +168,13 @@ namespace be {
         if(stat(_path,&statbuf)>=0) {
             return S_ISDIR(statbuf.st_mode)? true: false ;
         }
-        return (recursive? mkdir_p(_path): mkdir(_path, ACCESSPERMS)) == 0 ;
+        if(recursive) {
+            return mkdir_p(_path)==0 ;
+        } else {
+            int ret = mkdir(_path, ACCESSPERMS) ;
+            dn(ret)
+            return ret==0 ;
+        }
     }
 }
 

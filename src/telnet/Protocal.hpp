@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <functional>
+#include <iostream>
+#include <memory>
 
 #define PKG_LINE_BUFFSIZE 256
 
@@ -25,13 +27,14 @@ namespace be {
 		, DATA = 8					// 数据包(用于 CMD_FILE_PULL_REQ 的回应)
 		, MSG = 9					// 主动向客户端推送的事件
 
-		, FILE_OPEN_REQ = 10		// 打开文件，等待后续接受文件后写入. DATA区为文件内容
-		, FILE_OFFSET_REQ = 11		// 偏移
-		, FILE_PUSH_REQ = 12		// 发送文件
-		, FILE_CLOSE_REQ = 13		// 关闭文件
-		, FILE_PULL_REQ = 20		// 拉取文件. DATA区格式：路径(0结尾字符串) + Offset(uint32) + MaxSize(uint16)
-		, RESET = 30				// 重置命令. DATA区格式：boot_level (uint8)
-		, READY = 31				// 系统准备就绪事件
+		, FILE_OPEN = 32
+		, FILE_OPEN_APPEND = 33
+		, FILE_OFFSET = 34
+		, FILE_PUSH = 35
+		, FILE_CLOSE = 36
+		, FILE_PULL = 38			// 拉取文件. DATA区格式：路径(0结尾字符串) + Offset(uint32) + data(MaxSize:uint16)
+
+		, READY = 60				// 系统准备就绪事件
 	} ;
 
 	class Package {
@@ -97,7 +100,7 @@ namespace be {
     } ;
     
 	// 包头:固定长度区(4字节)
-    class StatePkgHeadFixed: public State {
+    class StatePkgHeadFields: public State {
 	private:
 		// uint8_t received= 0 ;
 
@@ -109,7 +112,7 @@ namespace be {
     } ;
 
 	// 包头:包长部分(1-4字节)
-    class StatePkgHeadLength: public State {
+    class StatePkgBodyLength: public State {
 	private:
 		// uint8_t buff[4] ;
 		// uint8_t received = 0 ;
@@ -131,21 +134,24 @@ namespace be {
 		bool checkVerifysum() ;
 	} ;
 
-	// 上下文类
 	typedef std::function<void(Package & pkg)> PackageProcFunc;
+	typedef std::function<std::unique_ptr<std::ostream>(Package & pkg) > StreamCreateFunc;
+
 	void defaultPkgProcFunc(Package & pkg) ;
 
+	// 上下文类
     class Parser {
 		private:
 			Package pkg ;
 			State * current = nullptr ;
 
 			StateLine * stateLine ;
-			StatePkgHeadFixed * statePkgHeadFixed ;
-			StatePkgHeadLength * statePkgHeadLength ;
+			StatePkgHeadFields * statePkgHeadFields ;
+			StatePkgBodyLength * statePkgBodyLength ;
 			StatePkgBody * statePkgBody ;
 
 			PackageProcFunc handler = nullptr ;
+			// StreamCreateFunc streamHandler = nullptr ;
 
 			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 			void commitPackage() ;
@@ -155,17 +161,18 @@ namespace be {
 		public:
 			uint8_t H1 = HEAD1 ;
 			uint8_t H2 = HEAD2 ;
-			uint8_t H2V = HEAD2 ;
-			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2,uint8_t H2V=HEAD2) ;
+			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
 			~Parser() ;
 			void parse(uint8_t * bytes, size_t len) ;
 			void setPkgHead(uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
 			void setProcessHandler(PackageProcFunc handler) ;
 			void test() {}
 
+			// void setStreamHandle(StreamCreateFunc handler) ;
+
 		friend class StateLine ;
-		friend class StatePkgHeadFixed ;
-		friend class StatePkgHeadLength ;
+		friend class StatePkgHeadFields ;
+		friend class StatePkgBodyLength ;
 		friend class StatePkgBody ;
     } ;
 }

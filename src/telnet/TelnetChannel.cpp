@@ -1,5 +1,6 @@
 #include "TelnetChannel.hpp"
 #include <cstring>
+#include "mallocf.h"
 
 
 namespace be {
@@ -34,6 +35,16 @@ namespace be {
             // mutexGive() ;
         }
     }
+    
+    void TelnetChannel::sendError(int pkgid, const char * format, ...) {
+        va_list args;
+        va_start( args, format );
+        char * message = vstrdupf(format, args) ;
+        va_end( args );
+        send(message, strlen(message), pkgid, EXCEPTION) ;
+        free(message) ;
+    }
+    
     bool TelnetChannel::mutexTake() {
 #ifdef PLATFORM_ESP32
         return xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE ;

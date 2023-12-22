@@ -27,6 +27,10 @@ namespace be {
         exportFunction("rmSync", jsRmSync) ;
         exportFunction("renameSync", jsRenameSync) ;
         exportFunction("info", jsInfo) ;
+        exportFunction("statSync", jsStatSync) ;
+        exportFunction("exsitsSync", jsExistsSync) ;
+        exportFunction("isFileSync", jsIsFileSync) ;
+        exportFunction("isDirSync", jsIsDirSync) ;
     }
 
     #define FETCH_FS                                                \
@@ -362,10 +366,93 @@ namespace be {
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(oldpath, 0)
-        ARGV_PATH(newpath, 0)
+        ARGV_PATH(newpath, 1)
 
         int ret = rename(oldpath.c_str(), newpath.c_str()) ;
         return JS_NewInt32(ctx, ret) ;
+    }
+
+
+    /**
+     * 同步返回文件状态
+     * 如果文件不存在,返回 null; 否则返回包含详细信息的对象
+     * 
+     * @import fs
+     * @beapi statSync
+     * @param path:string 文件路径
+     * @return null|{dev:number,ino:number,mode:number,size:number,isDir:bool,atime:number,mtime:number,ctime:number}
+     */
+    JSValue FSModule::jsStatSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        FETCH_FS
+        ARGV_PATH(path, 0)
+        struct stat statbuf;
+        if(stat(path.c_str(),&statbuf)<0) {
+            return JS_NULL ;
+        }
+        
+        JSValue obj = JS_NewObject(ctx) ;
+        JS_SetPropertyStr(ctx, obj, "dev", JS_NewInt32(ctx, statbuf.st_dev)) ;
+        JS_SetPropertyStr(ctx, obj, "ino", JS_NewInt32(ctx, statbuf.st_ino)) ;
+        JS_SetPropertyStr(ctx, obj, "mode", JS_NewInt32(ctx, statbuf.st_mode)) ;
+        if(S_ISDIR(statbuf.st_mode)) {
+            JS_SetPropertyStr(ctx, obj, "isDir", JS_TRUE) ;
+        }
+        else {
+            JS_SetPropertyStr(ctx, obj, "isDir", JS_FALSE) ;
+        }
+        JS_SetPropertyStr(ctx, obj, "size", JS_NewInt32(ctx, statbuf.st_size)) ;
+        JS_SetPropertyStr(ctx, obj, "atime", JS_NewInt64(ctx, statbuf.st_atime)) ;
+        JS_SetPropertyStr(ctx, obj, "mtime", JS_NewInt64(ctx, statbuf.st_mtime)) ;
+        JS_SetPropertyStr(ctx, obj, "ctime", JS_NewInt64(ctx, statbuf.st_ctime)) ;
+
+        return obj ;
+    }
+
+
+    /**
+     * 同步返回路径是否存在
+     * 
+     * @import fs
+     * @beapi existsSync
+     * @param path:string 路径
+     * @return bool
+     */
+    JSValue FSModule::jsExistsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        FETCH_FS
+        ARGV_PATH(path, 0)
+        return fs->exist(path.c_str()) ;
+    }
+
+    /**
+     * 同步返回路径是否存在
+     * 
+     * @import fs
+     * @beapi isFileSync
+     * @param path:string 路径
+     * @return bool
+     */
+    JSValue FSModule::jsIsFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        FETCH_FS
+        ARGV_PATH(path, 0)
+        return fs->isFile(path.c_str()) ;
+    }
+
+    /**
+     * 同步返回路径是否存在
+     * 
+     * @import fs
+     * @beapi isDirSync
+     * @param path:string 路径
+     * @return bool
+     */
+    JSValue FSModule::jsIsDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        FETCH_FS
+        ARGV_PATH(path, 0)
+        return fs->isDir(path.c_str()) ;
     }
 
     /**

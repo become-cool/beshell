@@ -63,6 +63,9 @@ namespace be {
         modules[ module->name ] = module ;
     }
 
+    NativeModule * ModuleLoader::moduleByName(const char * name) {
+        return modules[ name ] ;
+    }
 
     void ModuleLoader::init(JSRuntime * rt) {
         for (const auto & pair : modules) {

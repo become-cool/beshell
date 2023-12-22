@@ -22,8 +22,9 @@ using namespace std ;
 
 namespace be {
 
-    void TelnetSerial::task(void * argv) {        
+    void TelnetSerial::task(void * argv) {
         Parser parser([argv](Package & pkg){
+            // printf("cmd:%d,body len:%d,%s\n",pkg.head.fields.cmd,pkg.body_len,pkg.body) ;
             xQueueSend(((TelnetSerial*)argv)->pkg_queue, &pkg, 0) ;
             pkg.body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
             pkg.body_len = 0 ;
@@ -41,6 +42,7 @@ namespace be {
                 switch(event.type) {
                     case UART_DATA:
                         chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 1/portTICK_PERIOD_MS);
+                        // dn(chunklen)
                         parser.parse(dtmp, chunklen) ;
                         break;
                     //Event of HW FIFO overflow detected
@@ -113,6 +115,8 @@ namespace be {
         Package pkg ;
         if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
 
+            // printf("loop: cmd:%d,body len:%d,%s\n",pkg.head.fields.cmd,pkg.body_len,pkg.body) ;
+
             if(telnet){
                 telnet->onReceived(this,pkg) ;
             }
@@ -123,6 +127,8 @@ namespace be {
     }
 
     void TelnetSerial::sendData (const char * data, size_t datalen) {
-        uart_write_bytes(UART_NUM, data, datalen);
+        if(datalen && datalen) {
+            uart_write_bytes(UART_NUM, data, datalen);
+        }
     }
 }

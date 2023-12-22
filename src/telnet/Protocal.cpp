@@ -6,8 +6,8 @@
 #include <assert.h>
 
 #define STATE_LINE          parser->stateLine
-#define STATE_HEAD_FIXED    parser->statePkgHeadFixed
-#define STATE_HEAD_LENGTH   parser->statePkgHeadLength
+#define STATE_HEAD_FIXED    parser->statePkgHeadFields
+#define STATE_HEAD_LENGTH   parser->statePkgBodyLength
 #define STATE_BODY          parser->statePkgBody
 
 
@@ -186,7 +186,7 @@ namespace be {
     // 行数据
     void StateLine::parse(uint8_t * bytes, size_t * len) {
         
-        // 遇到断开的包头(H1前一次到达)
+        // 遇到断开的包头(H1在前一次数据的末尾到达)
         if( bytes[0]==parser->H2 && received>0 && buff[received-1]==parser->H1 ){
             (*len)-=1 ;
             received-=1 ;
@@ -228,21 +228,21 @@ namespace be {
     
     
     // 包头：固定数据区
-    void StatePkgHeadFixed::enter() {
+    void StatePkgHeadFields::enter() {
         parser->pkg.reset(0,0,0) ;
         received = 0 ;
     }
-    void StatePkgHeadFixed::parse(uint8_t * bytes, size_t * len) {
+    void StatePkgHeadFields::parse(uint8_t * bytes, size_t * len) {
         if( receiveToBuff(&bytes, len, parser->pkg.head.raw+2, 2) ) {
             parser->changeState(STATE_HEAD_LENGTH, bytes, len) ;
         }
     }
     
     // 包头：可变长度区
-    void StatePkgHeadLength::enter() {
+    void StatePkgBodyLength::enter() {
         received = 0 ;
     }
-    void StatePkgHeadLength::parse(uint8_t * bytes, size_t * len) {
+    void StatePkgBodyLength::parse(uint8_t * bytes, size_t * len) {
         // assert(parser->pkg) ;
         if((*len)<1) {
             return ;
@@ -259,30 +259,30 @@ namespace be {
         }
 
         // 可变长度
-        else if(parser->pkg.head.fields.h2==parser->H2V)  {
-            uint8_t m = 4 - received ;
-            if(m>(*len)) {
-                m = *len ;
-            }
+        // else if(parser->pkg.head.fields.h2==parser->H2V)  {
+        //     uint8_t m = 4 - received ;
+        //     if(m>(*len)) {
+        //         m = *len ;
+        //     }
 
-            // dn4(bytes[0],bytes[1],bytes[2],bytes[3])
+        //     // dn4(bytes[0],bytes[1],bytes[2],bytes[3])
 
-            uint8_t complete = false ;
-            for(uint8_t i = 0; i<m; i++) {
+        //     uint8_t complete = false ;
+        //     for(uint8_t i = 0; i<m; i++) {
 
-                parser->pkg.head.raw[4+received] = bytes[i] ;
+        //         parser->pkg.head.raw[4+received] = bytes[i] ;
 
-                (*len)-= 1 ;
-                received ++ ;
+        //         (*len)-= 1 ;
+        //         received ++ ;
 
-                // 遇到第一个小于 0x80 的字节，表示完成
-                if(bytes[i]<0x80) {
-                    parser->pkg.decodeBodyLength() ;
-                    parser->changeState(STATE_BODY, bytes+i, len) ;
-                    return ;
-                }
-            }
-        }
+        //         // 遇到第一个小于 0x80 的字节，表示完成
+        //         if(bytes[i]<0x80) {
+        //             parser->pkg.decodeBodyLength() ;
+        //             parser->changeState(STATE_BODY, bytes+i, len) ;
+        //             return ;
+        //         }
+        //     }
+        // }
     }
     
     // body
@@ -325,7 +325,7 @@ namespace be {
                     parser->commitPackage() ;
                 }
                 else {
-                    // printf("beprotocal bad verifysum\n") ;
+                    printf("beprotocal bad verifysum %d!=%d(received)\n", parser->pkg.calculateVerifysum(), parser->pkg.verifysum) ;
                 }
                 parser->changeState(STATE_LINE, bytes, len) ;
             }
@@ -337,21 +337,21 @@ namespace be {
     }
 
     // 上下文类
-    Parser::Parser(PackageProcFunc _handler, uint8_t _H1,uint8_t _H2,uint8_t _H2V)
+    Parser::Parser(PackageProcFunc _handler, uint8_t _H1,uint8_t _H2)
         : pkg(0,0, nullptr, 0, _H1, _H2)
         , stateLine(new StateLine(this))
-        , statePkgHeadFixed(new StatePkgHeadFixed(this))
-        , statePkgHeadLength(new StatePkgHeadLength(this))
+        , statePkgHeadFields(new StatePkgHeadFields(this))
+        , statePkgBodyLength(new StatePkgBodyLength(this))
         , statePkgBody(new StatePkgBody(this))
         , handler(_handler)
-        , H1(_H1), H2(_H2), H2V(_H2V)
+        , H1(_H1), H2(_H2)
     {
         current = stateLine ;
     }
     Parser::~Parser() {
         delete stateLine ;
-        delete statePkgHeadFixed ;
-        delete statePkgHeadLength ;
+        delete statePkgHeadFields ;
+        delete statePkgBodyLength ;
         delete statePkgBody ;
     }
     
@@ -383,6 +383,10 @@ namespace be {
             handler(pkg) ;
         }
     }
+    
+    // void Parser::setStreamHandle(StreamCreateFunc handler) {
+    //     streamHandler = handler ;
+    // }
 
     void defaultPkgProcFunc(Package & pkg) {
         printf("receive package, pkgid:%d, cmd:%d, length:%d\n",pkg.head.fields.pkgid,pkg.head.fields.cmd,pkg.body_len) ;

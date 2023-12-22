@@ -17,6 +17,8 @@ namespace be {
         SemaphoreHandle_t mutex;
 #endif
 
+        FILE * openedFile = nullptr ;
+
     protected:
         // TelnetPkgProcFunc packageHandler = nullptr;
         Telnet * telnet = nullptr ;
@@ -29,8 +31,11 @@ namespace be {
         virtual void sendData (const char * data, size_t datalen) = 0 ;
         void send (const char * data, int datalen=-1, int pkgId=-1, uint8_t cmd=OUTPUT) ;
         void send (Package & pkg) ;
+        void sendError (int pkgid, const char * format, ...) ;
 
         virtual bool mutexTake();
         virtual void mutexGive();
+
+        friend class Telnet ;
     } ;
 }
