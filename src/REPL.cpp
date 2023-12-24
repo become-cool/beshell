@@ -23,18 +23,18 @@ namespace be {
 
         size_t content_len = pkg.body_len ;
         // 不含字符串末尾的 0
-        if(pkg.body[pkg.body_len-1] == 0){
+        if(pkg.body()[pkg.body_len-1] == 0){
             content_len -- ;
         } ;
         
-        JSValue ret = beshell->engine->eval((char *)pkg.body, content_len,"eval") ;
+        JSValue ret = beshell->engine->eval((char *)pkg.body(), content_len,"eval") ;
 
         if(JS_IsException(ret)) {
             beshell->engine->dumpError(rspnId) ;
         }
         else {
             if(echo && !ch->disableEcho) {
-                ch->send((char *)pkg.body, pkg.body_len) ;
+                ch->send((char *)pkg.body(), pkg.body_len) ;
             }
             beshell->engine->print(ret, rspnId, RSPN, ch) ;
             if(echo) {

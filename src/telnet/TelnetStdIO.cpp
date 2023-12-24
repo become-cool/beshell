@@ -42,8 +42,7 @@ namespace be {
 
             buf[num_bytes] = 0 ;
 
-            Package pkg(0,LINE, buf, num_bytes) ;
-            telnet->onReceived(this, pkg) ;
+            telnet->onReceived(this, std::make_unique<Package>(0,LINE, buf, num_bytes)) ;
         }
     }
 

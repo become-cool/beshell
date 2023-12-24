@@ -51,7 +51,13 @@
         "iomanip": "cpp",
         "sstream": "cpp",
         "list": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "optional": "cpp",
+        "fstream": "cpp",
+        "strstream": "cpp",
+        "ctime": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

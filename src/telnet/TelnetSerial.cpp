@@ -16,18 +16,19 @@
 #define RD_BUF_SIZE     BUF_SIZE
 #define PATTERN_CHR_NUM 3
 
-#define PKG_QUEUE_LEN 5
+#define PKG_QUEUE_LEN 64
 
 using namespace std ;
 
 namespace be {
 
     void TelnetSerial::task(void * argv) {
-        Parser parser([argv](Package & pkg){
-            // printf("cmd:%d,body len:%d,%s\n",pkg.head.fields.cmd,pkg.body_len,pkg.body) ;
-            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &pkg, 0) ;
-            pkg.body = nullptr ; // 避免 package 的析构函数 delete body，由 loop delete 
-            pkg.body_len = 0 ;
+
+        // forwarding received package to telnet
+        Parser parser([argv](std::unique_ptr<Package> pkg){
+            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
+            Package * ptr = pkg.release() ;
+            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &ptr, 0) ;
         }) ;
 
         uart_event_t event;
@@ -107,22 +108,19 @@ namespace be {
         //Reset the pattern queue length to record at most 20 pattern positions.
         uart_pattern_queue_reset(UART_NUM, 20);
 
-        pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package));
+        pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
     }
 
     void TelnetSerial::loop () {
-        Package pkg ;
-        if(xQueueReceive(pkg_queue, (void * )&pkg, 0)){
-
-            // printf("loop: cmd:%d,body len:%d,%s\n",pkg.head.fields.cmd,pkg.body_len,pkg.body) ;
-
+        Package * ptr ;
+        std::unique_ptr<Package> pkg ;
+        if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
+            pkg.reset(ptr) ;
+            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
             if(telnet){
-                telnet->onReceived(this,pkg) ;
+                telnet->onReceived(this,move(pkg)) ;
             }
-
-            delete pkg.body ;
-            pkg.body = nullptr ;
         }
     }
 

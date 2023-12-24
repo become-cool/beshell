@@ -17,7 +17,7 @@ namespace be {
     void TelnetChannel::send (Package & pkg) {
         // mutexTake() ;
         sendData((const char *)pkg.head.raw, pkg.head_len);
-        sendData((const char *)pkg.body, pkg.body_len);
+        sendData((const char *)pkg.body(), pkg.body_len);
         sendData((const char *)&pkg.verifysum, 1);
         // mutexGive() ;
     }

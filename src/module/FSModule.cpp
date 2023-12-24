@@ -49,21 +49,21 @@ namespace be {
     #define STAT_PATH(path)                                                             \
         struct stat statbuf;                                                            \
         if(stat(path.c_str(),&statbuf)<0) {                                             \
-            JS_ThrowReferenceError(ctx, "Failed to stat file %s", path.c_str());        \
+            JS_ThrowReferenceError(ctx, "Failed to stat file %s", fs->trimVFSPath(path).c_str()); \
             return JS_EXCEPTION ;                                                       \
         }
 
     #define CHECK_IS_NOT_DIR(path)                                                      \
         STAT_PATH(path)                                                                 \
         if(S_ISDIR(statbuf.st_mode)) {                                                  \
-            JS_ThrowReferenceError(ctx, "Path is a directory %s", path.c_str());        \
+            JS_ThrowReferenceError(ctx, "Path is a directory %s", fs->trimVFSPath(path).c_str()); \
             return JS_EXCEPTION ;                                                       \
         }
 
     /**
      * 同步创建目录
      * 
-     * @beapi beapi.fs.mkdirSync
+     * @beapi fs.mkdirSync
      * @param path:string 路径
      * @param recursive:bool=false 路径
      * @return bool
@@ -83,7 +83,7 @@ namespace be {
     /**
      * 同步删除目录。如果目录非空返回 false。
      * 
-     * @beapi beapi.fs.rmdirSync
+     * @beapi fs.rmdirSync
      * @param path:string 路径
      * @return bool
      */
@@ -101,7 +101,7 @@ namespace be {
     /**
      * 同步删除文件
      * 
-     * @beapi beapi.fs.unlinkSync
+     * @beapi fs.unlinkSync
      * @param path:string 路径
      * @return bool
      */
@@ -117,11 +117,11 @@ namespace be {
      * 
      * > 函数返回的是一个 ArrayBuffer 对象，可以使用 ArrayBuffer.prototype.asString() 方法转换为字符串，例如：
      * > ```
-     * > let content = beapi.fs.readFileSync("~/foo.bar").asString()
+     * > let content = fs.readFileSync("~/foo.bar").asString()
      * > console.log(content)
      * > ```
      * 
-     * @beapi beapi.fs.readFileSync
+     * @beapi fs.readFileSync
      * @param path:string 路径
      * @param readlen:number=-1 读取长度，-1表示全文
      * @param offset:number=0 开始位置
@@ -178,7 +178,7 @@ namespace be {
     /**
      * 同步写入文件，返回写入字节数量
      * 
-     * @beapi beapi.fs.writeFileSync
+     * @beapi fs.writeFileSync
      * @param path:string 路径
      * @param data:string|ArrayBuffer 数据内容
      * @param append:bool=false 是否追加写入
@@ -204,7 +204,7 @@ namespace be {
 
         FILE * fd = fopen(path.c_str(), append? "a+": "w");
         if(NULL==fd) {
-            JS_ThrowReferenceError(ctx, "Failed to open file %s", path.c_str());
+            JS_ThrowReferenceError(ctx, "Failed to open file %s", fs->trimVFSPath(path).c_str());
             return JS_EXCEPTION ;
         }
 
@@ -248,7 +248,7 @@ namespace be {
      * 同步读取目录下的所有成员。
      * 如果 detail 参数为 false，仅返回文件名数字。
      * 
-     * @beapi beapi.fs.readdirSync
+     * @beapi fs.readdirSync
      * @param path:string 路径
      * @param detail:bool=false 是否范围详细信息
      * @return string[]|{name:string, type:"file"|"dir"|"unknown", size:number}[]
@@ -268,7 +268,7 @@ namespace be {
         }
 
         if(!dir) {
-            JS_ThrowReferenceError(ctx, "Cound not open dir %s", path.c_str());
+            JS_ThrowReferenceError(ctx, "Cound not open dir %s", fs->trimVFSPath(path).c_str());
             return JS_EXCEPTION ;
         }
         
@@ -422,7 +422,7 @@ namespace be {
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->exist(path.c_str()) ;
+        return fs->exist(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -437,7 +437,7 @@ namespace be {
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->isFile(path.c_str()) ;
+        return fs->isFile(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -452,7 +452,7 @@ namespace be {
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->isDir(path.c_str()) ;
+        return fs->isDir(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**

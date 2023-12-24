@@ -10,6 +10,7 @@
 #define STATE_HEAD_LENGTH   parser->statePkgBodyLength
 #define STATE_BODY          parser->statePkgBody
 
+using namespace std ;
 
 #define RECEIVE_TO_BUFF_PTR(buff, buffsize, received, data, datalen)  \
         {                                               \
@@ -27,128 +28,86 @@
 
 namespace be {
     
-    // Package::Package(uint8_t _pkgid, uint8_t _cmd, uint8_t * _body, size_t _body_len)
-    //     : pkgid(_pkgid)
-    //     , cmd(_cmd)
-    //     , body(_body)
-    //     , body_len(_body_len)
-    //     , verifysum(0)
-    // {}
-    Package::Package(uint8_t pkgid, uint8_t cmd, uint8_t * _body, size_t _body_len, uint8_t h1, uint8_t h2)
-        : body(_body)
-        , body_len(_body_len)
+    Package::Package(uint8_t pkgid, uint8_t cmd, uint8_t * __body, size_t _body_len, uint8_t h1, uint8_t h2)
+        : body_len(_body_len)
     {
-        head.fields.h1 = h1 ;
-        head.fields.h1 = h1 ;
-
         head.fields.h1 = h1 ;
         head.fields.h2 = h2 ;
         reset(pkgid,cmd,body_len) ;
+
+        if(__body) {
+            _body = __body ;
+            sharedBody = true ;
+        }
+    }
+    Package::Package(const Package * other)
+        : _body(other->_body)
+        , head_len(other->head_len)
+        , body_len(other->body_len)
+        , chunk_len(other->chunk_len)
+        , verifysum(other->verifysum)
+    {
+        std::memcpy(head.raw, other->head.raw, sizeof(head.raw)) ;
+    }
+    Package::~Package() {
+        if(!sharedBody && _body) {
+            delete _body ;
+        }
+    }
+
+    uint8_t * Package::body() const {
+        return _body ;
     }
 
     void Package::reset(uint8_t pkgid, uint8_t cmd,size_t bodylen) {
         head.fields.pkgid = pkgid ;
         head.fields.cmd = cmd ;
-        head.fields.len1 = 0 ;
-        head.fields.len2 = 0 ;
-        head.fields.len3 = 0 ;
-        head.fields.len4 = 0 ;
-        head_len = 5 ;
+        if(bodylen>0xFF) {
+            head.fields.cmd|= 0x80 ;
+        }
         body_len = bodylen ;
+        encodeBodyLength() ;
         verifysum = 0 ;
-    }
-
-    Package::~Package() {}
-
-    size_t Package::decodeBodyLength() {
-        // body_len = 0;
-        // if(head.fields.len1>=1) {
-        //     body_len|= buff[0] & 0x7F ;
-        //     head.fields.len1 = buff[0] ;
-        //     head_len = 5 ;
-        // }
-        // if(received>=2) {
-        //     body_len|= (buff[1] & 0x7F) << 7 ;
-        //     head.fields.len2 = buff[1] ;
-        //     head_len = 6 ;
-        // }
-        // if(received>=3) {
-        //     body_len|= (buff[2] & 0x7F) << 14 ;
-        //     head.fields.len3 = buff[2] ;
-        //     head_len = 7 ;
-        // }
-        // if(received>=4) {
-        //     body_len|= (buff[3] & 0x7F) << 21 ;
-        //     head.fields.len4 = buff[3] ;
-        //     head_len = 8 ;
-        // }
-        return 0 ;
     }
     
     void Package::encodeBodyLength() {
-        if(body_len<=0xFF) {
-            head.fields.len1 = 0xFF & body_len ;
+        if(body_len>0xFF) {
+            head.fields.cmd|= 0x80 ;
+            head.fields.len1 = (body_len>>8) & 0xFF ;
+            head.fields.len2 = body_len & 0xFF ;
+            head_len = 6 ;
+        } else {
+            head.fields.len1 = body_len & 0xFF ;
+            head.fields.len2 = 0 ;
             head_len = 5 ;
         }
-        else {
-            // *(len_bytes+0) = (len>>(7*0)) & 0x7F ;
-            // *(len_bytes+1) = (len>>(7*1)) & 0x7F ;
-            // *(len_bytes+2) = (len>>(7*2)) & 0x7F ;
-            // *(len_bytes+3) = (len>>(7*3)) & 0xFF ;  // 最高位字节可以用满8位
-
-            // if( *(len_bytes+3)>0 ) {
-            //     *(len_bytes+0) |= 0x80 ;
-            //     *(len_bytes+1) |= 0x80 ;
-            //     *(len_bytes+2) |= 0x80 ;
-            //     return 4 ;
-            // }
-            // else if( *(len_bytes+2)>0 ) {
-            //     *(len_bytes+0) |= 0x80 ;
-            //     *(len_bytes+1) |= 0x80 ;
-            //     return 3 ;
-            // }
-            // else if( *(len_bytes+1)>0 ) {
-            //     *(len_bytes+0) |= 0x80 ;
-            //     return 2 ;
-            // }
-            // return 1 ;
-        }
     }
 
-    void Package::mallocBody(bool endZero) {
-        if(body) {
-            freeBody() ;
+
+    void Package::mallocBody(uint16_t len, bool endZero) {
+        if(_body && !sharedBody) {
+            delete _body ;
+            _body = nullptr ;
         }
-        int len = body_len ;
-        if(endZero) {
-            len = len + 1 ;
-        }
+
         if(len) {
-            body = (uint8_t *)malloc(len) ;
-            if(body && endZero) {
-                body[len-1] = 0 ;
+            _body = new uint8_t[len] ;
+            if(endZero) {
+                _body[len-1] = 0 ;
             }
+            sharedBody = false ;
         }
     }
-    void Package::freeBody() {
-        if(body) {
-            free((void *)body) ;
-            body = nullptr ;
+
+    uint8_t Package::calculateVerifysum(uint8_t * data, size_t datalen, uint8_t baseval) {
+        for(uint16_t i=0; i<datalen; i++) {
+            baseval^= data[i] ;
         }
-    }
-    
-    static uint8_t _verifysum(uint8_t base, uint8_t * data, size_t len) {
-        for(uint16_t i=0; i<len; i++) {
-            base^= data[i] ;
-        }
-        return base ;
+        return baseval ;
     }
     uint8_t Package::calculateVerifysum() {
-        uint8_t sum = _verifysum(0,head.raw,head_len) ;
-        if(body) {
-            sum = _verifysum(sum,body,body_len) ;
-        }
-        return sum ;
+        uint8_t sum = Package::calculateVerifysum(head.raw,head_len) ;
+        return (_body&&body_len)? Package::calculateVerifysum(_body,body_len,sum): sum ;
     }
         
     size_t Package::calculateSize() {
@@ -183,10 +142,10 @@ namespace be {
         return buffsize == received ;
     }
 
-    // 行数据
+    // line data (separate by character '\ n')
     void StateLine::parse(uint8_t * bytes, size_t * len) {
         
-        // 遇到断开的包头(H1在前一次数据的末尾到达)
+        // encountered identification bytes that arrived separately (H1 reached at end of previous data)
         if( bytes[0]==parser->H2 && received>0 && buff[received-1]==parser->H1 ){
             (*len)-=1 ;
             received-=1 ;
@@ -194,18 +153,18 @@ namespace be {
             return ;
         }
 
-        for(int i=0;i<(*len);i++) {
-            // 到达行尾
+        for(int i=0;i<(int)(*len);i++) {
+            // reaching end of line
             if( bytes[i] == '\n' ) {
 
-                parser->pkg.reset(0, LINE, received+i+1) ;
-                parser->pkg.mallocBody(true) ;
-                // Package * pkg = parser->newPackage(LINE,0,received+i+2) ;
+                parser->pkg->reset(0, LINE, received+i+1) ;
+                parser->pkg->mallocBody(parser->pkg->body_len+1, true) ;
 
-                memcpy(parser->pkg.body, buff, received) ;
-                memcpy(parser->pkg.body+received, bytes, i+1) ;
-
-                // printf((char *)parser->pkg.body) ;
+                if(parser->pkg->body()) {
+                    memcpy(parser->pkg->body(), buff, received) ;
+                    memcpy(parser->pkg->body()+received, bytes, i+1) ;
+                    parser->pkg->body()[parser->pkg->body_len] = 0 ;
+                }
 
                 bytes+= i+1 ;
                 (*len)-= i+1 ;
@@ -214,7 +173,7 @@ namespace be {
                 parser->commitPackage() ;
                 return ;
             }
-            // 遇到包头
+            // encountered packet identifier bytes
             else if( i<(*len)-1 && bytes[i]==parser->H1 && bytes[i+1]==parser->H2 ) {
                 (*len)-=i+2 ;
                 bytes+=i+2 ;
@@ -227,118 +186,108 @@ namespace be {
     }
     
     
-    // 包头：固定数据区
+    // packet head：fixed length data segment
     void StatePkgHeadFields::enter() {
-        parser->pkg.reset(0,0,0) ;
+        parser->pkg->reset(0,0,0) ;
         received = 0 ;
     }
     void StatePkgHeadFields::parse(uint8_t * bytes, size_t * len) {
-        if( receiveToBuff(&bytes, len, parser->pkg.head.raw+2, 2) ) {
+        if( receiveToBuff(&bytes, len, parser->pkg->head.raw+2, 2) ) {
             parser->changeState(STATE_HEAD_LENGTH, bytes, len) ;
         }
     }
     
-    // 包头：可变长度区
+    // packet head：variable length data segment
     void StatePkgBodyLength::enter() {
         received = 0 ;
     }
     void StatePkgBodyLength::parse(uint8_t * bytes, size_t * len) {
-        // assert(parser->pkg) ;
-        if((*len)<1) {
+        size_t lenBytes = parser->pkg->head.fields.cmd<0x80? 1: 2 ;
+        if( !receiveToBuff(&bytes, len, &parser->pkg->head.fields.len1, lenBytes) ){
             return ;
         }
 
-        // 固定长度
-        if(parser->pkg.head.fields.h2==parser->H2) {
-            parser->pkg.head_len = 5 ;
-            parser->pkg.head.fields.len1 = (*bytes) ;
-            parser->pkg.body_len = parser->pkg.head.fields.len1 ;
-            (*len)-= 1 ;
-            parser->changeState(STATE_BODY, bytes+1, len) ;
-            return ;
+        if(lenBytes==1) {
+            parser->pkg->head_len = 5 ;
+            parser->pkg->body_len = parser->pkg->head.fields.len1 ;
+        } else  {
+            parser->pkg->head_len = 6 ;
+            parser->pkg->body_len = (parser->pkg->head.fields.len1 << 8) | parser->pkg->head.fields.len2 ;
         }
-
-        // 可变长度
-        // else if(parser->pkg.head.fields.h2==parser->H2V)  {
-        //     uint8_t m = 4 - received ;
-        //     if(m>(*len)) {
-        //         m = *len ;
-        //     }
-
-        //     // dn4(bytes[0],bytes[1],bytes[2],bytes[3])
-
-        //     uint8_t complete = false ;
-        //     for(uint8_t i = 0; i<m; i++) {
-
-        //         parser->pkg.head.raw[4+received] = bytes[i] ;
-
-        //         (*len)-= 1 ;
-        //         received ++ ;
-
-        //         // 遇到第一个小于 0x80 的字节，表示完成
-        //         if(bytes[i]<0x80) {
-        //             parser->pkg.decodeBodyLength() ;
-        //             parser->changeState(STATE_BODY, bytes+i, len) ;
-        //             return ;
-        //         }
-        //     }
-        // }
+        
+        parser->changeState(STATE_BODY, bytes, len) ;
     }
     
     // body
     void StatePkgBody::enter() {
-        if(parser->pkg.body_len>0) {
-            // parser->pkg.body = (uint8_t *)malloc(parser->pkg.body_len) ;
-            parser->pkg.mallocBody(true) ;
+        received = 0 ;
+        if(parser->pkg->body_len>0 && parser->pkg->body_len<=0xFF) {
+            parser->pkg->mallocBody(parser->pkg->body_len+1, true) ;
         }
         else {
-            parser->pkg.body = NULL ;
+            parser->pkg->_body = nullptr ;
         }
-        received = 0 ;
-        // verifysum_received = false ;
+
+        verifysum = Package::calculateVerifysum(parser->pkg->head.raw, parser->pkg->head_len, 0) ;
     }
     void StatePkgBody::parse(uint8_t * bytes, size_t * len) {
-        // assert(parser->pkg) ;
-
-        // body 未完成
-        if(parser->pkg.body_len > received) {
+        // _body incomplete
+        if( received < parser->pkg->body_len ) {
 
             size_t n = * len ;
-            if(n>parser->pkg.body_len-received) {
-                n = parser->pkg.body_len-received ;
+            if(n>parser->pkg->body_len-received) {
+                n = parser->pkg->body_len-received ;
             }
-            if(parser->pkg.body){
-                memcpy(parser->pkg.body+received, bytes, n) ;
+            // body length greater than 0xff
+            if( parser->pkg->body_len>0xFF ) {
+                if(parser->handler){
+                    // commit sub packet (body is only partial data)
+                    Package * chunk = new Package(parser->pkg) ;
+
+                    chunk->mallocBody(n,false) ;
+                    chunk->chunk_len = n ;
+                    std::memcpy(chunk->_body, bytes, n);
+
+                    chunk->head.fields.cmd &= 0x7F ;
+
+                    parser->handler(std::unique_ptr<Package>(chunk)) ;
+                }
             }
+
+            else if(parser->pkg->body()) {
+                memcpy(parser->pkg->body()+received, bytes, n) ;
+            }
+            
+            verifysum = Package::calculateVerifysum(bytes, n, verifysum) ;
+
             received+= n ;
             * len-= n ;
             bytes+= n ;
         }
 
-        // body 已完成
-        if(parser->pkg.body_len==received) {
+        // _body completed
+        if( received == parser->pkg->body_len ) {
             if((*len)>0) {
-                parser->pkg.verifysum = bytes[0] ;
+                parser->pkg->verifysum = bytes[0] ;
                 (*len)-= 1 ;
                 bytes+= 1 ;
-                if(checkVerifysum()){
+
+                if(verifysum==parser->pkg->verifysum){
                     parser->commitPackage() ;
                 }
                 else {
-                    printf("beprotocal bad verifysum %d!=%d(received)\n", parser->pkg.calculateVerifysum(), parser->pkg.verifysum) ;
+                    printf("be::protocal bad verifysum %d!=%d(received)\n", verifysum, parser->pkg->verifysum) ;
                 }
+
                 parser->changeState(STATE_LINE, bytes, len) ;
             }
         }
     }
 
-    bool StatePkgBody::checkVerifysum() {
-        return parser->pkg.calculateVerifysum() == parser->pkg.verifysum ;
-    }
 
-    // 上下文类
+    // context class
     Parser::Parser(PackageProcFunc _handler, uint8_t _H1,uint8_t _H2)
-        : pkg(0,0, nullptr, 0, _H1, _H2)
+        : pkg( new Package(0,0, nullptr, 0, _H1, _H2) )
         , stateLine(new StateLine(this))
         , statePkgHeadFields(new StatePkgHeadFields(this))
         , statePkgBodyLength(new StatePkgBodyLength(this))
@@ -372,7 +321,8 @@ namespace be {
     void Parser::changeState(State * state, uint8_t * bytes, size_t * len) {
         current = state ;
         current->enter() ;
-        // 继续处理
+
+        // continue processing unused data
         if(bytes!=nullptr && (*len)>0) {
             current->parse(bytes, len) ;
         }
@@ -380,15 +330,13 @@ namespace be {
 
     void Parser::commitPackage() {
         if(handler){
-            handler(pkg) ;
+            pkg->head.fields.cmd &= 0x7F ;
+            handler(std::unique_ptr<Package>(pkg)) ;
+            pkg = new Package(0,0,nullptr,0,H1,H2) ;
         }
     }
-    
-    // void Parser::setStreamHandle(StreamCreateFunc handler) {
-    //     streamHandler = handler ;
-    // }
 
-    void defaultPkgProcFunc(Package & pkg) {
-        printf("receive package, pkgid:%d, cmd:%d, length:%d\n",pkg.head.fields.pkgid,pkg.head.fields.cmd,pkg.body_len) ;
+    void defaultPkgProcFunc(std::unique_ptr<Package> pkg) {
+        printf("receive package, pkgid:%d, cmd:%d, length:%d\n",pkg->head.fields.pkgid,pkg->head.fields.cmd,pkg->body_len) ;
     }
 }

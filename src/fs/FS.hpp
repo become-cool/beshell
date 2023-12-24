@@ -29,6 +29,7 @@ namespace be {
         
         void setPrefix(const char * path) ;
         std::string toVFSPath(const char * path) ;
+        std::string trimVFSPath(std::string & path) ;
 
         void mount(const char * mountPoint, FSPartition * partition) ;
 

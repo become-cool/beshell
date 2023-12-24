@@ -43,6 +43,14 @@ namespace be {
 
     // }
 
+    static JSValue js_ArrayBuffer_asString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        size_t size ;
+        char * buff = (char *)JS_GetArrayBuffer(ctx, &size, this_val) ;
+        if(!buff || !size) {
+            return JS_NewStringLen(ctx, NULL, 0) ;
+        }
+        return JS_NewStringLen(ctx, buff, size) ;
+    }
 
 
     JSEngine::JSEngine(BeShell * _beshell)
@@ -120,6 +128,13 @@ namespace be {
         // eval_rc_script(ctx, "/lib/base/events.js") ;
         // eval_rc_script(ctx, "/lib/base/require.js") ;
 
+        
+        // ArrayBuffer.prototype.asString()
+        JSValue ArrayBufferProto = js_get_prop(ctx, global, 2, "ArrayBuffer", "prototype") ;
+        JS_SetPropertyStr(ctx, ArrayBufferProto, "asString", JS_NewCFunction(ctx, js_ArrayBuffer_asString, "asString", 0));
+	    JS_FreeValue(ctx, ArrayBufferProto);
+
+
         JSEngine * engine = JSEngine::fromJSRuntime(rt) ;
 
         assert(engine) ;
@@ -175,14 +190,16 @@ namespace be {
             return "" ;
         }
 
-        std::string str = console->stringify(ctx, exception_val) ;
+        const char * cstr = JS_ToCString(ctx, exception_val) ;
+        std::string str = cstr ;
+        JS_FreeCString(ctx, cstr) ;
+        // std::string str = console->stringify(ctx, exception_val) ;
 
         bool is_error = JS_IsError(ctx, exception_val);
         if (is_error) {
             JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack");
             if (!JS_IsUndefined(val)) {
-                const char * cstr = JS_ToCString(ctx, val) ;
-                str+= "\n-----\n" ;
+                cstr = JS_ToCString(ctx, val) ;
                 str+= cstr;
                 JS_FreeCString(ctx,cstr) ;
             }
@@ -230,5 +247,7 @@ namespace be {
         JS_SetPropertyStr(ctx, global, name, value) ;
         JS_FreeValue(ctx,global) ;
     }
+
+    
 
 }

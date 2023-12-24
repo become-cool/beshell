@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(beshell)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TYPE "Debug")
 
@@ -34,6 +34,7 @@ set(SRC_LIST
     src/REPL.cpp
     src/path.c
     src/utils.c
+    src/mallocf.c
 
     src/module/NativeModule.cpp
     src/module/ModuleLoader.cpp

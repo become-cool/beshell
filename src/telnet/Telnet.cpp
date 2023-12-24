@@ -3,7 +3,9 @@
 #include "BeShell.hpp"
 #include <cassert>
 #include <string.h>
+#include <sys/stat.h>
 
+using namespace std ;
 
 namespace be {
     Telnet::Telnet(BeShell * _beshell)
@@ -33,14 +35,14 @@ namespace be {
 #endif
     }
 
-    void Telnet::onReceived(TelnetChannel * ch, Package & pkg){
-        switch (pkg.head.fields.cmd)
+    void Telnet::onReceived(TelnetChannel * ch, std::unique_ptr<Package> pkg){
+        switch (pkg->head.fields.cmd)
         {
         case LINE:
         case RUN:
         case CALL:
             assert(beshell) ;
-            beshell->repl->input(pkg, ch) ;
+            beshell->repl->input(*pkg, ch) ;
             break;
         case FILE_OPEN:
             openFile(ch,pkg,false) ;
@@ -55,20 +57,20 @@ namespace be {
             pushFile(ch,pkg) ;
             break;
         case FILE_CLOSE:
-            pushFile(ch,pkg) ;
+            closeFile(ch,pkg) ;
             break;
         case FILE_PULL:
             pullFile(ch,pkg) ;
             break;
         default: 
-            ch->sendError(pkg.head.fields.pkgid, "cmd %d not implements", pkg.head.fields.cmd) ;
+            ch->sendError(pkg->head.fields.pkgid, "cmd %d not implements", pkg->head.fields.cmd) ;
             break;
         }
     }
 
 #define CHECK_FS_USED       \
         if(!beshell->fs) {  \
-            ch->sendError(pkg.head.fields.pkgid, "Do not use FS.") ; \
+            ch->sendError(pkg->head.fields.pkgid, "Do not use FS.") ; \
             return ;        \
         }
 
@@ -79,7 +81,7 @@ namespace be {
         else {
             pkgid%= 255 ;
         }
-        Package pkg((uint8_t)pkgid,cmd,(uint8_t *)data,datalen) ;
+        Package pkg((uint8_t)pkgid,cmd,(uint8_t*)data,datalen) ;
         pkg.pack() ;
 
 #ifdef PLATFORM_ESP32
@@ -103,12 +105,11 @@ namespace be {
 #endif
         return nullptr ;
     }
-    void Telnet::openFile(TelnetChannel * ch, Package & pkg, bool append) {
-
+    void Telnet::openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) {
         CHECK_FS_USED
 
-        if( pkg.body[pkg.body_len-1]!=0 ) {
-            ch->sendError(pkg.head.fields.pkgid, "Invalid path value(must be null ending)") ;
+        if( pkg->body()[pkg->body_len-1]!=0 ) {
+            ch->sendError(pkg->head.fields.pkgid, "Invalid path value(must be null ending)") ;
             return ;
         }
 
@@ -117,25 +118,22 @@ namespace be {
             ch->openedFile = nullptr ;
         }
         
-        const char * cpath = (const char *)pkg.body ;
+        const char * cpath = (const char *)pkg->body() ;
         string path = beshell->fs->toVFSPath(cpath) ;
 
-        cout << path << endl ;
-
         ch->openedFile = fopen(path.c_str(), append?"a+":"w+") ;
-        dp(ch->openedFile)
 
         if(ch->openedFile) {
-            ch->send(nullptr,0,pkg.head.fields.pkgid,RSPN) ;
+            ch->send(nullptr,0,pkg->head.fields.pkgid,RSPN) ;
         } else {
-            ch->sendError(pkg.head.fields.pkgid, "can not open file: %s", cpath) ;
+            ch->sendError(pkg->head.fields.pkgid, "can not open file: %s", cpath) ;
         }
     }
-    void Telnet::offsetFile(TelnetChannel * ch, Package & pkg) {
+    void Telnet::offsetFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
         CHECK_FS_USED
-        ch->sendError(pkg.head.fields.pkgid, "cmd not implements") ;
+        ch->sendError(pkg->head.fields.pkgid, "cmd not implements") ;
     }
-    void Telnet::closeFile(TelnetChannel * ch, Package & pkg) {
+    void Telnet::closeFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
         CHECK_FS_USED
 
         if(ch->openedFile) {
@@ -143,44 +141,102 @@ namespace be {
             ch->openedFile = nullptr ;
         }
 
-        ch->send(nullptr,0,pkg.head.fields.pkgid,RSPN) ;
+        ch->send(nullptr,0,pkg->head.fields.pkgid,RSPN) ;
     }
     
-    void Telnet::pushFile(TelnetChannel * ch, Package & pkg) {
+    void Telnet::pushFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
         CHECK_FS_USED
 
         if(!ch->openedFile) {
-            ch->sendError(pkg.head.fields.pkgid, "file not opened") ;
+            ch->sendError(pkg->head.fields.pkgid, "file not opened") ;
             return ;
         }
 
-        if(pkg.body_len) {
-            assert(pkg.body) ;
-            dp(ch->openedFile) ;
-            size_t writen = fwrite(pkg.body,1,pkg.body_len,ch->openedFile) ;
-            dn(writen)
+        if(pkg->body()) {
+            // 分段数据包
+            if(pkg->chunk_len && pkg->body_len>0xFF) {
+                size_t writen = fwrite(pkg->body(),1,pkg->chunk_len,ch->openedFile) ;
+                // dn(writen)
+            }
+            // 完整包
+            else {
+                size_t writen = fwrite(pkg->body(),1,pkg->body_len,ch->openedFile) ;
+                // dn(writen)
+                ch->send(nullptr, 0, pkg->head.fields.pkgid, RSPN) ;
+            }
             fflush(ch->openedFile) ;
-            fclose(ch->openedFile) ;
         }
 
-        ch->send(nullptr, 0, pkg.head.fields.pkgid, RSPN) ;
+        // 最后一个空包
+        else {
+            ch->send(nullptr, 0, pkg->head.fields.pkgid, RSPN) ;
+        }
     }
-    void Telnet::pullFile(TelnetChannel * ch, Package & pkg) {
-
+    void Telnet::pullFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
         CHECK_FS_USED
 
-        const char * cpath = (const char *)pkg.body ;
+        const char * cpath = (const char *)pkg->body() ;
         string path = beshell->fs->toVFSPath(cpath) ;
 
-        dn(pkg.body_len)
-    }
+        int pathlen = strlen(cpath) + 1 ;
+        
+        if( pathlen+6 != pkg->body_len ) {
+            ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
+            return ;
+        }
+        
+        struct stat statbuf;
+        if(stat(path.c_str(),&statbuf)!=0) {
+            ch->sendError(pkg->head.fields.pkgid, "file not exists") ;
+            return ;
+        }
+        if(!S_ISREG(statbuf.st_mode)) {
+            ch->sendError(pkg->head.fields.pkgid, "path is not a file") ;
+            return ;
+        }
+        
+        uint8_t * argptr = pkg->body()+pathlen ;
 
-    // std::unique_ptr<std::ostream> Telnet::createStream(Package & pkg) {
-    //     if( pkg.head.fields.cmd==FILE_PUSH
-    //         || pkg.head.fields.cmd==FILE_PUSH_APPEND
-    //         || pkg.head.fields.cmd==FILE_PUSH_OFFSET) {
-    //         return new fs
-    //     }
-    //     return nullptr ;
-    // }
+        size_t offset = (argptr[0]<<24) | (argptr[1]<<16) | (argptr[2]<<8) | argptr[3] ;
+        uint16_t length = (argptr[4]<<8) | argptr[5] ;
+
+        if(offset>=statbuf.st_size) {
+            ch->sendError(pkg->head.fields.pkgid, "invalid arg offset") ;
+            return ;
+        }
+
+        if(length>statbuf.st_size-offset) {
+            length = statbuf.st_size-offset ;
+        }
+        if(length>0xFFFF) {
+            length=0xFFFF ;
+        }
+        
+        FILE * h = fopen(path.c_str(), "r") ;
+        if(!h) {
+            ch->sendError(pkg->head.fields.pkgid, "can not open file") ;
+            return ;
+        }
+
+        Package rspnpkg(pkg->head.fields.pkgid, DATA, nullptr, length) ;
+        uint8_t verifysum = Package::calculateVerifysum(rspnpkg.head.raw,(size_t)rspnpkg.head_len) ;
+
+        ch->sendData((const char *)rspnpkg.head.raw,(size_t)rspnpkg.head_len) ;
+        // dn4( rspnpkg.head.fields.cmd, rspnpkg.head.fields.len1, rspnpkg.head.fields.len2, rspnpkg.head_len )
+
+        uint8_t data[256];
+        while(length>0) {
+            size_t chunklen = length>sizeof(data)? sizeof(data): length ;
+            size_t readed = fread(data, 1, chunklen, h);
+            // dn2(chunklen,readed)
+            length-= chunklen ;
+            ch->sendData((const char *)data,readed) ;
+            verifysum = Package::calculateVerifysum(data,readed,verifysum) ;
+        }
+
+        fclose(h) ;
+
+        // dn(verifysum)
+        ch->sendData((const char *)&verifysum,1) ;
+    }
 }

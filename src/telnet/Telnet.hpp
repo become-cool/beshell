@@ -36,16 +36,16 @@ namespace be {
 
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
-        void onReceived(TelnetChannel * , Package &) ;
+        void onReceived(TelnetChannel * , std::unique_ptr<Package>) ;
         static std::unique_ptr<std::ostream> createStream(Package & pkg) ;
 
         TelnetChannel * channel(const char * name) ;
 
     protected:
-        void openFile(TelnetChannel * ch, Package & pkg, bool append) ;
-        void offsetFile(TelnetChannel * ch, Package & pkg) ;
-        void closeFile(TelnetChannel * ch, Package & pkg) ;
-        void pushFile(TelnetChannel * , Package &) ;
-        void pullFile(TelnetChannel * , Package &) ;
+        void openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) ;
+        void offsetFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) ;
+        void closeFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) ;
+        void pushFile(TelnetChannel * , std::unique_ptr<Package> &) ;
+        void pullFile(TelnetChannel * , std::unique_ptr<Package> &) ;
     } ;
 }

@@ -108,6 +108,12 @@ namespace be {
         }
         return p ;
     }
+    std::string FS::trimVFSPath(std::string & path) {
+        if (path.substr(0, prefix.size()) == prefix) {
+            path = path.substr(prefix.size()) ;
+        }
+        return path ;
+    }
 
     bool FS::exist(const char * path) {
         string _path = toVFSPath(path) ;
