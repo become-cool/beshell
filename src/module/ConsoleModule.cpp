@@ -1,5 +1,6 @@
 #include "ConsoleModule.hpp"
 #include "JSEngine.hpp"
+#include "BeShell.hpp"
 #include "NativeObject.hpp"
 #include "debug.h"
 #include "utils.h"
@@ -34,10 +35,14 @@ namespace be {
             return JS_UNDEFINED ;
         }
 
+        ARGV_TO_STRING(0,str)
+        
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
+        assert(engine->beshell) ;
+        assert(engine->beshell->telnet) ;
 
-        engine->print(argv[0]) ;
+        engine->beshell->telnet->output(str.c_str(), str.length()) ;
 
         return JS_UNDEFINED ;
     }
