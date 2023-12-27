@@ -2,6 +2,7 @@
 #define ONCE_H_DEBUG
 
 #include <stdint.h>
+#include "utils.h"
 
 #define pf(...) printf(__VA_ARGS__) ;printf("\n") ;
 #define dd printf("%d@%s()\n", __LINE__, __FUNCTION__) ;

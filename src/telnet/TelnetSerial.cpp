@@ -22,6 +22,44 @@ using namespace std ;
 
 namespace be {
 
+    
+    void TelnetSerial::task2(void * argv) {
+        
+        fd_set rfds;
+        struct timeval tv;
+        int ret;
+        uint8_t *buf = (uint8_t *) malloc(RD_BUF_SIZE);
+
+        // forwarding received package to telnet
+        Parser parser([argv](std::unique_ptr<Package> pkg){
+            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
+            Package * ptr = pkg.release() ;
+            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &ptr, 0) ;
+        }) ;
+
+        while (1) {
+            FD_ZERO(&rfds);
+            FD_SET(UART_NUM, &rfds);
+
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+
+            ret = select(UART_NUM + 1, &rfds, NULL, NULL, &tv);
+            if (ret > 0) {
+                if (FD_ISSET(UART_NUM, &rfds)) {
+                    int len = uart_read_bytes(UART_NUM, buf, BUF_SIZE, 100/portTICK_PERIOD_MS);
+                    if (len > 0) {
+                        // printf("Received %d bytes\n", len);
+                        parser.parse(buf, len) ;
+                    }
+                }
+            }
+        }
+
+        free(buf);
+        vTaskDelete(NULL);
+    }
+
     void TelnetSerial::task(void * argv) {
 
         // forwarding received package to telnet
@@ -41,11 +79,13 @@ namespace be {
             if(xQueueReceive(((TelnetSerial*)argv)->uart_queue, (void * )&event, (TickType_t)portMAX_DELAY)) {
                 bzero(dtmp, RD_BUF_SIZE);
                 switch(event.type) {
-                    case UART_DATA:
-                        chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 1/portTICK_PERIOD_MS);
-                        // dn(chunklen)
+                    case UART_DATA: {
+                        uint64_t t = gettime() ;
+                        chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 100/portTICK_PERIOD_MS);
                         parser.parse(dtmp, chunklen) ;
+                        dn64(gettime()-t) ;
                         break;
+                    }
                     //Event of HW FIFO overflow detected
                     case UART_FIFO_OVF:
                     //Event of UART ring buffer full
@@ -109,7 +149,7 @@ namespace be {
         uart_pattern_queue_reset(UART_NUM, 20);
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
-        xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 0) ;   
+        xTaskCreatePinnedToCore(&TelnetSerial::task2, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;   
     }
 
     void TelnetSerial::loop () {

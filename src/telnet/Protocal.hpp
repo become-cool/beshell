@@ -27,12 +27,14 @@ namespace be {
 		, DATA = 8					// 数据包(用于 FILE_PULL 的回应)
 		, MSG = 9					// 主动向客户端推送的事件
 
+		, FILE_MIN = 32
 		, FILE_OPEN = 32
 		, FILE_OPEN_APPEND = 33
 		, FILE_OFFSET = 34
 		, FILE_PUSH = 35
 		, FILE_CLOSE = 36
 		, FILE_PULL = 38			// 拉取文件. DATA区格式：路径(0结尾字符串) + Offset(uint32) + Length(uint16)
+		, FILE_MAX = 38
 
 		, READY = 60				// 系统准备就绪事件
 	} ;
