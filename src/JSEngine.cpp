@@ -148,6 +148,7 @@ namespace be {
     }
 
     void JSEngine::loop() {
+        js_std_loop(ctx) ;
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -217,37 +218,26 @@ namespace be {
         return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
     }
 
-    // void telnet_run(JSContext * ctx, uint8_t pkgid, uint8_t cmd, uint8_t * data, size_t datalen) {
-    //     if(!JS_IsNull(_func_repl_input) && JS_IsFunction(ctx, _func_repl_input)) {
-    //         JSValueConst * argv = malloc(sizeof(JSValue)*4) ;
-    //         argv[0] = JS_NewInt32(ctx, pkgid) ;
-    //         argv[1] = JS_NewInt32(ctx, 0) ;
-    //         argv[2] = JS_NewInt32(ctx, cmd) ;
-    //         argv[3] = JS_NewStringLen(ctx, (char *)data, datalen) ;
+    JSValue JSEngine::evalScript(const char * filepath, int flags) {
+        assert(beshell) ;
+        if( !beshell->fs ) {
+            THROW_EXCEPTION("call useFS() first()")
+        }
 
-    //         // printf(">>> %.*s\n", datalen, data) ;
+        try{
+            std::string code = beshell->fs->readFileSync(filepath) ;
+            return JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
 
-    //         JSValue ret = JS_Call(ctx, _func_repl_input, JS_NULL, 4, argv) ;
-    //         if( JS_IsException(ret) ) {
-    //             echo_error(ctx) ;
-    //         }
+            // cout << content << endl ;
+        }catch(const char * error) {
+            THROW_EXCEPTION(error)
+        }
+    }
 
-    //         JS_FreeValue(ctx, ret) ;
-    //         JS_FreeValue(ctx, argv[3]) ;
-    //         free(argv) ;
-    //     }
-    //     else {
-    //         printf("_func_repl_input is NULL or not Function\n") ;
-    //     }
-    // }
-
-    
     void JSEngine::setGlobalValue(JSContext * ctx, const char * name, JSValue value) {
         JSValue global = JS_GetGlobalObject(ctx) ; 
         JS_SetPropertyStr(ctx, global, name, value) ;
         JS_FreeValue(ctx,global) ;
     }
-
-    
 
 }

@@ -3762,23 +3762,18 @@ void js_std_loop(JSContext *ctx)
         /* execute the pending jobs */
         for(;;) {
             err = JS_ExecutePendingJob(JS_GetRuntime(ctx), &ctx1);
-            dd
             if (err <= 0) {
                 if (err < 0) {
-
                     js_std_dump_error(ctx1);
-                    dd
                 }
                 break;
             }
         }
-dp(os_poll_func)
+
         if (!os_poll_func || os_poll_func(ctx)) {
-            dd
             break;
         }
     }
-    dd
 }
 
 void js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,

@@ -90,3 +90,4 @@ component_compile_options(-Wno-error=switch)
 component_compile_options(-Wno-switch)
 component_compile_options(-Wno-missing-field-initializers)
 
+string(REPLACE "-fno-rtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

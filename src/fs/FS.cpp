@@ -182,5 +182,57 @@ namespace be {
             return ret==0 ;
         }
     }
+    
+    std::string FS::readFileSync(const char * cpath, int offset, int readlen) {
+
+        std::string path = toVFSPath(cpath) ;
+
+        struct stat statbuf;
+        if(stat(path.c_str(),&statbuf)<0) {
+            throw "path invalid" ;
+        }
+        if(S_ISDIR(statbuf.st_mode)) {
+            throw "path is a dir" ;
+        }
+        if(readlen<0) {
+            readlen = statbuf.st_size ;
+        }
+        if(readlen<1){
+            return string() ;
+        }
+        
+        FILE * fd = fopen(path.c_str(), "r");
+        if(NULL==fd) {
+            throw "can not open file" ;
+        }
+
+        uint8_t * buff = new uint8_t[readlen] ;
+
+        if(offset>0) {
+            fseek(fd, offset, SEEK_SET) ;
+        }
+
+        size_t readed = fread(buff, 1, readlen, fd) ;
+        fclose(fd) ;
+
+        return std::string((const char *)buff,readed) ;
+    }
+    bool FS::writeFileSync(const char * cpath, const char * data, size_t len, bool append) {
+        if(data) {
+            return false ;
+        }
+
+        std::string path = toVFSPath(cpath) ;
+
+        FILE * fd = fopen(path.c_str(), append? "a+": "w");
+        if(NULL==fd) {
+            return false ;
+        }
+
+        fwrite(data, 1, len, fd);
+        fclose(fd) ;
+        
+        return true ;
+    }
 }
 

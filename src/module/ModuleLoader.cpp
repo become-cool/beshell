@@ -15,39 +15,59 @@ namespace be {
     class JSLoader: public NativeModule {
     protected:
         void defineExports() {
-            exportFunction("require",jsRequire) ;
+            exportFunction("__filename",jsFilename) ;
+            exportFunction("__dirname",jsDirname) ;
         }
     public:
-        JSLoader(): NativeModule("loader") {
-        };
-
-        static JSValue jsRequire(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            
-            CHECK_ARGC(1)
-            ARGV_TO_CSTRING(0, module_name)
-
-            JSModuleDef * m = JS_RunModule(ctx, "", module_name);
-
-            JS_FreeCString(ctx, module_name);
-
-            if (!m){
-                return JS_EXCEPTION ;
+        JSLoader(): NativeModule("loader") {};
+        
+        static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            int stack = 1 ;
+            if(argc>0) {
+                if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
+                    THROW_EXCEPTION("argv stack must be a number")
+                }
             }
+            JSAtom atom = JS_GetScriptOrModuleName(ctx, stack) ;
+            JSValue val1 = JS_AtomToString(ctx, atom);
 
-            /* return the module namespace */
-            JSValue ns = js_get_module_ns(ctx, m);
-            if (JS_IsException(ns)){
-                return JS_EXCEPTION ;
-            }
+            const char * fullpath = JS_ToCString(ctx,val1) ;
+            path_normalize(fullpath) ;
+            JSValue val2 = JS_NewString(ctx, fullpath);
 
-            return ns ;
+            JS_FreeAtom(ctx,atom) ;
+            JS_FreeValue(ctx,val1) ;
+            JS_FreeCString(ctx,fullpath) ;
+
+            return val2 ;
         }
+        static JSValue jsDirname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        void load(JSContext *ctx) {
-            JSValue global = JS_GetGlobalObject(ctx) ;
-            JS_SetPropertyStr(ctx, global, "require", JS_NewCFunction(ctx, jsRequire, "require", 1));
-            JS_FreeValue(ctx,global) ;
+            int stack = 1 ;
+            if(argc>0) {
+                if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
+                    THROW_EXCEPTION("argv stack must be a number")
+                }
+            }
 
+            JSAtom atom = JS_GetScriptOrModuleName(ctx, stack) ;
+            JSValue val = JS_AtomToString(ctx, atom);
+
+            const char * fullpath = JS_ToCString(ctx, val) ;
+            path_normalize(fullpath) ;
+            // char * path = vfspath_trim_prefix(fullpath) ;
+            JS_FreeAtom(ctx,atom) ;
+            JS_FreeValue(ctx,val) ;
+
+            char * dir = (char *) malloc(strlen(fullpath)+1) ;
+            path_dirname(fullpath,dir) ;
+
+            val = JS_NewString(ctx,dir) ;
+
+            JS_FreeCString(ctx, fullpath) ;
+            free(dir) ;
+
+            return val ;
         }
     } ;
 
@@ -98,34 +118,35 @@ namespace be {
         
     }
 
-    // 返回的字符串，需要由调用者 js_free
-    std::string ModuleLoader::resovleFS(FS & fs, const char * module_name, const char * base_dir) {
+    std::string ModuleLoader::resovleFS(FS * fs, const char * module_name, const char * base_dir) {
+
+        assert(fs) ;
 
         std::string fullpath = base_dir ;
         fullpath+= "/" ;
         fullpath+= module_name ;
 
         // to vfs path
-        fullpath = fs.toVFSPath(fullpath.c_str()) ;
+        fullpath = fs->toVFSPath(fullpath.c_str()) ;
 
-        // if(FSModule::isFile(fullpath.c_str())) {
-        //     return fullpath ;
-        // }
+        if(fs->isFile(fullpath.c_str())) {
+            return fullpath ;
+        }
 
-        // if(FSModule::isDir(fullpath.c_str())) {
-        //     // @todo package
+        if(fs->isDir(fullpath.c_str())) {
+            // @todo package
 
-        //     // index.js
-        //     fullpath+= "/index.js" ;
-        //     if(FSModule::isFile(fullpath.c_str())) {
-        //         return fullpath ;
-        //     }
-        // }
+            // index.js
+            fullpath+= "/index.js" ;
+            if(fs->isFile(fullpath.c_str())) {
+                return fullpath ;
+            }
+        }
         
-        // fullpath = fullpath+= ".bin" ;
-        // if(FSModule::isFile(fullpath.c_str())) {
-        //     return fullpath ;
-        // }
+        fullpath = fullpath+= ".bin" ;
+        if(fs->isFile(fullpath.c_str())) {
+            return fullpath ;
+        }
 
         return std::string("") ;
     }
@@ -142,44 +163,42 @@ namespace be {
             }
         }
 
-        return nullptr ;
-
-        // // resolve file 
-        // // -------------
-        // BeShell * beshell = BeShell::fromJSContext(ctx) ;
-        // assert(beshell) ;
+        // resolve file 
+        // -------------
+        JSEngine * engine= JSEngine::fromJSContext(ctx) ;
+        assert(engine) ;
         
-        // std::string fullpath ;
-        // // 绝对路
-        // if(module_name[0]=='/') {
-        //     fullpath = resovleFS(beshell->fs, module_name, NULL) ;
-        // }
+        std::string fullpath ;
+        // 绝对路
+        if(module_name[0]=='/') {
+            fullpath = resovleFS(engine->beshell->fs, module_name, NULL) ;
+        }
 
-        // // 相对路径
-        // else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
-        //     char * base_dir = strdup(module_base_name) ;
-        //     path_dirname(module_base_name, base_dir) ;
-        //     fullpath = resovleFS(beshell->fs, module_name, base_dir) ;
-        //     free(base_dir) ;
-        // }
+        // 相对路径
+        else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
+            char * base_dir = strdup(module_base_name) ;
+            path_dirname(module_base_name, base_dir) ;
+            fullpath = resovleFS(engine->beshell->fs, module_name, base_dir) ;
+            free(base_dir) ;
+        }
 
-        // // 系统默认目录
-        // else {
-        //     fullpath = resovleFS(beshell->fs, module_name, "/lib/local") ;
-        //     if(!fullpath.length()) {
-        //         fullpath = resovleFS(beshell->fs, module_name, "/opt") ;
-        //     }
-        // }
+        // 系统默认目录
+        else {
+            fullpath = resovleFS(engine->beshell->fs, module_name, "/lib/local") ;
+            if(!fullpath.length()) {
+                fullpath = resovleFS(engine->beshell->fs, module_name, "/opt") ;
+            }
+        }
 
-        // if(!fullpath.length()) {
-        //     return NULL ;
-        // }
+        if(!fullpath.length()) {
+            return NULL ;
+        }
 
-        // path_normalize(fullpath.c_str()) ;
+        path_normalize(fullpath.c_str()) ;
 
-        // char * jfullpath = js_strdup(ctx, fullpath.c_str()) ;
+        char * jfullpath = js_strdup(ctx, fullpath.c_str()) ;
 
-        // return jfullpath ;
+        return jfullpath ;
     }
 
     JSModuleDef * ModuleLoader::load(JSContext *ctx, const char *path, void *opaque) {

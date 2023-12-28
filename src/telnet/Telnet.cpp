@@ -42,7 +42,11 @@ namespace be {
         case RUN:
         case CALL:
             assert(beshell) ;
-            beshell->repl->input(*pkg, ch) ;
+            if(beshell->repl) {
+                beshell->repl->input(*pkg, ch) ;
+            } else {
+                cout << "call useREPL() first" << endl ;
+            }
             break;
         case FILE_OPEN:
             openFile(ch,pkg,false) ;

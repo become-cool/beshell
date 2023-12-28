@@ -40,7 +40,7 @@ namespace be {
         static JSValue getGlobalValue(const char * name) ;
 
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
-        void evalScript(const char * filepath, int flags=JS_EVAL_TYPE_GLOBAL) ;
+        JSValue evalScript(const char * filepath, int flags=JS_EVAL_TYPE_MODULE) ;
 
         static JSContext * InitContext(JSRuntime *rt) ;
         static JSEngine * fromJSContext(JSContext *) ;

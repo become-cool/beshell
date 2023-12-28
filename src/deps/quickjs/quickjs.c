@@ -1821,15 +1821,12 @@ int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx)
     JSJobEntry *e;
     JSValue res;
     int i, ret;
-dp(rt)
-dp(rt->job_list)
+
     if (list_empty(&rt->job_list)) {
-        dd
         *pctx = NULL;
-        dd
         return 0;
     }
-dd
+
     /* get the first pending job and execute it */
     e = list_entry(rt->job_list.next, JSJobEntry, link);
     list_del(&e->link);
