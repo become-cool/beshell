@@ -1,6 +1,6 @@
 #pragma once
 #include "telnet/Protocal.hpp"
-#include "deps/cmdline/cmdline.hpp"
+// #include "deps/cmdline/cmdline.hpp"
 
 namespace be {
     class BeShell ;

@@ -22,7 +22,7 @@ namespace be {
         JSLoader(): NativeModule("loader") {};
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            int stack = 1 ;
+            int32_t stack = 1 ;
             if(argc>0) {
                 if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
                     THROW_EXCEPTION("argv stack must be a number")
@@ -43,7 +43,7 @@ namespace be {
         }
         static JSValue jsDirname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-            int stack = 1 ;
+            int32_t stack = 1 ;
             if(argc>0) {
                 if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
                     THROW_EXCEPTION("argv stack must be a number")

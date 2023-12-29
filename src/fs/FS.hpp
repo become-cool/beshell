@@ -38,7 +38,8 @@ namespace be {
         bool isFile(const char * path) ;
         bool rm(const char * path, bool recursive=false) ;
         bool mkdir(const char * path, bool recursive=false) ;
-        std::string readFileSync(const char * path, int offset=0, int readlen=-1) ;
+
+        std::unique_ptr<char> readFileSync(const char * path, int * readed=nullptr, int offset=0, int readlen=-1) ;
         bool writeFileSync(const char * path, const char * data, size_t len, bool append=false) ;
     } ;
 }

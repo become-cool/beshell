@@ -114,7 +114,12 @@ static inline std::string demangle(const std::string &name)
 template <class T>
 std::string readable_typename()
 {
-  return demangle(typeid(T).name());
+  std::string tpname = "unknown" ;
+  if(std::is_same_v<T, float>) {
+    tpname = "float" ;
+  }
+
+  return demangle(tpname);
 }
 
 template <class T>
@@ -320,7 +325,10 @@ public:
   void add(const std::string &name,
            char short_name=0,
            const std::string &desc=""){
-    if (options.count(name)) throw cmdline_error("multiple definition: "+name);
+    if (options.count(name)) {
+      name = "multiple definition: "+name ;
+      throw cmdline_error(name);
+    }
     options[name]=new option_without_value(name, short_name, desc);
     ordered.push_back(options[name]);
   }

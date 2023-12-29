@@ -224,14 +224,15 @@ namespace be {
             THROW_EXCEPTION("call useFS() first()")
         }
 
-        try{
-            std::string code = beshell->fs->readFileSync(filepath) ;
-            return JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
-
-            // cout << content << endl ;
-        }catch(const char * error) {
-            THROW_EXCEPTION(error)
+        int readed ;
+        unique_ptr<char> content = beshell->fs->readFileSync(filepath,&readed) ;
+        if(readed<0) {
+            THROW_EXCEPTION("read file failed")
         }
+
+        string code(content.get(), readed) ;
+
+        return JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
     }
 
     void JSEngine::setGlobalValue(JSContext * ctx, const char * name, JSValue value) {

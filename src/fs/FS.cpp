@@ -183,39 +183,60 @@ namespace be {
         }
     }
     
-    std::string FS::readFileSync(const char * cpath, int offset, int readlen) {
+    std::unique_ptr<char> FS::readFileSync(const char * cpath, int * readed, int offset, int readlen) {
 
         std::string path = toVFSPath(cpath) ;
+        std::unique_ptr<char> ret ;
+
+        if(readed) {
+            *readed = 0 ;
+        }
 
         struct stat statbuf;
         if(stat(path.c_str(),&statbuf)<0) {
-            throw "path invalid" ;
+            // "path invalid" ;
+            if(readed) {
+                *readed = -1 ;
+            }
+            return ret ;
         }
         if(S_ISDIR(statbuf.st_mode)) {
-            throw "path is a dir" ;
+            // "path is a dir" ;
+            if(readed) {
+                *readed = -2 ;
+            }
+            return ret ;
         }
         if(readlen<0) {
             readlen = statbuf.st_size ;
         }
         if(readlen<1){
-            return string() ;
+            return ret ;
         }
         
         FILE * fd = fopen(path.c_str(), "r");
         if(NULL==fd) {
-            throw "can not open file" ;
+            // "can not open file" ;
+            if(readed) {
+                *readed = -3 ;
+            }
+            return ret ;
         }
 
-        uint8_t * buff = new uint8_t[readlen] ;
+        char * buff = new char[readlen] ;
 
         if(offset>0) {
             fseek(fd, offset, SEEK_SET) ;
         }
 
-        size_t readed = fread(buff, 1, readlen, fd) ;
+        size_t filelen = fread(buff, 1, readlen, fd) ;
         fclose(fd) ;
 
-        return std::string((const char *)buff,readed) ;
+        if(readed) {
+            * readed = filelen ;
+        }
+        ret.reset(buff) ;
+        return ret ;
     }
     bool FS::writeFileSync(const char * cpath, const char * data, size_t len, bool append) {
         if(data) {
