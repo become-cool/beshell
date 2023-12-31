@@ -1,0 +1,80 @@
+{
+    "hpp":
+    {
+      "prefix": "hpp",
+      "description": "hpp",
+      "body":
+      [
+        "#pragma once",
+        "",
+        "namespace be {",
+        "    class ${TM_FILENAME_BASE} {",
+        "    private:",
+        "    public:",
+        "        ${TM_FILENAME_BASE}() ;",
+        "    } ;",
+        "}"
+      ]
+    },
+    "cpp":
+    {
+      "prefix": "cpp",
+      "description": "cpp",
+      "body":
+      [
+        "#include \"${TM_FILENAME_BASE}.hpp\"",
+        "using namespace std;",
+        "",
+        "",
+        "namespace be {",
+        "    ${TM_FILENAME_BASE}::${TM_FILENAME_BASE}() {",
+        "",
+        "    }",
+        "}"
+      ]
+    },
+    "hppmodule":
+    {
+      "prefix": "hppmodule",
+      "description": "bemodule hpp",
+      "body":
+      [
+        "#pragma once",
+        "#include \"module/NativeModule.hpp\"",
+        "",
+        "namespace be {",
+        "    class ${TM_FILENAME_BASE}: public NativeModule {",
+        "    private:",
+        "    public:",
+        "        ${TM_FILENAME_BASE}() ;",
+        "        ",
+        "        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;",
+        "    } ;",
+        "}"
+      ]
+    },
+    "cppmodule":
+    {
+      "prefix": "cppmodule",
+      "description": "cppmodule",
+      "body":
+      [
+        "#include \"module/${TM_FILENAME_BASE}.hpp\"",
+        "",
+        "using namespace std ;",
+        "",
+        "namespace be {",
+        "    ${TM_FILENAME_BASE}::${TM_FILENAME_BASE}(): NativeModule(\"${TM_FILENAME_BASE}\") {",
+        "        isGlobal = false ;",
+        "        isReplGlobal = false ;",
+        "",
+        "        exportFunction(\"method\",jsMethod) ;",
+        "    }",
+        "    ",
+        "    JSValue ${TM_FILENAME_BASE}::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
+        "        return JS_UNDEFINED ;",
+        "    }",
+        "}"
+      ]
+    }
+  }
