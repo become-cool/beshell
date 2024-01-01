@@ -4,6 +4,7 @@ set(include_dirs ./src)
 # 源码目录
 set(src_dirs src)
 list(APPEND src_dirs src/fs)
+list(APPEND src_dirs src/repl)
 list(APPEND src_dirs src/telnet)
 list(APPEND src_dirs src/module)
 
@@ -73,6 +74,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
 
 
 # both c and c++

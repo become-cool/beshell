@@ -7,7 +7,7 @@
 #include <cstring>
 #include <cassert>
 #include <stdlib.h>
-#include "path.h"
+#include "path.hpp"
 #include "utils.h"
 
 namespace be {
@@ -31,7 +31,7 @@ namespace be {
             JSAtom atom = JS_GetScriptOrModuleName(ctx, stack) ;
             JSValue val1 = JS_AtomToString(ctx, atom);
 
-            const char * fullpath = JS_ToCString(ctx,val1) ;
+            char * fullpath = (char *)JS_ToCString(ctx,val1) ;
             path_normalize(fullpath) ;
             JSValue val2 = JS_NewString(ctx, fullpath);
 
@@ -53,7 +53,7 @@ namespace be {
             JSAtom atom = JS_GetScriptOrModuleName(ctx, stack) ;
             JSValue val = JS_AtomToString(ctx, atom);
 
-            const char * fullpath = JS_ToCString(ctx, val) ;
+            char * fullpath = (char *)JS_ToCString(ctx, val) ;
             path_normalize(fullpath) ;
             // char * path = vfspath_trim_prefix(fullpath) ;
             JS_FreeAtom(ctx,atom) ;
@@ -194,7 +194,7 @@ namespace be {
             return NULL ;
         }
 
-        path_normalize(fullpath.c_str()) ;
+        path_normalize((char *)fullpath.c_str()) ;
 
         char * jfullpath = js_strdup(ctx, fullpath.c_str()) ;
 

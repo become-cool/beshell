@@ -17,8 +17,6 @@ namespace be {
     private:
 
         BeShell * beshell ;
-
-        // TelnetPkgProcFunc onReceived ;
         
 #ifdef PLATFORM_ESP32
         TelnetSerial channelSeiral ;

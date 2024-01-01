@@ -2,6 +2,7 @@
 
 #include "deps/quickjs/quickjs-libc.h"
 #include "telnet/Telnet.hpp"
+#include "JSTimer.hpp"
 #include "module/ModuleLoader.hpp"
 #include "module/ConsoleModule.hpp"
 
@@ -23,6 +24,7 @@ namespace be {
         JSRuntime *rt = nullptr;
         JSContext *ctx = nullptr;
 
+        JSTimer timer ;
         ModuleLoader mloader ;
         
         JSEngine(BeShell *) ;

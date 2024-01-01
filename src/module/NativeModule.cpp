@@ -55,10 +55,7 @@ namespace be {
 
         // values
         for(auto pair: nmodule->exportValues) {
-            // ds(pair.first.c_str())
-            // dref(pair.second)
-            int ret = JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second);
-            // dref(pair.second)
+            JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second);
         }
 
         return 0 ;

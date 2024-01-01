@@ -10,7 +10,7 @@
 
 #include "debug.h"
 #include "JSEngine.hpp"
-#include "REPL.hpp"
+#include "repl/REPL.hpp"
 #include "fs/FS.hpp"
 #include "telnet/Telnet.hpp"
 

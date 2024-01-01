@@ -10,6 +10,7 @@
 #define dm(msg) printf("%s: %dKB\n", msg, esp_get_free_heap_size()/1024);
 #define dp(p)   printf(#p"@%p (%d)\n", p, __LINE__) ;
 #define ds(s)   printf(#s"=%s @%d\n", s, __LINE__) ;
+#define dstr(s)   printf(#s"=%s @%d\n", s.c_str(), __LINE__) ;
 #define dn(v)   printf(#v"=%d @%d\n", (int)v, __LINE__) ;
 #define dn64(v)   printf(#v"=%lld\n", v) ;
 #define dn2(v1,v2)              printf(#v1"=%d, "#v2"=%d @%d\n", (int)v1, (int)v2, __LINE__) ;

@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.12)
 project(beshell)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_BUILD_TYPE "Debug")
 
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
-    set(CMAKE_CXX_FLAGS "-O0 -Wall -g -ggdb -std=c++11")
+    set(CMAKE_CXX_FLAGS "-O0 -Wall -g -ggdb -std=c++17")
     set(CMAKE_C_FLAGS "-O0 -Wall -g -ggdb -std=gnu99")
 elseif (${CMAKE_BUILD_TYPE} MATCHES Release)
-    set(CMAKE_CXX_FLAGS "-O0 -Wall -std=c++11")
+    set(CMAKE_CXX_FLAGS "-O0 -Wall -std=c++17")
     set(CMAKE_C_FLAGS "-O0 -Wall -std=gnu99")
 endif()
 
@@ -30,9 +30,11 @@ SET(CMAKE_C_FLAGS_DEBUG "-O0")
 set(SRC_LIST
     main.cpp
     src/BeShell.cpp
+    src/JSTimer.cpp
     src/JSEngine.cpp
-    src/REPL.cpp
-    src/path.c
+    src/repl/REPL.cpp
+    src/path.cpp
+    src/string_utils.cpp
     src/utils.c
     src/mallocf.c
 

@@ -57,7 +57,8 @@
         "strstream": "cpp",
         "ctime": "cpp",
         "cfenv": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "string.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

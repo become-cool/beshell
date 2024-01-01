@@ -114,12 +114,16 @@ static inline std::string demangle(const std::string &name)
 template <class T>
 std::string readable_typename()
 {
+#ifdef PLATFORM_LINUX
+  return demangle(typeid(T).name());
+#else
   std::string tpname = "unknown" ;
   if(std::is_same_v<T, float>) {
     tpname = "float" ;
   }
-
   return demangle(tpname);
+#endif
+
 }
 
 template <class T>
@@ -326,8 +330,7 @@ public:
            char short_name=0,
            const std::string &desc=""){
     if (options.count(name)) {
-      name = "multiple definition: "+name ;
-      throw cmdline_error(name);
+      return ;
     }
     options[name]=new option_without_value(name, short_name, desc);
     ordered.push_back(options[name]);
@@ -349,7 +352,7 @@ public:
            bool need=true,
            const T def=T(),
            F reader=F()){
-    if (options.count(name)) throw cmdline_error("multiple definition: "+name);
+    if (options.count(name)) return ;
     options[name]=new option_with_value_with_reader<T, F>(name, short_name, need, def, desc, reader);
     ordered.push_back(options[name]);
   }
@@ -363,13 +366,13 @@ public:
   }
 
   bool exist(const std::string &name) const {
-    if (options.count(name)==0) throw cmdline_error("there is no flag: --"+name);
+    if (options.count(name)==0) return false ;
     return options.find(name)->second->has_set();
   }
 
   template <class T>
   const T &get(const std::string &name) const {
-    if (options.count(name)==0) throw cmdline_error("there is no flag: --"+name);
+    // if (options.count(name)==0) throw cmdline_error("there is no flag: --"+name);
     const option_with_value<T> *p=dynamic_cast<const option_with_value<T>*>(options.find(name)->second);
     if (p==NULL) throw cmdline_error("type mismatch flag '"+name+"'");
     return p->get();
@@ -415,8 +418,8 @@ public:
     if (buf.length()>0)
       args.push_back(buf);
 
-    for (size_t i=0; i<args.size(); i++)
-      std::cout<<"\""<<args[i]<<"\""<<std::endl;
+    // for (size_t i=0; i<args.size(); i++)
+    //   std::cout<<"\""<<args[i]<<"\""<<std::endl;
 
     return parse(args);
   }

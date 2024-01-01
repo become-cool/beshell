@@ -21,14 +21,27 @@ namespace be {
         sendData((const char *)&pkg.verifysum, 1);
         // mutexGive() ;
     }
+    void TelnetChannel::send (const std::string & data, int pkgId, uint8_t cmd) {
+        send(data.c_str(), data.length(), pkgId, cmd) ;
+    }
     void TelnetChannel::send (const char * data, int datalen, int pkgId, uint8_t cmd) {
         if(datalen<0) {
             datalen = strlen(data) ;
         }
         if(pkgId>=0) {
-            Package pkg((uint8_t)pkgId, cmd, (uint8_t *)data, datalen) ;
-            pkg.pack() ;
-            send(pkg) ;
+
+            do {
+                int pkglen = datalen>0xFFFF? 0xFFFF: datalen;
+
+                Package pkg((uint8_t)pkgId, cmd, (uint8_t *)data, pkglen) ;
+                pkg.pack() ;
+                send(pkg) ;
+
+                data+= pkglen ;
+                datalen-= pkglen ; 
+                
+            } while(datalen>0)  ;
+            
         } else if(datalen>0){
             // mutexTake() ;
             sendData(data,datalen) ;
@@ -49,6 +62,7 @@ namespace be {
 #ifdef PLATFORM_ESP32
         return xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE ;
 #endif
+        return true ;
     }
     void TelnetChannel::mutexGive() {
 #ifdef PLATFORM_ESP32

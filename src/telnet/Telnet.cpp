@@ -160,14 +160,12 @@ namespace be {
             // 分段数据包
             if(pkg->chunk_len && pkg->body_len>0xFF) {
                 necho_time("write file",{
-                    size_t writen = fwrite(pkg->body(),1,pkg->chunk_len,ch->openedFile) ;
+                    fwrite(pkg->body(),1,pkg->chunk_len,ch->openedFile) ;
                 })
-                // dn(writen)
             }
             // 完整包
             else {
-                size_t writen = fwrite(pkg->body(),1,pkg->body_len,ch->openedFile) ;
-                // dn(writen)
+                fwrite(pkg->body(),1,pkg->body_len,ch->openedFile) ;
                 ch->send(nullptr, 0, pkg->head.fields.pkgid, RSPN) ;
             }
             fflush(ch->openedFile) ;
@@ -186,7 +184,7 @@ namespace be {
 
         int pathlen = strlen(cpath) + 1 ;
         
-        if( pathlen+6 != pkg->body_len ) {
+        if( pathlen+6 != (int)pkg->body_len ) {
             ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
             return ;
         }
@@ -206,7 +204,7 @@ namespace be {
         size_t offset = (argptr[0]<<24) | (argptr[1]<<16) | (argptr[2]<<8) | argptr[3] ;
         uint16_t length = (argptr[4]<<8) | argptr[5] ;
 
-        if(offset>=statbuf.st_size) {
+        if(offset>=(size_t)statbuf.st_size) {
             ch->sendError(pkg->head.fields.pkgid, "invalid arg offset") ;
             return ;
         }

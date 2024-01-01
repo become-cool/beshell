@@ -19,29 +19,6 @@ using namespace std ;
 
 
 namespace be {
-    
-    // static void eval_rc_script(JSContext *ctx, const char * path) {
-        
-    //     const char * fullpath = path ;
-    //     // char * fullpath = vfspath_to_fs(path) ;
-
-    // #ifdef PLATFORM_ESP32
-    //     char * binpath = mallocf("%s.bin", fullpath) ;
-    //     struct stat statbuf;
-    //     if(stat(binpath,&statbuf)<0) {
-    //         evalScript(ctx, fullpath, false, false) ;
-    //     }
-    //     else {
-    //         evalScript(ctx, binpath, true, false) ;
-    //     }
-    //     free(binpath) ;
-    // #else
-    //     evalScript(ctx, fullpath, false, false) ;
-    // #endif
-
-    //     // free(fullpath) ;
-
-    // }
 
     static JSValue js_ArrayBuffer_asString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         size_t size ;
@@ -138,6 +115,7 @@ namespace be {
         JSEngine * engine = JSEngine::fromJSRuntime(rt) ;
 
         assert(engine) ;
+        engine->timer.setup(ctx) ;
         engine->mloader.setup(ctx) ;
 
         return ctx;
@@ -148,6 +126,7 @@ namespace be {
     }
 
     void JSEngine::loop() {
+        timer.loop(ctx) ;
         js_std_loop(ctx) ;
     }
 

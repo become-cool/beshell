@@ -15,7 +15,6 @@ namespace be {
     {}
 
     bool LittleFS::mount(const char * mountPoint) {
-        ds(mountPoint)
         const esp_vfs_littlefs_conf_t conf = {
             .base_path = mountPoint,
             .partition_label = label,
@@ -23,7 +22,6 @@ namespace be {
             .block_size = blockSize
         };
         if(esp_vfs_littlefs_register(&conf)!=ESP_OK){
-            dd
             printf("Failed to mount %s as LittleFS.\n", mountPoint) ;
             return false ;
         }

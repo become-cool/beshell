@@ -5,6 +5,8 @@
 #include <dirent.h>
 #include <cstring>
 #include "debug.h"
+#include "path.hpp"
+#include <unistd.h>
 
 #ifdef PLATFORM_ESP32
 #include "RawFS.hpp"
@@ -15,6 +17,8 @@
 extern const uint8_t fs_root_img_start[] asm("_binary_fs_root_img_start");
 extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #endif
+
+using namespace std ;
 
 
 namespace be {
@@ -108,9 +112,17 @@ namespace be {
         }
         return p ;
     }
-    std::string FS::trimVFSPath(std::string & path) {
-        if (path.substr(0, prefix.size()) == prefix) {
-            path = path.substr(prefix.size()) ;
+    std::string & FS::toVFSPath(std::string & path) {
+        if( path[0]=='/' && path.compare(0, prefix.size(), prefix)!=0 ) {
+            path = prefix + path ;
+        }
+        return path ;
+    }
+    std::string FS::trimVFSPath(const std::string & path) {
+        if (path.substr(0, prefix.size())==prefix) {
+            if(path.size()==prefix.size() || path[prefix.size()]=='/') {
+                return path.substr(prefix.size()) ;
+            }
         }
         return path ;
     }
@@ -121,9 +133,11 @@ namespace be {
         return stat(_path.c_str(),&statbuf)>=0 ;
     }
     bool FS::isDir(const char * path) {
+        toVFSPath(path) ;
         return be::isDir(path) ;
     }
     bool FS::isFile(const char * path) {
+        toVFSPath(path) ;
         return be::isFile(path) ;
     }
 
@@ -170,16 +184,15 @@ namespace be {
     }
 
     bool FS::mkdir(const char * _path, bool recursive) {
+        string path = toVFSPath(_path) ;
         struct stat statbuf;
-        if(stat(_path,&statbuf)>=0) {
+        if(stat(path.c_str(),&statbuf)>=0) {
             return S_ISDIR(statbuf.st_mode)? true: false ;
         }
         if(recursive) {
-            return mkdir_p(_path)==0 ;
+            return mkdir_p(path.c_str())==0 ;
         } else {
-            int ret = mkdir(_path, ACCESSPERMS) ;
-            dn(ret)
-            return ret==0 ;
+            return mkdir(path.c_str(), ACCESSPERMS) ;
         }
     }
     
@@ -254,6 +267,59 @@ namespace be {
         fclose(fd) ;
         
         return true ;
+    }
+
+    bool FS::touch(const char * _path) {
+        string path = toVFSPath(_path) ;
+        FILE *file = fopen(path.c_str(), "a");
+        if (file == NULL) {
+            return false ;
+        }
+        fclose(file);
+
+#ifdef PLATFORM_LINUX
+        struct utimbuf new_times;
+        new_times.actime = time(NULL);
+        new_times.modtime = time(NULL);
+        if (utime(path.c_str(), &new_times) != 0) {
+            return false ;
+        }
+#endif
+        return true ;
+    }
+
+    bool FS::setCwd(const std::string & path) {
+#ifdef PLATFORM_ESP32
+        pwd = trimVFSPath(path) ;
+        path_normalize(pwd) ;
+        return true ;
+#else
+        return chdir(path.c_str())==0 ;
+#endif
+    }
+    std::string FS::cwd() {
+#ifdef PLATFORM_ESP32
+        return pwd ;
+#else
+        char path[256] ;
+        if( getcwd(path, sizeof(path)) == nullptr ){
+            return "" ;
+        } else {
+            return path ;
+        }
+#endif
+    }
+    std::string FS::resolve(const std::string & path) {
+        if(path.length()<1) {
+            return cwd().c_str() ;
+        }
+        string _path ;
+        if( path[0] != '/' ) {
+            _path+= cwd() + "/" + path ;
+        } else {
+            _path = path ;
+        }
+        return path_normalize(_path) ;
     }
 }
 

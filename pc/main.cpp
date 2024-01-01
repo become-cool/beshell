@@ -1,15 +1,22 @@
  
 #include <iostream>
 #include <memory>
-#include "path.h"
+#include <string.h>
+#include "path.hpp"
 #include "BeShell.hpp"
+#include "path.hpp"
 #include "BeShell.hpp"
 #include "telnet/Protocal.hpp"
 using namespace std ;
 using namespace be;
 
-
 int main(int argc, char* argv[]) {
+
+    char p [256] ;
+    strcpy(p,"/./..") ;
+    path_normalize(p) ;
+    cout << p << endl ;
+    
     
     BeShell beshell ;
 

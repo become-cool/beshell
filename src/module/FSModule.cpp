@@ -469,7 +469,7 @@ namespace be {
 
         size_t total = 0 ;
         size_t used = 0 ;
-        size_t free_ = 0 ;
+        // size_t free_ = 0 ;
 
 // #ifdef PLATFORM_ESP32
 //         if(strcmp(jslabel,"/home")==0){
