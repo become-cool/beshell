@@ -52,7 +52,7 @@ namespace be {
             , NativeObject * parent=nullptr
         ) ;
         
-        ~NativeObject() ;
+        virtual ~NativeObject() ;
         
         virtual void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
         virtual void finalize(JSRuntime *rt, JSValue val) ;

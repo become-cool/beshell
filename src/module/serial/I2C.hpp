@@ -1,6 +1,6 @@
 #pragma once
 
-#include "module/NativeObject.hpp"
+#include "NativeObject.hpp"
 
 namespace be {
 
