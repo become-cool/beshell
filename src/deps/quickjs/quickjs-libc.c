@@ -367,7 +367,6 @@ uint8_t *js_load_file(JSContext *ctx, size_t *pbuf_len, const char *filename)
     size_t buf_len;
     long lret;
     
-    printf("fopen(%s)\n", filename) ;
     f = fopen(filename, "rb");
     if (!f) {
         return NULL;

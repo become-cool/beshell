@@ -24,8 +24,7 @@ namespace be {
 		, EXCEPTION = 5				// CMD_RUN/CMD_CALL/CALL_ASYNC 的异常
 		, CALLBACK = 6				// 执行本地js代码(远程发起)
 		, OUTPUT = 7				// 远程输出
-		, DATA = 8					// 数据包(用于 FILE_PULL 的回应)
-		, MSG = 9					// 主动向客户端推送的事件
+		, MSG = 8					// 主动向客户端推送的事件
 
 		, FILE_MIN = 32
 		, FILE_OPEN = 32
@@ -34,7 +33,8 @@ namespace be {
 		, FILE_PUSH = 35
 		, FILE_CLOSE = 36
 		, FILE_PULL = 38			// 拉取文件. DATA区格式：路径(0结尾字符串) + Offset(uint32) + Length(uint16)
-		, FILE_MAX = 38
+		, FILE_PULL_DATA = 39		// 拉取文件返回的数据
+		, FILE_MAX = 39
 
 		, READY = 60				// 系统准备就绪事件
 	} ;

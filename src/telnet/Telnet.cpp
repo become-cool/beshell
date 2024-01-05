@@ -180,14 +180,15 @@ namespace be {
         CHECK_FS_USED
 
         const char * cpath = (const char *)pkg->body() ;
-        string path = beshell->fs->toVFSPath(cpath) ;
-
         int pathlen = strlen(cpath) + 1 ;
         
         if( pathlen+6 != (int)pkg->body_len ) {
             ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
             return ;
         }
+
+        string path = beshell->fs->toVFSPath(cpath) ;
+        // dstr(path)
         
         struct stat statbuf;
         if(stat(path.c_str(),&statbuf)!=0) {
@@ -205,6 +206,7 @@ namespace be {
         uint16_t length = (argptr[4]<<8) | argptr[5] ;
 
         if(offset>=(size_t)statbuf.st_size) {
+            dd
             ch->sendError(pkg->head.fields.pkgid, "invalid arg offset") ;
             return ;
         }
@@ -222,12 +224,12 @@ namespace be {
             return ;
         }
 
-        Package rspnpkg(pkg->head.fields.pkgid, DATA, nullptr, length) ;
+        Package rspnpkg(pkg->head.fields.pkgid, FILE_PULL_DATA, nullptr, length) ;
         uint8_t verifysum = Package::calculateVerifysum(rspnpkg.head.raw,(size_t)rspnpkg.head_len) ;
 
         ch->sendData((const char *)rspnpkg.head.raw,(size_t)rspnpkg.head_len) ;
         // dn4( rspnpkg.head.fields.cmd, rspnpkg.head.fields.len1, rspnpkg.head.fields.len2, rspnpkg.head_len )
-
+// dn(length)
         uint8_t data[256];
         while(length>0) {
             size_t chunklen = length>sizeof(data)? sizeof(data): length ;
