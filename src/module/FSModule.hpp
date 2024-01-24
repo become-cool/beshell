@@ -7,7 +7,8 @@ namespace be {
     protected:
         void defineExports() ;
     public:
-        FSModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
         
         static JSValue jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -7,6 +7,7 @@ namespace be {
     protected:
         void defineExports() ;
     public:
-        PathModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
     } ;
 }

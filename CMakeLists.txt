@@ -36,16 +36,16 @@ list(APPEND src_dirs src/deps/quickjs)
 
 
 if(IDF_VERSION_MAJOR LESS 5)
-    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc_cal)
+    set(requires esp_adc_cal)
 else()
-    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc)
+    set(requires esp_adc)
 endif()
 
 
 idf_component_register(
     SRC_DIRS ${src_dirs}
     INCLUDE_DIRS ${include_dirs}
-    REQUIRES ${requires}
+    REQUIRES driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_lcd ${requires}
     EMBED_FILES fs-root.img
 )
 

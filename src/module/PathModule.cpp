@@ -3,8 +3,8 @@
 
 
 namespace be {
-    PathModule::PathModule(): NativeModule("path") {
-
+    NativeModule* PathModule::factory(JSContext * ctx, const char * name) {
+        return new PathModule(ctx, name) ;
     }
     void PathModule::defineExports() {
     }

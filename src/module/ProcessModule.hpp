@@ -7,7 +7,8 @@ namespace be {
     protected:
         void defineExports() ;
     public:
-        ProcessModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
         
         static JSValue reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;

@@ -19,7 +19,9 @@ namespace be {
         SPI * spi2 = nullptr ;
         SPI * spi3 = nullptr ;
 
-        SerialModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
+
         ~SerialModule() ;
         
         void init(JSRuntime * rt) ;

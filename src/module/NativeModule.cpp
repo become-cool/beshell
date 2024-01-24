@@ -9,7 +9,14 @@ using namespace std ;
 
 namespace be {
 
-    NativeModule::NativeModule(const char * _name): name(_name) {}
+    NativeModule::NativeModule(JSContext * _ctx, const char * _name, uint8_t _flagGlobal)
+        : ctx(_ctx)
+        , name(_name)
+        , flagGlobal(_flagGlobal)
+    {
+        m = JS_NewCModule(ctx, name.c_str(), importModule);
+        JS_SetModuleDefOpaque(m,this) ;
+    }
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
         assert(ctx) ;
@@ -37,6 +44,13 @@ namespace be {
         JS_AddModuleExport(ctx, m, name) ;
     }
     
+    void NativeModule::exportWithCallback(const char * name, ModuleExportor func) {
+        assert(m) ;
+        assert(ctx) ;
+        exportors[name] = func ;
+        JS_AddModuleExport(ctx, m, name) ;
+    }
+    
     NativeModule * NativeModule::fromJSModuleDef(JSModuleDef *m) {
         return (NativeModule *) JS_GetModuleDefOpaque(m) ;
     }
@@ -58,20 +72,25 @@ namespace be {
             JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second);
         }
 
+        // exportors
+        for(auto pair: nmodule->exportors) {
+            JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second(ctx));
+        }
+
         return 0 ;
     }
 
     void NativeModule::defineExports() {}
 
-    JSModuleDef * NativeModule::createModule(JSContext * _ctx) {
-        ctx = _ctx ;
-        m = JS_NewCModule(ctx, name.c_str(), importModule);
-        JS_SetModuleDefOpaque(m,this) ;
+    // JSModuleDef * NativeModule::createModule(JSContext * _ctx) {
+    //     ctx = _ctx ;
+    //     m = JS_NewCModule(ctx, name.c_str(), importModule);
+    //     JS_SetModuleDefOpaque(m,this) ;
 
-        defineExports() ;
+    //     defineExports() ;
 
-        return  m ;
-    }
+    //     return  m ;
+    // }
     
     void NativeModule::init(JSRuntime * rt) {}
     void NativeModule::setup(JSContext * ctx) {}

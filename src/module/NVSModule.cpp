@@ -79,8 +79,9 @@
 
 
 namespace be {
-    NVSModule::NVSModule(): NativeModule("nvs") {
-        isReplGlobal = true ;
+    
+    NativeModule* NVSModule::factory(JSContext * ctx, const char * name) {
+        return new NVSModule(ctx,name) ;
     }
 
     void NVSModule::defineExports() {

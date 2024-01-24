@@ -10,7 +10,9 @@ namespace be {
     protected:
         void defineExports() ;
     public:
-        ConsoleModule() ;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
+        ConsoleModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
+        
         ~ConsoleModule() ;
         void setup(JSContext *ctx) ;
         std::string stringify(JSContext *ctx, JSValue val) ;

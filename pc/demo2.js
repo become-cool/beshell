@@ -1,3 +1,5 @@
 console.log("demo2.js")
 
-export var aaa = "aaaaaaaa"
+export default class CCC {
+    
+}

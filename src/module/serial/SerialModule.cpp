@@ -3,10 +3,11 @@
 using namespace std ;
 
 namespace be {
-    SerialModule::SerialModule(): NativeModule("serial") {
-        isGlobal = true ;
-        isReplGlobal = true ;
+    
+    static SerialModule* factory(JSContext * ctx, const char * name) {
+        return new SerialModule(ctx,name,0) ;
     }
+
     #define DELETE_MEMBER(var) \
         if(var) {              \
             delete var ;       \

@@ -7,26 +7,31 @@
 
 namespace be {
     class NativeObject ;
+    class NativeClass ;
+
+	typedef void (*NativeClassDefineFunc)(NativeClass *) ;
+
     class NativeClass {
     private:
         JSClassID & classID ;
         JSContext * ctx ;
-        JSValue constructor = JS_NULL ;
         JSValue proto = JS_NULL ;
     public:
         NativeClass(
             JSContext * ctx
-            , const char * name
             , JSClassID & classID
-            , JSClassFinalizer * finalizer
+            , const char * name
+            , JSCFunction * constructor = nullptr
+            , JSClassFinalizer * finalizer = nullptr
         ) ;
         ~NativeClass() ;
         
         void setParent(JSContext * ctx, NativeClass * parent) ;
 
-        static NativeClass * fromClassID(JSContext * ctx, JSClassID & classID) ;
-
         JSValue newJSObject(JSContext * ctx) ;
+
+        static NativeClass * fromClassID(JSContext * ctx, JSClassID & classID) ;
+        static void registerClass(JSContext * ctx, JSClassID classID , const char * name , NativeClass * parent=nullptr) ;
 
         friend class NativeObject ;
     private:
@@ -34,8 +39,6 @@ namespace be {
 
     } ;
 
-
-	typedef void (*NativeClassDefineFunc)(NativeClass *) ;
 
     class NativeObject {
     private:
@@ -48,12 +51,14 @@ namespace be {
             JSContext * _ctx
             , JSClassID classID
             , const char * name
-            , NativeClassDefineFunc funcDefineClass=nullptr
+            , JSCFunction * constructor=nullptr
+            , JSClassFinalizer * finalizer=nullptr
             , NativeObject * parent=nullptr
+            , NativeClassDefineFunc funcDefineClass=nullptr
         ) ;
-        
+
         virtual ~NativeObject() ;
-        
+
         virtual void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
         virtual void finalize(JSRuntime *rt, JSValue val) ;
         inline static NativeObject * fromJSObject(JSValue obj) ;

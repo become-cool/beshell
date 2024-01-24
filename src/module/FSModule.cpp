@@ -12,9 +12,9 @@
 using namespace std ;
 
 
-namespace be {
-    FSModule::FSModule(): NativeModule("fs") {
-        isReplGlobal = true ;
+namespace be {    
+    NativeModule* FSModule::factory(JSContext * ctx, const char * name) {
+        return new FSModule(ctx,name,1) ;
     }
 
     void FSModule::defineExports() {

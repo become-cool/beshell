@@ -4,11 +4,16 @@
 using namespace std;
 
 
+
 namespace be {
+    
+    std::map<JSContext*, std::map<JSClassID, NativeClass *>> NativeClass::mapClasses ;
+    
     NativeClass::NativeClass(
         JSContext * _ctx
-        , const char * name
         , JSClassID & _classID
+        , const char * name
+        , JSCFunction * constructor
         , JSClassFinalizer * finalizer
     )
         : classID(_classID)
@@ -21,9 +26,13 @@ namespace be {
         jsClassDef.finalizer = finalizer ;
         JS_NewClass(JS_GetRuntime(ctx), classID, &jsClassDef);
 
-        JSValue proto = JS_NewObject(ctx);
-
+        proto = JS_NewObject(ctx);
         JS_SetClassProto(ctx, classID, proto);
+
+        if(constructor) {
+            JSValue jscotr = JS_NewCFunction2(_ctx, constructor, name, 1, JS_CFUNC_constructor, 0) ;
+            JS_SetConstructor(_ctx, jscotr, proto) ;
+        }
 
         mapClasses[ctx][classID] = this ;
     }
@@ -36,10 +45,6 @@ namespace be {
 
     NativeClass::~NativeClass() {
         if(ctx) {
-            if(!JS_IsNull(constructor)) {
-                JS_FreeValue(ctx, constructor) ;
-                constructor = JS_NULL ;
-            }
             if(!JS_IsNull(proto)) {
                 JS_FreeValue(ctx, proto) ;
                 proto = JS_NULL ;
@@ -63,6 +68,10 @@ namespace be {
         return mapClasses[ctx][classID] ;
     }
 
+    void NativeClass::registerClass(JSContext * ctx, JSClassID classID , const char * name , NativeClass * parent) {
+
+    }
+
     JSValue NativeClass::newJSObject(JSContext * ctx){
         return  JS_NewObjectClass(ctx, classID) ;
     }
@@ -72,15 +81,17 @@ namespace be {
         JSContext * _ctx
         , JSClassID classID
         , const char * name
-        , NativeClassDefineFunc funcDefineClass
+        , JSCFunction * constructor
+        , JSClassFinalizer * finalizer
         , NativeObject * parent
+        , NativeClassDefineFunc funcDefineClass
     )
         : nclass( NativeClass::fromClassID(_ctx, classID) )
         , ctx(_ctx)
     {
         if(!nclass) {
 
-            nclass = new NativeClass(_ctx, name, classID, jsFinalizer) ;
+            nclass = new NativeClass(_ctx, classID, name, constructor, finalizer) ;
 
             JSValue jscotr = JS_NewCFunction2(_ctx, jsConstructor, name, 1, JS_CFUNC_constructor, 0) ;
             JS_SetConstructor(_ctx, jscotr, nclass->proto) ;

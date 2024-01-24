@@ -7,8 +7,12 @@
 #include "path.hpp"
 #include "BeShell.hpp"
 #include "telnet/Protocal.hpp"
+#include "driver/display/DisplayModule.hpp"
+
+
 using namespace std ;
 using namespace be;
+using namespace be::driver::display;
 
 int main(int argc, char* argv[]) {
 
@@ -22,6 +26,7 @@ int main(int argc, char* argv[]) {
 
     beshell.useBasic() ;
     beshell.setup() ;
+    DisplayModule::use(beshell) ;
 
     char * dirname = strdup(argv[0]) ;
     path_dirname(argv[0],dirname) ;

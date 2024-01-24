@@ -32,6 +32,7 @@ set(SRC_LIST
     src/BeShell.cpp
     src/JSTimer.cpp
     src/JSEngine.cpp
+    src/NativeObject.cpp
     src/repl/REPL.cpp
     src/path.cpp
     src/string_utils.cpp
@@ -45,6 +46,11 @@ set(SRC_LIST
     src/module/ConsoleModule.cpp
     src/module/ProcessModule.cpp
     src/module/NVSModule.cpp
+
+    src/driver/display/DisplayModule.cpp
+    src/driver/display/Display.cpp
+    src/driver/display/Bus8080.cpp
+    src/driver/display/Display8080.cpp
 
     src/telnet/Protocal.cpp
     src/telnet/Telnet.cpp

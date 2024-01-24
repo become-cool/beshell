@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include "path.hpp"
 #include "utils.h"
+#include "quickjs_private.h"
+
+
 
 namespace be {
 
@@ -19,7 +22,10 @@ namespace be {
             exportFunction("__dirname",jsDirname) ;
         }
     public:
-        JSLoader(): NativeModule("loader") {};
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) {
+            return new JSLoader(ctx,name,1) ;
+        }
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             int32_t stack = 1 ;
@@ -72,49 +78,93 @@ namespace be {
     } ;
 
     ModuleLoader::ModuleLoader() {
-        add(new JSLoader) ;
-        add(new ProcessModule) ;
-        add(new ConsoleModule) ;
+        add("loader", JSLoader::factory) ;
+        add("process", ProcessModule::factory) ;
+        add("console", ConsoleModule::factory) ;
     }
+    
     ModuleLoader::~ModuleLoader() {
+        // @todo  delete native modules
+    }
+    
+    void ModuleLoader::add(const char * name, NativeModuleFactoryFunc factory) {
+        factories[name] = factory ;
     }
 
-    void ModuleLoader::add(NativeModule * module) {
-        modules[ module->name ] = module ;
-    }
+    // NativeModule * ModuleLoader::add(NativeModule * module) {
+    //     modules[ module->name ] = module ;
+    //     return module ;
+    // }
+    // NativeModule * ModuleLoader::added(const char * path) {
+    //     if(modules.count(path)>0) {
+    //         return modules[path] ;
+    //     } else {
+    //         return nullptr ;
+    //     }
+    // }
 
-    NativeModule * ModuleLoader::moduleByName(const char * name) {
-        return modules[ name ] ;
-    }
 
-    void ModuleLoader::init(JSRuntime * rt) {
-        for (const auto & pair : modules) {
-            pair.second->init(rt) ;
+    NativeModule * ModuleLoader::moduleByName(JSContext * ctx, const char * name) {
+        if( modules.count(ctx)<=1 || modules[ctx].count(name)<1 ) {
+            return nullptr ;
         }
+        return modules[ctx][name] ;
     }
+
+    // void ModuleLoader::init(JSRuntime * rt) {
+    //     for (const auto & pair : modules) {
+    //         pair.second->init(rt) ;
+    //     }
+    // }
 
     void ModuleLoader::setup(JSContext * ctx) {
 
         JS_SetModuleLoaderFunc(JS_GetRuntime(ctx), normalize, load, this);
 
-        for (const auto & pair : modules) {
-            pair.second->createModule(ctx) ;
-
-            if(pair.second->isReplGlobal) {
-
-                JSModuleDef * mm = JS_RunModule(ctx, "", pair.first.c_str());
-                JSValue mi = js_get_module_ns(ctx, mm ) ;
-
-                if (JS_IsException(mi)){
-                    // todo
-                } else {
-                    JSEngine::setGlobalValue(ctx, pair.first.c_str(), mi);
-                }
-                JS_FreeValue(ctx, mi) ;
-            }
+        for (const auto & pair : factories) {
             
-            pair.second->setup(ctx) ;
+            // pair.second->createModule(ctx) ;
+                
+            NativeModule * nm = pair.second(ctx, pair.first) ;
+
+            if(nm) {
+                if(nm->flagGlobal==1) {
+
+                    JSModuleDef * mm = JS_RunModule(ctx, "", pair.first);
+                    JSValue mi = js_get_module_ns(ctx, mm ) ;
+
+                    if (JS_IsException(mi)){
+                        // todo
+                    } else {
+                        JSEngine::setGlobalValue(ctx, pair.first, mi);
+                    }
+                    JS_FreeValue(ctx, mi) ;
+                    
+                }
+                nm->setup(ctx) ;
+            
+                modules[ctx][pair.first] = nm ;
+            }
         }
+
+        // for (const auto & pair : modules) {
+        //     pair.second->createModule(ctx) ;
+
+        //     if(pair.second->isReplGlobal) {
+
+        //         JSModuleDef * mm = JS_RunModule(ctx, "", pair.first.c_str());
+        //         JSValue mi = js_get_module_ns(ctx, mm ) ;
+
+        //         if (JS_IsException(mi)){
+        //             // todo
+        //         } else {
+        //             JSEngine::setGlobalValue(ctx, pair.first.c_str(), mi);
+        //         }
+        //         JS_FreeValue(ctx, mi) ;
+        //     }
+            
+        //     pair.second->setup(ctx) ;
+        // }
         
     }
 
@@ -155,15 +205,19 @@ namespace be {
         assert(opaque) ;
         ModuleLoader * mloader = (ModuleLoader *)opaque ;
 
+        if(mloader->modules.count(ctx)<1) {
+            return nullptr ;
+        }
+
         // 内置模块 
         // -------------
-        for (const auto & pair : mloader->modules) {
+        for (const auto & pair : mloader->modules[ctx]) {
             if( pair.first==module_name ) {
                 return js_strdup(ctx, module_name) ;
             }
         }
 
-        // resolve file 
+        // resolve file
         // -------------
         JSEngine * engine= JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
@@ -191,7 +245,7 @@ namespace be {
         }
 
         if(!fullpath.length()) {
-            return NULL ;
+            return nullptr ;
         }
 
         path_normalize((char *)fullpath.c_str()) ;

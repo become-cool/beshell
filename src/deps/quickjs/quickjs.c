@@ -3002,7 +3002,7 @@ static JSValue JS_NewSymbolFromAtom(JSContext *ctx, JSAtom descr,
 #define ATOM_GET_STR_BUF_SIZE 64
 
 /* Should only be used for debug. */
-static const char *JS_AtomGetStrRT(JSRuntime *rt, char *buf, int buf_size,
+const char *JS_AtomGetStrRT(JSRuntime *rt, char *buf, int buf_size,
                                    JSAtom atom)
 {
     if (__JS_AtomIsTaggedInt(atom)) {
@@ -3051,7 +3051,7 @@ static const char *JS_AtomGetStrRT(JSRuntime *rt, char *buf, int buf_size,
     return buf;
 }
 
-static const char *JS_AtomGetStr(JSContext *ctx, char *buf, int buf_size, JSAtom atom)
+const char *JS_AtomGetStr(JSContext *ctx, char *buf, int buf_size, JSAtom atom)
 {
     return JS_AtomGetStrRT(ctx->rt, buf, buf_size, atom);
 }

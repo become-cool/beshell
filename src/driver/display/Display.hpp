@@ -1,11 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include "NativeObject.hpp"
 
 #ifdef PLATFORM_ESP32
-#define cord_t uint16_t ; 
+#define coord_t uint16_t
 #else
-#define cord_t uint32_t ; 
+#define coord_t uint32_t
 #endif
 
 
@@ -13,11 +14,17 @@ namespace be {
 namespace driver {
 namespace display {
 
-    class Display {
+    class Display: public NativeObject {
     private:
     public:
-        virtual void drawPixel(cord_t x, cord_t y, uint8_t r, uint8_t g, uint8_t b) = 0 ;
-        virtual void drawRect(cord_t x1, cord_t y1,cord_t x2, cord_t y2, ) = 0 ;
+        Display(
+            JSContext * _ctx
+            , JSClassID classID
+            , const char * name
+            , NativeClassDefineFunc funcDefineClass=nullptr
+            , NativeObject * parent=nullptr ) ;
+        virtual void drawPixel(coord_t x, coord_t y, uint8_t r, uint8_t g, uint8_t b) = 0 ;
+        virtual void drawRect(coord_t x1, coord_t y1,coord_t x2, coord_t y2, const uint8_t * buff) = 0 ;
     } ;
 
 }}}

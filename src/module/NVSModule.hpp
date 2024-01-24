@@ -9,7 +9,9 @@ namespace be {
     protected:
         void defineExports() ;
     public:
-        NVSModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
+
         void setup(JSContext * ctx) ;
 
         void readOneTime(const char * key, uint8_t * value) const ;

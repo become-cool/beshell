@@ -3,8 +3,10 @@
 using namespace std ;
 
 namespace be {
-    GPIOModule::GPIOModule(): NativeModule("GPIOModule") {
-        exportFunction("method",jsMethod) ;
+
+    
+    NativeModule* GPIOModule::factory(JSContext * ctx, const char * name) {
+        return new GPIOModule(ctx,name) ;
     }
     
     JSValue GPIOModule::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

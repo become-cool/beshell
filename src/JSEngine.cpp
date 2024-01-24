@@ -64,11 +64,11 @@ namespace be {
         
         JS_SetRuntimeOpaque2(rt, this) ;
 
-        mloader.init(rt) ;
+        // mloader.init(rt) ;
         
         ctx = InitContext(rt);
         
-        console = (ConsoleModule *)mloader.moduleByName("console") ;
+        console = (ConsoleModule *)mloader.moduleByName(ctx, "console") ;
         assert(console) ;
     }
 
@@ -121,9 +121,9 @@ namespace be {
         return ctx;
     }
     
-    void JSEngine::addModule(NativeModule * m) {
-        mloader.add(m) ;
-    }
+    // void JSEngine::addModule(NativeModule * m) {
+    //     mloader.add(m) ;
+    // }
 
     void JSEngine::loop() {
         timer.loop(ctx) ;

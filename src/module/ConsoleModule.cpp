@@ -14,7 +14,12 @@ using namespace std ;
 
 namespace be {
 
-    ConsoleModule::ConsoleModule(): NativeModule("console") {
+    NativeModule* ConsoleModule::factory(JSContext * ctx, const char * name) {
+        return new ConsoleModule(ctx,name,1) ;
+    }
+    ConsoleModule::ConsoleModule(JSContext * ctx, const char * name, uint8_t flagGlobal)
+        : NativeModule(ctx,name,flagGlobal)
+    {
         jsStringify = JS_NULL ;
     }
     ConsoleModule::~ConsoleModule() {
