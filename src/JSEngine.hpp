@@ -4,7 +4,6 @@
 #include "telnet/Telnet.hpp"
 #include "JSTimer.hpp"
 #include "module/ModuleLoader.hpp"
-#include "module/ConsoleModule.hpp"
 #include "basic/Console.hpp"
 
 

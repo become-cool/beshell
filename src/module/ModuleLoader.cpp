@@ -1,6 +1,5 @@
 #include "module/ModuleLoader.hpp"
 #include "module/ProcessModule.hpp"
-#include "module/ConsoleModule.hpp"
 #include "module/PathModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
@@ -82,7 +81,6 @@ namespace be {
     ModuleLoader::ModuleLoader() {
         add("loader", JSLoader::factory) ;
         add("process", ProcessModule::factory) ;
-        add("console", ConsoleModule::factory) ;
     }
     
     ModuleLoader::~ModuleLoader() {

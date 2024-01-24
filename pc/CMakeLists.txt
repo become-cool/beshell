@@ -42,7 +42,6 @@ set(SRC_LIST
     src/module/NativeModule.cpp
     src/module/ModuleLoader.cpp
     src/module/PathModule.cpp
-    src/module/ConsoleModule.cpp
     src/module/ProcessModule.cpp
     src/module/NVSModule.cpp
     
