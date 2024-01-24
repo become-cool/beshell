@@ -3,10 +3,8 @@ using namespace std;
 
 namespace be {
   I2S::I2S(JSContext * ctx, uint8_t _busnum)
-        : NativeObject(ctx, classID, "I2S", defineClass)
+        : NativeObject(ctx, classID, "I2S")
         , busnum(_busnum)
     {
-    }
-    void I2S::defineClass(NativeClass *) {
     }
 }

@@ -5,7 +5,6 @@
 #include <string.h>
 #include "debug.h"
 #include "module/ModuleLoader.hpp"
-#include "module/ConsoleModule.hpp"
 #include "module/ProcessModule.hpp"
 #include <cassert>
 #include <iostream>
@@ -59,20 +58,17 @@ namespace be {
         rt = JS_NewRuntime();
 #endif
 
-        // js_std_set_worker_new_context_func(InitContext);
+        // js_std_set_worker_new_context_func(SetupContext);
         // js_std_init_handlers(rt);
         
         JS_SetRuntimeOpaque2(rt, this) ;
 
         // mloader.init(rt) ;
         
-        ctx = InitContext(rt);
-        
-        console = (ConsoleModule *)mloader.moduleByName(ctx, "console") ;
-        assert(console) ;
+        ctx = SetupContext(rt);
     }
 
-    JSContext * JSEngine::InitContext(JSRuntime *rt) {
+    JSContext * JSEngine::SetupContext(JSRuntime *rt) {
 
         JSContext *ctx;
         ctx = JS_NewContextRaw(rt);
@@ -97,7 +93,6 @@ namespace be {
         // global 对象
         JSValue global = JS_GetGlobalObject(ctx);
         JS_SetPropertyStr(ctx, global, "global", global);
-        // JS_FreeValue(ctx, global) ;
 
         // base 函数
         // eval_rc_script(ctx, "/lib/base/base.js") ;
@@ -118,12 +113,11 @@ namespace be {
         engine->timer.setup(ctx) ;
         engine->mloader.setup(ctx) ;
 
+        engine->console = new Console(ctx) ;
+        setGlobalValue(ctx, "console", engine->console->jsobj) ;
+
         return ctx;
     }
-    
-    // void JSEngine::addModule(NativeModule * m) {
-    //     mloader.add(m) ;
-    // }
 
     void JSEngine::loop() {
         timer.loop(ctx) ;
@@ -142,7 +136,6 @@ namespace be {
 
         std::string str = console->stringify(ctx, content) ;
 
-        // const char * cstr = JS_ToCStringLen(ctx, &len, content) ;
         if(!str.length()) {
             return ;
         }

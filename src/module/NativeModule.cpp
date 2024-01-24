@@ -14,7 +14,7 @@ namespace be {
         , name(_name)
         , flagGlobal(_flagGlobal)
     {
-        m = JS_NewCModule(ctx, name.c_str(), importModule);
+        m = JS_NewCModule(ctx, _name, importModule);
         JS_SetModuleDefOpaque(m,this) ;
     }
     
@@ -79,19 +79,7 @@ namespace be {
 
         return 0 ;
     }
-
-    void NativeModule::defineExports() {}
-
-    // JSModuleDef * NativeModule::createModule(JSContext * _ctx) {
-    //     ctx = _ctx ;
-    //     m = JS_NewCModule(ctx, name.c_str(), importModule);
-    //     JS_SetModuleDefOpaque(m,this) ;
-
-    //     defineExports() ;
-
-    //     return  m ;
-    // }
     
-    void NativeModule::init(JSRuntime * rt) {}
     void NativeModule::setup(JSContext * ctx) {}
+
 }

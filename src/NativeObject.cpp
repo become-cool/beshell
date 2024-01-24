@@ -15,6 +15,8 @@ namespace be {
         , const char * name
         , JSCFunction * constructor
         , JSClassFinalizer * finalizer
+        , const JSCFunctionListEntry * methods, int methods_size
+        , const JSCFunctionListEntry * staticMethods, int staticMethods_size
     )
         : classID(_classID)
         , ctx(_ctx)
@@ -29,10 +31,19 @@ namespace be {
         proto = JS_NewObject(ctx);
         JS_SetClassProto(ctx, classID, proto);
 
+        if(methods) {
+            JS_SetPropertyFunctionList(ctx, proto, methods, methods_size);
+        }
+
         if(constructor) {
             JSValue jscotr = JS_NewCFunction2(_ctx, constructor, name, 1, JS_CFUNC_constructor, 0) ;
             JS_SetConstructor(_ctx, jscotr, proto) ;
+
+            if(staticMethods) {
+                JS_SetPropertyFunctionList(ctx, jscotr, staticMethods, staticMethods_size);
+            }
         }
+
 
         mapClasses[ctx][classID] = this ;
     }
@@ -57,7 +68,6 @@ namespace be {
         JS_NewClassID(&classID);
 
         if (mapClasses.count(ctx) < 1) {
-            std::cout << "new ctx nclass pool" << std::endl ;
             mapClasses[ctx] = std::map<JSClassID, NativeClass *>() ;
         }
 
@@ -81,8 +91,8 @@ namespace be {
         JSContext * _ctx
         , JSClassID classID
         , const char * name
-        , JSCFunction * constructor
-        , JSClassFinalizer * finalizer
+        , const JSCFunctionListEntry * methods, int methods_size
+        , const JSCFunctionListEntry * staticMethods, int staticMethods_size
         , NativeObject * parent
         , NativeClassDefineFunc funcDefineClass
     )
@@ -91,10 +101,8 @@ namespace be {
     {
         if(!nclass) {
 
-            nclass = new NativeClass(_ctx, classID, name, constructor, finalizer) ;
-
-            JSValue jscotr = JS_NewCFunction2(_ctx, jsConstructor, name, 1, JS_CFUNC_constructor, 0) ;
-            JS_SetConstructor(_ctx, jscotr, nclass->proto) ;
+            nclass = new NativeClass(_ctx, classID, name, jsConstructor, jsFinalizer
+                , methods, methods_size, staticMethods, staticMethods_size) ;
 
             if(parent) {
                 nclass->setParent(ctx,parent->nclass) ;
@@ -106,9 +114,9 @@ namespace be {
         }
 
         jsobj = nclass->newJSObject(ctx) ;
-        JS_DupValue(ctx, jsobj) ;
-
         JS_SetOpaque(jsobj, this) ;
+
+        JS_DupValue(ctx, jsobj) ;
     }
     
     NativeObject::~NativeObject() {

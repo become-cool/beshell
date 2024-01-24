@@ -41,11 +41,12 @@ set(SRC_LIST
 
     src/module/NativeModule.cpp
     src/module/ModuleLoader.cpp
-    src/module/FSModule.cpp
     src/module/PathModule.cpp
     src/module/ConsoleModule.cpp
     src/module/ProcessModule.cpp
     src/module/NVSModule.cpp
+    
+    src/basic/Console.cpp
 
     src/driver/display/DisplayModule.cpp
     src/driver/display/Display.cpp
@@ -59,6 +60,7 @@ set(SRC_LIST
     src/telnet/TelnetWS.cpp
 
     src/fs/FS.cpp
+    src/fs/FSModule.cpp
 
 
 )

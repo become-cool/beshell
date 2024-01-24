@@ -8,16 +8,17 @@ namespace be {
     private:
         JSValue jsStringify ;
     protected:
-        void defineExports() ;
     public:
         static NativeModule* factory(JSContext * ctx, const char * name) ;
+
         ConsoleModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
-        
         ~ConsoleModule() ;
-        void setup(JSContext *ctx) ;
+        
         std::string stringify(JSContext *ctx, JSValue val) ;
 
         static JSValue jsWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        
+        void setup(JSContext * ctx) ;
     } ;
 }

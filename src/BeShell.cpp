@@ -1,5 +1,5 @@
 #include "BeShell.hpp"
-#include "module/FSModule.hpp"
+#include "fs/FSModule.hpp"
 #include "module/NVSModule.hpp"
 #include <iostream>
 #include <string.h>
@@ -54,14 +54,12 @@ namespace be {
         }
         repl = new REPL(this) ;
     }
-    void BeShell::useNVS() {
-        engine->mloader.add("nvs", NVSModule::factory) ;
-    }
 
     void BeShell::useBasic() {
         useFS() ;
         useREPL() ;
-        useNVS() ;
+        
+        NVSModule::use(this) ;
     }
 
     void BeShell::setup() {

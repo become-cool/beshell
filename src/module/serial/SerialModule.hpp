@@ -8,9 +8,6 @@
 
 namespace be {
     class SerialModule: public NativeModule {
-    private:
-    protected:
-        void defineExports() ;
     public:
         I2C * i2c0 = nullptr ;
         I2C * i2c1 = nullptr ;

@@ -5,8 +5,10 @@ using namespace std ;
 namespace be {
     NativeModule* ProcessModule::factory(JSContext * ctx, const char * name) {
         return new ProcessModule(ctx, name, 1) ;
-    }
-    void ProcessModule::defineExports() {
+    }    
+    ProcessModule::ProcessModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
+        : NativeModule(ctx, name, flagGlobal)
+    {
         exportFunction("reboot",reboot) ;
     }
     JSValue ProcessModule::reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

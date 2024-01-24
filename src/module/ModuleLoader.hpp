@@ -4,8 +4,7 @@
 #include <vector>
 #include <string>
 #include "module/NativeModule.hpp"
-#include "module/PathModule.hpp"
-#include "module/FSModule.hpp"
+#include "fs/FSModule.hpp"
 #include "fs/FS.hpp"
 
 namespace be {
@@ -17,11 +16,7 @@ namespace be {
     class ModuleLoader {
     private:
         std::map<const char *, NativeModuleFactoryFunc> factories ;
-        std::map<JSContext*, std::map<const char *, NativeModule*>> modules ;
-        
-        
-        JSModuleDef * createModuleDef(JSContext *) ;
-        void importModule(JSContext *) ;
+        std::map<JSContext*, std::map<std::string, NativeModule*>> modules ;
 
     public:
         ModuleLoader() ;

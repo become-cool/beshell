@@ -11,7 +11,6 @@ namespace display {
     private:
     public:
         Display8080(JSContext * ctx) ;
-        static void defineClass(NativeClass *) ;
         static JSClassID classID ;
 
         static void use(const be::BeShell & beshell) ;

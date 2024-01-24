@@ -1,8 +1,16 @@
-#include "deps/quickjs/list.h"
+#ifndef _QUICKJS_PRIVATE_H
+#define _QUICKJS_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "deps/quickjs/quickjs-libc.h"
+
+struct list_head {
+    struct list_head *prev;
+    struct list_head *next;
+};
 
 struct JSVarRef {} ;
 
@@ -86,4 +94,6 @@ const char *JS_AtomGetStrRT(JSRuntime *rt, char *buf, int buf_size, JSAtom atom)
                                    
 #ifdef __cplusplus
 }
+#endif
+
 #endif

@@ -21,10 +21,9 @@ namespace be {
     protected:
         JSModuleDef * m = nullptr ;
         JSContext * ctx = nullptr ;
-        virtual void defineExports() ;
 
     public:
-        std::string name ;
+        const char * name ;
 
         uint8_t flagGlobal = 0 ;
         
@@ -34,9 +33,6 @@ namespace be {
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
         void exportWithCallback(const char * name, ModuleExportor func) ;
 
-        JSModuleDef * createModule(JSContext *) ;
-
-        virtual void init(JSRuntime * ctx) ;
         virtual void setup(JSContext * ctx) ;
 
         inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;

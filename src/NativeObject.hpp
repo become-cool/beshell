@@ -23,6 +23,8 @@ namespace be {
             , const char * name
             , JSCFunction * constructor = nullptr
             , JSClassFinalizer * finalizer = nullptr
+            , const JSCFunctionListEntry * methods=nullptr, int methods_size=0
+            , const JSCFunctionListEntry * staticMethods=nullptr, int staticMethods_size=0
         ) ;
         ~NativeClass() ;
         
@@ -45,22 +47,24 @@ namespace be {
     protected:
         NativeClass * nclass;
         JSContext * ctx ;
-        JSValue jsobj ;
+        
+        virtual void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
+        virtual void finalize(JSRuntime *rt, JSValue val) ;
     public:
         NativeObject(
             JSContext * _ctx
             , JSClassID classID
             , const char * name
-            , JSCFunction * constructor=nullptr
-            , JSClassFinalizer * finalizer=nullptr
+            , const JSCFunctionListEntry * methods=nullptr, int methods_size=0
+            , const JSCFunctionListEntry * staticMethods=nullptr, int staticMethods_size=0
             , NativeObject * parent=nullptr
             , NativeClassDefineFunc funcDefineClass=nullptr
         ) ;
 
         virtual ~NativeObject() ;
 
-        virtual void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
-        virtual void finalize(JSRuntime *rt, JSValue val) ;
+        JSValue jsobj ;
+        
         inline static NativeObject * fromJSObject(JSValue obj) ;
 
         private:

@@ -9,10 +9,8 @@ namespace display {
     JSClassID Display8080::classID ;
 
     Display8080::Display8080(JSContext * ctx)
-        : Display(ctx, classID, "Display8080", defineClass)
+        : Display(ctx, classID, "Display8080")
     {
-    }
-    void Display8080::defineClass(NativeClass *) {
     }
 
     void Display8080::use(const be::BeShell & beshell) {

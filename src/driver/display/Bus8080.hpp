@@ -12,7 +12,6 @@ namespace display {
         uint8_t busnum = 0 ;
     public:
         Bus8080(JSContext * ctx, uint8_t _busnum=0) ;
-        static void defineClass(NativeClass *) ;
         static JSClassID classID ;
 
     } ;
