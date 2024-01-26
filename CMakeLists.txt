@@ -6,6 +6,7 @@ set(src_dirs src)
 list(APPEND src_dirs src/fs)
 list(APPEND src_dirs src/repl)
 list(APPEND src_dirs src/telnet)
+list(APPEND src_dirs src/basic)
 list(APPEND src_dirs src/module)
 list(APPEND src_dirs src/module/serial)
 
@@ -73,12 +74,14 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-brace")
 
 
 # both c and c++
+component_compile_options(-Wno-missing-braces)
 component_compile_options(-Wno-error=format=)
 component_compile_options(-Wno-format)
 component_compile_options(-Wno-unused-function)

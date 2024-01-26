@@ -6,7 +6,6 @@
 
 using namespace std ;
 
-
 namespace be {
 
     JSClassID Console::classID = 0 ;
@@ -19,7 +18,6 @@ namespace be {
     Console::Console(JSContext * ctx)
         : NativeObject(ctx, classID, "console", methods, countof(methods))
     {
-        
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
 
@@ -46,20 +44,20 @@ function (value,format) {
     return str
 }
     )", "console.js", {
-        engine->dumpError() ;
-    })
-
+            engine->dumpError() ;
+            return ;
+        })
 
     JSValue DEF_JS_FUNC(jsEmit, R"(
 function() {
     console.message(JSON.stringify(Object.values(arguments)))
 }
     )", "console.js", {
-        engine->dumpError() ;
-    })
+            engine->dumpError() ;
+            return ;
+        })
 
-    
-    JSValue DEF_JS_FUNC(jsLog, R"(
+        JSValue DEF_JS_FUNC(jsLog, R"(
 function() {
     let vals = []
     for(let v of arguments){
@@ -83,13 +81,13 @@ function() {
     console.write(vals.join(' ')+'\n')
 }
     )", "console.js", {
-        engine->dumpError() ;
-    })
+            engine->dumpError() ;
+            return ;
+        })
 
         JS_SetPropertyStr(ctx, jsobj, "stringify", jsStringify) ;
         JS_SetPropertyStr(ctx, jsobj, "log", jsLog) ;
         JS_SetPropertyStr(ctx, jsobj, "emit", jsEmit) ;
-
     }
 
     void Console::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) {
@@ -116,7 +114,7 @@ function() {
     #undef stringify
     string Console::stringify(JSContext *ctx, JSValue val) {
 
-        const char * cstr ;
+        const char * cstr = nullptr ;
         // 简单调用 toString
         if( JS_IsNull(jsStringify) ) {
             cstr = JS_ToCString(ctx,val) ;

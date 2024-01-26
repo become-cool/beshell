@@ -3401,12 +3401,17 @@ static int JS_NewClass1(JSRuntime *rt, JSClassID class_id,
         rt->class_count = new_size;
     }
     cl = &rt->class_array[class_id];
+
     cl->class_id = class_id;
     cl->class_name = JS_DupAtomRT(rt, name);
     cl->finalizer = class_def->finalizer;
     cl->gc_mark = class_def->gc_mark;
     cl->call = class_def->call;
     cl->exotic = class_def->exotic;
+    if(class_id==51) {
+        dp(cl)
+        dp(cl->exotic)
+    }
     return 0;
 }
 
@@ -3415,7 +3420,7 @@ int JS_NewClass(JSRuntime *rt, JSClassID class_id, const JSClassDef *class_def)
     int ret, len;
     JSAtom name;
 
-    // printf("class id:%d, class name %s \n", class_id, class_def->class_name) ;
+    printf("class id:%d, class name %s \n", class_id, class_def->class_name) ;
 
     len = strlen(class_def->class_name);
     name = __JS_FindAtom(rt, class_def->class_name, len, JS_ATOM_TYPE_STRING);
@@ -8462,6 +8467,10 @@ retry:
                 }
             } else {
                 const JSClassExoticMethods *em = ctx->rt->class_array[p1->class_id].exotic;
+                dp(ctx)
+                dp(ctx->rt->class_array)
+                dn(p1->class_id)
+                dp(em)
                 if (em) {
                     JSValue obj1;
                     if (em->set_property) {

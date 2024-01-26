@@ -3,10 +3,8 @@ using namespace std;
 
 namespace be {
   SPI::SPI(JSContext * ctx, uint8_t _busnum)
-        : NativeObject(ctx, classID, "SPI", defineClass)
+        : NativeObject(ctx, classID, "SPI")
         , busnum(_busnum)
     {
-    }
-    void SPI::defineClass(NativeClass *) {
     }
 }

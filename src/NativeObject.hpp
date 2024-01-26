@@ -5,6 +5,9 @@
 #include <vector>
 #include <iostream>
 
+#include <quickjs_private.h>
+#define dclass(ctx,classID) printf("class(%d) addr: %p, exotic: %p @%d\n", classID, & ctx->rt->class_array[classID], ctx->rt->class_array[classID].exotic, __LINE__) ;
+
 namespace be {
     class NativeObject ;
     class NativeClass ;

@@ -1,14 +1,14 @@
 #include "NativeObject.hpp"
 #include "utils.h"
+#include <string.h>
 
 using namespace std;
 
 
-
 namespace be {
-    
+
     std::map<JSContext*, std::map<JSClassID, NativeClass *>> NativeClass::mapClasses ;
-    
+
     NativeClass::NativeClass(
         JSContext * _ctx
         , JSClassID & _classID
@@ -24,6 +24,8 @@ namespace be {
         JS_NewClassID(&classID);
 
         JSClassDef jsClassDef ;
+        memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
+
         jsClassDef.class_name = name ;
         jsClassDef.finalizer = finalizer ;
         JS_NewClass(JS_GetRuntime(ctx), classID, &jsClassDef);
@@ -31,19 +33,18 @@ namespace be {
         proto = JS_NewObject(ctx);
         JS_SetClassProto(ctx, classID, proto);
 
-        if(methods) {
-            JS_SetPropertyFunctionList(ctx, proto, methods, methods_size);
-        }
+        // if(methods) {
+        //     JS_SetPropertyFunctionList(ctx, proto, methods, methods_size);
+        // }
 
-        if(constructor) {
-            JSValue jscotr = JS_NewCFunction2(_ctx, constructor, name, 1, JS_CFUNC_constructor, 0) ;
-            JS_SetConstructor(_ctx, jscotr, proto) ;
+        // if(constructor) {
+        //     JSValue jscotr = JS_NewCFunction2(_ctx, constructor, name, 1, JS_CFUNC_constructor, 0) ;
+        //     JS_SetConstructor(_ctx, jscotr, proto) ;
 
-            if(staticMethods) {
-                JS_SetPropertyFunctionList(ctx, jscotr, staticMethods, staticMethods_size);
-            }
-        }
-
+        //     if(staticMethods) {
+        //         JS_SetPropertyFunctionList(ctx, jscotr, staticMethods, staticMethods_size);
+        //     }
+        // }
 
         mapClasses[ctx][classID] = this ;
     }
@@ -65,13 +66,12 @@ namespace be {
     }
     
     NativeClass * NativeClass::fromClassID(JSContext * ctx, JSClassID & classID) {
-        JS_NewClassID(&classID);
 
         if (mapClasses.count(ctx) < 1) {
             mapClasses[ctx] = std::map<JSClassID, NativeClass *>() ;
         }
 
-        if (mapClasses.count(ctx)<0) {
+        if (mapClasses[ctx].count(classID)<1) {
             return nullptr ;
         }
 
@@ -118,7 +118,7 @@ namespace be {
 
         JS_DupValue(ctx, jsobj) ;
     }
-    
+
     NativeObject::~NativeObject() {
         JS_FreeValue(ctx, jsobj) ;
     }
