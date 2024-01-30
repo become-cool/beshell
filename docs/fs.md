@@ -25,5 +25,39 @@ beShell.useFS("/littleFS",new LittleFS("/spiffs",true));
 ```
 ### js api
 ```js
+//同步创建目录
+//path:目录路径
+let path = "/littleFS/test";
+//recursive:是否递归创建
+let recursive = true;
+//mkResult:创建结果
+let mkResult = fs.mkdirSync(path, recursive);
 
+//同步读取文件
+fs.readFileSync(path + "/test.txt");
+//同步写入文件
+//append:是否追加
+let append = true;
+fs.writeFileSync(path + "/test.txt", "hello world", append);
+//同步重命名文件
+fs.renameSync(path + "/test.txt", path + "/new_test.txt");
+// 文件分区的信息， 返回的对象包括了分区的总大小，和已用大小
+let info = fs.info(path + "/test.txt");
+console.log(info);
+//{total: 1024, used: 0}
+//同步获取文件状态,如果文件不存在,返回 null; 否则返回包含详细信息的对象
+let fileInfo = fs.statSync(path + "/test.txt");
+console.log(fileInfo);
+//同步返回目录是否存在,bool值
+let exsits = fs.exsitsSync(path);
+//同步判断是否是文件
+let isFile = fs.isFileSync(path + "/test.txt");
+//同步判断是否是目录
+let isDir = fs.isDirSync(path);
+//同步删除目录，如果目录为空，返回false
+fs.rmdirSync(path, recursive);
+//同步删除文件
+fs.unlinkSync(path + "/test.txt");
+//同步删除文件或目录，如果是目录，recursive为true时，递归删除
+fs.rmSync(path, recursive);
 ```
