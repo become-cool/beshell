@@ -33,7 +33,7 @@ set(SRC_LIST
         ${CMAKE_SOURCE_DIR}/src/BeShell.cpp
         ${CMAKE_SOURCE_DIR}/src/JSTimer.cpp
         ${CMAKE_SOURCE_DIR}/src/JSEngine.cpp
-        ${CMAKE_SOURCE_DIR}/src/NativeObject.cpp
+        ${CMAKE_SOURCE_DIR}/src/NativeClass.cpp
         ${CMAKE_SOURCE_DIR}/src/repl/REPL.cpp
         ${CMAKE_SOURCE_DIR}/src/path.cpp
         ${CMAKE_SOURCE_DIR}/src/string_utils.cpp
@@ -46,12 +46,12 @@ set(SRC_LIST
         ${CMAKE_SOURCE_DIR}/src/module/ProcessModule.cpp
         ${CMAKE_SOURCE_DIR}/src/module/NVSModule.cpp
 
-        ${CMAKE_SOURCE_DIR}/src/basic/Console.cpp
-        
-        ${CMAKE_SOURCE_DIR}/src/driver/display/DisplayModule.cpp
-        ${CMAKE_SOURCE_DIR}/src/driver/display/Display.cpp
-        ${CMAKE_SOURCE_DIR}/src/driver/display/Bus8080.cpp
-        ${CMAKE_SOURCE_DIR}/src/driver/display/Display8080.cpp
+        # ${CMAKE_SOURCE_DIR}/src/basic/Console.cpp
+
+        # ${CMAKE_SOURCE_DIR}/src/driver/display/DisplayModule.cpp
+        # ${CMAKE_SOURCE_DIR}/src/driver/display/Display.cpp
+        # ${CMAKE_SOURCE_DIR}/src/driver/display/Bus8080.cpp
+        # ${CMAKE_SOURCE_DIR}/src/driver/display/Display8080.cpp
 
         ${CMAKE_SOURCE_DIR}/src/telnet/Protocal.cpp
         ${CMAKE_SOURCE_DIR}/src/telnet/Telnet.cpp

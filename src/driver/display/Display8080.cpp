@@ -9,7 +9,7 @@ namespace display {
     JSClassID Display8080::classID ;
 
     Display8080::Display8080(JSContext * ctx)
-        : Display(ctx, classID, "Display8080")
+        : Display(ctx)
     {
     }
 

@@ -2,49 +2,59 @@
 
 #include <iostream>
 #include "BeShell.hpp"
-#include "NativeObject.hpp"
+#include "NativeClass.hpp"
 #include "module/NativeModule.hpp"
 
+using namespace std ;
+using namespace be ;
 
-class DemoClass: public be::NativeObject {
+template <typename T>
+class A {
+public:
+    void xxx() {
+        T::out() ;
+    }
+} ;
+
+
+class B: public A<B> {
+protected:
+    static void out() {
+        std::cout << "out()()()" << std::endl;
+    }
+    
+    friend class A ;
+} ;
+
+
+class DemoClass: public NativeClass<DemoClass> {
 public:
 
-    static JSClassID classID ;
-    inline static be::NativeClass* defineClass(JSContext * ctx) {
-        if(mapCtxClasses.count(ctx)<1) {
-            mapCtxClasses[ctx] = new be::NativeClass(
-                ctx, classID, "DemoClass"
-                , DemoClass::constructor
-                , nullptr
-                , {}) ;
-        }
-        dn(classID)
-        dp(DemoClass::constructor)
-        return mapCtxClasses[ctx] ;
-    }
 
 
-    DemoClass(JSContext * ctx):
-        NativeObject(ctx, defineClass(ctx))
-    {
+
+    // DemoClass(JSContext * ctx):
+    //     NativeObject(ctx, defineClass(ctx))
+    // {
         
-    }
+    // }
 
-    static void create(JSContext * ctx) {
-        dd
-        JSValue jsobj = defineClass(ctx)->newJSObject(ctx) ;
-        dn(classID)
-    }
+    // static void create(JSContext * ctx) {
+    //     JSValue jsobj = defineClass(ctx)->newJSObject(ctx) ;
+    // }
 
-private:
-    static std::map<JSContext*, be::NativeClass*> mapCtxClasses ;
-    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+public:
+    static JSClassID classID ;
+    static const char * className ;
+    static std::map<JSContext*, be::NativeClass<DemoClass>*> mapCtxClasses ;
 
+    // static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-} ;
-
-class DemoModule: public be::NativeModule {
 
 } ;
+
+// class DemoModule: public be::NativeModule {
+
+// } ;
 
 void useDemo(JSContext * ctx) ;

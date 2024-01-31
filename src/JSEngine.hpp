@@ -4,7 +4,7 @@
 #include "telnet/Telnet.hpp"
 #include "JSTimer.hpp"
 #include "module/ModuleLoader.hpp"
-#include "basic/Console.hpp"
+// #include "basic/Console.hpp"
 
 
 namespace be {
@@ -12,7 +12,7 @@ namespace be {
     class JSEngine {
     private:
 
-        Console * console = nullptr ;
+        // Console * console = nullptr ;
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 

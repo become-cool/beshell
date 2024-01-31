@@ -4,16 +4,15 @@ using namespace std ;
 using namespace be ;
 
 
-JSClassID DemoClass::classID ;
-std::map<JSContext*, be::NativeClass*> DemoClass::mapCtxClasses ;
+const char * DemoClass::className = "DemoClass" ;
+JSClassID DemoClass::classID = 0 ;
+std::map<JSContext*, be::NativeClass<DemoClass>*> DemoClass::mapCtxClasses ;
 
 
-JSValue DemoClass::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    std::cout << "111111111111" << std::endl ;
-    return JS_UNDEFINED ;
-}
+// JSValue DemoClass::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+//     return JS_UNDEFINED ;
+// }
 
 void useDemo(JSContext * ctx) {
-    dd
-    DemoClass::create(ctx) ;
+    // DemoClass::create(ctx) ;
 }
