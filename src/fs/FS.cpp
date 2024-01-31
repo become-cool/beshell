@@ -10,12 +10,13 @@
 
 #ifdef PLATFORM_ESP32
 #include "RawFS.hpp"
+extern const uint8_t fs_root_img_start[] asm("_binary_fs_root_img_start");
+extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #endif
 
 
-#ifdef PLATFORM_ESP32
-extern const uint8_t fs_root_img_start[] asm("_binary_fs_root_img_start");
-extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
+#ifdef PLATFORM_LINUX
+#include <utime.h>
 #endif
 
 using namespace std ;
