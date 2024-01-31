@@ -53190,6 +53190,7 @@ static JSValue js_atomics_op(JSContext *ctx,
         a = func_name((uint64_t *)ptr, v);     \
         break;
 #else
+#ifndef __STDC_NO_ATOMICS__
 #define OP(op_name, func_name)                          \
     case ATOMICS_OP_ ## op_name | (0 << 3):             \
        a = func_name((uint8_t *)ptr, v);       \
@@ -53200,6 +53201,18 @@ static JSValue js_atomics_op(JSContext *ctx,
     case ATOMICS_OP_ ## op_name | (2 << 3):             \
         a = func_name((uint32_t *)ptr, v);     \
         break;
+#else
+#define OP(op_name, func_name)                          \
+    case ATOMICS_OP_ ## op_name | (0 << 3):             \
+       a = func_name((_Atomic uint8_t *)ptr, v);       \
+       break;                                           \
+    case ATOMICS_OP_ ## op_name | (1 << 3):             \
+        a = func_name((_Atomic uint16_t *)ptr, v);     \
+        break;                                          \
+    case ATOMICS_OP_ ## op_name | (2 << 3):             \
+        a = func_name((_Atomic uint32_t *)ptr, v);     \
+        break;
+#endif
 #endif
         OP(ADD, atomic_fetch_add)
         OP(AND, atomic_fetch_and)
@@ -53208,7 +53221,7 @@ static JSValue js_atomics_op(JSContext *ctx,
         OP(XOR, atomic_fetch_xor)
         OP(EXCHANGE, atomic_exchange)
 #undef OP
-
+#ifndef __STDC_NO_ATOMICS__
     case ATOMICS_OP_LOAD | (0 << 3):
         a = atomic_load((uint8_t *)ptr);
         break;
@@ -53218,6 +53231,17 @@ static JSValue js_atomics_op(JSContext *ctx,
     case ATOMICS_OP_LOAD | (2 << 3):
         a = atomic_load((uint32_t *)ptr);
         break;
+#else
+       case ATOMICS_OP_LOAD | (0 << 3):
+           a = atomic_load((_Atomic uint8_t *)ptr);
+           break;
+       case ATOMICS_OP_LOAD | (1 << 3):
+           a = atomic_load((_Atomic uint16_t *)ptr);
+           break;
+       case ATOMICS_OP_LOAD | (2 << 3):
+           a = atomic_load((_Atomic uint32_t *)ptr);
+           break;
+#endif
 #ifdef CONFIG_BIGNUM
     case ATOMICS_OP_LOAD | (3 << 3):
         a = atomic_load((uint64_t *)ptr);
@@ -53227,21 +53251,33 @@ static JSValue js_atomics_op(JSContext *ctx,
     case ATOMICS_OP_COMPARE_EXCHANGE | (0 << 3):
         {
             uint8_t v1 = v;
+#ifndef __STDC_NO_ATOMICS__
             atomic_compare_exchange_strong((uint8_t *)ptr, &v1, rep_val);
+#else
+        atomic_compare_exchange_strong((_Atomic uint8_t *)ptr, &v1, rep_val);
+#endif
             a = v1;
         }
         break;
     case ATOMICS_OP_COMPARE_EXCHANGE | (1 << 3):
         {
             uint16_t v1 = v;
+#ifndef __STDC_NO_ATOMICS__
             atomic_compare_exchange_strong((uint16_t *)ptr, &v1, rep_val);
+#else
+        atomic_compare_exchange_strong((_Atomic uint16_t *)ptr, &v1, rep_val);
+#endif
             a = v1;
         }
         break;
     case ATOMICS_OP_COMPARE_EXCHANGE | (2 << 3):
         {
             uint32_t v1 = v;
+#ifndef __STDC_NO_ATOMICS__
             atomic_compare_exchange_strong((uint32_t *)ptr, &v1, rep_val);
+#else
+        atomic_compare_exchange_strong((_Atomic uint32_t *)ptr, &v1, rep_val);
+#endif
             a = v1;
         }
         break;
@@ -53334,13 +53370,25 @@ static JSValue js_atomics_store(JSContext *ctx,
             return JS_ThrowTypeErrorDetachedArrayBuffer(ctx);
         switch(size_log2) {
         case 0:
+#ifndef __STDC_NO_ATOMICS__
             atomic_store((uint8_t*)ptr, v);
+#else
+            atomic_store((_Atomic uint8_t*)ptr, v);
+#endif
             break;
         case 1:
+#ifndef __STDC_NO_ATOMICS__
             atomic_store((uint16_t*)ptr, v);
+#else
+                atomic_store((_Atomic uint16_t*)ptr, v);
+#endif
             break;
         case 2:
+#ifndef __STDC_NO_ATOMICS__
             atomic_store((uint32_t*)ptr, v);
+#else
+            atomic_store((_Atomic uint32_t*)ptr, v);
+#endif
             break;
         default:
             abort();
