@@ -276,7 +276,7 @@ namespace be {
                     parser->commitPackage() ;
                 }
                 else {
-                    printf("be::protocal bad verifysum %d!=%d(received)\n", verifysum, parser->pkg->verifysum) ;
+                    // printf("be::protocal bad verifysum %d!=%d(received)\n", verifysum, parser->pkg->verifysum) ;
                 }
 
                 parser->changeState(STATE_LINE, bytes, len) ;

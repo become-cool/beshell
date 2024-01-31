@@ -8,9 +8,6 @@
 
 namespace be {
     class SerialModule: public NativeModule {
-    private:
-    protected:
-        void defineExports() ;
     public:
         I2C * i2c0 = nullptr ;
         I2C * i2c1 = nullptr ;
@@ -19,7 +16,9 @@ namespace be {
         SPI * spi2 = nullptr ;
         SPI * spi3 = nullptr ;
 
-        SerialModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
+
         ~SerialModule() ;
         
         void init(JSRuntime * rt) ;

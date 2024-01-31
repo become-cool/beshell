@@ -26,7 +26,6 @@ namespace be {
             return false ;
         }
         this->mountPoint = mountPoint ;
-        cout << "mount at:" << mountPoint << endl ;
         return true ;
     }
     void LittleFS::unmount() {

@@ -6,7 +6,7 @@ namespace be {
 namespace driver {
 namespace display {
 
-    SPIDisplay::SPIDisplay() {
+    SPIDisplay::SPIDisplay(): Display() {
 
     }
 

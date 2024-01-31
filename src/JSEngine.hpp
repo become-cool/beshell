@@ -4,12 +4,7 @@
 #include "telnet/Telnet.hpp"
 #include "JSTimer.hpp"
 #include "module/ModuleLoader.hpp"
-#include "module/ConsoleModule.hpp"
-
-
-#define BESHELL_VERSION "0.3.0"
-#define ESPIDF_VERSION IDF_VER
-#define QUICKJS_VERSION "2021-03-27"
+#include "basic/Console.hpp"
 
 
 namespace be {
@@ -17,7 +12,9 @@ namespace be {
     class JSEngine {
     private:
 
-        ConsoleModule * console = nullptr ;
+        Console * console = nullptr ;
+
+        static JSContext * SetupContext(JSRuntime *rt) ;
 
     public:
         BeShell * beshell ;
@@ -28,8 +25,6 @@ namespace be {
         ModuleLoader mloader ;
         
         JSEngine(BeShell *) ;
-
-        void addModule(NativeModule * m) ;
 
         void setup() ;
         void loop() ;
@@ -44,7 +39,6 @@ namespace be {
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
         JSValue evalScript(const char * filepath, int flags=JS_EVAL_TYPE_MODULE) ;
 
-        static JSContext * InitContext(JSRuntime *rt) ;
         static JSEngine * fromJSContext(JSContext *) ;
         static JSEngine * fromJSRuntime(JSRuntime *) ;
     } ;

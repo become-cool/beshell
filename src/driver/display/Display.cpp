@@ -7,8 +7,6 @@ namespace driver {
 namespace display {
 
     
-    Display::Display() {
 
-    }
     
 }}}

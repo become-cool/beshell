@@ -1,31 +1,60 @@
 #include "NativeObject.hpp"
 #include "utils.h"
+#include <string.h>
 
 using namespace std;
 
 
 namespace be {
+
+    // std::map<JSContext*, std::map<JSClassID, NativeClass *>> NativeClass::mapClasses ;
+
     NativeClass::NativeClass(
         JSContext * _ctx
-        , const char * name
         , JSClassID & _classID
+        , const char * name
+        , JSCFunction * constructor
+        , NativeClass * parent
+        , const std::vector<JSCFunctionListEntry> && _methods
+        , const std::vector<JSCFunctionListEntry> && _staticMethods
         , JSClassFinalizer * finalizer
     )
         : classID(_classID)
         , ctx(_ctx)
+        , methods(move(_methods))
+        , staticMethods(move(_staticMethods))
     {
         JS_NewClassID(&classID);
+        dn(classID)
 
         JSClassDef jsClassDef ;
+        memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
+
         jsClassDef.class_name = name ;
         jsClassDef.finalizer = finalizer ;
         JS_NewClass(JS_GetRuntime(ctx), classID, &jsClassDef);
 
-        JSValue proto = JS_NewObject(ctx);
-
+        proto = JS_NewObject(ctx);
         JS_SetClassProto(ctx, classID, proto);
+        dn(classID)
 
-        mapClasses[ctx][classID] = this ;
+        if(methods.size()) {
+            dd
+            JS_SetPropertyFunctionList(ctx, proto, methods.data(), methods.size());
+        }
+
+        if(constructor) {
+            ds(name)
+            dp(constructor)
+            JSValue jscotr = JS_NewCFunction2(_ctx, constructor, name, 1, JS_CFUNC_constructor, 0) ;
+            JS_SetConstructor(_ctx, jscotr, proto) ;
+
+            if(staticMethods.size()) {
+                JS_SetPropertyFunctionList(ctx, jscotr, staticMethods.data(), staticMethods.size());
+            }
+        }
+
+        // mapClasses[ctx][classID] = this ;
     }
 
     void NativeClass::setParent(JSContext * ctx, NativeClass * parent) {
@@ -36,10 +65,6 @@ namespace be {
 
     NativeClass::~NativeClass() {
         if(ctx) {
-            if(!JS_IsNull(constructor)) {
-                JS_FreeValue(ctx, constructor) ;
-                constructor = JS_NULL ;
-            }
             if(!JS_IsNull(proto)) {
                 JS_FreeValue(ctx, proto) ;
                 proto = JS_NULL ;
@@ -47,59 +72,28 @@ namespace be {
             ctx = nullptr ;
         }
     }
-    
-    NativeClass * NativeClass::fromClassID(JSContext * ctx, JSClassID & classID) {
-        JS_NewClassID(&classID);
-
-        if (mapClasses.count(ctx) < 1) {
-            std::cout << "new ctx nclass pool" << std::endl ;
-            mapClasses[ctx] = std::map<JSClassID, NativeClass *>() ;
-        }
-
-        if (mapClasses.count(ctx)<0) {
-            return nullptr ;
-        }
-
-        return mapClasses[ctx][classID] ;
-    }
 
     JSValue NativeClass::newJSObject(JSContext * ctx){
+        dd
+        dn(classID)
         return  JS_NewObjectClass(ctx, classID) ;
     }
 
-
-    NativeObject::NativeObject(
-        JSContext * _ctx
-        , JSClassID classID
-        , const char * name
-        , NativeClassDefineFunc funcDefineClass
-        , NativeObject * parent
-    )
-        : nclass( NativeClass::fromClassID(_ctx, classID) )
-        , ctx(_ctx)
+    // 在 c++ 中创建对象
+    NativeObject::NativeObject(JSContext * ctx, NativeClass * _nclass)
+        : ctx(ctx)
+        , nclass(_nclass)
     {
-        if(!nclass) {
-
-            nclass = new NativeClass(_ctx, name, classID, jsFinalizer) ;
-
-            JSValue jscotr = JS_NewCFunction2(_ctx, jsConstructor, name, 1, JS_CFUNC_constructor, 0) ;
-            JS_SetConstructor(_ctx, jscotr, nclass->proto) ;
-
-            if(parent) {
-                nclass->setParent(ctx,parent->nclass) ;
-            }
-            
-            if(funcDefineClass) {
-                funcDefineClass(nclass) ;
-            }
-        }
-
         jsobj = nclass->newJSObject(ctx) ;
-        JS_DupValue(ctx, jsobj) ;
-
-        JS_SetOpaque(jsobj, this) ;
     }
-    
+
+    // 在 JS 中创建
+    NativeObject::NativeObject(JSContext * ctx, NativeClass * _nclass, JSValue _jsobj)
+        : ctx(ctx)
+        , nclass(_nclass)
+        , jsobj(_jsobj)
+    {}
+
     NativeObject::~NativeObject() {
         JS_FreeValue(ctx, jsobj) ;
     }
@@ -114,20 +108,14 @@ namespace be {
         }
         return obj ;
     }
-    JSValue NativeObject::jsConstructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        NativeObject * obj = fromJSObject(this_val) ;
+
+    JSValue NativeObject::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {}
+    
+    void NativeObject::finalizer(JSRuntime *rt, JSValue val) {
+        NativeObject * obj = fromJSObject(val) ;
         if(obj) {
-            obj->constructor(ctx, this_val, argc, argv) ;
-            return JS_UNDEFINED ;
-        } else {
-            THROW_EXCEPTION("Is not a NativeObject object") ;
+            obj->jsobj = JS_UNDEFINED ;
         }
     }
-    void NativeObject::jsFinalizer(JSRuntime *rt, JSValue val) {
-        NativeObject * obj = fromJSObject(val) ;
-        obj->finalize(rt,val) ;
-    }
-
-    void NativeObject::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) {}
-    void NativeObject::finalize(JSRuntime *rt, JSValue val) {}
+    // void NativeObject::finalize(JSRuntime *rt, JSValue val) {}
 }

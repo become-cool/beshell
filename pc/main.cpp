@@ -4,24 +4,27 @@
 #include <string.h>
 #include "path.hpp"
 #include "BeShell.hpp"
+#include "demo/Demo.hpp"
 #include "path.hpp"
 #include "BeShell.hpp"
 #include "telnet/Protocal.hpp"
+#include "driver/display/DisplayModule.hpp"
+
+
 using namespace std ;
 using namespace be;
+using namespace be::driver::display;
+
 
 int main(int argc, char* argv[]) {
 
-    char p [256] ;
-    strcpy(p,"/./..") ;
-    path_normalize(p) ;
-    cout << p << endl ;
-    
-    
     BeShell beshell ;
 
     beshell.useBasic() ;
     beshell.setup() ;
+    // DisplayModule::use(beshell) ;
+
+    useDemo(beshell.engine->ctx) ;
 
     char * dirname = strdup(argv[0]) ;
     path_dirname(argv[0],dirname) ;

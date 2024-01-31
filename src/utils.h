@@ -422,6 +422,13 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
     }
 
 
+#define DEF_JS_FUNC(jsvar, code, filename, fail)    \
+    jsvar = JS_Eval(ctx, "(" code ")", strlen("(" code ")"), filename, JS_EVAL_TYPE_GLOBAL) ;   \
+    if(JS_IsException(jsvar)) {                     \
+        fail                                        \
+    }
+
+    
 #ifdef __cplusplus
 }
 #endif

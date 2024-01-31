@@ -3,10 +3,8 @@
 
 namespace be {
     class PathModule: public NativeModule {
-    private:
-    protected:
-        void defineExports() ;
     public:
-        PathModule() ;
+        PathModule(JSContext * ctx, const char * name,uint8_t flagGlobal) ;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
     } ;
 }

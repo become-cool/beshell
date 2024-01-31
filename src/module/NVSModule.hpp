@@ -1,16 +1,18 @@
 #pragma once
 
 #include <stdint.h>
+#include "BeShell.hpp"
 #include "NativeModule.hpp"
 
 namespace be {
     class NVSModule: public NativeModule {
     private:
     protected:
-        void defineExports() ;
     public:
-        NVSModule() ;
-        void setup(JSContext * ctx) ;
+        static void use(BeShell * beshell) ;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
+
+        NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal=0);
 
         void readOneTime(const char * key, uint8_t * value) const ;
         

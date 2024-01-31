@@ -79,11 +79,24 @@
 
 
 namespace be {
-    NVSModule::NVSModule(): NativeModule("nvs") {
-        isReplGlobal = true ;
+    
+    void NVSModule::use(BeShell * beshell) {
+#ifdef PLATFORM_ESP32
+        esp_err_t ret = nvs_flash_init();
+        if(ret!=ESP_OK) {
+            std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
+        }
+#endif
+        beshell->engine->mloader.add("nvs", factory) ;
+    }
+    
+    NativeModule* NVSModule::factory(JSContext * ctx, const char * name) {
+        return new NVSModule(ctx,name,0) ;
     }
 
-    void NVSModule::defineExports() {
+    NVSModule::NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
+        : NativeModule(ctx, name, flagGlobal)
+    {
         
         exportFunction("jsErase", jsErase) ;
         // exportFunction("jsReadString", jsReadString) ;
@@ -104,15 +117,6 @@ namespace be {
         exportFunction("writeUint8", jsWriteUint8) ;
         exportFunction("writeUint16", jsWriteUint16) ;
         exportFunction("writeUint32", jsWriteUint32) ;
-    }
-
-    void NVSModule::setup(JSContext * ctx){
-#ifdef PLATFORM_ESP32
-        esp_err_t ret = nvs_flash_init();
-        if(ret!=ESP_OK) {
-            std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
-        }
-#endif
     }
     
     // c/c++ helper api
@@ -181,9 +185,9 @@ namespace be {
 
     JSValue NVSModule::jsErase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
-        ARGV_TO_CSTRING(0,key)
 
 #ifdef PLATFORM_ESP32
+        ARGV_TO_CSTRING(0,key)
         JSValue result = JS_FALSE;
         
         NVS_OPEN("beshell", handle, {

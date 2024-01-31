@@ -1,7 +1,6 @@
 #include "module/ModuleLoader.hpp"
-#include "module/NativeModule.hpp"
 #include "module/ProcessModule.hpp"
-#include "module/ConsoleModule.hpp"
+#include "module/PathModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -9,17 +8,25 @@
 #include <stdlib.h>
 #include "path.hpp"
 #include "utils.h"
+#include "quickjs_private.h"
+
+
 
 namespace be {
 
     class JSLoader: public NativeModule {
-    protected:
-        void defineExports() {
+    public:
+        using NativeModule::NativeModule;
+        
+        JSLoader(JSContext * ctx, const char * name,uint8_t flagGlobal)
+            : NativeModule(ctx, name, flagGlobal)
+        {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
         }
-    public:
-        JSLoader(): NativeModule("loader") {};
+        static NativeModule* factory(JSContext * ctx, const char * name) {
+            return new JSLoader(ctx,name,1) ;
+        }
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             int32_t stack = 1 ;
@@ -72,50 +79,59 @@ namespace be {
     } ;
 
     ModuleLoader::ModuleLoader() {
-        add(new JSLoader) ;
-        add(new ProcessModule) ;
-        add(new ConsoleModule) ;
+        add("loader", JSLoader::factory) ;
+        add("process", ProcessModule::factory) ;
     }
+    
     ModuleLoader::~ModuleLoader() {
+        // @todo  delete native modules
+    }
+    
+    void ModuleLoader::add(const char * name, NativeModuleFactoryFunc factory) {
+        factories[name] = factory ;
     }
 
-    void ModuleLoader::add(NativeModule * module) {
-        modules[ module->name ] = module ;
-    }
-
-    NativeModule * ModuleLoader::moduleByName(const char * name) {
-        return modules[ name ] ;
-    }
-
-    void ModuleLoader::init(JSRuntime * rt) {
-        for (const auto & pair : modules) {
-            pair.second->init(rt) ;
+    NativeModule * ModuleLoader::moduleByName(JSContext * ctx, const char * name) {
+        if( modules.count(ctx)<1 ) {
+            return nullptr ;
         }
+        if(modules[ctx].count(name)<1) {
+            return nullptr ;
+        }
+        return modules[ctx][name] ;
     }
 
     void ModuleLoader::setup(JSContext * ctx) {
 
         JS_SetModuleLoaderFunc(JS_GetRuntime(ctx), normalize, load, this);
 
-        for (const auto & pair : modules) {
-            pair.second->createModule(ctx) ;
+        for (const auto & pair : factories) {
 
-            if(pair.second->isReplGlobal) {
-
-                JSModuleDef * mm = JS_RunModule(ctx, "", pair.first.c_str());
-                JSValue mi = js_get_module_ns(ctx, mm ) ;
-
-                if (JS_IsException(mi)){
-                    // todo
-                } else {
-                    JSEngine::setGlobalValue(ctx, pair.first.c_str(), mi);
-                }
-                JS_FreeValue(ctx, mi) ;
+            NativeModule * nm = pair.second(ctx, pair.first) ;
+            if(!nm) {
+                printf("module %s factory return NULL\n", pair.first) ;
+                continue;
             }
-            
-            pair.second->setup(ctx) ;
-        }
-        
+
+            modules[ctx][(const char *)pair.first] = nm ;
+
+            if(nm->flagGlobal==1) {
+
+                JSModuleDef * mm = JS_RunModule(ctx, "", (const char *)pair.first);
+                if(mm) {
+                    JSValue mi = js_get_module_ns(ctx, mm ) ;
+
+                    if (JS_IsException(mi)){
+                        // todo
+                    } else {
+                        JSEngine::setGlobalValue(ctx, (const char *)pair.first, mi);
+                    }
+                    JS_FreeValue(ctx, mi) ;
+                }
+            }
+
+            nm->setup(ctx) ;
+        }        
     }
 
     std::string ModuleLoader::resovleFS(FS * fs, const char * module_name, const char * base_dir) {
@@ -155,15 +171,19 @@ namespace be {
         assert(opaque) ;
         ModuleLoader * mloader = (ModuleLoader *)opaque ;
 
+        if(mloader->modules.count(ctx)<1) {
+            return nullptr ;
+        }
+
         // 内置模块 
         // -------------
-        for (const auto & pair : mloader->modules) {
+        for (const auto & pair : mloader->modules[ctx]) {
             if( pair.first==module_name ) {
                 return js_strdup(ctx, module_name) ;
             }
         }
 
-        // resolve file 
+        // resolve file
         // -------------
         JSEngine * engine= JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
@@ -191,7 +211,7 @@ namespace be {
         }
 
         if(!fullpath.length()) {
-            return NULL ;
+            return nullptr ;
         }
 
         path_normalize((char *)fullpath.c_str()) ;

@@ -367,7 +367,6 @@ uint8_t *js_load_file(JSContext *ctx, size_t *pbuf_len, const char *filename)
     size_t buf_len;
     long lret;
     
-    printf("fopen(%s)\n", filename) ;
     f = fopen(filename, "rb");
     if (!f) {
         return NULL;
@@ -3017,7 +3016,7 @@ static JSContext *(*js_worker_new_context_func)(JSRuntime *rt);
 
 static int atomic_add_int(int *ptr, int v)
 {
-#ifndef __EMSCRIPTEN__
+#ifndef __STDC_NO_ATOMICS__
     return atomic_fetch_add((uint32_t *)ptr, v) + v;
 #else
     return atomic_fetch_add((_Atomic uint32_t *)ptr, v) + v;

@@ -5,7 +5,8 @@ namespace be {
     class GPIOModule: public NativeModule {
     private:
     public:
-        GPIOModule() ;
+        using NativeModule::NativeModule;
+        static NativeModule* factory(JSContext * ctx, const char * name) ;
         
         static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;

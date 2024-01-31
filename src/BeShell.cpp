@@ -1,5 +1,5 @@
 #include "BeShell.hpp"
-#include "module/FSModule.hpp"
+#include "fs/FSModule.hpp"
 #include "module/NVSModule.hpp"
 #include <iostream>
 #include <string.h>
@@ -42,7 +42,7 @@ namespace be {
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(!fs) {
             fs = new FS() ;
-            engine->addModule(new FSModule()) ;
+            engine->mloader.add("fs", FSModule::factory) ;
         }
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;
@@ -54,14 +54,12 @@ namespace be {
         }
         repl = new REPL(this) ;
     }
-    void BeShell::useNVS() {
-        engine->addModule(new NVSModule) ;
-    }
 
     void BeShell::useBasic() {
         useFS() ;
         useREPL() ;
-        useNVS() ;
+        
+        NVSModule::use(this) ;
     }
 
     void BeShell::setup() {

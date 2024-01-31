@@ -19,6 +19,12 @@ extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #include <utime.h>
 #endif
 
+
+#ifdef PLATFORM_LINUX
+#include <utime.h>
+#include <sys/types.h>
+#endif
+
 using namespace std ;
 
 

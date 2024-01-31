@@ -1,3 +1,5 @@
+project(beshll-component)
+cmake_minimum_required(VERSION 3.24)
 # 头文件目录
 set(include_dirs ./src)
 
@@ -6,6 +8,7 @@ set(src_dirs src)
 list(APPEND src_dirs src/fs)
 list(APPEND src_dirs src/repl)
 list(APPEND src_dirs src/telnet)
+list(APPEND src_dirs src/basic)
 list(APPEND src_dirs src/module)
 list(APPEND src_dirs src/module/serial)
 
@@ -35,20 +38,20 @@ list(APPEND src_dirs src/deps/quickjs)
 # list(APPEND src_dirs deps/esp32-perfmon)
 
 
-if(IDF_VERSION_MAJOR LESS 5)
-    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc_cal)
-else()
-    set(requires driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_adc)
-endif()
+if (IDF_VERSION_MAJOR LESS 5)
+    set(requires esp_adc_cal)
+else ()
+    set(requires esp_adc)
+endif ()
 
-
-idf_component_register(
-    SRC_DIRS ${src_dirs}
-    INCLUDE_DIRS ${include_dirs}
-    REQUIRES ${requires}
-    EMBED_FILES fs-root.img
-)
-
+if (COMMAND idf_component_register)
+    idf_component_register(
+            SRC_DIRS ${src_dirs}
+            INCLUDE_DIRS ${include_dirs}
+            REQUIRES driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_lcd ${requires}
+            EMBED_FILES fs-root.img
+    )
+endif ()
 
 # # for mongoose tls/ssl
 add_definitions(-DMG_ENABLE_MBEDTLS)
@@ -59,8 +62,9 @@ add_definitions(-DMG_ENABLE_MBEDTLS)
 add_definitions(-DGNUBOY_NO_MINIZIP)
 add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)
-add_definitions(-DPLATFORM_ESP32)
-
+if (COMMAND idf_component_register)
+    add_definitions(-DPLATFORM_ESP32)
+endif ()
 set(CMAKE_CXX_STANDARD 11)
 
 # for c
@@ -73,25 +77,36 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-brace")
 
-
-# both c and c++
-component_compile_options(-Wno-error=format=)
-component_compile_options(-Wno-format)
-component_compile_options(-Wno-unused-function)
-component_compile_options(-Wno-unused-variable)
-component_compile_options(-Wno-unused-but-set-variable)
-component_compile_options(-Wno-cast-function-type)
-component_compile_options(-Wno-implicit-fallthrough)
-component_compile_options(-Wno-cpp)
-component_compile_options(-Wno-type-limits)
-component_compile_options(-Wno-int-to-pointer-cast)
-component_compile_options(-Wno-error=switch)
-component_compile_options(-Wno-switch)
-component_compile_options(-Wno-missing-field-initializers)
+if (COMMAND component_compile_options)
+    # both c and c++
+    component_compile_options(-Wno-missing-braces)
+    component_compile_options(-Wno-error=format=)
+    component_compile_options(-Wno-format)
+    component_compile_options(-Wno-unused-function)
+    component_compile_options(-Wno-unused-variable)
+    component_compile_options(-Wno-unused-but-set-variable)
+    component_compile_options(-Wno-cast-function-type)
+    component_compile_options(-Wno-implicit-fallthrough)
+    component_compile_options(-Wno-cpp)
+    component_compile_options(-Wno-type-limits)
+    component_compile_options(-Wno-int-to-pointer-cast)
+    component_compile_options(-Wno-error=switch)
+    component_compile_options(-Wno-switch)
+    component_compile_options(-Wno-missing-field-initializers)
+endif ()
 
 string(REPLACE "-fno-rtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REPLACE "-fno-exceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+#clang
+if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+    add_definitions(-D__STDC_NO_ATOMICS__=1)
+endif ()
+message("Operating System: ${CMAKE_SYSTEM_NAME}")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    add_subdirectory(pc)
+endif ()
