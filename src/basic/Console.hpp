@@ -6,9 +6,6 @@ namespace be {
 
     class Console: public NativeObject {
 
-    protected:
-        void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
-
     public:
         Console(JSContext * ctx) ;
 
@@ -19,8 +16,12 @@ namespace be {
         static JSValue jsLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSClassID classID ;
-    
+        inline static NativeClass* defineClass(JSContext * ctx) ;
+
     private:
+        static std::map<JSContext*, NativeClass*> mapCtxClasses ;
+        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        
         JSValue jsStringify = JS_UNDEFINED ;
     } ;
 

@@ -9,14 +9,23 @@ using namespace std ;
 namespace be {
 
     JSClassID Console::classID = 0 ;
+    std::map<JSContext*, NativeClass*> Console::mapCtxClasses ;
 
-    static const JSCFunctionListEntry methods[] = {
-        JS_CFUNC_DEF("write", 1, Console::jsWrite)
-    } ;
-
+    NativeClass * Console::defineClass(JSContext * ctx) {
+        if(mapCtxClasses.count(ctx)<1) {
+            mapCtxClasses[ctx] = new NativeClass(
+                ctx, classID, "Console"
+                , Console::constructor
+                , nullptr
+                , {
+                    JS_CFUNC_DEF("write", 1, Console::jsWrite)
+                }) ;
+        }
+        return mapCtxClasses[ctx] ;
+    }
 
     Console::Console(JSContext * ctx)
-        : NativeObject(ctx, classID, "console", methods, countof(methods))
+        : NativeObject(ctx, defineClass(ctx))
     {
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
@@ -90,8 +99,9 @@ function() {
         JS_SetPropertyStr(ctx, jsobj, "emit", jsEmit) ;
     }
 
-    void Console::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) {
-
+    JSValue Console::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) {
+        // new Console() ;
+        return JS_UNDEFINED ;
     }
 
     JSValue Console::jsWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

@@ -19,15 +19,21 @@ namespace be {
         JSClassID & classID ;
         JSContext * ctx ;
         JSValue proto = JS_NULL ;
+        
+    protected:
+        std::vector<JSCFunctionListEntry> methods ;
+        std::vector<JSCFunctionListEntry> staticMethods ;
+
     public:
         NativeClass(
             JSContext * ctx
             , JSClassID & classID
             , const char * name
             , JSCFunction * constructor = nullptr
+            , NativeClass * parent=nullptr
+            , const std::vector<JSCFunctionListEntry> && methods = {}
+            , const std::vector<JSCFunctionListEntry> && staticMethods = {}
             , JSClassFinalizer * finalizer = nullptr
-            , const JSCFunctionListEntry * methods=nullptr, int methods_size=0
-            , const JSCFunctionListEntry * staticMethods=nullptr, int staticMethods_size=0
         ) ;
         ~NativeClass() ;
         
@@ -35,12 +41,7 @@ namespace be {
 
         JSValue newJSObject(JSContext * ctx) ;
 
-        static NativeClass * fromClassID(JSContext * ctx, JSClassID & classID) ;
-        static void registerClass(JSContext * ctx, JSClassID classID , const char * name , NativeClass * parent=nullptr) ;
-
         friend class NativeObject ;
-    private:
-        static std::map<JSContext*, std::map<JSClassID, NativeClass *>> mapClasses ;
 
     } ;
 
@@ -48,31 +49,21 @@ namespace be {
     class NativeObject {
     private:
     protected:
-        NativeClass * nclass;
         JSContext * ctx ;
-        
-        virtual void constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst * argv) ;
-        virtual void finalize(JSRuntime *rt, JSValue val) ;
-    public:
-        NativeObject(
-            JSContext * _ctx
-            , JSClassID classID
-            , const char * name
-            , const JSCFunctionListEntry * methods=nullptr, int methods_size=0
-            , const JSCFunctionListEntry * staticMethods=nullptr, int staticMethods_size=0
-            , NativeObject * parent=nullptr
-            , NativeClassDefineFunc funcDefineClass=nullptr
-        ) ;
+        NativeClass * nclass;
+    
+    protected:
+        NativeObject(JSContext * ctx, NativeClass * nclass) ;
+        NativeObject(JSContext * ctx, NativeClass * nclass, JSValue jsobj) ;
 
+    public:
         virtual ~NativeObject() ;
 
         JSValue jsobj ;
-        
         inline static NativeObject * fromJSObject(JSValue obj) ;
 
         private:
-            static JSValue jsConstructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-            static void jsFinalizer(JSRuntime *rt, JSValue val) ;
-
+            static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+            static void finalizer(JSRuntime *rt, JSValue val) ;
     } ;
 }

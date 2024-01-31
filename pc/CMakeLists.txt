@@ -47,10 +47,10 @@ set(SRC_LIST
     
     src/basic/Console.cpp
 
-    src/driver/display/DisplayModule.cpp
-    src/driver/display/Display.cpp
-    src/driver/display/Bus8080.cpp
-    src/driver/display/Display8080.cpp
+    # src/driver/display/DisplayModule.cpp
+    # src/driver/display/Display.cpp
+    # src/driver/display/Bus8080.cpp
+    # src/driver/display/Display8080.cpp
 
     src/telnet/Protocal.cpp
     src/telnet/Telnet.cpp
@@ -61,6 +61,7 @@ set(SRC_LIST
     src/fs/FS.cpp
     src/fs/FSModule.cpp
 
+    demo/Demo.cpp
 
 )
 
