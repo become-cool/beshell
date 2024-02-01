@@ -62,7 +62,7 @@ set(SRC_LIST
         ${CMAKE_SOURCE_DIR}/src/fs/FS.cpp
         ${CMAKE_SOURCE_DIR}/src/fs/FSModule.cpp
 
-    demo/Demo.cpp
+        demo/Demo.cpp
 
         )
 

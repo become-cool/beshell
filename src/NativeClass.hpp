@@ -3,80 +3,134 @@
 #include "deps/quickjs/quickjs-libc.h"
 #include <map>
 #include <vector>
+#include <cassert>
 #include <iostream>
-
+#include <memory>
 #include <quickjs_private.h>
-#define dclass(ctx,classID) printf("class(%d) addr: %p, exotic: %p @%d\n", classID, & ctx->rt->class_array[classID], ctx->rt->class_array[classID].exotic, __LINE__) ;
+#include <string.h>
+#include "utils.h"
+
+#define NATIVE_CLASS_META                                   \
+    protected:                                              \
+        static JSClassID classID ;                          \
+        static const char * className ;                     \
+        static std::map<JSContext*, JSValue> mapCtxProtos ; \
+    friend class NativeClass ;
+
 
 namespace be {
-
-    class NativeClassDef ;
-
-	typedef void (*NativeClassDefDefineFunc)(NativeClassDef *) ;
-
 
     template <typename T>
     class NativeClass {
     private:
-    protected:
         JSContext * ctx ;
-        NativeClassDef * nclass;
-    
+        std::shared_ptr<T> self ;
+
     protected:
-        NativeClass(JSContext * ctx) {
-            nclass = defineClass(ctx) ;
-        }
-
-        std::vector<JSCFunctionListEntry> methods ;
-        std::vector<JSCFunctionListEntry> staticMethods ;
-
-        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static void finalizer(JSRuntime *rt, JSValue val) ;
-    
-    public:
-        virtual ~NativeClass() ;
-
         JSValue jsobj ;
-        inline static NativeClass * fromJSObject(JSValue obj) ;
 
-        // static JSClassID classID ;
-        inline static NativeClassDef* defineClass(JSContext * ctx) {
-            if(T::mapCtxClasses.count(ctx)<1) {
-                T::mapCtxClasses[ctx] = new be::NativeClassDef(
-                    ctx, T::classID, T::className
-                    , T::constructor
-                    , T::methods
-                    , T::staticMethods
-                    , T::finalizer) ;
+        static std::vector<JSCFunctionListEntry> methods ;
+        static std::vector<JSCFunctionListEntry> staticMethods ;
+        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            auto obj = new T(ctx) ;
+            obj->self = std::shared_ptr<T> (obj) ;
+            return JS_UNDEFINED ;
+        }
+        static void finalizer(JSRuntime *rt, JSValue val) {
+            NativeClass<T> * obj = fromJSObject(val) ;
+            if(obj) {
+                obj->self = nullptr ;
+                obj->jsobj = JS_UNDEFINED ;
             }
-            return T::mapCtxClasses[ctx] ;
+        }
+
+    public:
+        // for JS
+        NativeClass(JSContext * _ctx, JSValue _jsobj)
+            : ctx(_ctx)
+            , jsobj(_jsobj)
+        {
+            JS_DupValue(ctx, jsobj) ;
+        }
+        // for c++
+        NativeClass(JSContext * ctx) {
+            if( T::classID<1 ) {
+                defineClass(ctx) ;
+                assert(T::classID>0) ;
+            }
+            NativeClass( ctx, JS_NewObjectClass(ctx, T::classID) ) ;
+        }
+
+        ~NativeClass() {
+            if(!JS_IsUndefined(jsobj)) {
+                JS_SetOpaque(jsobj, nullptr) ;
+                JS_FreeValue(ctx,jsobj) ;
+            }
+        }
+
+        static NativeClass<T> * fromJSObject(JSValue jsObj) {
+            NativeClass * obj = (NativeClass *) JS_GetOpaqueInternal(jsObj) ;
+            if(!obj) {
+                return nullptr ;
+            }
+            if( JS_GetOpaqueClassID(jsObj)!=T::classID ) {
+                return nullptr ;
+            }
+            return obj ;
+        }
+
+        
+        static JSValue defineClass(JSContext * ctx) {
+            if(T::mapCtxProtos.count(ctx)>0) {
+                return T::mapCtxProtos[ctx] ;
+            }
+            
+            JS_NewClassID(&T::classID);
+
+            JSClassDef jsClassDef ;
+            memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
+
+            jsClassDef.class_name = T::className ;
+            jsClassDef.finalizer = T::finalizer ;
+            JS_NewClass(JS_GetRuntime(ctx), T::classID, &jsClassDef);
+
+            JSValue proto = JS_NewObject(ctx);
+            JS_SetClassProto(ctx, T::classID, proto);
+
+            if(T::methods.size()) {
+                JS_SetPropertyFunctionList(ctx, proto, T::methods.data(), T::methods.size());
+            }
+
+            JSValue jscotr = JS_NewCFunction2(ctx, T::constructor, T::className, 1, JS_CFUNC_constructor, 0) ;
+            JS_SetConstructor(ctx, jscotr, proto) ;
+
+            if(T::staticMethods.size()) {
+                JS_SetPropertyFunctionList(ctx, jscotr, T::staticMethods.data(), T::staticMethods.size());
+            }
+            
+            JS_DupValue(ctx, proto) ;
+            T::mapCtxProtos[ctx] = proto ;
+
+            return proto ;
+        }
+        
+        template <typename P>
+        void setParent(JSContext * ctx, NativeClass<P> * parent) {            
+            if(T::mapCtxProtos.count(ctx)<1 || P::mapCtxProtos.count(ctx)<1) {
+                return ;
+            }
+            JSValue parentProto = P::mapCtxProtos[ctx] ;
+            JS_DupValue(ctx, parentProto) ;
+
+            JSValue proto = T::mapCtxProtos[ctx] ;
+            JS_SetPropertyStr(ctx, proto, "__proto__", parentProto);
         }
     } ;
 
     
-    class NativeClassDef {
-    private:
-        JSClassID & classID ;
-        JSContext * ctx ;
-        JSValue proto = JS_NULL ;
-
-    public:
-        NativeClassDef(
-            JSContext * ctx
-            , JSClassID & classID
-            , const char * name
-            , JSCFunction * constructor = nullptr
-            // , NativeClassDef * parent=nullptr
-            , const std::vector<JSCFunctionListEntry> & methods = {}
-            , const std::vector<JSCFunctionListEntry> & staticMethods = {}
-            , JSClassFinalizer * finalizer = nullptr
-        ) ;
-        ~NativeClassDef() ;
-        
-        void setParent(JSContext * ctx, NativeClassDef * parent) ;
-
-        JSValue newJSObject(JSContext * ctx) ;
-
-        // friend class NativeClass ;
-    } ;
+    template <typename T>
+    std::vector<JSCFunctionListEntry> NativeClass<T>::methods ;
+    
+    template <typename T>
+    std::vector<JSCFunctionListEntry> NativeClass<T>::staticMethods ;
 }
