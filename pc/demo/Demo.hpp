@@ -3,7 +3,7 @@
 #include <iostream>
 #include "BeShell.hpp"
 #include "NativeClass.hpp"
-#include "module/NativeModule.hpp"
+#include "NativeModule.hpp"
 
 using namespace std ;
 using namespace be ;

@@ -1,6 +1,6 @@
 #pragma once
 #include "BeShell.hpp"
-#include "module/NativeModule.hpp"
+#include "NativeModule.hpp"
 
 namespace be {
 namespace driver {

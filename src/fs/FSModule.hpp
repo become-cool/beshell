@@ -1,5 +1,5 @@
 #pragma once
-#include "module/NativeModule.hpp"
+#include "NativeModule.hpp"
 
 namespace be {
     class FSModule: public NativeModule {

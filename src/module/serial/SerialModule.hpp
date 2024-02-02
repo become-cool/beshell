@@ -1,6 +1,6 @@
 #pragma once
 
-#include "module/NativeModule.hpp"
+#include "NativeModule.hpp"
 #include "module/serial/UART.hpp"
 #include "module/serial/I2C.hpp"
 #include "module/serial/I2S.hpp"
