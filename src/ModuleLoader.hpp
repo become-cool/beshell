@@ -22,12 +22,17 @@ namespace be {
         ModuleLoader() ;
         ~ModuleLoader() ;
 
+        template <typename M>
+        static NativeModule* factory(JSContext * ctx, const char * name) {
+            return new M(ctx, name) ;
+        }
+        template <typename M>
+        void add(const char * name=nullptr) {
+            factories[name?name:M::name] = factory<M> ;
+        }
+
         void add(const char * name, NativeModuleFactoryFunc factory) ;
-
-        // NativeModule * add(NativeModule * module) ;
-        // NativeModule * added(const char *) ;
-
-        // void init(JSRuntime * rt) ;
+        
         void setup(JSContext * ctx) ;
 
         NativeModule * moduleByName(JSContext * ctx, const char * name) ;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <BeShell.hpp>
 #include "BeShell.hpp"
 #include "NativeClass.hpp"
 #include "NativeModule.hpp"
@@ -10,18 +11,29 @@ using namespace be ;
 
 
 class DemoClass: public NativeClass<DemoClass> {
-    NATIVE_CLASS_META
+    DECLARE_NCLASS_META
     // std::vector<JSCFunctionListEntry> NativeClass<DemoClass>::methods = {};
     // std::vector<JSCFunctionListEntry> NativeClass<DemoClass>::staticMethods ={};
 
 public:
     DemoClass(JSContext * ctx, int a=0): NativeClass(ctx) {
-        dd
+
     }
 
 } ;
 
 
 
+class DemoModule: public NativeModule {
+public:
+    DemoModule(JSContext * ctx, const char * name,uint8_t flagGlobal=1)
+        : NativeModule(ctx, name, flagGlobal)
+    {
 
-void useDemo(JSContext * ctx) ;
+    }
+    static NativeModule* factory(JSContext * ctx, const char * name) {
+        return new DemoModule(ctx,name,1) ;
+    }
+} ;
+
+void useDemo(BeShell & beshell, JSContext * ctx) ;

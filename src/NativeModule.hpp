@@ -23,7 +23,7 @@ namespace be {
         JSContext * ctx = nullptr ;
 
     public:
-        const char * name ;
+        static const char * name ;
 
         uint8_t flagGlobal = 0 ;
         

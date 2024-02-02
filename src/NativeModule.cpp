@@ -9,12 +9,14 @@ using namespace std ;
 
 namespace be {
 
-    NativeModule::NativeModule(JSContext * _ctx, const char * _name, uint8_t _flagGlobal)
+    const char * NativeModule::name = "unname_module" ;
+
+    NativeModule::NativeModule(JSContext * _ctx, const char * name, uint8_t _flagGlobal)
         : ctx(_ctx)
-        , name(_name)
+        // , name(_name)
         , flagGlobal(_flagGlobal)
     {
-        m = JS_NewCModule(ctx, _name, importModule);
+        m = JS_NewCModule(ctx, name, importModule);
         JS_SetModuleDefOpaque(m,this) ;
     }
     

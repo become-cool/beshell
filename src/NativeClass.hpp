@@ -10,13 +10,17 @@
 #include <string.h>
 #include "utils.h"
 
-#define NATIVE_CLASS_META                                   \
+#define DECLARE_NCLASS_META                                 \
     protected:                                              \
         static JSClassID classID ;                          \
         static const char * className ;                     \
         static std::map<JSContext*, JSValue> mapCtxProtos ; \
     friend class NativeClass ;
 
+#define DEFINE_NCLASS_META(CLASS)               \
+    const char * CLASS::className = #CLASS ;    \
+    JSClassID CLASS::classID = 0 ;              \
+    std::map<JSContext*, JSValue> CLASS::mapCtxProtos ;
 
 namespace be {
 
@@ -27,7 +31,6 @@ namespace be {
         std::shared_ptr<T> self ;
 
     protected:
-        JSValue jsobj ;
 
         static std::vector<JSCFunctionListEntry> methods ;
         static std::vector<JSCFunctionListEntry> staticMethods ;
@@ -45,6 +48,8 @@ namespace be {
         }
 
     public:
+        JSValue jsobj ;
+        
         // for JS
         NativeClass(JSContext * _ctx, JSValue _jsobj)
             : ctx(_ctx)
@@ -79,7 +84,6 @@ namespace be {
             return obj ;
         }
 
-        
         static JSValue defineClass(JSContext * ctx) {
             if(T::mapCtxProtos.count(ctx)>0) {
                 return T::mapCtxProtos[ctx] ;

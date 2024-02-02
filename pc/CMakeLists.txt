@@ -47,7 +47,7 @@ set(SRC_LIST
         ${CMAKE_SOURCE_DIR}/src/module/ProcessModule.cpp
         ${CMAKE_SOURCE_DIR}/src/module/NVSModule.cpp
 
-        # ${CMAKE_SOURCE_DIR}/src/basic/Console.cpp
+        ${CMAKE_SOURCE_DIR}/src/basic/Console.cpp
         # ${CMAKE_SOURCE_DIR}/src/driver/display/DisplayModule.cpp
         # ${CMAKE_SOURCE_DIR}/src/driver/display/Display.cpp
         # ${CMAKE_SOURCE_DIR}/src/driver/display/Bus8080.cpp

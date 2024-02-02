@@ -21,10 +21,10 @@ int main(int argc, char* argv[]) {
     BeShell beshell ;
 
     beshell.useBasic() ;
-    beshell.setup() ;
     // DisplayModule::use(beshell) ;
+    useDemo(beshell, beshell.engine->ctx) ;
 
-    useDemo(beshell.engine->ctx) ;
+    beshell.setup() ;
 
     char * dirname = strdup(argv[0]) ;
     path_dirname(argv[0],dirname) ;

@@ -113,8 +113,8 @@ namespace be {
         engine->timer.setup(ctx) ;
         engine->mloader.setup(ctx) ;
 
-        // engine->console = new Console(ctx) ;
-        // setGlobalValue(ctx, "console", engine->console->jsobj) ;
+        engine->console = new Console(ctx) ;
+        setGlobalValue(ctx, "console", engine->console->jsobj) ;
 
         return ctx;
     }
@@ -134,18 +134,18 @@ namespace be {
     void JSEngine::print(JSValue content, int pkgId, uint8_t cmd, TelnetChannel * ch) {
         assert(beshell) ;
 
-        // std::string str = console->stringify(ctx, content) ;
+        std::string str = console->stringify(ctx, content) ;
 
-        // if(!str.length()) {
-        //     return ;
-        // }
-        // if(ch) {
-        //     ch->send(str.c_str(), str.length(), pkgId, cmd) ;
-        // } else if(beshell->telnet) {
-        //     beshell->telnet->output(str.c_str(), str.length(), pkgId, cmd) ;
-        // } else {
-        //     cout << str ;
-        // }
+        if(!str.length()) {
+            return ;
+        }
+        if(ch) {
+            ch->send(str.c_str(), str.length(), pkgId, cmd) ;
+        } else if(beshell->telnet) {
+            beshell->telnet->output(str.c_str(), str.length(), pkgId, cmd) ;
+        } else {
+            cout << str ;
+        }
     }
 
     void JSEngine::dumpError(int pkgId, TelnetChannel * ch) {
