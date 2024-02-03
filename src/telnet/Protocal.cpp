@@ -153,7 +153,7 @@ namespace be {
             return ;
         }
 
-        for(int i=0;i<(int)(*len);i++) {
+        for(size_t i=0;i<(*len);i++) {
             // reaching end of line
             if( bytes[i] == '\n' ) {
 
@@ -337,6 +337,6 @@ namespace be {
     }
 
     void defaultPkgProcFunc(std::unique_ptr<Package> pkg) {
-        printf("receive package, pkgid:%d, cmd:%d, length:%d\n",pkg->head.fields.pkgid,pkg->head.fields.cmd,pkg->body_len) ;
+        printf("receive package, pkgid:%d, cmd:%d, length:%zu\n",pkg->head.fields.pkgid,pkg->head.fields.cmd,pkg->body_len) ;
     }
 }

@@ -36,7 +36,7 @@ set(SRC_LIST
         ${CMAKE_SOURCE_DIR}/src/repl/REPL.cpp
         ${CMAKE_SOURCE_DIR}/src/path.cpp
         ${CMAKE_SOURCE_DIR}/src/string_utils.cpp
-        ${CMAKE_SOURCE_DIR}/src/utils.c
+        ${CMAKE_SOURCE_DIR}/src/qjs_utils.c
         ${CMAKE_SOURCE_DIR}/src/mallocf.c
 
         ${CMAKE_SOURCE_DIR}/src/NativeClass.cpp

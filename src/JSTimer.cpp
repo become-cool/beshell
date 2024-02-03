@@ -1,7 +1,7 @@
 #include "JSTimer.hpp"
 #include "BeShell.hpp"
 #include "JSEngine.hpp"
-#include "utils.h"
+#include "qjs_utils.h"
 #include <cassert>
 
 using namespace std;

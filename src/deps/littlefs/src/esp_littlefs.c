@@ -24,7 +24,7 @@
 
 #include "esp_littlefs.h"
 #include "littlefs_api.h"
-#include "utils.h"
+#include "qjs_utils.h"
 
 
 static const char TAG[] = "esp_littlefs";

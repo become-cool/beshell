@@ -8,7 +8,7 @@
 #include <memory>
 #include <quickjs_private.h>
 #include <string.h>
-#include "utils.h"
+#include "qjs_utils.h"
 
 #define DECLARE_NCLASS_META                                 \
     protected:                                              \
@@ -21,6 +21,7 @@
     const char * CLASS::className = #CLASS ;    \
     JSClassID CLASS::classID = 0 ;              \
     std::map<JSContext*, JSValue> CLASS::mapCtxProtos ;
+
 
 namespace be {
 
@@ -47,24 +48,24 @@ namespace be {
             }
         }
 
+    protected :
+        NativeClass(JSContext * _ctx, JSValue _jsobj=JS_UNDEFINED)
+            : ctx(_ctx)
+        {
+            if( JS_IsNone(_jsobj) ) {
+                if( T::classID<1 ) {
+                    defineClass(ctx) ;
+                    assert(T::classID>0) ;
+                }
+                _jsobj = JS_NewObjectClass(ctx, T::classID) ;
+            }
+
+            JS_DupValue(ctx, jsobj) ;
+            jsobj = _jsobj ;
+        }
+
     public:
         JSValue jsobj ;
-        
-        // for JS
-        NativeClass(JSContext * _ctx, JSValue _jsobj)
-            : ctx(_ctx)
-            , jsobj(_jsobj)
-        {
-            JS_DupValue(ctx, jsobj) ;
-        }
-        // for c++
-        NativeClass(JSContext * ctx) {
-            if( T::classID<1 ) {
-                defineClass(ctx) ;
-                assert(T::classID>0) ;
-            }
-            NativeClass( ctx, JS_NewObjectClass(ctx, T::classID) ) ;
-        }
 
         ~NativeClass() {
             if(!JS_IsUndefined(jsobj)) {

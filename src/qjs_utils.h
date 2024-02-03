@@ -428,6 +428,8 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
         fail                                        \
     }
 
+
+#define JS_IsNone(jsval) (JS_IsUndefined(jsval)||JS_IsNull(jsval))
     
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 #define ONCE_H_DEBUG
 
 #include <stdint.h>
-#include "utils.h"
+#include "qjs_utils.h"
 
 #define pf(...) printf(__VA_ARGS__) ;printf("\n") ;
 #define dd printf("%d@%s()\n", __LINE__, __FUNCTION__) ;
@@ -17,6 +17,12 @@
 #define dn3(v1,v2,v3)           printf(#v1"=%d, "#v2"=%d, "#v3"=%d @%d\n", (int)v1, (int)v2, (int)v3, __LINE__) ;
 #define dn4(v1,v2,v3,v4)        printf(#v1"=%d, "#v2"=%d, "#v3"=%d, "#v4"=%d @%d\n", (int)v1, (int)v2, (int)v3, (int)v4, __LINE__) ;
 #define dn5(v1,v2,v3,v4,v5)     printf(#v1"=%d, "#v2"=%d, "#v3"=%d, "#v4"=%d, "#v5"=%d @%d\n", (int)v1, (int)v2, (int)v3, (int)v4, (int)v5, __LINE__) ;
+
+#define dvar(jsvar) {                               \
+    const char * cstr = JS_ToCString(ctx, jsvar) ;  \
+    printf("%s=%s %d@%s()\n",#jsvar, cstr, __LINE__, __FUNCTION__) ;                \
+    JS_FreeCString(ctx, cstr) ;                     \
+}
 
 #define dfunc   printf("%s()@%d\n", __FUNCTION__, __LINE__) ;
 

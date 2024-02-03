@@ -1,6 +1,6 @@
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
-#include "utils.h"
+#include "qjs_utils.h"
 #include <sys/stat.h>
 #include <string.h>
 #include "debug.h"

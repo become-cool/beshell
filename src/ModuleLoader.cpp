@@ -7,7 +7,7 @@
 #include <cassert>
 #include <stdlib.h>
 #include "path.hpp"
-#include "utils.h"
+#include "qjs_utils.h"
 #include "quickjs_private.h"
 
 

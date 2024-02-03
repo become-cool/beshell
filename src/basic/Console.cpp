@@ -1,5 +1,5 @@
 #include "./Console.hpp"
-#include "utils.h"
+#include "qjs_utils.h"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <assert.h>
@@ -84,27 +84,13 @@ function() {
             return ;
         })
 
-    // dref(jsStringify)
-    // const char * eeee = JS_ToCString(ctx, jsStringify) ;
-    // ds(eeee) ;
-    // JS_FreeCString(ctx, eeee) ;
-    // dref(jsStringify)
-
-        JS_DupValue(ctx, jsStringify) ;
         JS_SetPropertyStr(ctx, jsobj, "stringify", jsStringify) ;
-    // dref(jsStringify)
-
-    // const char * ttt = JS_ToCString(ctx, jsStringify) ;
-    // ds(ttt) ;
-    // JS_FreeCString(ctx, ttt) ;
-
-
         JS_SetPropertyStr(ctx, jsobj, "log", jsLog) ;
         JS_SetPropertyStr(ctx, jsobj, "emit", jsEmit) ;
     }
 
     JSValue Console::jsWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-dd
+
         if(argc<1) {
             return JS_UNDEFINED ;
         }
@@ -123,34 +109,21 @@ dd
 
     #undef stringify
     string Console::stringify(JSContext *ctx, JSValue val) {
-dd
         const char * cstr = nullptr ;
         // 简单调用 toString
         if( JS_IsUndefined(jsStringify) || JS_IsNull(jsStringify) ) {
-            dd
             cstr = JS_ToCString(ctx,val) ;
         }
         // 深度 stringify
         else {
-            dd
-
-
-    const char * eeee = JS_ToCString(ctx, jsStringify) ;
-    ds(eeee) ;
-    JS_FreeCString(ctx, eeee) ;
-
-    dref(jsStringify) ;
-
 
             JSValue ret = JS_Call(ctx, jsStringify, JS_UNDEFINED, 1, &val) ;
             if(JS_IsException(ret)) {
-                dd
                 JSEngine * engine = JSEngine::fromJSContext(ctx) ;
                 assert(engine) ;
                 engine->dumpError() ;
             }
             else {
-                dd
                 cstr = JS_ToCString(ctx,ret) ;
                 JS_FreeValue(ctx, ret) ;
             }
@@ -158,7 +131,7 @@ dd
 
         string str = cstr? cstr: "" ;
         JS_FreeCString(ctx, cstr) ;
-dd
+
         return str ;
     }
 }

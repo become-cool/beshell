@@ -3,7 +3,7 @@
 #include "BeShell.hpp"
 #include "FSModule.hpp"
 #include "fs/FS.hpp"
-#include "utils.h"
+#include "qjs_utils.h"
 #include <sys/stat.h>
 #include <cstring>
 #include <dirent.h>

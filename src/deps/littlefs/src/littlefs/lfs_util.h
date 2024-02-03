@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <inttypes.h>
-#include "utils.h"
+#include "qjs_utils.h"
 
 #ifndef LFS_NO_MALLOC
 #include <stdlib.h>

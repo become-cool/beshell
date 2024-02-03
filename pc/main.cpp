@@ -16,6 +16,7 @@ using namespace be;
 using namespace be::driver::display;
 
 
+
 int main(int argc, char* argv[]) {
 
     BeShell beshell ;
@@ -24,7 +25,9 @@ int main(int argc, char* argv[]) {
     // DisplayModule::use(beshell) ;
     useDemo(beshell, beshell.engine->ctx) ;
 
+
     beshell.setup() ;
+
 
     char * dirname = strdup(argv[0]) ;
     path_dirname(argv[0],dirname) ;

@@ -6,7 +6,7 @@
 #include "esp_vfs_dev.h"
 #include "esp_vfs.h"
 #include "debug.h"
-#include "utils.h"
+#include "qjs_utils.h"
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/types.h>

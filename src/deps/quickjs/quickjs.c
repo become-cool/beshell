@@ -8463,10 +8463,6 @@ retry:
                 }
             } else {
                 const JSClassExoticMethods *em = ctx->rt->class_array[p1->class_id].exotic;
-                dp(ctx)
-                dp(ctx->rt->class_array)
-                dn(p1->class_id)
-                dp(em)
                 if (em) {
                     JSValue obj1;
                     if (em->set_property) {
