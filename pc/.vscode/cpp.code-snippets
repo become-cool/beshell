@@ -76,5 +76,56 @@
         "    }",
         "}"
       ]
+    },
+    
+    "nclass-hpp":
+    {
+        "prefix": "nclasshpp",
+        "description": "BeShell Native Class header file (.hpp)",
+        "body":
+        [
+            "#pragma once" ,
+            "" ,
+            "#include <NativeClass.hpp>" ,
+            "" ,
+            "class ${TM_FILENAME_BASE}: public be::NativeClass<${TM_FILENAME_BASE}> {" ,
+            "  DECLARE_NCLASS_META" ,
+            "  static std::vector<JSCFunctionListEntry> methods ;" ,
+            "  // static std::vector<JSCFunctionListEntry> staticMethods ;" ,
+            "" ,
+            "public:",
+            "    ${TM_FILENAME_BASE}(JSContext * ctx) ;" ,
+            "" ,
+            "    static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
+            "" ,
+            "} ;" ,
+        ]
+    },
+
+    
+    "nclass-cpp":
+    {
+        "prefix": "nclasscpp",
+        "description": "BeShell Native Class source file (.cpp)",
+        "body":
+        [
+            "#include \"Demo.hpp\"",
+            "" ,
+            "using namespace std ;",
+            "" ,
+            "DEFINE_NCLASS_META(Demo)",
+            "std::vector<JSCFunctionListEntry> Demo::methods = {",
+            "    JS_CFUNC_DEF(\"method\", 0, Demo::jsMethod),",
+            "} ;",
+            "" ,
+            "Demo::Demo(JSContext * ctx)",
+            "    : NativeClass(ctx)",
+            "{",
+            "}",
+            "" ,
+            "JSValue Demo::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
+            "    return JS_UNDEFINED ;",
+            "}",
+        ]
     }
   }

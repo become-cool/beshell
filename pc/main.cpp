@@ -5,6 +5,7 @@
 #include "path.hpp"
 #include "BeShell.hpp"
 #include "demo/Demo.hpp"
+#include "demo/DemoModule.hpp"
 #include "path.hpp"
 #include "BeShell.hpp"
 #include "telnet/Protocal.hpp"

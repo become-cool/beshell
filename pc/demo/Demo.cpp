@@ -1,16 +1,17 @@
 #include "Demo.hpp"
 
 using namespace std ;
-using namespace be ;
 
+DEFINE_NCLASS_META(Demo)
+std::vector<JSCFunctionListEntry> Demo::methods = {
+    JS_CFUNC_DEF("method", 0, Demo::jsMethod),
+} ;
 
+Demo::Demo(JSContext * ctx)
+    : NativeClass(ctx)
+{
+}
 
-DEFINE_NCLASS_META(DemoClass)
-
-
-void useDemo(BeShell & beshell, JSContext * ctx) {
-
-    beshell.engine->mloader.add<DemoModule>("name") ;
-
-    // new DemoClass(ctx) ;
+JSValue Demo::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    return JS_UNDEFINED ;
 }
