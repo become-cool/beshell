@@ -1,4 +1,4 @@
-project(beshll-component)
+# project(beshll-component)
 cmake_minimum_required(VERSION 3.24)
 # 头文件目录
 set(include_dirs ./src)

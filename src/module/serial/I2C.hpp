@@ -1,19 +1,12 @@
 #pragma once
 
-#include "NativeObject.hpp"
-#include <map>
+#include "NativeClass.hpp"
 
 namespace be {
 
-    class I2C: public NativeObject {
-    private:
-        uint8_t busnum = 0 ;
-        static std::map<JSContext*, NativeClass*> mapCtxClasses ;
-
-    protected:
+    class I2C: public NativeClass<I2C> {
+        DECLARE_NCLASS_META
     public:
         I2C(JSContext * ctx, uint8_t _busnum=0) ;
-        inline static NativeClass* defineClass(JSContext * ctx) ;
-        static JSClassID classID ;
     } ;
 }

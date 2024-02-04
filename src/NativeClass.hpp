@@ -25,7 +25,7 @@
 
 namespace be {
 
-    template <typename T>
+    template <typename T, typename P=void>
     class NativeClass {
     private:
         JSContext * ctx ;
@@ -52,6 +52,8 @@ namespace be {
         NativeClass(JSContext * _ctx, JSValue _jsobj=JS_UNDEFINED)
             : ctx(_ctx)
         {
+            // std::is_same_v<P, void>
+
             if( JS_IsNone(_jsobj) ) {
                 if( T::classID<1 ) {
                     defineClass(ctx) ;
@@ -119,12 +121,11 @@ namespace be {
             return proto ;
         }
         
-        template <typename P>
-        void setParent(JSContext * ctx, NativeClass<P> * parent) {            
-            if(T::mapCtxProtos.count(ctx)<1 || P::mapCtxProtos.count(ctx)<1) {
+        void setParent(JSContext * ctx, NativeClass<T> * parent) {            
+            if(T::mapCtxProtos.count(ctx)<1 || T::mapCtxProtos.count(ctx)<1) {
                 return ;
             }
-            JSValue parentProto = P::mapCtxProtos[ctx] ;
+            JSValue parentProto = T::mapCtxProtos[ctx] ;
             JS_DupValue(ctx, parentProto) ;
 
             JSValue proto = T::mapCtxProtos[ctx] ;
@@ -133,9 +134,9 @@ namespace be {
     } ;
 
     
-    template <typename T>
-    std::vector<JSCFunctionListEntry> NativeClass<T>::methods ;
+    template <typename T,typename P>
+    std::vector<JSCFunctionListEntry> NativeClass<T,P>::methods ;
     
-    template <typename T>
-    std::vector<JSCFunctionListEntry> NativeClass<T>::staticMethods ;
+    template <typename T,typename P>
+    std::vector<JSCFunctionListEntry> NativeClass<T,P>::staticMethods ;
 }
