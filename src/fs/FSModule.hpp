@@ -6,8 +6,7 @@ namespace be {
     private:
     protected:
     public:
-        FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal);
-        static NativeModule* factory(JSContext * ctx, const char * name) ;
+        FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal=1);
         
         static JSValue jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

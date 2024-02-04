@@ -10,7 +10,6 @@ namespace be {
     protected:
     public:
         static void use(BeShell * beshell) ;
-        static NativeModule* factory(JSContext * ctx, const char * name) ;
 
         NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal=0);
 

@@ -87,11 +87,7 @@ namespace be {
             std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
         }
 #endif
-        beshell->engine->mloader.add("nvs", factory) ;
-    }
-    
-    NativeModule* NVSModule::factory(JSContext * ctx, const char * name) {
-        return new NVSModule(ctx,name,0) ;
+        beshell->engine->mloader.add<NVSModule>("nvs") ;
     }
 
     NVSModule::NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)

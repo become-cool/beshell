@@ -42,7 +42,7 @@ namespace be {
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(!fs) {
             fs = new FS() ;
-            engine->mloader.add("fs", FSModule::factory) ;
+            engine->mloader.add<FSModule>("fs") ;
         }
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;

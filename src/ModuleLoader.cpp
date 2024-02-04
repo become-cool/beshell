@@ -18,14 +18,11 @@ namespace be {
     public:
         using NativeModule::NativeModule;
         
-        JSLoader(JSContext * ctx, const char * name,uint8_t flagGlobal)
+        JSLoader(JSContext * ctx, const char * name,uint8_t flagGlobal=1)
             : NativeModule(ctx, name, flagGlobal)
         {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
-        }
-        static NativeModule* factory(JSContext * ctx, const char * name) {
-            return new JSLoader(ctx,name,1) ;
         }
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -79,16 +76,12 @@ namespace be {
     } ;
 
     ModuleLoader::ModuleLoader() {
-        add("loader", JSLoader::factory) ;
-        add("process", ProcessModule::factory) ;
+        add<JSLoader>("loader") ;
+        add<ProcessModule>("process") ;
     }
     
     ModuleLoader::~ModuleLoader() {
         // @todo  delete native modules
-    }
-    
-    void ModuleLoader::add(const char * name, NativeModuleFactoryFunc factory) {
-        factories[name] = factory ;
     }
 
     NativeModule * ModuleLoader::moduleByName(JSContext * ctx, const char * name) {

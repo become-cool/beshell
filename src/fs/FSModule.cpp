@@ -12,10 +12,7 @@
 using namespace std ;
 
 
-namespace be {    
-    NativeModule* FSModule::factory(JSContext * ctx, const char * name) {
-        return new FSModule(ctx,name,1) ;
-    }
+namespace be {
 
     FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
