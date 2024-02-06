@@ -11,16 +11,17 @@
 #include "qjs_utils.h"
 
 #define DECLARE_NCLASS_META                                 \
+    public:                                                 \
+        static const char * className ;                     \
     protected:                                              \
         static JSClassID classID ;                          \
-        static const char * className ;                     \
-        static std::map<JSContext*, JSValue> mapCtxProtos ; \
+        static std::map<JSContext*, JSValue> mapCtxConstructors ; \
     friend class NativeClass ;
 
 #define DEFINE_NCLASS_META(CLASS)               \
     const char * CLASS::className = #CLASS ;    \
     JSClassID CLASS::classID = 0 ;              \
-    std::map<JSContext*, JSValue> CLASS::mapCtxProtos ;
+    std::map<JSContext*, JSValue> CLASS::mapCtxConstructors ;
 
 
 namespace be {
@@ -88,8 +89,8 @@ namespace be {
         }
 
         static JSValue defineClass(JSContext * ctx) {
-            if(T::mapCtxProtos.count(ctx)>0) {
-                return T::mapCtxProtos[ctx] ;
+            if(T::mapCtxConstructors.count(ctx)>0) {
+                return T::mapCtxConstructors[ctx] ;
             }
             
             JS_NewClassID(&T::classID);
@@ -115,20 +116,20 @@ namespace be {
                 JS_SetPropertyFunctionList(ctx, jscotr, T::staticMethods.data(), T::staticMethods.size());
             }
             
-            JS_DupValue(ctx, proto) ;
-            T::mapCtxProtos[ctx] = proto ;
+            JS_DupValue(ctx, jscotr) ;
+            T::mapCtxConstructors[ctx] = jscotr ;
 
-            return proto ;
+            return jscotr ;
         }
         
         void setParent(JSContext * ctx, NativeClass<T> * parent) {            
-            if(T::mapCtxProtos.count(ctx)<1 || T::mapCtxProtos.count(ctx)<1) {
+            if(T::mapCtxConstructors.count(ctx)<1 || T::mapCtxConstructors.count(ctx)<1) {
                 return ;
             }
-            JSValue parentProto = T::mapCtxProtos[ctx] ;
+            JSValue parentProto = T::mapCtxConstructors[ctx] ;
             JS_DupValue(ctx, parentProto) ;
 
-            JSValue proto = T::mapCtxProtos[ctx] ;
+            JSValue proto = T::mapCtxConstructors[ctx] ;
             JS_SetPropertyStr(ctx, proto, "__proto__", parentProto);
         }
     } ;

@@ -1,13 +1,9 @@
-#include "module/serial/SerialModule.hpp"
+#include "SerialModule.hpp"
 
 using namespace std ;
 
 namespace be {
     
-    static SerialModule* factory(JSContext * ctx, const char * name) {
-        return new SerialModule(ctx,name,0) ;
-    }
-
     #define DELETE_MEMBER(var) \
         if(var) {              \
             delete var ;       \

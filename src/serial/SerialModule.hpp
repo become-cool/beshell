@@ -17,7 +17,6 @@ namespace be {
         // SPI * spi3 = nullptr ;
 
         using NativeModule::NativeModule;
-        static NativeModule* factory(JSContext * ctx, const char * name) ;
 
         ~SerialModule() ;
         

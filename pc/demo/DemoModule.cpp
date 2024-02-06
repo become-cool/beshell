@@ -6,7 +6,7 @@
 
 void useDemo(be::BeShell & beshell, JSContext * ctx) {
 
-    beshell.engine->mloader.add<DemoModule>("name") ;
+    beshell.engine->mloader.add<DemoModule>("demo") ;
 
     // new DemoClass(ctx) ;
 }

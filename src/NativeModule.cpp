@@ -1,6 +1,5 @@
 #include "NativeModule.hpp"
 #include <string.h>
-#include <cassert>
 #include <functional>
 #include <iostream>
 #include "debug.h"
@@ -13,7 +12,6 @@ namespace be {
 
     NativeModule::NativeModule(JSContext * _ctx, const char * name, uint8_t _flagGlobal)
         : ctx(_ctx)
-        // , name(_name)
         , flagGlobal(_flagGlobal)
     {
         m = JS_NewCModule(ctx, name, importModule);
@@ -22,7 +20,6 @@ namespace be {
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
         assert(ctx) ;
-        assert(m) ;
 
         JSCFunctionListEntry fe ;
         memset(&fe,0,sizeof(JSCFunctionListEntry)) ;
@@ -37,19 +34,8 @@ namespace be {
 
         JS_AddModuleExport(ctx, m, name) ;
     }
-    void NativeModule::exportValue(const char * name, JSValue value) {
-        assert(m) ;
+    void NativeModule::exportName(const char * name) {
         assert(ctx) ;
-
-        exportValues[name] = value ;
-
-        JS_AddModuleExport(ctx, m, name) ;
-    }
-    
-    void NativeModule::exportWithCallback(const char * name, ModuleExportor func) {
-        assert(m) ;
-        assert(ctx) ;
-        exportors[name] = func ;
         JS_AddModuleExport(ctx, m, name) ;
     }
     
@@ -61,27 +47,18 @@ namespace be {
         NativeModule * nmodule = fromJSModuleDef(m) ;
         assert(nmodule) ;
 
-        // funcs
-        int funcCnt = nmodule->exportFuncs.size() ;
-        JSCFunctionListEntry func_list[funcCnt] ;
-        for(int i=0;i<funcCnt;i++) {
-            func_list[i] = nmodule->exportFuncs[i] ;
-        }
-        JS_SetModuleExportList(ctx, m, func_list, nmodule->exportFuncs.size());
 
-        // values
-        for(auto pair: nmodule->exportValues) {
-            JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second);
+        JS_SetModuleExportList(ctx, m, nmodule->exportFuncs.data(), nmodule->exportFuncs.size());
+
+        for(auto factory : nmodule->classFactories) {
+            factory(ctx, m) ;
         }
 
-        // exportors
-        for(auto pair: nmodule->exportors) {
-            JS_SetModuleExport(ctx, m, pair.first.c_str(), pair.second(ctx));
-        }
+        nmodule->import() ;
 
         return 0 ;
     }
     
-    void NativeModule::setup(JSContext * ctx) {}
+    void NativeModule::import() {}
 
 }

@@ -122,8 +122,6 @@ namespace be {
                     JS_FreeValue(ctx, mi) ;
                 }
             }
-
-            nm->setup(ctx) ;
         }        
     }
 

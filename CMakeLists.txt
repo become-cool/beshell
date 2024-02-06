@@ -10,7 +10,6 @@ list(APPEND src_dirs src/repl)
 list(APPEND src_dirs src/telnet)
 list(APPEND src_dirs src/basic)
 list(APPEND src_dirs src/module)
-list(APPEND src_dirs src/module/serial)
 
 # # little fs
 # list(APPEND include_dirs deps/littlefs/src)
