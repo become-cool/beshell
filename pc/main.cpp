@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
     beshell.useBasic() ;
     // DisplayModule::use(beshell) ;
-    useDemo(beshell, beshell.engine->ctx) ;
+    DemoModule::use(beshell) ;
 
 
     beshell.setup() ;

@@ -3,6 +3,13 @@
 using namespace std ;
 
 namespace be {
+
+    
+    SerialModule::SerialModule(JSContext * ctx, const char * name)
+        : 
+    {
+
+    }
     
     #define DELETE_MEMBER(var) \
         if(var) {              \
@@ -17,9 +24,10 @@ namespace be {
         // DELETE_MEMBER(spi3)
     }
 
-    void SerialModule::init(JSRuntime * rt) {
-    }
-    void SerialModule::setup(JSContext * ctx) {
+    void SerialModule::import() {
+        assert(ctx) ;
+        assert(m) ;
+
         // i2c0 = new I2C(ctx, 0) ;
         // i2c1 = new I2C(ctx, 1) ;
         // spi1 = new SPI(ctx, 1) ;

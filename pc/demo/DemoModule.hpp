@@ -1,27 +1,15 @@
 #pragma once
 
 #include "BeShell.hpp"
-#include "Demo.hpp"
 #include "NativeModule.hpp"
-
-
 
 class DemoModule: public be::NativeModule {
 public:
-    DemoModule(JSContext * ctx, const char * name)
-        : NativeModule(ctx, name, 1)
-    {
-        dd
-        exportClass<Demo>() ;
-    }
+    DemoModule(JSContext * ctx, const char * name) ;
 
-    void import(JSContext *ctx, JSModuleDef *m) {
-    }
+    void import() ;
 
-    static void use(be::BeShell & beshell) {
-        beshell.engine->mloader.add<DemoModule>();
-    }
+    static void use(be::BeShell & beshell) ;
+
+    static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 } ;
-
-
-void useDemo(be::BeShell & beshell, JSContext * ctx) ;

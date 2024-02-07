@@ -109,23 +109,77 @@
         "description": "BeShell Native Class source file (.cpp)",
         "body":
         [
-            "#include \"Demo.hpp\"",
+            "#include \"${TM_FILENAME_BASE}.hpp\"",
             "" ,
             "using namespace std ;",
             "" ,
-            "DEFINE_NCLASS_META(Demo)",
-            "std::vector<JSCFunctionListEntry> Demo::methods = {",
-            "    JS_CFUNC_DEF(\"method\", 0, Demo::jsMethod),",
+            "DEFINE_NCLASS_META(${TM_FILENAME_BASE})",
+            "std::vector<JSCFunctionListEntry> ${TM_FILENAME_BASE}::methods = {",
+            "    JS_CFUNC_DEF(\"method\", 0, ${TM_FILENAME_BASE}::jsMethod),",
             "} ;",
             "" ,
-            "Demo::Demo(JSContext * ctx)",
+            "${TM_FILENAME_BASE}::${TM_FILENAME_BASE}(JSContext * ctx)",
             "    : NativeClass(ctx)",
             "{",
             "}",
             "" ,
-            "JSValue Demo::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
+            "JSValue ${TM_FILENAME_BASE}::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
             "    return JS_UNDEFINED ;",
             "}",
+        ]
+    }
+
+    , "nmodule-hpp":
+    {
+        "prefix": "nmodulehpp",
+        "description": "BeShell Native Module header file (.hpp)",
+        "body":
+        [
+            "#pragma once" ,
+            "" ,
+            "#include \"BeShell.hpp\"" ,
+            "#include \"NativeModule.hpp\"" ,
+            "" ,
+            "class ${TM_FILENAME_BASE}: public be::NativeModule {" ,
+            "public:" ,
+            "    ${TM_FILENAME_BASE}(JSContext * ctx, const char * name) ;" ,
+            "" ,
+            "    \/\/ void import() ;" ,
+            "" ,
+            "    static void use(be::BeShell & beshell) ;" ,
+            "" ,
+            "    static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
+            "} ;" ,
+            ""
+        ]
+    }
+    
+    , "nmodule-cpp":
+    {
+        "prefix": "nmodulecpp",
+        "description": "BeShell Native Module source file (.cpp)",
+        "body":
+        [
+            "#include \"${TM_FILENAME_BASE}.hpp\"" ,
+            "" ,
+            "${TM_FILENAME_BASE}::${TM_FILENAME_BASE}(JSContext * ctx, const char * name)",
+            "    : NativeModule(ctx, name, 0)",
+            "{",
+            "    \/\/ exportClass<ClassName>() ;",
+            "    exportFunction(\"func\",jsFunc,0) ;",
+            "}",
+            "" ,
+            "\/\/ void ${TM_FILENAME_BASE}::import() {",
+            "\/\/ }",
+            "" ,
+            "void ${TM_FILENAME_BASE}::use(be::BeShell & beshell) {",
+            "    beshell.addModule<${TM_FILENAME_BASE}>(\"${TM_FILENAME_BASE/(.+)/${1:/downcase}/g}\") ;",
+            "}" ,
+            "" ,
+            "JSValue ${TM_FILENAME_BASE}::jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {" ,
+            "    return JS_UNDEFINED ;" ,
+            "}" ,
+            ""
         ]
     }
   }

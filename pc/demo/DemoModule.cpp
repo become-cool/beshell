@@ -1,12 +1,21 @@
 #include "DemoModule.hpp"
-#include "BeShell.hpp"
 #include "Demo.hpp"
 
+DemoModule::DemoModule(JSContext * ctx, const char * name)
+    : NativeModule(ctx, name, 0)
+{
+    exportClass<Demo>() ;
+    exportFunction("func",jsFunc,0) ;
+}
 
+void DemoModule::import() {
+    dd
+}
 
-void useDemo(be::BeShell & beshell, JSContext * ctx) {
+void DemoModule::use(be::BeShell & beshell) {
+    beshell.addModule<DemoModule>("demo") ;
+}
 
-    beshell.engine->mloader.add<DemoModule>("demo") ;
-
-    // new DemoClass(ctx) ;
+JSValue DemoModule::jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    return JS_UNDEFINED ;
 }

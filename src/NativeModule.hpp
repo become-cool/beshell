@@ -49,8 +49,6 @@ namespace be {
             classFactories.push_back(classFactory<C>) ;
         }
 
-
-
         inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;
         
         friend class ModuleLoader ;
