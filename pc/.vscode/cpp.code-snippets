@@ -146,7 +146,7 @@
             "" ,
             "    \/\/ void import() ;" ,
             "" ,
-            "    static void use(be::BeShell & beshell) ;" ,
+            "    inline static void use(be::BeShell & beshell) ;" ,
             "" ,
             "    static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
             "} ;" ,

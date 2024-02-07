@@ -28,7 +28,7 @@ namespace be {
         }
         template <typename M>
         void add(const char * name=nullptr) {
-            factories[name?name:M::name] = factory<M> ;
+            factories[name? name: M::name] = factory<M> ;
         }
         
         void setup(JSContext * ctx) ;

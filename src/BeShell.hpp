@@ -45,14 +45,16 @@ namespace be {
         void run() ;
         void main() ;
 
-        void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
-        void useREPL() ;
-        void useBasic() ;
 
         template <typename M>
         void addModule(const char * name) {
             engine->mloader.add<M>(name) ;
         }
+
+        void useBasic() ;
+        void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
+        void useREPL() ;
+        void useSerial() ;
     } ;
 
 }

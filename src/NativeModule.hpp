@@ -39,6 +39,9 @@ namespace be {
         NativeModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
 
         void exportName(const char * name) ;
+
+        void exportValue(const char * name, JSValue value) ;
+
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
 
         template <typename C>

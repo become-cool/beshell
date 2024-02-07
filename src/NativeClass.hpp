@@ -53,8 +53,6 @@ namespace be {
         NativeClass(JSContext * _ctx, JSValue _jsobj=JS_UNDEFINED)
             : ctx(_ctx)
         {
-            // std::is_same_v<P, void>
-
             if( JS_IsNone(_jsobj) ) {
                 if( T::classID<1 ) {
                     defineClass(ctx) ;

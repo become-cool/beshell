@@ -1,6 +1,7 @@
 #include "BeShell.hpp"
 #include "fs/FSModule.hpp"
 #include "module/NVSModule.hpp"
+#include "module/serial/SerialModule.hpp"
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
@@ -38,6 +39,13 @@ namespace be {
         DELETE_VAR(telnet)
         DELETE_VAR(engine)
     }
+
+    void BeShell::useBasic() {
+        useFS() ;
+        useREPL() ;
+        
+        NVSModule::use(this) ;
+    }
     
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(!fs) {
@@ -54,12 +62,8 @@ namespace be {
         }
         repl = new REPL(this) ;
     }
-
-    void BeShell::useBasic() {
-        useFS() ;
-        useREPL() ;
-        
-        NVSModule::use(this) ;
+    void BeShell::useSerial() {
+        SerialModule::use(*this) ;
     }
 
     void BeShell::setup() {

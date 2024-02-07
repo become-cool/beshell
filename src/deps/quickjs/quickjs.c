@@ -30388,7 +30388,7 @@ static BOOL code_match(CodeContext *s, int pos, ...)
 
 static void instantiate_hoisted_definitions(JSContext *ctx, JSFunctionDef *s, DynBuf *bc)
 {
-    int i, idx, var_idx;
+    int i, idx=0, var_idx;
 
     /* add the hoisted functions and variables */
     for(i = 0; i < s->hoisted_def_count; i++) {

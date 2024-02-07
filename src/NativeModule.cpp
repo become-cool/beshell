@@ -39,6 +39,13 @@ namespace be {
         assert(m) ;
         JS_AddModuleExport(ctx, m, name) ;
     }
+
+    void NativeModule::exportValue(const char * name, JSValue value) {
+        assert(ctx) ;
+        assert(m) ;
+        JS_SetModuleExport(ctx, m, name, value) ;
+    }
+
     
     NativeModule * NativeModule::fromJSModuleDef(JSModuleDef *m) {
         assert(m) ;
@@ -55,7 +62,6 @@ namespace be {
             factory(ctx, m) ;
         }
 
-        dd
         nmodule->import() ;
 
         return 0 ;
