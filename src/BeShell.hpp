@@ -1,13 +1,6 @@
 #pragma once
 
-#ifdef PLATFORM_ESP32
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#endif 
-
 #include <queue>
-
 #include "debug.h"
 #include "JSEngine.hpp"
 #include "repl/REPL.hpp"
@@ -15,10 +8,16 @@
 #include "telnet/Telnet.hpp"
 
 
-
 #define BESHELL_VERSION "0.3.0"
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
+
+
+
+#ifdef PLATFORM_ESP32
+#define MODULE_SERIAL
+#endif
+
 
 
 namespace be {
@@ -54,6 +53,7 @@ namespace be {
         void useBasic() ;
         void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
         void useREPL() ;
+        
         void useSerial() ;
     } ;
 

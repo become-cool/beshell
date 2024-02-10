@@ -4,12 +4,12 @@
 DemoModule::DemoModule(JSContext * ctx, const char * name)
     : NativeModule(ctx, name, 0)
 {
+    exportClass<DemoBase>() ;
     exportClass<Demo>() ;
     exportFunction("func",jsFunc,0) ;
 }
 
 void DemoModule::import() {
-    dd
 }
 
 void DemoModule::use(be::BeShell & beshell) {

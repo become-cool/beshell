@@ -1,7 +1,6 @@
 #include "BeShell.hpp"
 #include "fs/FSModule.hpp"
 #include "module/NVSModule.hpp"
-#include "module/serial/SerialModule.hpp"
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
@@ -12,6 +11,8 @@
 #include "freertos/task.h"
 #include "esp_vfs_fat.h"
 #include "esp_event_loop.h"
+
+#include "module/serial/SerialModule.hpp"
 #endif
 
 using namespace std ;
@@ -56,15 +57,19 @@ namespace be {
             fs->mount(mountPath,partition) ;
         }
     }
+    
     void BeShell::useREPL() {
         if(repl) {
             return ;
         }
         repl = new REPL(this) ;
     }
+    
+    #ifdef PLATFORM_ESP32
     void BeShell::useSerial() {
         SerialModule::use(*this) ;
     }
+    #endif
 
     void BeShell::setup() {
 

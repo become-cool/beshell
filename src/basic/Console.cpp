@@ -8,14 +8,20 @@ using namespace std ;
 
 namespace be {
 
-    DEFINE_NCLASS_META(Console)
+    DEFINE_NCLASS_META(Console,NativeClass)
 
     std::vector<JSCFunctionListEntry> Console::methods = {
         JS_CFUNC_DEF("write", 1, jsWrite),
     };
 
-    Console::Console(JSContext * ctx)
-        : NativeClass(ctx)
+    JSValue Console::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        auto obj = new Console(ctx) ;
+        obj->self = std::shared_ptr<Console> (obj) ;
+        return obj->jsobj ;
+    }
+
+    Console::Console(JSContext * ctx, JSValue _jsobj)
+        : NativeClass(ctx,build(ctx,_jsobj))
     {
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;

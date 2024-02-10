@@ -97,7 +97,6 @@ namespace be {
     void FS::mount(const char * mountPoint, FSPartition * partition) {
 #ifdef PLATFORM_ESP32
         string point = toVFSPath(mountPoint) ;
-        cout << point << endl ;
         partitions[point] = partition ;
         partition->mount(point.c_str()) ;
 #endif

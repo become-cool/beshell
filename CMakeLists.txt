@@ -11,6 +11,7 @@ list(APPEND src_dirs src/telnet)
 list(APPEND src_dirs src/basic)
 list(APPEND src_dirs src/module)
 list(APPEND src_dirs src/module/serial)
+list(APPEND src_dirs src/driver/display)
 
 # # little fs
 list(APPEND src_dirs src/deps/littlefs/src)
@@ -42,14 +43,27 @@ else ()
     set(requires esp_adc)
 endif ()
 
-if (COMMAND idf_component_register)
-    idf_component_register(
-            SRC_DIRS ${src_dirs}
-            INCLUDE_DIRS ${include_dirs}
-            REQUIRES driver mbedtls vfs fatfs spi_flash esp_timer nvs_flash esp_wifi efuse esp_netif esp_ringbuf esp_lcd ${requires}
-            EMBED_FILES fs-root.img
-    )
-endif ()
+idf_component_register(
+        SRC_DIRS
+            ${src_dirs}
+        INCLUDE_DIRS
+            ${include_dirs}
+        REQUIRES 
+            driver
+            mbedtls
+            vfs
+            fatfs
+            spi_flash
+            esp_timer
+            nvs_flash
+            esp_wifi
+            efuse
+            esp_netif
+            esp_ringbuf
+            esp_lcd
+            ${requires}
+        EMBED_FILES fs-root.img
+)
 
 # # for mongoose tls/ssl
 add_definitions(-DMG_ENABLE_MBEDTLS)
@@ -57,12 +71,10 @@ add_definitions(-DMG_ENABLE_MBEDTLS)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
 
+add_definitions(-DPLATFORM_ESP32)
 add_definitions(-DGNUBOY_NO_MINIZIP)
 add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)
-if (COMMAND idf_component_register)
-    add_definitions(-DPLATFORM_ESP32)
-endif ()
 set(CMAKE_CXX_STANDARD 11)
 
 # for c
@@ -98,8 +110,8 @@ if (COMMAND component_compile_options)
     component_compile_options(-Wno-missing-field-initializers)
 endif ()
 
-string(REPLACE "-fno-rtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-string(REPLACE "-fno-exceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# string(REPLACE "-fno-rtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# string(REPLACE "-fno-exceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 #clang
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     add_definitions(-D__STDC_NO_ATOMICS__=1)

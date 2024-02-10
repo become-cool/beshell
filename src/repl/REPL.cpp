@@ -149,7 +149,11 @@ namespace be {
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
                 CHECK_FS_USED
                 ARGS_TO_FILE(0, path)
-                beshell->engine->evalScript(path.c_str()) ;
+                JSValue ret = beshell->engine->evalScript(path.c_str()) ;
+                if(JS_IsException(ret)) {
+                    beshell->engine->dumpError(-1,ch) ;
+                }
+                JS_FreeValue(beshell->engine->ctx,ret) ;
             }
         ) ;
         alias(".","source") ;

@@ -3,4 +3,93 @@
 
 using namespace std;
 namespace be {
+
+    const JSClassID NativeClass::classID = 0 ;
+    std::map<JSContext*, std::map<JSClassID, JSValue>> NativeClass::mapCtxClassID2Proto ;
+    std::vector<JSCFunctionListEntry> NativeClass::methods ;
+    std::vector<JSCFunctionListEntry> NativeClass::staticMethods ;
+
+    NativeClass::NativeClass(JSContext * _ctx, JSValue _jsobj)
+        : ctx(_ctx)
+        , jsobj(_jsobj)
+    {
+        assert(JS_IsObject(jsobj)) ;
+        JS_SetOpaque(jsobj, this) ;
+    }
+
+    NativeClass::~NativeClass() {
+        if(!JS_IsUndefined(jsobj)) {
+            JS_SetOpaque(jsobj, nullptr) ;
+            JS_FreeValue(ctx,jsobj) ;
+        }
+    }
+
+    NativeClass * NativeClass::fromJS(JSValue jsObj) {
+        NativeClass * obj = (NativeClass *) JS_GetOpaqueInternal(jsObj) ;
+        if(!obj) {
+            return nullptr ;
+        }
+        return obj ;
+    }
+    
+        
+    JSValue NativeClass::defineClass(
+            JSContext * ctx
+            , JSClassID & classID
+            , const char * className
+            , const std::vector<JSCFunctionListEntry>& methods
+            , const std::vector<JSCFunctionListEntry>& staticMethods
+            , NClassConstructorFunc constructor
+            , NClassFinalizerFunc finalizer
+            , JSClassID parentClassID
+    ) {
+        JS_NewClassID(&classID);
+
+        if(mapCtxClassID2Proto[ctx].count(classID)>0) {
+            return mapCtxClassID2Proto[ctx][classID] ;
+        }
+
+        JSClassDef jsClassDef ;
+        memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
+
+        jsClassDef.class_name = className ;
+        jsClassDef.finalizer = finalizer ;
+        JS_NewClass(JS_GetRuntime(ctx), classID, &jsClassDef);
+
+        JSValue proto = JS_NewObject(ctx);
+        JS_SetClassProto(ctx, classID, proto);
+
+        if(methods.size()) {
+            JS_SetPropertyFunctionList(ctx, proto, methods.data(), methods.size());
+        }
+
+        JSValue jscotr = JS_NewCFunction2(ctx, constructor, className, 1, JS_CFUNC_constructor, 0) ;
+        JS_SetConstructor(ctx, jscotr, proto) ;
+
+        if(staticMethods.size()) {
+            JS_SetPropertyFunctionList(ctx, jscotr, staticMethods.data(), staticMethods.size());
+        }
+        
+        JS_DupValue(ctx, jscotr) ;
+        mapCtxClassID2Proto[ctx][classID] = jscotr ;
+
+        if(parentClassID>0) {
+            if(mapCtxClassID2Proto[ctx].count(parentClassID)>0) {
+                JSValue parent = mapCtxClassID2Proto[ctx][parentClassID] ;
+                JSValue parentProto = JS_GetPropertyStr(ctx,parent,"prototype") ;
+                JS_DupValue(ctx, parentProto) ;
+                JS_SetPropertyStr(ctx, proto, "__proto__", parentProto);
+            }
+        }
+
+        return jscotr ;
+    }
+    
+    void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
+        NativeClass * obj = fromJS(val) ;
+        if(obj) {
+            obj->self = nullptr ;
+            obj->jsobj = JS_UNDEFINED ;
+        }
+    }
 }
