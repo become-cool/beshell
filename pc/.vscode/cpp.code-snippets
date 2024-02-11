@@ -84,7 +84,7 @@
         "description": "BeShell Native Class header file (.hpp)",
         "body":
         [
-            "#pragma once" ,
+            "#pragma once" ,ls
             "" ,
             "#include <NativeClass.hpp>" ,
             "" ,

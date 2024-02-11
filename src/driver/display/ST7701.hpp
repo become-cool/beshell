@@ -20,7 +20,9 @@ private:
     void write9b(uint16_t data) ;
 
 public:
-    ST7701(JSContext * ctx) ;
+    ST7701(JSContext * ctx, JSValue jsobj=JS_NULL) ;
+    
+    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     static JSValue jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 

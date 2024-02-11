@@ -42,10 +42,25 @@ std::vector<JSCFunctionListEntry> Demo::methods = {
 Demo::Demo(JSContext * ctx, JSValue jsobj)
     : DemoBase(ctx, build(ctx,jsobj))
 {}
-
-
 JSValue Demo::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     auto obj = new Demo(ctx) ;
     obj->self = std::shared_ptr<Demo> (obj) ;
+    return obj->jsobj ;
+}
+
+// Demo -------------------
+DEFINE_NCLASS_META(DemoChild,Demo)
+std::vector<JSCFunctionListEntry> DemoChild::methods = {
+    JS_CFUNC_DEF("method2", 0, jsMethod2),
+    JS_CFUNC_DEF("method3", 0, jsMethod3),
+} ;
+
+
+DemoChild::DemoChild(JSContext * ctx, JSValue jsobj)
+    : Demo(ctx, build(ctx,jsobj))
+{}
+JSValue DemoChild::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    auto obj = new DemoChild(ctx) ;
+    obj->self = std::shared_ptr<DemoChild> (obj) ;
     return obj->jsobj ;
 }

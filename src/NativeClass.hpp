@@ -30,6 +30,9 @@
         return JS_NewObjectClass(ctx, CLASS::classID) ;             \
     }                                                               \
     JSValue CLASS::defineClass(JSContext * ctx) {                   \
+        if(PARENT_CLASS::classID==0) {                              \
+            PARENT_CLASS::defineClass(ctx) ;                        \
+        }                                                           \
         return NativeClass::defineClass(                            \
                 ctx,CLASS::classID,CLASS::className                 \
                 , CLASS::methods, CLASS::staticMethods              \
@@ -51,7 +54,6 @@ namespace be {
 
         static std::vector<JSCFunctionListEntry> methods ;
         static std::vector<JSCFunctionListEntry> staticMethods ;
-        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static void finalizer(JSRuntime *rt, JSValue val) ;
 
     protected :
@@ -79,6 +81,7 @@ namespace be {
                 , NClassFinalizerFunc finalizer=NativeClass::finalizer
                 , JSClassID parentClassID=0
         ) ;
+        static JSValue defineClass(JSContext * ctx);
     } ;
 
     

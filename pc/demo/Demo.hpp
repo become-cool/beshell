@@ -21,3 +21,12 @@ public:
     Demo(JSContext * ctx, JSValue jsobj=JS_NULL) ;
     static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 } ;
+
+class DemoChild: public Demo {
+  DECLARE_NCLASS_META
+  static std::vector<JSCFunctionListEntry> methods ;
+
+public:
+    DemoChild(JSContext * ctx, JSValue jsobj=JS_NULL) ;
+    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+} ;

@@ -66,13 +66,13 @@ namespace display {
 //     } flags;                             /*!< LCD RGB panel configuration flags */
 // } esp_lcd_rgb_panel_config_t;
 
-DEFINE_NCLASS_META(RGB565)
+DEFINE_NCLASS_META(RGB565, Display)
 std::vector<JSCFunctionListEntry> RGB565::methods = {
     JS_CFUNC_DEF("test", 0, RGB565::jsTest),
 } ;
 
-RGB565::RGB565(JSContext * ctx)
-    : NativeClass(ctx)
+RGB565::RGB565(JSContext * ctx, JSValue _jsobj)
+    : Display(ctx, build(ctx, _jsobj))
 {
     esp_lcd_rgb_panel_config_t panel_config ;
     memset(&panel_config, 0, sizeof(esp_lcd_rgb_panel_config_t)) ;
@@ -81,7 +81,7 @@ RGB565::RGB565(JSContext * ctx)
     panel_config.psram_trans_align = 64 ;
 
 // #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
-        // .bounce_buffer_size_px = 10 * LCD_WIDTH,
+    // panel_config.bounce_buffer_size_px = 10 * LCD_WIDTH,
 // #endif   
 
     panel_config.clk_src = LCD_CLK_SRC_DEFAULT;
@@ -111,7 +111,7 @@ RGB565::RGB565(JSContext * ctx)
     panel_config.data_gpio_nums[15] = GPIO_LCD_R4 ;
 
         // .timings = {
-    panel_config.timings.pclk_hz = 14 * 1000 * 1000;
+    panel_config.timings.pclk_hz = 5 * 1000 * 1000;
     panel_config.timings.h_res = LCD_WIDTH;
     panel_config.timings.v_res = LCD_HEIGHT;
     
@@ -127,7 +127,7 @@ RGB565::RGB565(JSContext * ctx)
         // },
     panel_config.flags.fb_in_psram = true; // allocate frame buffer in PSRAM
 // #if CONFIG_EXAMPLE_DOUBLE_FB
-    panel_config.flags.double_fb = true;   // allocate double frame buffer
+    // panel_config.flags.double_fb = true;   // allocate double frame buffer
 // #endif // CONFIG_EXAMPLE_DOUBLE_FB
     // };
     ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &handle));
@@ -144,17 +144,15 @@ RGB565::RGB565(JSContext * ctx)
 }
 
 
-void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,void  * pixels) {
-    assert(handle) ;
-    esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
-}
+    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,void  * pixels) {
+        assert(handle) ;
+        esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
+    }
 
 
     JSValue RGB565::jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-
-        
         dd;
-        RGB565 * disp = (RGB565*)fromJSObject(this_val) ;
+        RGB565 * disp = (RGB565*)fromJS(this_val) ;
         assert(disp) ;
 
         void * buff = malloc(100 * 100 * 2) ;
@@ -163,8 +161,12 @@ void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,void  * pixels
         esp_lcd_panel_draw_bitmap(disp->handle, 0, 0, 100, 100, (void *)buff);
 
         return JS_UNDEFINED ;
-
     }
 
+    JSValue RGB565::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        auto obj = new RGB565(ctx) ;
+        obj->self = std::shared_ptr<RGB565> (obj) ;
+        return obj->jsobj ;
+    }
 
 }}}

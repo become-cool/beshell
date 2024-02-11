@@ -2,17 +2,23 @@
 
 #include <NativeClass.hpp>
 
-class SPI: public be::NativeClass<SPI> {
-    DECLARE_NCLASS_META
-    static std::vector<JSCFunctionListEntry> methods ;
-    // static std::vector<JSCFunctionListEntry> staticMethods ;
+namespace be {
 
-private:
-    uint8_t busnum ;
+    class SPI: public NativeClass {
+        DECLARE_NCLASS_META
+        static std::vector<JSCFunctionListEntry> methods ;
+        // static std::vector<JSCFunctionListEntry> staticMethods ;
 
-public:
-    SPI(JSContext * ctx, uint8_t busnum=1) ;
+    private:
+        uint8_t busnum ;
 
-    static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+    public:
+        SPI(JSContext * ctx, JSValue jsobj=JS_NULL, uint8_t busnum=1) ;
 
-} ;
+        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+    } ;
+
+}

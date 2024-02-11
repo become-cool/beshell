@@ -9,7 +9,7 @@ namespace be {
 namespace driver {
 namespace display {
 
-DEFINE_NCLASS_META(ST7701)
+DEFINE_NCLASS_META(ST7701, RGB565)
 
     
 #define GPIO_LCD_RST    (GPIO_NUM_NC)
@@ -24,13 +24,18 @@ DEFINE_NCLASS_META(ST7701)
 #define LCD_SDA_Clr()   gpio_set_level(GPIO_LCD_SDA, 0)
 #define LCD_SDA_Set()   gpio_set_level(GPIO_LCD_SDA, 1)
 
-ST7701::ST7701(JSContext * ctx)
-    : RGB565(ctx)
+ST7701::ST7701(JSContext * ctx, JSValue _jsobj)
+    : RGB565(ctx, build(ctx, _jsobj))
 {
     initGPIO() ;
     initReg() ;
 }
 
+JSValue ST7701::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    auto obj = new ST7701(ctx) ;
+    obj->self = std::shared_ptr<ST7701> (obj) ;
+    return obj->jsobj ;
+}
 
 std::vector<JSCFunctionListEntry> ST7701::methods = {
     JS_CFUNC_DEF("test", 0, ST7701::jsTest),
@@ -38,9 +43,7 @@ std::vector<JSCFunctionListEntry> ST7701::methods = {
 
 JSValue ST7701::jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-    
-    dd;
-    ST7701 * disp = (ST7701*)fromJSObject(this_val) ;
+    ST7701 * disp = (ST7701*)fromJS(this_val) ;
     assert(disp) ;
 
     void * buff = malloc(100 * 100 * 2) ;

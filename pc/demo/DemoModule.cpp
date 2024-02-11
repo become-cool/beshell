@@ -4,8 +4,9 @@
 DemoModule::DemoModule(JSContext * ctx, const char * name)
     : NativeModule(ctx, name, 0)
 {
-    exportClass<DemoBase>() ;
+    // exportClass<DemoBase>() ;
     exportClass<Demo>() ;
+    exportClass<DemoChild>() ;
     exportFunction("func",jsFunc,0) ;
 }
 

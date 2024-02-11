@@ -11,7 +11,7 @@ namespace be {
 namespace driver {
 namespace display {
 
-class RGB565: public NativeClass<RGB565>, public Display {
+class RGB565: public Display {
     DECLARE_NCLASS_META
     static std::vector<JSCFunctionListEntry> methods ;
     // static std::vector<JSCFunctionListEntry> staticMethods ;
@@ -20,7 +20,9 @@ protected:
     esp_lcd_panel_handle_t handle = nullptr;
 
 public:
-    RGB565(JSContext * ctx) ;
+    RGB565(JSContext * ctx, JSValue jsobj=JS_NULL) ;
+    
+    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     void drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,void  * pixels) ;
 
