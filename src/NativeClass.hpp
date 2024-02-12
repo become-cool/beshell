@@ -42,6 +42,16 @@
             ) ;                                                     \
     }
 
+
+#define THIS_NCLASS(CLASS,var)                                      \
+    if( !be::NativeClass::instanceOf<CLASS>(ctx,this_val) ) {       \
+        THROW_EXCEPTION("invalid method")                           \
+    }                                                               \
+    CLASS * var = (CLASS *) fromJS(this_val) ;                      \
+    if(!var) {                                                      \
+        THROW_EXCEPTION("invalid method")                           \
+    }
+
 namespace be {
     
 	typedef JSValue (*NClassConstructorFunc)(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -82,6 +92,13 @@ namespace be {
                 , JSClassID parentClassID=0
         ) ;
         static JSValue defineClass(JSContext * ctx);
+
+        template <typename N>
+        inline static bool instanceOf(JSContext * ctx, JSValue jsobj) {
+            JSValue proto = JS_GetClassProto(ctx, N::classID);
+            JSValue cotr = JS_GetPropertyStr(ctx, proto, "constructor") ;
+            return JS_IsInstanceOf(ctx, jsobj, cotr) ;
+        }
     } ;
 
     

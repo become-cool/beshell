@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "esp_system.h"
 #else
 #include <stdio.h>
@@ -24,7 +24,7 @@ static void random_(uint8_t * data, size_t len) {
 
 
 void uuid_generate(uuid_t out) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
     esp_fill_random((uint8_t *)out, sizeof(uuid_t));
 #else
     random_((uint8_t *)out, sizeof(uuid_t));

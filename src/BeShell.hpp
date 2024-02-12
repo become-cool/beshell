@@ -7,15 +7,19 @@
 #include "fs/FS.hpp"
 #include "telnet/Telnet.hpp"
 
+#ifdef ESP_PLATFORM
+#include "lv/LV.hpp"
+#endif
+
 
 #define BESHELL_VERSION "0.3.0"
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
 
 
-
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #define MODULE_SERIAL
+#define MODULE_LV
 #endif
 
 
@@ -34,6 +38,9 @@ namespace be {
         FS * fs = nullptr ;
         Telnet * telnet = nullptr ;
         REPL * repl = nullptr ;
+#ifdef MODULE_LV
+        lv::LV * lv = nullptr ;
+#endif
 
         JSEngine * engine = nullptr ;
 
@@ -55,6 +62,9 @@ namespace be {
         void useREPL() ;
         
         void useSerial() ;
+#ifdef MODULE_LV
+        void useLV() ;
+#endif
     } ;
 
 }

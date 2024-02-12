@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 
 
 namespace be {

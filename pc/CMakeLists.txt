@@ -19,7 +19,7 @@ LINK_LIBRARIES(m)
 LINK_LIBRARIES(pthread)
 
 add_definitions(-g)
-add_definitions(-DPLATFORM_LINUX)
+add_definitions(-DLINUX_PLATFORM)
 add_definitions(-DMG_ENABLE_OPENSSL)
 # add_definitions(-DWIN32)
 # add_definitions(-DMG_ENABLE_LINES)

@@ -72,10 +72,10 @@ namespace be {
         JS_DupValue(ctx, jscotr) ;
         mapCtxClassID2Proto[ctx][classID] = jscotr ;
         
-        printf("classname: %s, classid: %d\n", className, classID) ;
+        // printf("classname: %s, classid: %d\n", className, classID) ;
 
         if(parentClassID>0) {
-            printf("classid: %d -> parentclassid: %d\n", classID, parentClassID) ;
+            // printf("classid: %d -> parentclassid: %d\n", classID, parentClassID) ;
             if(mapCtxClassID2Proto[ctx].count(parentClassID)>0) {
                 JSValue parent = mapCtxClassID2Proto[ctx][parentClassID] ;
                 JSValue parentProto = JS_GetPropertyStr(ctx,parent,"prototype") ;

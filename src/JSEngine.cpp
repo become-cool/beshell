@@ -10,7 +10,7 @@
 #include <iostream>
 #include <iomanip>
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "malloc_funcs.h"
 #endif
 
@@ -38,7 +38,7 @@ namespace be {
             return ;
         }
         
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         // // esp32 平台优先使用 PSRAM内存
         // if( getPsramTotal()>1024 ) {
         //     static const JSMallocFunctions def_malloc_funcs = {

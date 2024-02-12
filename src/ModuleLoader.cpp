@@ -125,6 +125,10 @@ namespace be {
         }        
     }
 
+    void ModuleLoader::add(const char * name, NativeModuleFactoryFunc factory) {
+        factories[name] = factory ;
+    }
+
     std::string ModuleLoader::resovleFS(FS * fs, const char * module_name, const char * base_dir) {
 
         assert(fs) ;

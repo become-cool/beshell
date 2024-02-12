@@ -310,7 +310,7 @@ namespace be {
         }
 
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         // esp32 vfs 读取目录时，忽略了挂载点，将已知挂载点补充上
         if(strcmp(path.c_str(),"/fs/")==0 || strcmp(path.c_str(),"/fs")==0) {
             if(detail) {
@@ -470,7 +470,7 @@ namespace be {
         size_t used = 0 ;
         // size_t free_ = 0 ;
 
-// #ifdef PLATFORM_ESP32
+// #ifdef ESP_PLATFORM
 //         if(strcmp(jslabel,"/home")==0){
 //             // littlefs
 //             if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {

@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "esp_heap_caps.h"
 #endif
 
@@ -28,7 +28,7 @@ uint64_t gettime_ns() {
 }
 
 inline void * mallocDMA(size_t size) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
     void * data = heap_caps_malloc(size, MALLOC_CAP_DMA) ;
 	// if(!data) {
 	// 	return heap_caps_malloc(size, MALLOC_CAP_SPIRAM) ;

@@ -33,50 +33,7 @@
         "}"
       ]
     },
-    "hppmodule":
-    {
-      "prefix": "hppmodule",
-      "description": "bemodule hpp",
-      "body":
-      [
-        "#pragma once",
-        "#include \"module/NativeModule.hpp\"",
-        "",
-        "namespace be {",
-        "    class ${TM_FILENAME_BASE}: public NativeModule {",
-        "    private:",
-        "    public:",
-        "        ${TM_FILENAME_BASE}() ;",
-        "        ",
-        "        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;",
-        "    } ;",
-        "}"
-      ]
-    },
-    "cppmodule":
-    {
-      "prefix": "cppmodule",
-      "description": "cppmodule",
-      "body":
-      [
-        "#include \"module/${TM_FILENAME_BASE}.hpp\"",
-        "",
-        "using namespace std ;",
-        "",
-        "namespace be {",
-        "    ${TM_FILENAME_BASE}::${TM_FILENAME_BASE}(): NativeModule(\"${TM_FILENAME_BASE}\") {",
-        "        isGlobal = false ;",
-        "        isReplGlobal = false ;",
-        "",
-        "        exportFunction(\"method\",jsMethod) ;",
-        "    }",
-        "    ",
-        "    JSValue ${TM_FILENAME_BASE}::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
-        "        return JS_UNDEFINED ;",
-        "    }",
-        "}"
-      ]
-    },
+    
     
     "nclass-hpp":
     {
@@ -84,25 +41,24 @@
         "description": "BeShell Native Class header file (.hpp)",
         "body":
         [
-            "#pragma once" ,ls
+            "#pragma once" ,
             "" ,
             "#include <NativeClass.hpp>" ,
             "" ,
-            "class ${TM_FILENAME_BASE}: public be::NativeClass<${TM_FILENAME_BASE}> {" ,
-            "  DECLARE_NCLASS_META" ,
-            "  static std::vector<JSCFunctionListEntry> methods ;" ,
-            "  // static std::vector<JSCFunctionListEntry> staticMethods ;" ,
+            "class ${TM_FILENAME_BASE}: public be::NativeClass {" ,
+            "    DECLARE_NCLASS_META" ,
+            "    static std::vector<JSCFunctionListEntry> methods ;" ,
+            "    // static std::vector<JSCFunctionListEntry> staticMethods ;" ,
             "" ,
             "public:",
             "    ${TM_FILENAME_BASE}(JSContext * ctx) ;" ,
             "" ,
+            "    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;"
             "    static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
             "" ,
             "} ;" ,
         ]
     },
-
-    
     "nclass-cpp":
     {
         "prefix": "nclasscpp",
@@ -113,7 +69,7 @@
             "" ,
             "using namespace std ;",
             "" ,
-            "DEFINE_NCLASS_META(${TM_FILENAME_BASE})",
+            "DEFINE_NCLASS_META(${TM_FILENAME_BASE}, NativeClass)",
             "std::vector<JSCFunctionListEntry> ${TM_FILENAME_BASE}::methods = {",
             "    JS_CFUNC_DEF(\"method\", 0, ${TM_FILENAME_BASE}::jsMethod),",
             "} ;",
@@ -123,12 +79,18 @@
             "{",
             "}",
             "" ,
+            "JSValue ${TM_FILENAME_BASE}::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {" ,
+            "    auto obj = new ${TM_FILENAME_BASE}(ctx) ;" ,
+            "    obj->self = std::shared_ptr<${TM_FILENAME_BASE}> (obj) ;" ,
+            "    return obj->jsobj ;" ,
+            "}" ,
+            "" ,
             "JSValue ${TM_FILENAME_BASE}::jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {",
             "    return JS_UNDEFINED ;",
             "}",
         ]
     }
-
+    
     , "nmodule-hpp":
     {
         "prefix": "nmodulehpp",
@@ -146,7 +108,9 @@
             "" ,
             "    \/\/ void import() ;" ,
             "" ,
-            "    inline static void use(be::BeShell & beshell) ;" ,
+            "    inline static void use(be::BeShell & beshell) {",
+            "        beshell.addModule<${TM_FILENAME_BASE}>(\"${TM_FILENAME_BASE/(.+)/${1:/downcase}/g}\") ;",
+            "    }" ,
             "" ,
             "    static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
             "} ;" ,
@@ -171,10 +135,6 @@
             "" ,
             "\/\/ void ${TM_FILENAME_BASE}::import() {",
             "\/\/ }",
-            "" ,
-            "void ${TM_FILENAME_BASE}::use(be::BeShell & beshell) {",
-            "    beshell.addModule<${TM_FILENAME_BASE}>(\"${TM_FILENAME_BASE/(.+)/${1:/downcase}/g}\") ;",
-            "}" ,
             "" ,
             "JSValue ${TM_FILENAME_BASE}::jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {" ,
             "    return JS_UNDEFINED ;" ,

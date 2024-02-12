@@ -30,6 +30,7 @@ namespace be {
         void add(const char * name=nullptr) {
             factories[name? name: M::name] = factory<M> ;
         }
+        void add(const char * name, NativeModuleFactoryFunc factory) ;
         
         void setup(JSContext * ctx) ;
 

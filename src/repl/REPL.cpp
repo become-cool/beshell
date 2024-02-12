@@ -11,7 +11,7 @@
 #include <iomanip>
 #include <sstream>
 #include <utime.h>
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "esp_system.h"
 #endif
 
@@ -202,7 +202,7 @@ namespace be {
             }
         }) ;
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         registerCommand("reboot", 
             "Usage: reboot"
         , [this](BeShell * beshell, TelnetChannel * ch, Options & args){

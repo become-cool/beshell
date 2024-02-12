@@ -5,7 +5,7 @@
 #include <cstring>
 #include <sys/select.h>
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 
 using namespace std ;
 

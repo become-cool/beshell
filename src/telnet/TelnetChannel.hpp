@@ -1,6 +1,6 @@
 #pragma once
 #include "Protocal.hpp"
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #endif
@@ -13,7 +13,7 @@ namespace be {
 
     class TelnetChannel {
     private:
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         SemaphoreHandle_t mutex;
 #endif
 

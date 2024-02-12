@@ -1,6 +1,7 @@
 #include "Demo.hpp"
 
 using namespace std ;
+using namespace be ;
 
 
 JSValue jsMethod1(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -13,6 +14,9 @@ JSValue jsMethod2(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst 
 }
 JSValue jsMethod3(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     cout << "method3" << endl ;
+    
+    cout << NativeClass::instanceOf<DemoBase>(ctx, argv[0]) << endl ;
+
     return JS_UNDEFINED ;
 }
 

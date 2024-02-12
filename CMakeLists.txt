@@ -12,6 +12,7 @@ list(APPEND src_dirs src/basic)
 list(APPEND src_dirs src/module)
 list(APPEND src_dirs src/module/serial)
 list(APPEND src_dirs src/driver/display)
+list(APPEND src_dirs src/lv)
 
 # # little fs
 list(APPEND src_dirs src/deps/littlefs/src)
@@ -61,6 +62,7 @@ idf_component_register(
             esp_netif
             esp_ringbuf
             esp_lcd
+            lvgl
             ${requires}
         EMBED_FILES fs-root.img
 )
@@ -71,7 +73,6 @@ add_definitions(-DMG_ENABLE_MBEDTLS)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
 
-add_definitions(-DPLATFORM_ESP32)
 add_definitions(-DGNUBOY_NO_MINIZIP)
 add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)

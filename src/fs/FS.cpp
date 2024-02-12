@@ -8,19 +8,19 @@
 #include "path.hpp"
 #include <unistd.h>
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "RawFS.hpp"
 extern const uint8_t fs_root_img_start[] asm("_binary_fs_root_img_start");
 extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #endif
 
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 #include <utime.h>
 #endif
 
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 #include <utime.h>
 #include <sys/types.h>
 #endif
@@ -79,13 +79,13 @@ namespace be {
 
 
     FS::FS() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         setPrefix("/fs") ;
 #else
 #endif
     }
     FS::~FS() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         for(auto it=partitions.begin(); it!=partitions.end(); ++it) {
             it->second->unmount() ;
             delete it->second ;
@@ -95,7 +95,7 @@ namespace be {
     }
 
     void FS::mount(const char * mountPoint, FSPartition * partition) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         string point = toVFSPath(mountPoint) ;
         partitions[point] = partition ;
         partition->mount(point.c_str()) ;
@@ -283,7 +283,7 @@ namespace be {
         }
         fclose(file);
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         struct utimbuf new_times;
         new_times.actime = time(NULL);
         new_times.modtime = time(NULL);
@@ -295,7 +295,7 @@ namespace be {
     }
 
     bool FS::setCwd(const std::string & path) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         pwd = trimVFSPath(path) ;
         path_normalize(pwd) ;
         return true ;
@@ -304,7 +304,7 @@ namespace be {
 #endif
     }
     std::string FS::cwd() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         return pwd ;
 #else
         char path[256] ;

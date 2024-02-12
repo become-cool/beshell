@@ -10,27 +10,27 @@ using namespace std ;
 namespace be {
     Telnet::Telnet(BeShell * _beshell)
         : beshell(_beshell)
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         , channelSeiral(this)
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         , channelStdIO(this)
 #endif
     {}
 
     void Telnet::setup() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         channelSeiral.setup() ;
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         channelStdIO.setup() ;
 #endif
     }
     void Telnet::loop() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         channelSeiral.loop() ;
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         channelStdIO.loop() ;
 #endif
     }
@@ -88,21 +88,21 @@ namespace be {
         Package pkg((uint8_t)pkgid,cmd,(uint8_t*)data,datalen) ;
         pkg.pack() ;
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         channelSeiral.send(pkg) ;
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         channelStdIO.send(data,datalen) ;
 #endif
     }
 
     TelnetChannel * Telnet::channel(const char * name) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         if(strcmp(name,"serial")==0){
             return & channelSeiral ;
         }
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         if(strcmp(name,"stdio")==0){
             return & channelStdIO ;
         }

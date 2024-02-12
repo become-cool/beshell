@@ -3,10 +3,10 @@
 #include <memory>
 
 #include "TelnetChannel.hpp"
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "TelnetSerial.hpp"
 #endif 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 #include "TelnetStdIO.hpp"
 #endif 
 
@@ -18,10 +18,10 @@ namespace be {
 
         BeShell * beshell ;
         
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         TelnetSerial channelSeiral ;
 #endif
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         TelnetStdIO channelStdIO ;
 #endif
 

@@ -16,7 +16,7 @@ namespace be {
     class FS {
     private:
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         map<std::string, FSPartition *> partitions;
         std::string pwd = "/" ;
 #endif

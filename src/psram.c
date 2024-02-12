@@ -73,7 +73,7 @@ void psram_init() {
 
 
 void echo_DMA(const char * where) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
     printf( "%s [Free DMA: %d]\n", where, heap_caps_get_free_size(MALLOC_CAP_DMA) ) ;
 #endif
 }

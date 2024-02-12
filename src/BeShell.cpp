@@ -6,12 +6,13 @@
 #include "qjs_utils.h"
 
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_vfs_fat.h"
 #include "esp_event_loop.h"
 
+#include "lv/LVModule.hpp"
 #include "module/serial/SerialModule.hpp"
 #endif
 
@@ -39,6 +40,9 @@ namespace be {
         DELETE_VAR(repl)
         DELETE_VAR(telnet)
         DELETE_VAR(engine)
+#ifdef MODULE_LV
+        DELETE_VAR(lv)
+#endif
     }
 
     void BeShell::useBasic() {
@@ -65,21 +69,37 @@ namespace be {
         repl = new REPL(this) ;
     }
     
-    #ifdef PLATFORM_ESP32
+    #ifdef MODULE_SERIAL
     void BeShell::useSerial() {
         SerialModule::use(*this) ;
     }
     #endif
 
+#ifdef MODULE_LV
+    void BeShell::useLV() {
+        if(lv) {
+            return ;
+        }
+        lv::LVModule::use(*this) ;
+        lv = new lv::LV ;
+    }
+#endif
+
     void BeShell::setup() {
 
-#ifdef PLATFORM_ESP32   
+#ifdef ESP_PLATFORM   
         ESP_ERROR_CHECK(esp_event_loop_create_default());
 #endif
 
         telnet->setup() ;
 
         engine->setup() ;
+
+#ifdef MODULE_LV
+        if(lv) {
+            lv->setup() ;
+        }
+#endif
     }
 
     void BeShell::loop() {
@@ -87,13 +107,19 @@ namespace be {
         telnet->loop() ;
 
         engine->loop() ;
+
+#ifdef MODULE_LV
+        if(lv) {
+            lv->loop() ;
+        }
+#endif
     }
 
     void BeShell::run() {
         while(1) {
             loop() ;
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
             vTaskDelay(1) ;
 #endif
         }

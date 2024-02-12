@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 
 #include "esp_system.h"
 #include "nvs_flash.h"
@@ -40,7 +40,7 @@
 
 #endif
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
 #define NVS_INT_GETTER(name,type,ctype)                             \
         bool NVSModule::read##name(const char * key, ctype & value, const char * ns) { \
             return false ;                                            \
@@ -81,7 +81,7 @@
 namespace be {
     
     void NVSModule::use(BeShell * beshell) {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         esp_err_t ret = nvs_flash_init();
         if(ret!=ESP_OK) {
             std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
@@ -182,7 +182,7 @@ namespace be {
     JSValue NVSModule::jsErase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         ARGV_TO_CSTRING(0,key)
         JSValue result = JS_FALSE;
         
@@ -197,14 +197,14 @@ namespace be {
         return result ;
 #endif
 
-#ifdef PLATFORM_LINUX
+#ifdef LINUX_PLATFORM
         return JS_FALSE ;
 #endif
 
     }
 
     void NVSModule::readOneTime(const char * key, uint8_t * value) const {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         NVS_OPEN("beshell", handle, {
             return ;
         })

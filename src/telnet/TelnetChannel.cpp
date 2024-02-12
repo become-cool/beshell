@@ -7,7 +7,7 @@ namespace be {
     TelnetChannel::TelnetChannel(Telnet * _telnet)
         : telnet(_telnet)
     {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         mutex  = xSemaphoreCreateMutex();
 #endif
     }
@@ -59,13 +59,13 @@ namespace be {
     }
     
     bool TelnetChannel::mutexTake() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         return xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE ;
 #endif
         return true ;
     }
     void TelnetChannel::mutexGive() {
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
         xSemaphoreGive(mutex);
 #endif
     }

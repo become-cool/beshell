@@ -4,13 +4,7 @@
 
 using namespace std ;
 
-namespace be {
-namespace driver {
-namespace display {
-
-#define LCD_WIDTH       (480)
-#define LCD_HEIGHT      (480)
-
+namespace be::driver::display {
 
 #define GPIO_LCD_DE     (GPIO_NUM_5)
 #define GPIO_LCD_VSYNC  (GPIO_NUM_6)
@@ -66,92 +60,98 @@ namespace display {
 //     } flags;                             /*!< LCD RGB panel configuration flags */
 // } esp_lcd_rgb_panel_config_t;
 
-DEFINE_NCLASS_META(RGB565, Display)
-std::vector<JSCFunctionListEntry> RGB565::methods = {
-    JS_CFUNC_DEF("test", 0, RGB565::jsTest),
-} ;
+    DEFINE_NCLASS_META(RGB565, Display)
+    std::vector<JSCFunctionListEntry> RGB565::methods = {
+        JS_CFUNC_DEF("test", 0, RGB565::jsTest),
+    } ;
 
-RGB565::RGB565(JSContext * ctx, JSValue _jsobj)
-    : Display(ctx, build(ctx, _jsobj))
-{
-    esp_lcd_rgb_panel_config_t panel_config ;
-    memset(&panel_config, 0, sizeof(esp_lcd_rgb_panel_config_t)) ;
+    RGB565::RGB565(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
+        : Display(ctx, build(ctx, _jsobj), width, height)
+    {
+        _width = 480 ;
+        _height = 480 ;
 
-    panel_config.data_width = 16 ; // RGB565 in parallel mode, thus 16bit in width
-    panel_config.psram_trans_align = 64 ;
+        esp_lcd_rgb_panel_config_t panel_config ;
+        memset(&panel_config, 0, sizeof(esp_lcd_rgb_panel_config_t)) ;
 
-// #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
-    // panel_config.bounce_buffer_size_px = 10 * LCD_WIDTH,
-// #endif   
+        panel_config.data_width = 16 ; // RGB565 in parallel mode, thus 16bit in width
+        panel_config.psram_trans_align = 64 ;
 
-    panel_config.clk_src = LCD_CLK_SRC_DEFAULT;
-    panel_config.disp_gpio_num = GPIO_NUM_NC;
-    panel_config.pclk_gpio_num = GPIO_LCD_PCLK;
-    panel_config.vsync_gpio_num = GPIO_LCD_VSYNC;
-    panel_config.hsync_gpio_num = GPIO_LCD_HSYNC;
-    panel_config.de_gpio_num = GPIO_LCD_DE;
+    // #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
+        // panel_config.bounce_buffer_size_px = 10 * LCD_WIDTH,
+    // #endif   
 
-    panel_config.data_gpio_nums[0] = GPIO_LCD_B0 ;
-    panel_config.data_gpio_nums[1] = GPIO_LCD_B1 ;
-    panel_config.data_gpio_nums[2] = GPIO_LCD_B2 ;
-    panel_config.data_gpio_nums[3] = GPIO_LCD_B3 ;
-    panel_config.data_gpio_nums[4] = GPIO_LCD_B4 ;
+        panel_config.clk_src = LCD_CLK_SRC_DEFAULT;
+        panel_config.disp_gpio_num = GPIO_NUM_NC;
+        panel_config.pclk_gpio_num = GPIO_LCD_PCLK;
+        panel_config.vsync_gpio_num = GPIO_LCD_VSYNC;
+        panel_config.hsync_gpio_num = GPIO_LCD_HSYNC;
+        panel_config.de_gpio_num = GPIO_LCD_DE;
 
-    panel_config.data_gpio_nums[5] = GPIO_LCD_G0 ;
-    panel_config.data_gpio_nums[6] = GPIO_LCD_G1 ;
-    panel_config.data_gpio_nums[7] = GPIO_LCD_G2 ;
-    panel_config.data_gpio_nums[8] = GPIO_LCD_G3 ;
-    panel_config.data_gpio_nums[9] = GPIO_LCD_G4 ;
-    panel_config.data_gpio_nums[10] = GPIO_LCD_G5 ;
+        panel_config.data_gpio_nums[0] = GPIO_LCD_B0 ;
+        panel_config.data_gpio_nums[1] = GPIO_LCD_B1 ;
+        panel_config.data_gpio_nums[2] = GPIO_LCD_B2 ;
+        panel_config.data_gpio_nums[3] = GPIO_LCD_B3 ;
+        panel_config.data_gpio_nums[4] = GPIO_LCD_B4 ;
 
-    panel_config.data_gpio_nums[11] = GPIO_LCD_R0 ;
-    panel_config.data_gpio_nums[12] = GPIO_LCD_R1 ;
-    panel_config.data_gpio_nums[13] = GPIO_LCD_R2 ;
-    panel_config.data_gpio_nums[14] = GPIO_LCD_R3 ;
-    panel_config.data_gpio_nums[15] = GPIO_LCD_R4 ;
+        panel_config.data_gpio_nums[5] = GPIO_LCD_G0 ;
+        panel_config.data_gpio_nums[6] = GPIO_LCD_G1 ;
+        panel_config.data_gpio_nums[7] = GPIO_LCD_G2 ;
+        panel_config.data_gpio_nums[8] = GPIO_LCD_G3 ;
+        panel_config.data_gpio_nums[9] = GPIO_LCD_G4 ;
+        panel_config.data_gpio_nums[10] = GPIO_LCD_G5 ;
 
-        // .timings = {
-    panel_config.timings.pclk_hz = 5 * 1000 * 1000;
-    panel_config.timings.h_res = LCD_WIDTH;
-    panel_config.timings.v_res = LCD_HEIGHT;
-    
-    // The following parameters should refer to LCD spec
-    panel_config.timings.hsync_back_porch = 50;
-    panel_config.timings.hsync_front_porch = 10;
-    panel_config.timings.hsync_pulse_width = 8;
-    panel_config.timings.vsync_back_porch = 20;// 20;
-    panel_config.timings.vsync_front_porch = 10;
-    panel_config.timings.vsync_pulse_width = 8;
-    panel_config.timings.flags.pclk_active_neg = false; // RGB data is clocked out on falling edge
-            // .flags.hsync_idle_low = true,
-        // },
-    panel_config.flags.fb_in_psram = true; // allocate frame buffer in PSRAM
-// #if CONFIG_EXAMPLE_DOUBLE_FB
-    // panel_config.flags.double_fb = true;   // allocate double frame buffer
-// #endif // CONFIG_EXAMPLE_DOUBLE_FB
-    // };
-    ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &handle));
+        panel_config.data_gpio_nums[11] = GPIO_LCD_R0 ;
+        panel_config.data_gpio_nums[12] = GPIO_LCD_R1 ;
+        panel_config.data_gpio_nums[13] = GPIO_LCD_R2 ;
+        panel_config.data_gpio_nums[14] = GPIO_LCD_R3 ;
+        panel_config.data_gpio_nums[15] = GPIO_LCD_R4 ;
 
-    /* Register event callbacks */
-    // esp_lcd_rgb_panel_event_callbacks_t cbs = {
-    //     .on_vsync = rgb_on_vsync_event,
-    // };
-    // ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(handle, &cbs, &disp_drv));
+            // .timings = {
+        panel_config.timings.pclk_hz = 14 * 1000 * 1000;
+        panel_config.timings.h_res = _width;
+        panel_config.timings.v_res = _height;
+        
+        // The following parameters should refer to LCD spec
+        panel_config.timings.hsync_back_porch = 50;
+        panel_config.timings.hsync_front_porch = 10;
+        panel_config.timings.hsync_pulse_width = 8;
+        panel_config.timings.vsync_back_porch = 20;
+        panel_config.timings.vsync_front_porch = 10;
+        panel_config.timings.vsync_pulse_width = 8;
+        panel_config.timings.flags.pclk_active_neg = false; // RGB data is clocked out on falling edge
+                // .flags.hsync_idle_low = true,
+            // },
+        panel_config.flags.fb_in_psram = true; // allocate frame buffer in PSRAM
+    // #if CONFIG_EXAMPLE_DOUBLE_FB
+        panel_config.flags.double_fb = true;   // allocate double frame buffer
+    // #endif // CONFIG_EXAMPLE_DOUBLE_FB
+        // };
+        ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &handle));
 
-    /* Initialize RGB LCD panel */
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_init(handle));
-}
+        /* Register event callbacks */
+        // esp_lcd_rgb_panel_event_callbacks_t cbs = {
+        //     .on_vsync = rgb_on_vsync_event,
+        // };
+        // ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(handle, &cbs, &disp_drv));
+
+        /* Initialize RGB LCD panel */
+        ESP_ERROR_CHECK(esp_lcd_panel_reset(handle));
+        ESP_ERROR_CHECK(esp_lcd_panel_init(handle));
+    }
+
+    // void RGB565::setup() {
+
+    // }
 
 
-    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,void  * pixels) {
+    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
         assert(handle) ;
         esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
     }
 
 
     JSValue RGB565::jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        dd;
         RGB565 * disp = (RGB565*)fromJS(this_val) ;
         assert(disp) ;
 
@@ -169,4 +169,9 @@ RGB565::RGB565(JSContext * ctx, JSValue _jsobj)
         return obj->jsobj ;
     }
 
-}}}
+    bool RGB565::createBuff() {
+        ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &buff1, &buff2));
+        lv_display_set_buffers(lv_display, buff1, buff2, _width*_height*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_PARTIAL);
+        return true ;
+    }
+}

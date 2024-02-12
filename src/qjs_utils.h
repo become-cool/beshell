@@ -257,7 +257,7 @@ void freeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 
 // SRAM优先于PSRAM
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #define HMALLOC(var, size) var = heap_caps_malloc(size, MALLOC_CAP_DMA); \
     if(!var) { var = heap_caps_malloc(size, MALLOC_CAP_SPIRAM); }
 #else
@@ -430,6 +430,7 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 
 #define JS_IsNone(jsval) (JS_IsUndefined(jsval)||JS_IsNull(jsval))
+
     
 #ifdef __cplusplus
 }
