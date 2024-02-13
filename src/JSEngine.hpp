@@ -1,6 +1,6 @@
 #pragma once
 
-#include "deps/quickjs/quickjs-libc.h"
+#include "quickjs/quickjs-libc.h"
 #include "telnet/Telnet.hpp"
 #include "JSTimer.hpp"
 #include "ModuleLoader.hpp"

@@ -4,7 +4,7 @@
 #include "debug.h"
 #include "esp_vfs.h"
 #include "esp_partition.h"
-#include "deps/littlefs/src/esp_littlefs.h"
+#include "littlefs/src/esp_littlefs.h"
 
 using namespace std ;
 

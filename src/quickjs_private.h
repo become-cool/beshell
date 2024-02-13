@@ -1,8 +1,8 @@
 #ifndef _QUICKJS_PRIVATE_H
 #define _QUICKJS_PRIVATE_H
 
-#include "deps/quickjs/cutils.h"
-#include "deps/quickjs/quickjs-libc.h"
+#include "quickjs/cutils.h"
+#include "quickjs/quickjs-libc.h"
 
 
 #ifdef __cplusplus

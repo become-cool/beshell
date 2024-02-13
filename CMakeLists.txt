@@ -1,25 +1,32 @@
 # project(beshll-component)
 cmake_minimum_required(VERSION 3.24)
 # 头文件目录
-set(include_dirs ./src)
+set(include_dirs
+        ./src
+        ./deps
+    )
 
 # 源码目录
-set(src_dirs src)
-list(APPEND src_dirs src/fs)
-list(APPEND src_dirs src/repl)
-list(APPEND src_dirs src/telnet)
-list(APPEND src_dirs src/basic)
-list(APPEND src_dirs src/module)
-list(APPEND src_dirs src/module/serial)
-list(APPEND src_dirs src/driver/display)
-list(APPEND src_dirs src/lv)
+file(GLOB_RECURSE src_beshell
+        src/*.c
+        src/*.cpp
+    )
 
-# # little fs
-list(APPEND src_dirs src/deps/littlefs/src)
-list(APPEND src_dirs src/deps/littlefs/src/littlefs)
+# little fs
+set(src_littlefs
+        deps/littlefs/src/esp_littlefs.c
+        deps/littlefs/src/littlefs_api.c
+        deps/littlefs/src/littlefs/lfs.c
+        deps/littlefs/src/littlefs/lfs_util.c
+    )
 
 # quickjs
-list(APPEND src_dirs src/deps/quickjs)
+file(GLOB_RECURSE src_quickjs deps/quickjs/*.c)
+
+# lvgl
+file(GLOB_RECURSE src_lvgl deps/lvgl/src/*.c)
+list(APPEND include_dirs deps/lvgl)
+list(APPEND include_dirs deps/lvgl/src)
 
 # # TinyUntar
 # list(APPEND include_dirs deps/TinyUntar/tinyuntar)
@@ -45,8 +52,13 @@ else ()
 endif ()
 
 idf_component_register(
-        SRC_DIRS
-            ${src_dirs}
+        SRCS
+            ${src_beshell}
+            ${src_quickjs}
+            ${src_littlefs}
+            ${src_lvgl}
+        # SRC_DIRS
+        #     ${src_dirs}
         INCLUDE_DIRS
             ${include_dirs}
         REQUIRES 
@@ -62,10 +74,13 @@ idf_component_register(
             esp_netif
             esp_ringbuf
             esp_lcd
-            lvgl
             ${requires}
         EMBED_FILES fs-root.img
 )
+
+# for lvgl
+add_definitions(-DLV_CONF_INCLUDE_SIMPLE)
+
 
 # # for mongoose tls/ssl
 add_definitions(-DMG_ENABLE_MBEDTLS)
