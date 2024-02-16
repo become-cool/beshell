@@ -12,7 +12,7 @@ namespace be::lv {
         JS_CGETSET_DEF("scaleY",Img::getScaleY,Img::setScaleY) ,
         JS_CGETSET_DEF("blendMode",Img::getBlendMode,Img::setBlendMode) ,
         JS_CGETSET_DEF("antialias",Img::getAntialias,Img::setAntialias) ,
-        JS_CGETSET_DEF("innerAlign",Img::getInnerAlign,Img::setInnerAlign) ,
+        JS_CGETSET_DEF("align",Img::getAlign,Img::setAlign) ,
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
@@ -34,7 +34,6 @@ namespace be::lv {
         // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
         // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
         // void lv_image_cache_drop(const void * src)
-        // void lv_image_header_cache_drop(const void * src)
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -185,32 +184,26 @@ namespace be::lv {
         lv_image_set_antialias(thisobj->lvobj(), antialias) ;
         return JS_UNDEFINED ;
     }
-    JSValue Img::getInnerAlign(JSContext *ctx, JSValueConst this_val){
+    JSValue Img::getAlign(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
-        lv_image_align_t value = lv_image_get_inner_align(thisobj->lvobj()) ;
+        lv_image_align_t value = lv_image_get_align(thisobj->lvobj()) ;
         JSValue retval = lv_image_align_const_to_jsstr(ctx, value) ;
         return retval ;
     }
-    JSValue Img::setInnerAlign(JSContext *ctx, JSValueConst this_val, JSValueConst val){
+    JSValue Img::setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Img,thisobj)
-        // argv innerAlign
+        // argv align
         const char * cstr_val = JS_ToCString(ctx, val) ;
-        lv_image_align_t innerAlign;
-        if(lv_image_align_str_to_const(cstr_val,&innerAlign)) {
+        lv_image_align_t align;
+        if(lv_image_align_str_to_const(cstr_val,&align)) {
             JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_image_align_t",cstr_val) ;
             JS_FreeCString(ctx, cstr_val) ;
             return JS_EXCEPTION ;
         }
         JS_FreeCString(ctx, cstr_val) ;
-        lv_image_set_inner_align(thisobj->lvobj(), innerAlign) ;
+        lv_image_set_align(thisobj->lvobj(), align) ;
         return JS_UNDEFINED ;
     }
-    // unspported type: const lv_image_dsc_t *
-    // JSValue Img::getBitmapMapSrc(JSContext *ctx, JSValueConst this_val){}
-    // const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
-    // unspported type: const lv_image_dsc_t *
-    // JSValue Img::setBitmapMapSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
-    // void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
 
 // AUTO GENERATE CODE END [GETSETS] --------
 
@@ -265,9 +258,6 @@ namespace be::lv {
 
         // Unsupported arg type: const void *
         // void lv_image_cache_drop(const void * src)
-
-        // Unsupported arg type: const void *
-        // void lv_image_header_cache_drop(const void * src)
 
 // AUTO GENERATE CODE END [METHODS] --------
 

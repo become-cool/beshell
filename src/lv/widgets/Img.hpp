@@ -33,8 +33,8 @@ namespace be::lv {
         static JSValue setBlendMode(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getAntialias(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setAntialias(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-        static JSValue getInnerAlign(JSContext *ctx, JSValueConst this_val) ;
-        static JSValue setInnerAlign(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
+        static JSValue getAlign(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
 
 // AUTO GENERATE CODE END [GETSETS] --------
 
@@ -56,7 +56,6 @@ namespace be::lv {
         static JSValue jsDecoderAddToCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsDecoderPostProcess(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsCacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsHeaderCacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 // AUTO GENERATE CODE END [METHODS] --------
     } ;

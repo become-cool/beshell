@@ -450,12 +450,6 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"-finish")==0) {
         (*out) = LV_EVENT_FLUSH_FINISH ;
     }
-    else if(strcmp(name,"-wait-start")==0) {
-        (*out) = LV_EVENT_FLUSH_WAIT_START ;
-    }
-    else if(strcmp(name,"-wait-finish")==0) {
-        (*out) = LV_EVENT_FLUSH_WAIT_FINISH ;
-    }
     else if(strcmp(name,"")==0) {
         (*out) = LV_EVENT_VSYNC ;
     }
@@ -537,8 +531,6 @@ const char * lv_event_code_const_to_str(lv_event_code_t code) {
         case LV_EVENT_RENDER_READY: return "r-ready";
         case LV_EVENT_FLUSH_START: return "-start";
         case LV_EVENT_FLUSH_FINISH: return "-finish";
-        case LV_EVENT_FLUSH_WAIT_START: return "-wait-start";
-        case LV_EVENT_FLUSH_WAIT_FINISH: return "-wait-finish";
         case LV_EVENT_VSYNC: return "";
         case _LV_EVENT_LAST: return "";
         case LV_EVENT_PREPROCESS: return "ocess";
@@ -869,9 +861,6 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"form-skew-y")==0) {
         (*out) = LV_STYLE_TRANSFORM_SKEW_Y ;
     }
-    else if(strcmp(name,"p-mask-src")==0) {
-        (*out) = LV_STYLE_BITMAP_MASK_SRC ;
-    }
     else if(strcmp(name,"flow")==0) {
         (*out) = LV_STYLE_FLEX_FLOW ;
     }
@@ -1038,7 +1027,6 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_TRANSFORM_PIVOT_Y: return "form-pivot-y";
         case LV_STYLE_TRANSFORM_SKEW_X: return "form-skew-x";
         case LV_STYLE_TRANSFORM_SKEW_Y: return "form-skew-y";
-        case LV_STYLE_BITMAP_MASK_SRC: return "p-mask-src";
         case LV_STYLE_FLEX_FLOW: return "flow";
         case LV_STYLE_FLEX_MAIN_PLACE: return "main-place";
         case LV_STYLE_FLEX_CROSS_PLACE: return "cross-place";
