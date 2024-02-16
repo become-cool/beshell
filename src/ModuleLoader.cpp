@@ -29,7 +29,7 @@ namespace be {
             int32_t stack = 1 ;
             if(argc>0) {
                 if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
-                    THROW_EXCEPTION("argv stack must be a number")
+                    JSTHROW("argv stack must be a number")
                 }
             }
             JSAtom atom = JS_GetScriptOrModuleName(ctx, stack) ;
@@ -50,7 +50,7 @@ namespace be {
             int32_t stack = 1 ;
             if(argc>0) {
                 if(JS_ToInt32(ctx, &stack, argv[0])!=0) {
-                    THROW_EXCEPTION("argv stack must be a number")
+                    JSTHROW("argv stack must be a number")
                 }
             }
 

@@ -255,12 +255,12 @@ static JSValue js_gameplayer_test_rom(JSContext *ctx, JSValueConst this_val, int
     CHECK_ARGC(1)
     char * rompath = js_arg_to_vfspath(ctx, argv[0]) ;
     if(!rompath) {
-        THROW_EXCEPTION("invalid rom path")
+        JSTHROW("invalid rom path")
     }
 
     if(!player_nofrendo_read_rom(rompath)) {
         free(rompath) ;
-        THROW_EXCEPTION("can not open rom")
+        JSTHROW("can not open rom")
     }
 
     // ds(rompath)

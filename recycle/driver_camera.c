@@ -45,12 +45,12 @@ UXGA    1600 x 1200
 static JSValue js_camera_setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
     if(inited) {
-        THROW_EXCEPTION("camera device has setuped.")
+        JSTHROW("camera device has setuped.")
     }
 
     CHECK_ARGC(1)
     if( !JS_IsObject(argv[0]) ) {
-        THROW_EXCEPTION("setup param must be a object")
+        JSTHROW("setup param must be a object")
     }
     
     camera_config_t config ;
@@ -100,7 +100,7 @@ static JSValue js_camera_setup(JSContext *ctx, JSValueConst this_val, int argc, 
             config.pixel_format = PIXFORMAT_GRAYSCALE ;
         }
         else {
-            THROW_EXCEPTION("unknow options.format value")
+            JSTHROW("unknow options.format value")
         }
         JS_FreeCString(ctx, cformat) ;
     }
@@ -136,7 +136,7 @@ static JSValue js_camera_setup(JSContext *ctx, JSValueConst this_val, int argc, 
             config.frame_size = FRAMESIZE_UXGA ;
         }
         else {
-            THROW_EXCEPTION("unknow options.size value")
+            JSTHROW("unknow options.size value")
         }
         JS_FreeCString(ctx, csize) ;
     }
@@ -146,7 +146,7 @@ static JSValue js_camera_setup(JSContext *ctx, JSValueConst this_val, int argc, 
 
     esp_err_t err = esp_camera_init(&config);
     if (err != ESP_OK) {
-        THROW_EXCEPTION("Camera Init Failed, %s (%d)", esp_err_to_name(err), err)
+        JSTHROW("Camera Init Failed, %s (%d)", esp_err_to_name(err), err)
     }
 
     inited = true ;
@@ -338,7 +338,7 @@ static JSValue js_camera_start_tcp_stream(JSContext *ctx, JSValueConst this_val,
     ARGV_TO_CSTRING_E(0, url, "invalid url")
     
     if(task_cam_tcp_handle) {
-        THROW_EXCEPTION("camera tcp stream has started.\n")
+        JSTHROW("camera tcp stream has started.\n")
     }
 
     // mg_listen(be_module_mg_mgr(), url, camera_tcp_stream, NULL);
@@ -352,7 +352,7 @@ static JSValue js_camera_start_tcp_stream(JSContext *ctx, JSValueConst this_val,
 
 static JSValue js_camera_unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
     if(!inited) {
-        THROW_EXCEPTION("camera device not setup yet.")
+        JSTHROW("camera device not setup yet.")
     }
     if(esp_camera_deinit()==ESP_OK) {
         inited = false ;
@@ -367,7 +367,7 @@ static JSValue js_camera_capture(JSContext *ctx, JSValueConst this_val, int argc
     CHECK_ARGC(0)
     
     if(!inited) {
-        THROW_EXCEPTION("camera device not setup yet.")
+        JSTHROW("camera device not setup yet.")
     }
 
     camera_fb_t * fb = esp_camera_fb_get();
@@ -378,7 +378,7 @@ static JSValue js_camera_capture(JSContext *ctx, JSValueConst this_val, int argc
     uint8_t * buff = malloc(fb->len) ;
     if(!buff) {
         esp_camera_fb_return(fb);
-        THROW_EXCEPTION("out of memory") ;
+        JSTHROW("out of memory") ;
     }
     memcpy(buff, fb->buf, fb->len) ;
     JSValue arrbuff = JS_NewArrayBuffer(ctx, buff, fb->len, freeArrayBuffer, NULL, false) ;
@@ -400,7 +400,7 @@ static JSValue js_camera_jpeg2rgb888(JSContext *ctx, JSValueConst this_val, int 
     // int width = 0;
     // int height = 0;
     // if( JS_ToInt32(ctx, &width, propWidth)!=0 || JS_ToInt32(ctx, &height, propHeight)!=0 ){
-    //     THROW_EXCEPTION("arg frame is not a valid frame object, missing width or height property.")
+    //     JSTHROW("arg frame is not a valid frame object, missing width or height property.")
     // }
     // dn2(width, height)
 

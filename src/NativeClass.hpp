@@ -10,47 +10,59 @@
 #include <string.h>
 #include "qjs_utils.h"
 
-#define DECLARE_NCLASS_META                                         \
-    public:                                                         \
-        static const char * className ;                             \
-        JSValue build(JSContext * ctx, JSValue jsobj=JS_NULL) ;     \
-        static JSValue defineClass(JSContext * ctx) ;               \
-    protected:                                                      \
-        static JSClassID classID ;                                  \
+#define DECLARE_NCLASS_META                                             \
+    public:                                                             \
+        static const char * className ;                                 \
+        static JSValue build(JSContext * ctx, JSValue jsobj=JS_NULL) ;  \
+        static JSValue defineClass(JSContext * ctx) ;                   \
+    protected:                                                          \
+        static JSClassID classID ;                                      \
     friend class NativeClass ;
 
-#define DEFINE_NCLASS_META(CLASS,PARENT_CLASS)                      \
-    const char * CLASS::className = #CLASS ;                        \
-    JSClassID CLASS::classID = 0 ;                                  \
-    JSValue CLASS::build(JSContext * ctx, JSValue jsobj) {          \
-        if(!JS_IsNull(jsobj)) {                                     \
-            return jsobj ;                                          \
-        }                                                           \
-        CLASS::defineClass(ctx) ;                                   \
-        return JS_NewObjectClass(ctx, CLASS::classID) ;             \
-    }                                                               \
-    JSValue CLASS::defineClass(JSContext * ctx) {                   \
-        if(PARENT_CLASS::classID==0) {                              \
-            PARENT_CLASS::defineClass(ctx) ;                        \
-        }                                                           \
-        return NativeClass::defineClass(                            \
-                ctx,CLASS::classID,CLASS::className                 \
-                , CLASS::methods, CLASS::staticMethods              \
-                , CLASS::constructor                                \
-                , CLASS::finalizer                                  \
-                , PARENT_CLASS::classID                             \
-            ) ;                                                     \
+#define DEFINE_NCLASS_META(CLASS,PARENT_CLASS)                          \
+    const char * CLASS::className = #CLASS ;                            \
+    JSClassID CLASS::classID = 0 ;                                      \
+    JSValue CLASS::build(JSContext * ctx, JSValue jsobj) {              \
+        if(!JS_IsNull(jsobj)) {                                         \
+            return jsobj ;                                              \
+        }                                                               \
+        CLASS::defineClass(ctx) ;                                       \
+        return JS_NewObjectClass(ctx, CLASS::classID) ;                 \
+    }                                                                   \
+    JSValue CLASS::defineClass(JSContext * ctx) {                       \
+        if(PARENT_CLASS::classID==0) {                                  \
+            PARENT_CLASS::defineClass(ctx) ;                            \
+        }                                                               \
+        return NativeClass::defineClass(                                \
+                ctx,CLASS::classID,CLASS::className                     \
+                , CLASS::methods, CLASS::staticMethods                  \
+                , CLASS::constructor                                    \
+                , CLASS::finalizer                                      \
+                , PARENT_CLASS::classID                                 \
+            ) ;                                                         \
     }
 
 
-#define THIS_NCLASS(CLASS,var)                                      \
-    if( !be::NativeClass::instanceOf<CLASS>(ctx,this_val) ) {       \
-        THROW_EXCEPTION("invalid method")                           \
-    }                                                               \
-    CLASS * var = (CLASS *) fromJS(this_val) ;                      \
-    if(!var) {                                                      \
-        THROW_EXCEPTION("invalid method")                           \
+#define CHECK_NCLASS_ARGV(CLASS,jsval)                                  \
+    if( !be::NativeClass::instanceOf<CLASS>(ctx,jsval) ) {              \
+        JSTHROW("value is not a %s object", #CLASS)                     \
     }
+
+#define JSVALUE_TO_NCLASS(CLASS, jsval, var)                            \
+    CHECK_NCLASS_ARGV(CLASS,jsval)                                      \
+    CLASS * var = (CLASS *) be::NativeClass::fromJS(jsval) ;            \
+    if(!var) {                                                          \
+        JSTHROW("invalid native pointer")                               \
+    }
+#define JSVALUE_TO_NCLASS_VAR(CLASS, jsval, var)                        \
+    CHECK_NCLASS_ARGV(CLASS,jsval)                                      \
+    var = (CLASS *) be::NativeClass::fromJS(jsval) ;                    \
+    if(!var) {                                                          \
+        JSTHROW("invalid native pointer")                               \
+    }
+
+#define THIS_NCLASS(CLASS,var)                                          \
+    JSVALUE_TO_NCLASS(CLASS,this_val,var)
 
 namespace be {
     

@@ -96,11 +96,11 @@ namespace be {
         CHECK_ARGC(2)
 
         if(!JS_IsFunction(ctx, argv[0])) {
-            THROW_EXCEPTION("arg callback is not a function")
+            JSTHROW("arg callback is not a function")
         }
         uint32_t interval ;
         if(JS_ToUint32(ctx, &interval, argv[1]) ) {
-            THROW_EXCEPTION("Invalid param type")
+            JSTHROW("Invalid param type")
         }
 
         JSTimerEvent * event = engine->timer.setTimer(
@@ -122,7 +122,7 @@ namespace be {
         CHECK_ENGINE
         CHECK_ARGC(1)
         if(!JS_IsFunction(ctx, argv[0])) {
-            THROW_EXCEPTION("arg callback is not a function")
+            JSTHROW("arg callback is not a function")
         }
 
         JSTimerEvent * event = engine->timer.setTimer(

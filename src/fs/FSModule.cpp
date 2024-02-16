@@ -35,7 +35,7 @@ namespace be {
     #define FETCH_FS                                                \
             FS * fs = JSEngine::fromJSContext(ctx)->beshell->fs ;   \
             if(!fs) {                                               \
-                THROW_EXCEPTION("call BeShell::USE_FS() first")     \
+                JSTHROW("call BeShell::USE_FS() first")     \
             }
     #define ARGV_PATH(var, i)                                       \
             string var ;                                            \
@@ -154,14 +154,14 @@ namespace be {
         char * buff = (char *)malloc((int)readlen) ;
 
         if(!buff) {
-            THROW_EXCEPTION("Failed to malloc buff");
+            JSTHROW("Failed to malloc buff");
         }
 
         FILE * fd = fopen(path.c_str(), "r");
 
         if(NULL==fd) {
             free(buff) ;
-            THROW_EXCEPTION("Failed to open file (%d).", errno);
+            JSTHROW("Failed to open file (%d).", errno);
         }
         if(offset>0) {
             fseek(fd, offset, SEEK_SET) ;
@@ -475,7 +475,7 @@ namespace be {
 //             // littlefs
 //             if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {
 //                 JS_FreeCString(ctx, jslabel) ;
-//                 THROW_EXCEPTION("esp_littlefs_info() bad")
+//                 JSTHROW("esp_littlefs_info() bad")
 //             }
 
 //             // fatfs

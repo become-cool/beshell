@@ -16,7 +16,9 @@ namespace lv {
 
         static void use(be::BeShell & beshell) ;
 
-        static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue loadScreen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     } ;
 

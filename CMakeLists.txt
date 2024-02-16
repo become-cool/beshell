@@ -75,7 +75,7 @@ idf_component_register(
             esp_ringbuf
             esp_lcd
             ${requires}
-        EMBED_FILES fs-root.img
+        #EMBED_FILES fs-root.img
 )
 
 # for lvgl

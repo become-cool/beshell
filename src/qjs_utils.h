@@ -16,28 +16,23 @@ extern "C" {
 #define VAR_REFCNT(var) ((JSRefCountHeader *)JS_VALUE_GET_PTR(var))->ref_count
 #define P_VAR_REFCNT(var) printf(#var" ref count:%d @%d\n", VAR_REFCNT(var), __LINE__) ;
 
-#define THROW_EXCEPTION(...)                                \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);               \
+#define JSTHROW(...)                                \
+    JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
     return JS_EXCEPTION ;
 
 
-#define THROW_GOTO(label, ...)                              \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);               \
+#define JSTHROW_GOTO(label, ...)                    \
+    JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
     goto label ;
 
-#define THROW_EXCEPTION_FREE(exec, ...)                     \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);               \
-    exec                                                    \
-    return JS_EXCEPTION ;
-
-#define CHECK_ARGC(num)                                     \
-    if(argc<num) {                                          \
-        THROW_EXCEPTION("Missing param")                    \
+#define CHECK_ARGC(num)                             \
+    if(argc<num) {                                  \
+        JSTHROW("Missing param")                    \
     }
 
-#define ARGV_TO_INT_VAR(i, var, api)                        \
-	if( api(ctx, &var, argv[i])!=0 ) {                      \
-        THROW_EXCEPTION("Invalid param type")               \
+#define ARGV_TO_INT_VAR(i, var, api)                \
+	if( api(ctx, &var, argv[i])!=0 ) {              \
+        JSTHROW("Invalid param type")               \
 	}
 #define  ARGV_TO_UINT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32)
 #define   ARGV_TO_INT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToInt32)
@@ -52,7 +47,7 @@ extern "C" {
 #define ARGV_TO_INT_VAR_OPT(i, var, api)            \
     if( i<argc ) {                                  \
         if( api(ctx, &var, argv[i])!=0 ) {          \
-            THROW_EXCEPTION("Invalid param type")   \
+            JSTHROW("Invalid param type")           \
         }                                           \
     }
 #define  ARGV_TO_UINT8_VAR_OPT(i,var)   ARGV_TO_INT_VAR_OPT(i, var, JS_ToUint32)
@@ -71,7 +66,7 @@ extern "C" {
     }                                               \
     else {                                          \
         if( api(ctx, &var, argv[i])!=0 ) {          \
-            THROW_EXCEPTION("Invalid param type")   \
+            JSTHROW("Invalid param type")   \
         }                                           \
     }
 	      
@@ -90,7 +85,7 @@ extern "C" {
     {                                                       \
         tmp_type tmp ;                                      \
         if( api(ctx, &tmp, argv[i])!=0 ) {                  \
-            THROW_EXCEPTION("Invalid param type")           \
+            JSTHROW("Invalid param type")           \
         }                                                   \
         var = (ctype)tmp ;                                  \
     }
@@ -109,7 +104,7 @@ extern "C" {
 	ctype var = def ;                               \
     if( i<argc ) {                                  \
         if( api(ctx, &var, argv[i])!=0 ) {          \
-            THROW_EXCEPTION("Invalid param type")   \
+            JSTHROW("Invalid param type")   \
         }                                           \
     }
 
@@ -128,7 +123,7 @@ extern "C" {
     const char * var = JS_ToCStringLen(ctx, &len, argv[i]) ;
 #define ARGV_TO_STRING_LEN_E(i, var, len, msg)              \
     if(!JS_IsString(argv[i])) {                             \
-        THROW_EXCEPTION(msg)                                \
+        JSTHROW(msg)                                \
     }                                                       \
     ARGV_TO_STRING_LEN(i, var, len)
 
@@ -148,7 +143,7 @@ extern "C" {
 #define ARGV_AS_CSTRING_E(i, var, msg)                       \
     var = NULL ;                                            \
     if(!JS_IsString(argv[i])) {                             \
-        THROW_EXCEPTION(msg)                                \
+        JSTHROW(msg)                                \
     }                                                       \
     var = JS_ToCString(ctx, argv[i]) ;
 #define ARGV_TO_CSTRING_E(i, var, msg)  const char * ARGV_AS_STRING_E(i, var, msg)
@@ -165,7 +160,7 @@ extern "C" {
     size_t varlen = 0;                                                              \
     uint8_t * var = (uint8_t *)JS_GetArrayBuffer(ctx, &varlen, argv[i]) ;           \
     if(!var) {                                                                      \
-        THROW_EXCEPTION("argv is not a ArrayBuffer")                                \
+        JSTHROW("argv is not a ArrayBuffer")                                \
     }
 
 
@@ -173,7 +168,7 @@ extern "C" {
     {                                       \
         esp_err_t res = func_invoke ;       \
         if( res != ESP_OK ) {               \
-            THROW_EXCEPTION(#func_invoke " failed, err: %d", res)   \
+            JSTHROW(#func_invoke " failed, err: %d", res)   \
         }                                   \
     }
 
@@ -290,7 +285,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         else {                                                                          \
             if( !JS_IsNumber(jsvar) ) {                                                 \
                 JS_FreeValue(ctx, jsvar) ;                                              \
-                THROW_EXCEPTION(ctx, "property %s is not a number", propName) ;         \
+                JSTHROW(ctx, "property %s is not a number", propName) ;         \
             }                                                                           \
             JS_ToInt32(ctx, &cvar, jsvar) ;                                             \
         }                                                                               \
@@ -302,7 +297,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         if( !JS_IsUndefined(jsvar) ) {                                                     \
             if( !JS_IsNumber(jsvar) ) {                                                 \
                 JS_FreeValue(ctx, jsvar) ;                                              \
-                THROW_EXCEPTION(ctx, "property %s is not a number", propName) ;         \
+                JSTHROW(ctx, "property %s is not a number", propName) ;         \
             }                                                                           \
             JS_ToInt32(ctx, &cvar, jsvar) ;                                             \
         }                                                                               \
@@ -319,7 +314,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         else {                                                                          \
             if( !JS_IsNumber(jsvar) ) {                                                 \
                 JS_FreeValue(ctx, jsvar) ;                                              \
-                THROW_EXCEPTION(ctx, "property %s is not a number", propName) ;         \
+                JSTHROW(ctx, "property %s is not a number", propName) ;         \
             }                                                                           \
             tmptype tmp = 0 ;                                                           \
             getter(ctx, &tmp, jsvar) ;                                                  \
@@ -337,7 +332,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
         if( !JS_IsNumber(jsvar) ) {                                                     \
             JS_FreeValue(ctx, jsvar) ;                                                  \
-            THROW_EXCEPTION(ctx, "property %s is not a number", propName) ;             \
+            JSTHROW(ctx, "property %s is not a number", propName) ;             \
         }                                                                               \
         getter(ctx, (ctype *) &cvar, jsvar) ;                                           \
     }
@@ -384,7 +379,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     }
 
 #define ASSIGN_STR_PROP_E(obj, propName, cvar, err_msg)                                 \
-    ASSIGN_STR_PROP_C( obj, propName, cvar, THROW_EXCEPTION(err_msg))
+    ASSIGN_STR_PROP_C( obj, propName, cvar, JSTHROW(err_msg))
 
 
 #define ASSIGN_BOOL_PROP(obj, propName, cvar)                                           \

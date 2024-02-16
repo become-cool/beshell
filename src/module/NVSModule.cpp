@@ -72,7 +72,7 @@
         ctype value = 0 ;                                               \
         if(JS_To##jstype(ctx, (apitype*)&value, argv[1])!=0) {          \
             JS_FreeCString(ctx, key) ;                                  \
-            THROW_EXCEPTION("arg %s is not a number", "value")          \
+            JSTHROW("arg %s is not a number", "value")          \
         }                                                               \
         return write##name(key, value, "beshell")? JS_TRUE: JS_FALSE ;  \
     }

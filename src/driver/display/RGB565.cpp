@@ -150,7 +150,6 @@ namespace be::driver::display {
         esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
     }
 
-
     JSValue RGB565::jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         RGB565 * disp = (RGB565*)fromJS(this_val) ;
         assert(disp) ;
@@ -171,7 +170,7 @@ namespace be::driver::display {
 
     bool RGB565::createBuff() {
         ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &buff1, &buff2));
-        lv_display_set_buffers(lv_display, buff1, buff2, _width*_height*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_PARTIAL);
+        lv_display_set_buffers(lv_display, buff1, buff2, _width*_height*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_FULL);
         return true ;
     }
 }

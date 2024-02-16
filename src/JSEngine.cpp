@@ -193,13 +193,13 @@ namespace be {
     JSValue JSEngine::evalScript(const char * filepath, int flags) {
         assert(beshell) ;
         if( !beshell->fs ) {
-            THROW_EXCEPTION("call useFS() first()")
+            JSTHROW("call useFS() first()")
         }
 
         int readed ;
         unique_ptr<char> content = beshell->fs->readFileSync(filepath,&readed) ;
         if(readed<0) {
-            THROW_EXCEPTION("read file failed")
+            JSTHROW("read file failed")
         }
 
         string code(content.get(), readed) ;

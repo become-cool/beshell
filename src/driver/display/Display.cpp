@@ -35,7 +35,7 @@ namespace be::driver::display {
     JSValue Display::jsDrawRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         Display * disp = (Display *)fromJS(this_val) ;
         if(!disp) {
-            THROW_EXCEPTION("not a valid object")
+            JSTHROW("not a valid object")
         }
         CHECK_ARGC(5)
         ARGV_TO_INT16(0,x1)
@@ -49,7 +49,7 @@ namespace be::driver::display {
         size_t size = w*h ;
         uint16_t * buff = new uint16_t[size] ;
         if(!buff) {
-            THROW_EXCEPTION("out of memory?")
+            JSTHROW("out of memory?")
         }
 
         std::fill_n(buff, size, color);
@@ -119,7 +119,7 @@ namespace be::driver::display {
     JSValue Display::jsRegisterToLV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Display,thisobj)
         if(!thisobj->registerToLV()){
-            THROW_EXCEPTION("out of memory?")
+            JSTHROW("out of memory?")
         }
         return JS_UNDEFINED ;
     }
