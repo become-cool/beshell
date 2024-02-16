@@ -1,0 +1,3 @@
+[submodule "deps/lvgl"]
+	path = deps/lvgl
+	url = https://gitee.com/aleeshadow/lvgl-mirro.git
