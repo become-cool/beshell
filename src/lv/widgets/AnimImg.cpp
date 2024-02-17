@@ -7,18 +7,20 @@ namespace be::lv {
         JS_CGETSET_DEF("duration",AnimImg::getDuration,AnimImg::setDuration) ,
         JS_CGETSET_DEF("repeatCount",AnimImg::getRepeatCount,AnimImg::setRepeatCount) ,
         JS_CGETSET_DEF("srcCount",AnimImg::getSrcCount,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("start", 0, AnimImg::jsStart),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     AnimImg::AnimImg(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, AnimImg::build(ctx,jsobj), lvobj)
     {}
 
     AnimImg::AnimImg(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_animimg_create(parent))
+        : AnimImg(ctx, JS_NULL, lv_animimg_create(parent))
     {}
         
     JSValue AnimImg::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -70,6 +72,7 @@ namespace be::lv {
         JSValue retval = JS_NewUint32(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -78,6 +81,7 @@ namespace be::lv {
             lv_animimg_start( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

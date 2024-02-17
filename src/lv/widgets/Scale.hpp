@@ -31,12 +31,14 @@ namespace be::lv {
         static JSValue setPostDraw(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getRangeMinValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getRangeMaxValue(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsAddSection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsSectionSetRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsSectionSetStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

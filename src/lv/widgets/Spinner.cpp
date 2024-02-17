@@ -5,18 +5,20 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Spinner::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Spinner::Spinner(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Spinner::build(ctx,jsobj), lvobj)
     {}
 
     Spinner::Spinner(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_spinner_create(parent))
+        : Spinner(ctx, JS_NULL, lv_spinner_create(parent))
     {}
         
     JSValue Spinner::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -30,9 +32,11 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
 
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
 

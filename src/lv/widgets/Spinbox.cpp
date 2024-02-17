@@ -9,21 +9,23 @@ namespace be::lv {
         JS_CGETSET_DEF("step",SpinBox::getStep,SpinBox::setStep) ,
         JS_CGETSET_DEF("cursorPos",be::lv::Obj::invalidGetter,SpinBox::setCursorPos) ,
         JS_CGETSET_DEF("digitStepDirection",be::lv::Obj::invalidGetter,SpinBox::setDigitStepDirection) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("stepNext", 0, SpinBox::jsStepNext),
         JS_CFUNC_DEF("stepPrev", 0, SpinBox::jsStepPrev),
         JS_CFUNC_DEF("increment", 0, SpinBox::jsIncrement),
         JS_CFUNC_DEF("decrement", 0, SpinBox::jsDecrement),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     SpinBox::SpinBox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, SpinBox::build(ctx,jsobj), lvobj)
     {}
 
     SpinBox::SpinBox(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_spinbox_create(parent))
+        : SpinBox(ctx, JS_NULL, lv_spinbox_create(parent))
     {}
         
     JSValue SpinBox::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -101,6 +103,7 @@ namespace be::lv {
         lv_spinbox_set_digit_step_direction(thisobj->lvobj(), digitStepDirection) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -127,6 +130,7 @@ namespace be::lv {
             lv_spinbox_decrement( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -18,9 +18,11 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue setState(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
     } ;

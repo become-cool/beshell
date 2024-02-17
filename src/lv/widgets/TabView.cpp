@@ -10,19 +10,21 @@ namespace be::lv {
         JS_CGETSET_DEF("tabActive",TabView::getTabActive,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("content",TabView::getContent,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("tabBar",TabView::getTabBar,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTab", 1, TabView::jsAddTab),
         JS_CFUNC_DEF("renameTab", 2, TabView::jsRenameTab),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     TabView::TabView(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, TabView::build(ctx,jsobj), lvobj)
     {}
 
     TabView::TabView(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_tabview_create(parent))
+        : TabView(ctx, JS_NULL, lv_tabview_create(parent))
     {}
         
     JSValue TabView::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -82,6 +84,7 @@ namespace be::lv {
         JSValue retval = value? be::lv::Obj::wrap(ctx, (lv_obj_t*)value)->jsobj: JS_NULL ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -105,6 +108,7 @@ namespace be::lv {
             lv_tabview_rename_tab( thisobj->lvobj(), idx, new_name ) ;
             return JS_UNDEFINED ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

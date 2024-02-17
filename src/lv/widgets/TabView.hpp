@@ -23,11 +23,13 @@ namespace be::lv {
         static JSValue getTabActive(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getContent(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getTabBar(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsAddTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRenameTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

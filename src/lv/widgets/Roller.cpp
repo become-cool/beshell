@@ -7,19 +7,21 @@ namespace be::lv {
         JS_CGETSET_DEF("visibleRowCount",be::lv::Obj::invalidGetter,Roller::setVisibleRowCount) ,
         JS_CGETSET_DEF("selected",Roller::getSelected,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("optionCount",Roller::getOptionCount,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Roller::Roller(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Roller::build(ctx,jsobj), lvobj)
     {}
 
     Roller::Roller(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_roller_create(parent))
+        : Roller(ctx, JS_NULL, lv_roller_create(parent))
     {}
         
     JSValue Roller::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -56,11 +58,13 @@ namespace be::lv {
         JSValue retval = JS_NewUint32(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         // Unsupported arg type: lv_subject_t *
         // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

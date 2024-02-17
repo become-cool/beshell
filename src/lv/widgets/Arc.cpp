@@ -11,21 +11,23 @@ namespace be::lv {
         JS_CGETSET_DEF("knobOffset",Arc::getKnobOffset,Arc::setKnobOffset) ,
         JS_CGETSET_DEF("minValue",Arc::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Arc::getMaxValue,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         // void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
         // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Arc::Arc(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Arc::build(ctx,jsobj), lvobj)
     {}
 
     Arc::Arc(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_arc_create(parent))
+        : Arc(ctx, JS_NULL, lv_arc_create(parent))
     {}
         
     JSValue Arc::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -143,6 +145,7 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -154,6 +157,7 @@ namespace be::lv {
 
         // Unsupported arg type: const lv_obj_t *
         // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

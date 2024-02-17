@@ -6,20 +6,22 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("header",Win::getHeader,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("content",Win::getContent,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTitle", 1, Win::jsAddTitle),
         // Unsupported arg type:
         // lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Win::Win(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Win::build(ctx,jsobj), lvobj)
     {}
 
     Win::Win(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_win_create(parent))
+        : Win(ctx, JS_NULL, lv_win_create(parent))
     {}
         
     JSValue Win::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -44,6 +46,7 @@ namespace be::lv {
         JSValue retval = value? be::lv::Obj::wrap(ctx, (lv_obj_t*)value)->jsobj: JS_NULL ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -58,6 +61,7 @@ namespace be::lv {
 
         // Unsupported arg type: const void *
         // lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

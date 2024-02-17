@@ -5,20 +5,22 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Calendar::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("btnmatrix",Calendar::getBtnmatrix,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("headerArrowCreate", 0, Calendar::jsHeaderArrowCreate),
         JS_CFUNC_DEF("headerDropdownCreate", 0, Calendar::jsHeaderDropdownCreate),
         JS_CFUNC_DEF("headerDropdownSetYearList", 1, Calendar::jsHeaderDropdownSetYearList),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Calendar::Calendar(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Calendar::build(ctx,jsobj), lvobj)
     {}
 
     Calendar::Calendar(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_calendar_create(parent))
+        : Calendar(ctx, JS_NULL, lv_calendar_create(parent))
     {}
         
     JSValue Calendar::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -52,6 +54,7 @@ namespace be::lv {
     // unspported type: size_t
     // JSValue Calendar::getHighlightedDatesNum(JSContext *ctx, JSValueConst this_val){}
     // size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -76,6 +79,7 @@ namespace be::lv {
             lv_calendar_header_dropdown_set_year_list( thisobj->lvobj(), years_list ) ;
             return JS_UNDEFINED ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

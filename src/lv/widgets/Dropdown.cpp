@@ -12,6 +12,7 @@ namespace be::lv {
         JS_CGETSET_DEF("selectedHighlight",Dropdown::getSelectedHighlight,Dropdown::setSelectedHighlight) ,
         JS_CGETSET_DEF("list",Dropdown::getList,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("optionCount",Dropdown::getOptionCount,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addOption", 2, Dropdown::jsAddOption),
@@ -21,15 +22,16 @@ namespace be::lv {
         JS_CFUNC_DEF("isOpen", 0, Dropdown::jsIsOpen),
         // Unsupported arg type:
         // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Dropdown::Dropdown(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Dropdown::build(ctx,jsobj), lvobj)
     {}
 
     Dropdown::Dropdown(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_dropdown_create(parent))
+        : Dropdown(ctx, JS_NULL, lv_dropdown_create(parent))
     {}
         
     JSValue Dropdown::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -131,6 +133,7 @@ namespace be::lv {
         JSValue retval = JS_NewUint32(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -173,6 +176,7 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

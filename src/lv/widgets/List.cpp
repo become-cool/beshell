@@ -5,20 +5,22 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> List::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addText", 1, List::jsAddText),
         // Unsupported arg type:
         // lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     List::List(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, List::build(ctx,jsobj), lvobj)
     {}
 
     List::List(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_list_create(parent))
+        : List(ctx, JS_NULL, lv_list_create(parent))
     {}
         
     JSValue List::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -31,6 +33,7 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 
 // AUTO GENERATE CODE END [GETSETS] --------
 
@@ -46,6 +49,7 @@ namespace be::lv {
 
         // Unsupported arg type: const void *
         // lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

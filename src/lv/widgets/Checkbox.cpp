@@ -6,18 +6,20 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("text",be::lv::Obj::invalidGetter,Checkbox::setText) ,
         JS_CGETSET_DEF("textStatic",be::lv::Obj::invalidGetter,Checkbox::setTextStatic) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Checkbox::Checkbox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Checkbox::build(ctx,jsobj), lvobj)
     {}
 
     Checkbox::Checkbox(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_checkbox_create(parent))
+        : Checkbox(ctx, JS_NULL, lv_checkbox_create(parent))
     {}
         
     JSValue Checkbox::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -45,9 +47,11 @@ namespace be::lv {
         lv_checkbox_set_text_static(thisobj->lvobj(), textStatic) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
 

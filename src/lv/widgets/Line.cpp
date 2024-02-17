@@ -5,18 +5,20 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Line::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("yInvert",Line::getYInvert,Line::setYInvert) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Line::Line(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Line::build(ctx,jsobj), lvobj)
     {}
 
     Line::Line(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_line_create(parent))
+        : Line(ctx, JS_NULL, lv_line_create(parent))
     {}
         
     JSValue Line::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -41,9 +43,11 @@ namespace be::lv {
         lv_line_set_y_invert(thisobj->lvobj(), yInvert) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
 

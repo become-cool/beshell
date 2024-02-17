@@ -6,20 +6,22 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("rowCount",Table::getRowCount,Table::setRowCount) ,
         JS_CGETSET_DEF("columnCount",Table::getColumnCount,Table::setColumnCount) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addCellCtrl", 3, Table::jsAddCellCtrl),
         JS_CFUNC_DEF("clearCellCtrl", 3, Table::jsClearCellCtrl),
         JS_CFUNC_DEF("hasCellCtrl", 3, Table::jsHasCellCtrl),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Table::Table(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Table::build(ctx,jsobj), lvobj)
     {}
 
     Table::Table(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_table_create(parent))
+        : Table(ctx, JS_NULL, lv_table_create(parent))
     {}
         
     JSValue Table::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -62,6 +64,7 @@ namespace be::lv {
         lv_table_set_column_count(thisobj->lvobj(), columnCount) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -122,6 +125,7 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

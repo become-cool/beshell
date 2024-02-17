@@ -13,6 +13,7 @@ namespace be::lv {
         JS_CGETSET_DEF("blendMode",Img::getBlendMode,Img::setBlendMode) ,
         JS_CGETSET_DEF("antialias",Img::getAntialias,Img::setAntialias) ,
         JS_CGETSET_DEF("align",Img::getAlign,Img::setAlign) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
@@ -33,15 +34,16 @@ namespace be::lv {
         // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
         // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
         // void lv_image_cache_drop(const void * src)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Img::Img(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Img::build(ctx,jsobj), lvobj)
     {}
 
     Img::Img(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_image_create(parent))
+        : Img(ctx, JS_NULL, lv_image_create(parent))
     {}
         
     JSValue Img::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -202,6 +204,7 @@ namespace be::lv {
         lv_image_set_align(thisobj->lvobj(), align) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -255,6 +258,7 @@ namespace be::lv {
 
         // Unsupported arg type: const void *
         // void lv_image_cache_drop(const void * src)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

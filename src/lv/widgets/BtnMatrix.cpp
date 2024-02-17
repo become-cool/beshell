@@ -8,20 +8,22 @@ namespace be::lv {
         JS_CGETSET_DEF("buttonCtrlAll",be::lv::Obj::invalidGetter,BtnMatrix::setButtonCtrlAll) ,
         JS_CGETSET_DEF("oneChecked",BtnMatrix::getOneChecked,BtnMatrix::setOneChecked) ,
         JS_CGETSET_DEF("popovers",BtnMatrix::getPopovers,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("clearButtonCtrl", 2, BtnMatrix::jsClearButtonCtrl),
         JS_CFUNC_DEF("clearButtonCtrlAll", 1, BtnMatrix::jsClearButtonCtrlAll),
         JS_CFUNC_DEF("hasButtonCtrl", 2, BtnMatrix::jsHasButtonCtrl),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     BtnMatrix::BtnMatrix(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, BtnMatrix::build(ctx,jsobj), lvobj)
     {}
 
     BtnMatrix::BtnMatrix(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_buttonmatrix_create(parent))
+        : BtnMatrix(ctx, JS_NULL, lv_buttonmatrix_create(parent))
     {}
         
     JSValue BtnMatrix::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -90,6 +92,7 @@ namespace be::lv {
         JSValue retval = JS_NewBool(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -149,6 +152,7 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -5,18 +5,20 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> TileView::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("tileActive",TileView::getTileActive,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTile", 3, TileView::jsAddTile),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     TileView::TileView(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, TileView::build(ctx,jsobj), lvobj)
     {}
 
     TileView::TileView(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_tileview_create(parent))
+        : TileView(ctx, JS_NULL, lv_tileview_create(parent))
     {}
         
     JSValue TileView::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -35,6 +37,7 @@ namespace be::lv {
         JSValue retval = value? be::lv::Obj::wrap(ctx, (lv_obj_t*)value)->jsobj: JS_NULL ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -62,6 +65,7 @@ namespace be::lv {
             JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
             return jsretval ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

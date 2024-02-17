@@ -7,19 +7,21 @@ namespace be::lv {
         JS_CGETSET_DEF("textarea",Keyboard::getTextarea,Keyboard::setTextarea) ,
         JS_CGETSET_DEF("mode",Keyboard::getMode,Keyboard::setMode) ,
         JS_CGETSET_DEF("popovers",be::lv::Obj::invalidGetter,Keyboard::setPopovers) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // void lv_keyboard_def_event_cb(lv_event_t * e)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Keyboard::Keyboard(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Keyboard::build(ctx,jsobj), lvobj)
     {}
 
     Keyboard::Keyboard(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_keyboard_create(parent))
+        : Keyboard(ctx, JS_NULL, lv_keyboard_create(parent))
     {}
         
     JSValue Keyboard::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -70,11 +72,13 @@ namespace be::lv {
         lv_keyboard_set_popovers(thisobj->lvobj(), popovers) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         // Unsupported arg type: lv_event_t *
         // void lv_keyboard_def_event_cb(lv_event_t * e)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

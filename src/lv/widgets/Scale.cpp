@@ -13,21 +13,23 @@ namespace be::lv {
         JS_CGETSET_DEF("postDraw",be::lv::Obj::invalidGetter,Scale::setPostDraw) ,
         JS_CGETSET_DEF("rangeMinValue",Scale::getRangeMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("rangeMaxValue",Scale::getRangeMaxValue,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
         // void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
         // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Scale::Scale(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Scale::build(ctx,jsobj), lvobj)
     {}
 
     Scale::Scale(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_scale_create(parent))
+        : Scale(ctx, JS_NULL, lv_scale_create(parent))
     {}
         
     JSValue Scale::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -147,6 +149,7 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -158,6 +161,7 @@ namespace be::lv {
 
         // Unsupported arg type: lv_scale_section_t *
         // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

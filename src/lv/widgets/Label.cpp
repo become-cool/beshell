@@ -9,6 +9,7 @@ namespace be::lv {
         JS_CGETSET_DEF("longMode",Label::getLongMode,Label::setLongMode) ,
         JS_CGETSET_DEF("textSelectionStart",Label::getTextSelectionStart,Label::setTextSelectionStart) ,
         JS_CGETSET_DEF("textSelectionEnd",Label::getTextSelectionEnd,Label::setTextSelectionEnd) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("insText", 2, Label::jsInsText),
@@ -16,15 +17,16 @@ namespace be::lv {
         // Unsupported arg type:
         // lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
         // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Label::Label(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, jsobj, lvobj)
+        : Obj(ctx, Label::build(ctx,jsobj), lvobj)
     {}
 
     Label::Label(JSContext * ctx, lv_obj_t * parent)
-        : Obj(ctx, JS_NULL, lv_label_create(parent))
+        : Label(ctx, JS_NULL, lv_label_create(parent))
     {}
         
     JSValue Label::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -100,6 +102,7 @@ namespace be::lv {
         lv_label_set_text_selection_end(thisobj->lvobj(), textSelectionEnd) ;
         return JS_UNDEFINED ;
     }
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -135,6 +138,7 @@ namespace be::lv {
             lv_label_cut_text( thisobj->lvobj(), pos, cnt ) ;
             return JS_UNDEFINED ;
         }
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }
