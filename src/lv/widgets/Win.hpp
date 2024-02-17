@@ -19,13 +19,11 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getHeader(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getContent(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsAddTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsAddButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

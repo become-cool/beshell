@@ -5,10 +5,8 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Spinner::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -32,11 +30,9 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
 
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
 
 // AUTO GENERATE CODE END [METHODS] --------
 

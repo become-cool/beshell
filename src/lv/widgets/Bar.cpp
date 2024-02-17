@@ -9,11 +9,9 @@ namespace be::lv {
         JS_CGETSET_DEF("startValue",Bar::getStartValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("minValue",Bar::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Bar::getMaxValue,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("isSymmetrical", 0, Bar::jsIsSymmetrical),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -43,10 +41,15 @@ namespace be::lv {
     }
     JSValue Bar::setMode(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Bar,thisobj)
-        uint8_t mode ;
-        if(JS_ToUint32(ctx, (uint32_t *) &mode, val)!=0){
-            JSTHROW("arg %s of method %s.%s() must be a %s","mode","Bar","setMode","number")
+        // argv mode
+        const char * cstr_val = JS_ToCString(ctx, val) ;
+        lv_bar_mode_t mode;
+        if(lv_bar_mode_str_to_const(cstr_val,&mode)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_bar_mode_t",cstr_val) ;
+            JS_FreeCString(ctx, cstr_val) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_val) ;
         lv_bar_set_mode(thisobj->lvobj(), mode) ;
         return JS_UNDEFINED ;
     }
@@ -74,7 +77,6 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -84,7 +86,6 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -5,6 +5,114 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [CONST MAPPING] --------
 
+// lv_flex_flow_t
+bool lv_flex_flow_str_to_const(const char * name, lv_flex_flow_t * out) {
+    if(strcmp(name,"row")==0) {
+        (*out) = LV_FLEX_FLOW_ROW ;
+    }
+    else if(strcmp(name,"column")==0) {
+        (*out) = LV_FLEX_FLOW_COLUMN ;
+    }
+    else if(strcmp(name,"row-wrap")==0) {
+        (*out) = LV_FLEX_FLOW_ROW_WRAP ;
+    }
+    else if(strcmp(name,"row-reverse")==0) {
+        (*out) = LV_FLEX_FLOW_ROW_REVERSE ;
+    }
+    else if(strcmp(name,"row-wrap-reverse")==0) {
+        (*out) = LV_FLEX_FLOW_ROW_WRAP_REVERSE ;
+    }
+    else if(strcmp(name,"column-wrap")==0) {
+        (*out) = LV_FLEX_FLOW_COLUMN_WRAP ;
+    }
+    else if(strcmp(name,"column-reverse")==0) {
+        (*out) = LV_FLEX_FLOW_COLUMN_REVERSE ;
+    }
+    else if(strcmp(name,"column-wrap-reverse")==0) {
+        (*out) = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_flex_flow_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_flex_flow_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_flex_flow_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_flex_flow_const_to_str(lv_flex_flow_t code) {
+
+    switch(code) {
+        case LV_FLEX_FLOW_ROW: return "row";
+        case LV_FLEX_FLOW_COLUMN: return "column";
+        case LV_FLEX_FLOW_ROW_WRAP: return "row-wrap";
+        case LV_FLEX_FLOW_ROW_REVERSE: return "row-reverse";
+        case LV_FLEX_FLOW_ROW_WRAP_REVERSE: return "row-wrap-reverse";
+        case LV_FLEX_FLOW_COLUMN_WRAP: return "column-wrap";
+        case LV_FLEX_FLOW_COLUMN_REVERSE: return "column-reverse";
+        case LV_FLEX_FLOW_COLUMN_WRAP_REVERSE: return "column-wrap-reverse";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_flex_flow_const_to_jsstr(JSContext *ctx, lv_flex_flow_t code) {
+    return JS_NewString(ctx, lv_flex_flow_const_to_str(code));
+}
+
+// lv_flex_align_t
+bool lv_flex_align_str_to_const(const char * name, lv_flex_align_t * out) {
+    if(strcmp(name,"start")==0) {
+        (*out) = LV_FLEX_ALIGN_START ;
+    }
+    else if(strcmp(name,"end")==0) {
+        (*out) = LV_FLEX_ALIGN_END ;
+    }
+    else if(strcmp(name,"center")==0) {
+        (*out) = LV_FLEX_ALIGN_CENTER ;
+    }
+    else if(strcmp(name,"space-evenly")==0) {
+        (*out) = LV_FLEX_ALIGN_SPACE_EVENLY ;
+    }
+    else if(strcmp(name,"space-around")==0) {
+        (*out) = LV_FLEX_ALIGN_SPACE_AROUND ;
+    }
+    else if(strcmp(name,"space-between")==0) {
+        (*out) = LV_FLEX_ALIGN_SPACE_BETWEEN ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_flex_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_flex_align_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_flex_align_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_flex_align_const_to_str(lv_flex_align_t code) {
+
+    switch(code) {
+        case LV_FLEX_ALIGN_START: return "start";
+        case LV_FLEX_ALIGN_END: return "end";
+        case LV_FLEX_ALIGN_CENTER: return "center";
+        case LV_FLEX_ALIGN_SPACE_EVENLY: return "space-evenly";
+        case LV_FLEX_ALIGN_SPACE_AROUND: return "space-around";
+        case LV_FLEX_ALIGN_SPACE_BETWEEN: return "space-between";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_flex_align_const_to_jsstr(JSContext *ctx, lv_flex_align_t code) {
+    return JS_NewString(ctx, lv_flex_align_const_to_str(code));
+}
+
 // lv_align_t
 bool lv_align_str_to_const(const char * name, lv_align_t * out) {
     if(strcmp(name,"default")==0) {
@@ -119,6 +227,190 @@ JSValue lv_align_const_to_jsstr(JSContext *ctx, lv_align_t code) {
     return JS_NewString(ctx, lv_align_const_to_str(code));
 }
 
+// lv_border_side_t
+bool lv_border_side_str_to_const(const char * name, lv_border_side_t * out) {
+    if(strcmp(name,"none")==0) {
+        (*out) = LV_BORDER_SIDE_NONE ;
+    }
+    else if(strcmp(name,"bottom")==0) {
+        (*out) = LV_BORDER_SIDE_BOTTOM ;
+    }
+    else if(strcmp(name,"top")==0) {
+        (*out) = LV_BORDER_SIDE_TOP ;
+    }
+    else if(strcmp(name,"left")==0) {
+        (*out) = LV_BORDER_SIDE_LEFT ;
+    }
+    else if(strcmp(name,"right")==0) {
+        (*out) = LV_BORDER_SIDE_RIGHT ;
+    }
+    else if(strcmp(name,"full")==0) {
+        (*out) = LV_BORDER_SIDE_FULL ;
+    }
+    else if(strcmp(name,"internal")==0) {
+        (*out) = LV_BORDER_SIDE_INTERNAL ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_border_side_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_border_side_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_border_side_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_border_side_const_to_str(lv_border_side_t code) {
+
+    switch(code) {
+        case LV_BORDER_SIDE_NONE: return "none";
+        case LV_BORDER_SIDE_BOTTOM: return "bottom";
+        case LV_BORDER_SIDE_TOP: return "top";
+        case LV_BORDER_SIDE_LEFT: return "left";
+        case LV_BORDER_SIDE_RIGHT: return "right";
+        case LV_BORDER_SIDE_FULL: return "full";
+        case LV_BORDER_SIDE_INTERNAL: return "internal";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_border_side_const_to_jsstr(JSContext *ctx, lv_border_side_t code) {
+    return JS_NewString(ctx, lv_border_side_const_to_str(code));
+}
+
+// lv_text_align_t
+bool lv_text_align_str_to_const(const char * name, lv_text_align_t * out) {
+    if(strcmp(name,"auto")==0) {
+        (*out) = LV_TEXT_ALIGN_AUTO ;
+    }
+    else if(strcmp(name,"left")==0) {
+        (*out) = LV_TEXT_ALIGN_LEFT ;
+    }
+    else if(strcmp(name,"center")==0) {
+        (*out) = LV_TEXT_ALIGN_CENTER ;
+    }
+    else if(strcmp(name,"right")==0) {
+        (*out) = LV_TEXT_ALIGN_RIGHT ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_text_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_text_align_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_text_align_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_text_align_const_to_str(lv_text_align_t code) {
+
+    switch(code) {
+        case LV_TEXT_ALIGN_AUTO: return "auto";
+        case LV_TEXT_ALIGN_LEFT: return "left";
+        case LV_TEXT_ALIGN_CENTER: return "center";
+        case LV_TEXT_ALIGN_RIGHT: return "right";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_text_align_const_to_jsstr(JSContext *ctx, lv_text_align_t code) {
+    return JS_NewString(ctx, lv_text_align_const_to_str(code));
+}
+
+// lv_base_dir_t
+bool lv_base_dir_str_to_const(const char * name, lv_base_dir_t * out) {
+    if(strcmp(name,"ltr")==0) {
+        (*out) = LV_BASE_DIR_LTR ;
+    }
+    else if(strcmp(name,"rtl")==0) {
+        (*out) = LV_BASE_DIR_RTL ;
+    }
+    else if(strcmp(name,"auto")==0) {
+        (*out) = LV_BASE_DIR_AUTO ;
+    }
+    else if(strcmp(name,"neutral")==0) {
+        (*out) = LV_BASE_DIR_NEUTRAL ;
+    }
+    else if(strcmp(name,"weak")==0) {
+        (*out) = LV_BASE_DIR_WEAK ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_base_dir_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_base_dir_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_base_dir_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_base_dir_const_to_str(lv_base_dir_t code) {
+
+    switch(code) {
+        case LV_BASE_DIR_LTR: return "ltr";
+        case LV_BASE_DIR_RTL: return "rtl";
+        case LV_BASE_DIR_AUTO: return "auto";
+        case LV_BASE_DIR_NEUTRAL: return "neutral";
+        case LV_BASE_DIR_WEAK: return "weak";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_base_dir_const_to_jsstr(JSContext *ctx, lv_base_dir_t code) {
+    return JS_NewString(ctx, lv_base_dir_const_to_str(code));
+}
+
+// lv_scrollbar_mode_t
+bool lv_scrollbar_mode_str_to_const(const char * name, lv_scrollbar_mode_t * out) {
+    if(strcmp(name,"mode-off")==0) {
+        (*out) = LV_SCROLLBAR_MODE_OFF ;
+    }
+    else if(strcmp(name,"mode-on")==0) {
+        (*out) = LV_SCROLLBAR_MODE_ON ;
+    }
+    else if(strcmp(name,"mode-active")==0) {
+        (*out) = LV_SCROLLBAR_MODE_ACTIVE ;
+    }
+    else if(strcmp(name,"mode-auto")==0) {
+        (*out) = LV_SCROLLBAR_MODE_AUTO ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_scrollbar_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_scrollbar_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_scrollbar_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_scrollbar_mode_const_to_str(lv_scrollbar_mode_t code) {
+
+    switch(code) {
+        case LV_SCROLLBAR_MODE_OFF: return "mode-off";
+        case LV_SCROLLBAR_MODE_ON: return "mode-on";
+        case LV_SCROLLBAR_MODE_ACTIVE: return "mode-active";
+        case LV_SCROLLBAR_MODE_AUTO: return "mode-auto";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_scrollbar_mode_const_to_jsstr(JSContext *ctx, lv_scrollbar_mode_t code) {
+    return JS_NewString(ctx, lv_scrollbar_mode_const_to_str(code));
+}
+
 // lv_dir_t
 bool lv_dir_str_to_const(const char * name, lv_dir_t * out) {
     if(strcmp(name,"none")==0) {
@@ -219,31 +511,100 @@ JSValue lv_scroll_snap_const_to_jsstr(JSContext *ctx, lv_scroll_snap_t code) {
     return JS_NewString(ctx, lv_scroll_snap_const_to_str(code));
 }
 
-// lv_flex_flow_t
-bool lv_flex_flow_str_to_const(const char * name, lv_flex_flow_t * out) {
-    if(strcmp(name,"row")==0) {
-        (*out) = LV_FLEX_FLOW_ROW ;
+// lv_obj_flag_t
+bool lv__obj_flag_str_to_const(const char * name, lv_obj_flag_t * out) {
+    if(strcmp(name,"idden")==0) {
+        (*out) = LV_OBJ_FLAG_HIDDEN ;
     }
-    else if(strcmp(name,"column")==0) {
-        (*out) = LV_FLEX_FLOW_COLUMN ;
+    else if(strcmp(name,"lickable")==0) {
+        (*out) = LV_OBJ_FLAG_CLICKABLE ;
     }
-    else if(strcmp(name,"row-wrap")==0) {
-        (*out) = LV_FLEX_FLOW_ROW_WRAP ;
+    else if(strcmp(name,"lick-focusable")==0) {
+        (*out) = LV_OBJ_FLAG_CLICK_FOCUSABLE ;
     }
-    else if(strcmp(name,"row-reverse")==0) {
-        (*out) = LV_FLEX_FLOW_ROW_REVERSE ;
+    else if(strcmp(name,"heckable")==0) {
+        (*out) = LV_OBJ_FLAG_CHECKABLE ;
     }
-    else if(strcmp(name,"row-wrap-reverse")==0) {
-        (*out) = LV_FLEX_FLOW_ROW_WRAP_REVERSE ;
+    else if(strcmp(name,"crollable")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLLABLE ;
     }
-    else if(strcmp(name,"column-wrap")==0) {
-        (*out) = LV_FLEX_FLOW_COLUMN_WRAP ;
+    else if(strcmp(name,"croll-elastic")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_ELASTIC ;
     }
-    else if(strcmp(name,"column-reverse")==0) {
-        (*out) = LV_FLEX_FLOW_COLUMN_REVERSE ;
+    else if(strcmp(name,"croll-momentum")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_MOMENTUM ;
     }
-    else if(strcmp(name,"column-wrap-reverse")==0) {
-        (*out) = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE ;
+    else if(strcmp(name,"croll-one")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_ONE ;
+    }
+    else if(strcmp(name,"croll-chain-hor")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_CHAIN_HOR ;
+    }
+    else if(strcmp(name,"croll-chain-ver")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_CHAIN_VER ;
+    }
+    else if(strcmp(name,"croll-chain")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_CHAIN ;
+    }
+    else if(strcmp(name,"croll-on-focus")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_ON_FOCUS ;
+    }
+    else if(strcmp(name,"croll-with-arrow")==0) {
+        (*out) = LV_OBJ_FLAG_SCROLL_WITH_ARROW ;
+    }
+    else if(strcmp(name,"nappable")==0) {
+        (*out) = LV_OBJ_FLAG_SNAPPABLE ;
+    }
+    else if(strcmp(name,"ress-lock")==0) {
+        (*out) = LV_OBJ_FLAG_PRESS_LOCK ;
+    }
+    else if(strcmp(name,"vent-bubble")==0) {
+        (*out) = LV_OBJ_FLAG_EVENT_BUBBLE ;
+    }
+    else if(strcmp(name,"esture-bubble")==0) {
+        (*out) = LV_OBJ_FLAG_GESTURE_BUBBLE ;
+    }
+    else if(strcmp(name,"dv-hittest")==0) {
+        (*out) = LV_OBJ_FLAG_ADV_HITTEST ;
+    }
+    else if(strcmp(name,"gnore-layout")==0) {
+        (*out) = LV_OBJ_FLAG_IGNORE_LAYOUT ;
+    }
+    else if(strcmp(name,"loating")==0) {
+        (*out) = LV_OBJ_FLAG_FLOATING ;
+    }
+    else if(strcmp(name,"end-draw-task-events")==0) {
+        (*out) = LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS ;
+    }
+    else if(strcmp(name,"verflow-visible")==0) {
+        (*out) = LV_OBJ_FLAG_OVERFLOW_VISIBLE ;
+    }
+    else if(strcmp(name,"lex-in-new-track")==0) {
+        (*out) = LV_OBJ_FLAG_FLEX_IN_NEW_TRACK ;
+    }
+    else if(strcmp(name,"ayout-1")==0) {
+        (*out) = LV_OBJ_FLAG_LAYOUT_1 ;
+    }
+    else if(strcmp(name,"ayout-2")==0) {
+        (*out) = LV_OBJ_FLAG_LAYOUT_2 ;
+    }
+    else if(strcmp(name,"idget-1")==0) {
+        (*out) = LV_OBJ_FLAG_WIDGET_1 ;
+    }
+    else if(strcmp(name,"idget-2")==0) {
+        (*out) = LV_OBJ_FLAG_WIDGET_2 ;
+    }
+    else if(strcmp(name,"ser-1")==0) {
+        (*out) = LV_OBJ_FLAG_USER_1 ;
+    }
+    else if(strcmp(name,"ser-2")==0) {
+        (*out) = LV_OBJ_FLAG_USER_2 ;
+    }
+    else if(strcmp(name,"ser-3")==0) {
+        (*out) = LV_OBJ_FLAG_USER_3 ;
+    }
+    else if(strcmp(name,"ser-4")==0) {
+        (*out) = LV_OBJ_FLAG_USER_4 ;
     }
 
     else {
@@ -251,30 +612,135 @@ bool lv_flex_flow_str_to_const(const char * name, lv_flex_flow_t * out) {
     }
     return true ;
 }
-bool lv_flex_flow_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_flex_flow_t* out) {
+bool lv__obj_flag_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_obj_flag_t* out) {
     char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
-    bool suc = lv_flex_flow_str_to_const(cstr, out) ;
+    bool suc = lv__obj_flag_str_to_const(cstr, out) ;
     JS_FreeCString(ctx, cstr) ;
     return suc ;
 }
-const char * lv_flex_flow_const_to_str(lv_flex_flow_t code) {
+const char * lv__obj_flag_const_to_str(lv_obj_flag_t code) {
 
     switch(code) {
-        case LV_FLEX_FLOW_ROW: return "row";
-        case LV_FLEX_FLOW_COLUMN: return "column";
-        case LV_FLEX_FLOW_ROW_WRAP: return "row-wrap";
-        case LV_FLEX_FLOW_ROW_REVERSE: return "row-reverse";
-        case LV_FLEX_FLOW_ROW_WRAP_REVERSE: return "row-wrap-reverse";
-        case LV_FLEX_FLOW_COLUMN_WRAP: return "column-wrap";
-        case LV_FLEX_FLOW_COLUMN_REVERSE: return "column-reverse";
-        case LV_FLEX_FLOW_COLUMN_WRAP_REVERSE: return "column-wrap-reverse";
+        case LV_OBJ_FLAG_HIDDEN: return "idden";
+        case LV_OBJ_FLAG_CLICKABLE: return "lickable";
+        case LV_OBJ_FLAG_CLICK_FOCUSABLE: return "lick-focusable";
+        case LV_OBJ_FLAG_CHECKABLE: return "heckable";
+        case LV_OBJ_FLAG_SCROLLABLE: return "crollable";
+        case LV_OBJ_FLAG_SCROLL_ELASTIC: return "croll-elastic";
+        case LV_OBJ_FLAG_SCROLL_MOMENTUM: return "croll-momentum";
+        case LV_OBJ_FLAG_SCROLL_ONE: return "croll-one";
+        case LV_OBJ_FLAG_SCROLL_CHAIN_HOR: return "croll-chain-hor";
+        case LV_OBJ_FLAG_SCROLL_CHAIN_VER: return "croll-chain-ver";
+        case LV_OBJ_FLAG_SCROLL_CHAIN: return "croll-chain";
+        case LV_OBJ_FLAG_SCROLL_ON_FOCUS: return "croll-on-focus";
+        case LV_OBJ_FLAG_SCROLL_WITH_ARROW: return "croll-with-arrow";
+        case LV_OBJ_FLAG_SNAPPABLE: return "nappable";
+        case LV_OBJ_FLAG_PRESS_LOCK: return "ress-lock";
+        case LV_OBJ_FLAG_EVENT_BUBBLE: return "vent-bubble";
+        case LV_OBJ_FLAG_GESTURE_BUBBLE: return "esture-bubble";
+        case LV_OBJ_FLAG_ADV_HITTEST: return "dv-hittest";
+        case LV_OBJ_FLAG_IGNORE_LAYOUT: return "gnore-layout";
+        case LV_OBJ_FLAG_FLOATING: return "loating";
+        case LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS: return "end-draw-task-events";
+        case LV_OBJ_FLAG_OVERFLOW_VISIBLE: return "verflow-visible";
+        case LV_OBJ_FLAG_FLEX_IN_NEW_TRACK: return "lex-in-new-track";
+        case LV_OBJ_FLAG_LAYOUT_1: return "ayout-1";
+        case LV_OBJ_FLAG_LAYOUT_2: return "ayout-2";
+        case LV_OBJ_FLAG_WIDGET_1: return "idget-1";
+        case LV_OBJ_FLAG_WIDGET_2: return "idget-2";
+        case LV_OBJ_FLAG_USER_1: return "ser-1";
+        case LV_OBJ_FLAG_USER_2: return "ser-2";
+        case LV_OBJ_FLAG_USER_3: return "ser-3";
+        case LV_OBJ_FLAG_USER_4: return "ser-4";
 
         default:
             return "unknow";
     }
 }
-JSValue lv_flex_flow_const_to_jsstr(JSContext *ctx, lv_flex_flow_t code) {
-    return JS_NewString(ctx, lv_flex_flow_const_to_str(code));
+JSValue lv__obj_flag_const_to_jsstr(JSContext *ctx, lv_obj_flag_t code) {
+    return JS_NewString(ctx, lv__obj_flag_const_to_str(code));
+}
+
+// lv_state_t
+bool lv_state_str_to_const(const char * name, lv_state_t * out) {
+    if(strcmp(name,"default")==0) {
+        (*out) = LV_STATE_DEFAULT ;
+    }
+    else if(strcmp(name,"checked")==0) {
+        (*out) = LV_STATE_CHECKED ;
+    }
+    else if(strcmp(name,"focused")==0) {
+        (*out) = LV_STATE_FOCUSED ;
+    }
+    else if(strcmp(name,"focus-key")==0) {
+        (*out) = LV_STATE_FOCUS_KEY ;
+    }
+    else if(strcmp(name,"edited")==0) {
+        (*out) = LV_STATE_EDITED ;
+    }
+    else if(strcmp(name,"hovered")==0) {
+        (*out) = LV_STATE_HOVERED ;
+    }
+    else if(strcmp(name,"pressed")==0) {
+        (*out) = LV_STATE_PRESSED ;
+    }
+    else if(strcmp(name,"scrolled")==0) {
+        (*out) = LV_STATE_SCROLLED ;
+    }
+    else if(strcmp(name,"disabled")==0) {
+        (*out) = LV_STATE_DISABLED ;
+    }
+    else if(strcmp(name,"user-1")==0) {
+        (*out) = LV_STATE_USER_1 ;
+    }
+    else if(strcmp(name,"user-2")==0) {
+        (*out) = LV_STATE_USER_2 ;
+    }
+    else if(strcmp(name,"user-3")==0) {
+        (*out) = LV_STATE_USER_3 ;
+    }
+    else if(strcmp(name,"user-4")==0) {
+        (*out) = LV_STATE_USER_4 ;
+    }
+    else if(strcmp(name,"any")==0) {
+        (*out) = LV_STATE_ANY ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_state_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_state_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_state_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_state_const_to_str(lv_state_t code) {
+
+    switch(code) {
+        case LV_STATE_DEFAULT: return "default";
+        case LV_STATE_CHECKED: return "checked";
+        case LV_STATE_FOCUSED: return "focused";
+        case LV_STATE_FOCUS_KEY: return "focus-key";
+        case LV_STATE_EDITED: return "edited";
+        case LV_STATE_HOVERED: return "hovered";
+        case LV_STATE_PRESSED: return "pressed";
+        case LV_STATE_SCROLLED: return "scrolled";
+        case LV_STATE_DISABLED: return "disabled";
+        case LV_STATE_USER_1: return "user-1";
+        case LV_STATE_USER_2: return "user-2";
+        case LV_STATE_USER_3: return "user-3";
+        case LV_STATE_USER_4: return "user-4";
+        case LV_STATE_ANY: return "any";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_state_const_to_jsstr(JSContext *ctx, lv_state_t code) {
+    return JS_NewString(ctx, lv_state_const_to_str(code));
 }
 
 // lv_event_code_t
@@ -1054,6 +1520,76 @@ JSValue lv_style_prop_const_to_jsstr(JSContext *ctx, lv_style_prop_t code) {
     return JS_NewString(ctx, lv_style_prop_const_to_str(code));
 }
 
+// lv_opa_t
+bool lv_opa_str_to_const(const char * name, lv_opa_t * out) {
+    if(strcmp(name,"0")==0) {
+        (*out) = LV_OPA_0 ;
+    }
+    else if(strcmp(name,"10")==0) {
+        (*out) = LV_OPA_10 ;
+    }
+    else if(strcmp(name,"20")==0) {
+        (*out) = LV_OPA_20 ;
+    }
+    else if(strcmp(name,"30")==0) {
+        (*out) = LV_OPA_30 ;
+    }
+    else if(strcmp(name,"40")==0) {
+        (*out) = LV_OPA_40 ;
+    }
+    else if(strcmp(name,"50")==0) {
+        (*out) = LV_OPA_50 ;
+    }
+    else if(strcmp(name,"60")==0) {
+        (*out) = LV_OPA_60 ;
+    }
+    else if(strcmp(name,"70")==0) {
+        (*out) = LV_OPA_70 ;
+    }
+    else if(strcmp(name,"80")==0) {
+        (*out) = LV_OPA_80 ;
+    }
+    else if(strcmp(name,"90")==0) {
+        (*out) = LV_OPA_90 ;
+    }
+    else if(strcmp(name,"100")==0) {
+        (*out) = LV_OPA_100 ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_opa_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_opa_const_to_str(lv_opa_t code) {
+
+    switch(code) {
+        case LV_OPA_0: return "0";
+        case LV_OPA_10: return "10";
+        case LV_OPA_20: return "20";
+        case LV_OPA_30: return "30";
+        case LV_OPA_40: return "40";
+        case LV_OPA_50: return "50";
+        case LV_OPA_60: return "60";
+        case LV_OPA_70: return "70";
+        case LV_OPA_80: return "80";
+        case LV_OPA_90: return "90";
+        case LV_OPA_100: return "100";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) {
+    return JS_NewString(ctx, lv_opa_const_to_str(code));
+}
+
 // lv_keyboard_mode_t
 bool lv_keyboard_mode_str_to_const(const char * name, lv_keyboard_mode_t * out) {
     if(strcmp(name,"mode-text-lower")==0) {
@@ -1164,6 +1700,94 @@ const char * lv_scale_mode_const_to_str(lv_scale_mode_t code) {
 }
 JSValue lv_scale_mode_const_to_jsstr(JSContext *ctx, lv_scale_mode_t code) {
     return JS_NewString(ctx, lv_scale_mode_const_to_str(code));
+}
+
+// lv_table_cell_ctrl_t
+bool lv_table_cell_ctrl_str_to_const(const char * name, lv_table_cell_ctrl_t * out) {
+    if(strcmp(name,"merge-right")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_MERGE_RIGHT ;
+    }
+    else if(strcmp(name,"text-crop")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_TEXT_CROP ;
+    }
+    else if(strcmp(name,"custom-1")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_CUSTOM_1 ;
+    }
+    else if(strcmp(name,"custom-2")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_CUSTOM_2 ;
+    }
+    else if(strcmp(name,"custom-3")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_CUSTOM_3 ;
+    }
+    else if(strcmp(name,"custom-4")==0) {
+        (*out) = LV_TABLE_CELL_CTRL_CUSTOM_4 ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_table_cell_ctrl_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_table_cell_ctrl_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_table_cell_ctrl_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_table_cell_ctrl_const_to_str(lv_table_cell_ctrl_t code) {
+
+    switch(code) {
+        case LV_TABLE_CELL_CTRL_MERGE_RIGHT: return "merge-right";
+        case LV_TABLE_CELL_CTRL_TEXT_CROP: return "text-crop";
+        case LV_TABLE_CELL_CTRL_CUSTOM_1: return "custom-1";
+        case LV_TABLE_CELL_CTRL_CUSTOM_2: return "custom-2";
+        case LV_TABLE_CELL_CTRL_CUSTOM_3: return "custom-3";
+        case LV_TABLE_CELL_CTRL_CUSTOM_4: return "custom-4";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_table_cell_ctrl_const_to_jsstr(JSContext *ctx, lv_table_cell_ctrl_t code) {
+    return JS_NewString(ctx, lv_table_cell_ctrl_const_to_str(code));
+}
+
+// lv_arc_mode_t
+bool lv_arc_mode_str_to_const(const char * name, lv_arc_mode_t * out) {
+    if(strcmp(name,"mode-normal")==0) {
+        (*out) = LV_ARC_MODE_NORMAL ;
+    }
+    else if(strcmp(name,"mode-symmetrical")==0) {
+        (*out) = LV_ARC_MODE_SYMMETRICAL ;
+    }
+    else if(strcmp(name,"mode-reverse")==0) {
+        (*out) = LV_ARC_MODE_REVERSE ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_arc_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_arc_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_arc_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_arc_mode_const_to_str(lv_arc_mode_t code) {
+
+    switch(code) {
+        case LV_ARC_MODE_NORMAL: return "mode-normal";
+        case LV_ARC_MODE_SYMMETRICAL: return "mode-symmetrical";
+        case LV_ARC_MODE_REVERSE: return "mode-reverse";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_arc_mode_const_to_jsstr(JSContext *ctx, lv_arc_mode_t code) {
+    return JS_NewString(ctx, lv_arc_mode_const_to_str(code));
 }
 
 // lv_buttonmatrix_ctrl_t
@@ -1484,6 +2108,90 @@ const char * lv_image_align_const_to_str(lv_image_align_t code) {
 }
 JSValue lv_image_align_const_to_jsstr(JSContext *ctx, lv_image_align_t code) {
     return JS_NewString(ctx, lv_image_align_const_to_str(code));
+}
+
+// lv_label_long_mode_t
+bool lv_label_long_mode_str_to_const(const char * name, lv_label_long_mode_t * out) {
+    if(strcmp(name,"wrap")==0) {
+        (*out) = LV_LABEL_LONG_WRAP ;
+    }
+    else if(strcmp(name,"dot")==0) {
+        (*out) = LV_LABEL_LONG_DOT ;
+    }
+    else if(strcmp(name,"scroll")==0) {
+        (*out) = LV_LABEL_LONG_SCROLL ;
+    }
+    else if(strcmp(name,"scroll-circular")==0) {
+        (*out) = LV_LABEL_LONG_SCROLL_CIRCULAR ;
+    }
+    else if(strcmp(name,"clip")==0) {
+        (*out) = LV_LABEL_LONG_CLIP ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_label_long_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_label_long_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_label_long_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_label_long_mode_const_to_str(lv_label_long_mode_t code) {
+
+    switch(code) {
+        case LV_LABEL_LONG_WRAP: return "wrap";
+        case LV_LABEL_LONG_DOT: return "dot";
+        case LV_LABEL_LONG_SCROLL: return "scroll";
+        case LV_LABEL_LONG_SCROLL_CIRCULAR: return "scroll-circular";
+        case LV_LABEL_LONG_CLIP: return "clip";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_label_long_mode_const_to_jsstr(JSContext *ctx, lv_label_long_mode_t code) {
+    return JS_NewString(ctx, lv_label_long_mode_const_to_str(code));
+}
+
+// lv_bar_mode_t
+bool lv_bar_mode_str_to_const(const char * name, lv_bar_mode_t * out) {
+    if(strcmp(name,"mode-normal")==0) {
+        (*out) = LV_BAR_MODE_NORMAL ;
+    }
+    else if(strcmp(name,"mode-symmetrical")==0) {
+        (*out) = LV_BAR_MODE_SYMMETRICAL ;
+    }
+    else if(strcmp(name,"mode-range")==0) {
+        (*out) = LV_BAR_MODE_RANGE ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_bar_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_bar_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_bar_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_bar_mode_const_to_str(lv_bar_mode_t code) {
+
+    switch(code) {
+        case LV_BAR_MODE_NORMAL: return "mode-normal";
+        case LV_BAR_MODE_SYMMETRICAL: return "mode-symmetrical";
+        case LV_BAR_MODE_RANGE: return "mode-range";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_bar_mode_const_to_jsstr(JSContext *ctx, lv_bar_mode_t code) {
+    return JS_NewString(ctx, lv_bar_mode_const_to_str(code));
 }
 
 // lv_imagebutton_state_t

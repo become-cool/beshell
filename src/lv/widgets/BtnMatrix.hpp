@@ -23,14 +23,12 @@ namespace be::lv {
         static JSValue getOneChecked(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setOneChecked(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getPopovers(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsClearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsClearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsHasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -5,10 +5,8 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> ImgBtn::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",be::lv::Obj::invalidGetter,ImgBtn::setState) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -45,11 +43,9 @@ namespace be::lv {
         lv_imagebutton_set_state(thisobj->lvobj(), state) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
 
 // AUTO GENERATE CODE END [METHODS] --------
 

@@ -11,14 +11,12 @@ namespace be::lv {
         JS_CGETSET_DEF("knobOffset",Arc::getKnobOffset,Arc::setKnobOffset) ,
         JS_CGETSET_DEF("minValue",Arc::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Arc::getMaxValue,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         // void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
         // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -75,10 +73,15 @@ namespace be::lv {
     }
     JSValue Arc::setMode(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
-        uint8_t mode ;
-        if(JS_ToUint32(ctx, (uint32_t *) &mode, val)!=0){
-            JSTHROW("arg %s of method %s.%s() must be a %s","mode","Arc","setMode","number")
+        // argv mode
+        const char * cstr_val = JS_ToCString(ctx, val) ;
+        lv_arc_mode_t mode;
+        if(lv_arc_mode_str_to_const(cstr_val,&mode)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_arc_mode_t",cstr_val) ;
+            JS_FreeCString(ctx, cstr_val) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_val) ;
         lv_arc_set_mode(thisobj->lvobj(), mode) ;
         return JS_UNDEFINED ;
     }
@@ -145,7 +148,6 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -157,7 +159,6 @@ namespace be::lv {
 
         // Unsupported arg type: const lv_obj_t *
         // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

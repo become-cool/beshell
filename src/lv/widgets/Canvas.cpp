@@ -5,7 +5,6 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Canvas::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("fillBg", 2, Canvas::jsFillBg),
@@ -13,7 +12,6 @@ namespace be::lv {
         // void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf, const lv_area_t * dest_area)
         // void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
         // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -47,7 +45,6 @@ namespace be::lv {
     // unspported type: const void *
     // JSValue Canvas::getBuf(JSContext *ctx, JSValueConst this_val){}
     // const void * lv_canvas_get_buf(lv_obj_t * canvas)
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -61,10 +58,15 @@ namespace be::lv {
             if(JS_ToUint32(ctx, (uint32_t *) &color, argv[0])!=0){
                 JSTHROW("arg %s of method %s.%s() must be a %s","color","Canvas","fillBg","number")
             }
-            uint8_t opa ;
-            if(JS_ToUint32(ctx, (uint32_t *) &opa, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","opa","Canvas","fillBg","number")
+            // argv opa
+            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+            lv_opa_t opa;
+            if(lv_opa_str_to_const(cstr_argv_1_,&opa)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_opa_t",cstr_argv_1_) ;
+                JS_FreeCString(ctx, cstr_argv_1_) ;
+                return JS_EXCEPTION ;
             }
+            JS_FreeCString(ctx, cstr_argv_1_) ;
             lv_canvas_fill_bg( thisobj->lvobj(), color, opa ) ;
             return JS_UNDEFINED ;
         }
@@ -74,7 +76,6 @@ namespace be::lv {
 
         // Unsupported arg type: lv_layer_t *
         // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

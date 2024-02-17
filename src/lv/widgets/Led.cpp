@@ -6,13 +6,11 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("color",be::lv::Obj::invalidGetter,Led::setColor) ,
         JS_CGETSET_DEF("brightness",Led::getBrightness,Led::setBrightness) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("on", 0, Led::jsOn),
         JS_CFUNC_DEF("off", 0, Led::jsOff),
         JS_CFUNC_DEF("toggle", 0, Led::jsToggle),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -58,7 +56,6 @@ namespace be::lv {
         lv_led_set_brightness(thisobj->lvobj(), brightness) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -79,7 +76,6 @@ namespace be::lv {
             lv_led_toggle( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

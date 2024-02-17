@@ -24,7 +24,6 @@ namespace be::lv {
         static JSValue setUpdateMode(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getPressedPoint(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getFirstPointCenterOffset(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -33,7 +32,6 @@ namespace be::lv {
         static JSValue jsRemoveSeries(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsHideSeries(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsAddCursor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

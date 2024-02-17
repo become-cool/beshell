@@ -3,6 +3,7 @@
 namespace be::lv {
     DEFINE_NCLASS_META(Img, Obj)
     std::vector<JSCFunctionListEntry> Img::methods = {
+        JS_CGETSET_DEF("src",Img::getSrc,Img::setSrc) ,
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("offsetX",Img::getOffsetX,Img::setOffsetX) ,
         JS_CGETSET_DEF("offsetY",Img::getOffsetY,Img::setOffsetY) ,
@@ -13,7 +14,6 @@ namespace be::lv {
         JS_CGETSET_DEF("blendMode",Img::getBlendMode,Img::setBlendMode) ,
         JS_CGETSET_DEF("antialias",Img::getAntialias,Img::setAntialias) ,
         JS_CGETSET_DEF("align",Img::getAlign,Img::setAlign) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
@@ -34,7 +34,6 @@ namespace be::lv {
         // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
         // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
         // void lv_image_cache_drop(const void * src)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -54,6 +53,22 @@ namespace be::lv {
         Img * widget = new Img(ctx,lvparent) ;
         return widget->jsobj ;
     }
+
+
+    JSValue Img::getSrc(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Img,thisobj)
+        const char * value = (char *)lv_image_get_src(thisobj->lvobj()) ;
+        return value? JS_NewString(ctx, value): JS_NULL ;
+    }
+    JSValue Img::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){
+        THIS_NCLASS(Img,thisobj)
+        const char * src = (char *)JS_ToCString(ctx, value) ;
+        lv_image_set_src(thisobj->lvobj(), src) ;
+        JS_FreeCString(ctx, src) ;
+        return JS_UNDEFINED ;
+    }
+
+
 
 // AUTO GENERATE CODE START [GETSETS] --------
     // unspported type: const void *
@@ -204,7 +219,6 @@ namespace be::lv {
         lv_image_set_align(thisobj->lvobj(), align) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -258,7 +272,6 @@ namespace be::lv {
 
         // Unsupported arg type: const void *
         // void lv_image_cache_drop(const void * src)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

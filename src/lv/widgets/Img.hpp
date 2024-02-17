@@ -15,6 +15,8 @@ namespace be::lv {
         Img(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static JSValue getSrc(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getOffsetX(JSContext *ctx, JSValueConst this_val) ;
@@ -35,7 +37,6 @@ namespace be::lv {
         static JSValue setAntialias(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getAlign(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -56,7 +57,6 @@ namespace be::lv {
         static JSValue jsDecoderAddToCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsDecoderPostProcess(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsCacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

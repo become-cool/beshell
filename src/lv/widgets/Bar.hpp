@@ -23,12 +23,10 @@ namespace be::lv {
         static JSValue getStartValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMinValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMaxValue(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsIsSymmetrical(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

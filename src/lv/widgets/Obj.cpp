@@ -55,6 +55,8 @@ namespace be::lv {
         JS_CFUNC_DEF("addFlag", 1, Obj::jsAddFlag),
         JS_CFUNC_DEF("removeFlag", 1, Obj::jsRemoveFlag),
         JS_CFUNC_DEF("updateFlag", 2, Obj::jsUpdateFlag),
+        JS_CFUNC_DEF("addState", 1, Obj::jsAddState),
+        JS_CFUNC_DEF("removeState", 1, Obj::jsRemoveState),
         JS_CFUNC_DEF("allocateSpecAttr", 0, Obj::jsAllocateSpecAttr),
         JS_CFUNC_DEF("classInitObj", 0, Obj::jsClassInitObj),
         JS_CFUNC_DEF("isEditable", 0, Obj::jsIsEditable),
@@ -80,8 +82,6 @@ namespace be::lv {
         JS_CFUNC_DEF("scrollbarInvalidate", 0, Obj::jsScrollbarInvalidate),
         JS_CFUNC_DEF("readjustScroll", 1, Obj::jsReadjustScroll),
         JS_CFUNC_DEF("removeStyleAll", 0, Obj::jsRemoveStyleAll),
-        JS_CFUNC_DEF("refreshStyle", 2, Obj::jsRefreshStyle),
-        JS_CFUNC_DEF("removeLocalStyleProp", 2, Obj::jsRemoveLocalStyleProp),
         JS_CFUNC_DEF("fadeIn", 2, Obj::jsFadeIn),
         JS_CFUNC_DEF("fadeOut", 2, Obj::jsFadeOut),
         JS_CFUNC_DEF("delete", 0, Obj::jsDelete),
@@ -92,8 +92,6 @@ namespace be::lv {
         JS_CFUNC_DEF("moveToIndex", 1, Obj::jsMoveToIndex),
         JS_CFUNC_DEF("dumpTree", 0, Obj::jsDumpTree),
         // Unsupported arg type:
-        // void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
-        // void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
         // bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
         // bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
         // bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
@@ -124,8 +122,10 @@ namespace be::lv {
         // bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style, lv_style_selector_t selector)
         // void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
         // void lv_obj_report_style_change(lv_style_t * style)
+        // void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         // void lv_obj_enable_style_refresh(bool en)
         // bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
+        // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
         // lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
         // void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
         // void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
@@ -391,10 +391,15 @@ namespace be::lv {
     }
     JSValue Obj::setScrollbarMode(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
-        uint8_t scrollbarMode ;
-        if(JS_ToUint32(ctx, (uint32_t *) &scrollbarMode, val)!=0){
-            JSTHROW("arg %s of method %s.%s() must be a %s","scrollbarMode","Obj","setScrollbarMode","number")
+        // argv scrollbarMode
+        const char * cstr_val = JS_ToCString(ctx, val) ;
+        lv_scrollbar_mode_t scrollbarMode;
+        if(lv_scrollbar_mode_str_to_const(cstr_val,&scrollbarMode)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_scrollbar_mode_t",cstr_val) ;
+            JS_FreeCString(ctx, cstr_val) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_val) ;
         lv_obj_set_scrollbar_mode(thisobj->lvobj(), scrollbarMode) ;
         return JS_UNDEFINED ;
     }
@@ -557,10 +562,15 @@ namespace be::lv {
         JSValue Obj::jsAddFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             THIS_NCLASS(Obj,thisobj)
             CHECK_ARGC(1)
-            uint32_t f ;
-            if(JS_ToUint32(ctx, (uint32_t *) &f, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","f","Obj","addFlag","number")
+            // argv f
+            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+            lv_obj_flag_t f;
+            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
+                JS_FreeCString(ctx, cstr_argv_0_) ;
+                return JS_EXCEPTION ;
             }
+            JS_FreeCString(ctx, cstr_argv_0_) ;
             lv_obj_add_flag( thisobj->lvobj(), f ) ;
             return JS_UNDEFINED ;
         }
@@ -568,10 +578,15 @@ namespace be::lv {
         JSValue Obj::jsRemoveFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             THIS_NCLASS(Obj,thisobj)
             CHECK_ARGC(1)
-            uint32_t f ;
-            if(JS_ToUint32(ctx, (uint32_t *) &f, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","f","Obj","removeFlag","number")
+            // argv f
+            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+            lv_obj_flag_t f;
+            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
+                JS_FreeCString(ctx, cstr_argv_0_) ;
+                return JS_EXCEPTION ;
             }
+            JS_FreeCString(ctx, cstr_argv_0_) ;
             lv_obj_remove_flag( thisobj->lvobj(), f ) ;
             return JS_UNDEFINED ;
         }
@@ -579,20 +594,51 @@ namespace be::lv {
         JSValue Obj::jsUpdateFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             THIS_NCLASS(Obj,thisobj)
             CHECK_ARGC(2)
-            uint32_t f ;
-            if(JS_ToUint32(ctx, (uint32_t *) &f, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","f","Obj","updateFlag","number")
+            // argv f
+            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+            lv_obj_flag_t f;
+            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
+                JS_FreeCString(ctx, cstr_argv_0_) ;
+                return JS_EXCEPTION ;
             }
+            JS_FreeCString(ctx, cstr_argv_0_) ;
             bool v = JS_ToBool(ctx, argv[1]) ;
             lv_obj_update_flag( thisobj->lvobj(), f, v ) ;
             return JS_UNDEFINED ;
         }
 
-        // Unsupported arg type: lv_state_t
-        // void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
+        JSValue Obj::jsAddState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            THIS_NCLASS(Obj,thisobj)
+            CHECK_ARGC(1)
+            // argv state
+            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+            lv_state_t state;
+            if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
+                JS_FreeCString(ctx, cstr_argv_0_) ;
+                return JS_EXCEPTION ;
+            }
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            lv_obj_add_state( thisobj->lvobj(), state ) ;
+            return JS_UNDEFINED ;
+        }
 
-        // Unsupported arg type: lv_state_t
-        // void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
+        JSValue Obj::jsRemoveState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            THIS_NCLASS(Obj,thisobj)
+            CHECK_ARGC(1)
+            // argv state
+            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+            lv_state_t state;
+            if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
+                JS_FreeCString(ctx, cstr_argv_0_) ;
+                return JS_EXCEPTION ;
+            }
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            lv_obj_remove_state( thisobj->lvobj(), state ) ;
+            return JS_UNDEFINED ;
+        }
 
         // Unsupported arg type: const lv_obj_t *
         // bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
@@ -1010,25 +1056,8 @@ namespace be::lv {
         // Unsupported arg type: lv_style_t *
         // void lv_obj_report_style_change(lv_style_t * style)
 
-        JSValue Obj::jsRefreshStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t part ;
-            if(JS_ToUint32(ctx, (uint32_t *) &part, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","part","Obj","refreshStyle","number")
-            }
-            // argv prop
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_style_prop_t prop;
-            if(lv_style_prop_str_to_const(cstr_argv_1_,&prop)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_style_prop_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
-            JS_FreeCString(ctx, cstr_argv_1_) ;
-            lv_obj_refresh_style( thisobj->lvobj(), part, prop ) ;
-            return JS_UNDEFINED ;
-        }
+        // Unsupported arg type: lv_part_t
+        // void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
         // Unsupported arg type: bool
         // void lv_obj_enable_style_refresh(bool en)
@@ -1036,26 +1065,8 @@ namespace be::lv {
         // Unsupported arg type: const lv_obj_t *
         // bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
 
-        JSValue Obj::jsRemoveLocalStyleProp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            // argv prop
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_style_prop_t prop;
-            if(lv_style_prop_str_to_const(cstr_argv_0_,&prop)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_style_prop_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
-            JS_FreeCString(ctx, cstr_argv_0_) ;
-            uint32_t selector ;
-            if(JS_ToUint32(ctx, (uint32_t *) &selector, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","selector","Obj","removeLocalStyleProp","number")
-            }
-            bool retval = lv_obj_remove_local_style_prop( thisobj->lvobj(), prop, selector ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
-        }
+        // Unsupported arg type: lv_style_selector_t
+        // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
 
         JSValue Obj::jsFadeIn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             THIS_NCLASS(Obj,thisobj)

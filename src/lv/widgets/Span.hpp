@@ -29,14 +29,12 @@ namespace be::lv {
         static JSValue setMaxLines(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getSpanCount(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMaxLineHeight(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsNewSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsDeleteSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRefrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

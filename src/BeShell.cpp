@@ -97,7 +97,7 @@ namespace be {
 
 #ifdef MODULE_LV
         if(lv) {
-            lv->setup() ;
+            lv->setup(*this) ;
         }
 #endif
     }

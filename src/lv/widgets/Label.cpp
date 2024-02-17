@@ -9,7 +9,6 @@ namespace be::lv {
         JS_CGETSET_DEF("longMode",Label::getLongMode,Label::setLongMode) ,
         JS_CGETSET_DEF("textSelectionStart",Label::getTextSelectionStart,Label::setTextSelectionStart) ,
         JS_CGETSET_DEF("textSelectionEnd",Label::getTextSelectionEnd,Label::setTextSelectionEnd) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("insText", 2, Label::jsInsText),
@@ -17,7 +16,6 @@ namespace be::lv {
         // Unsupported arg type:
         // lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
         // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -65,10 +63,15 @@ namespace be::lv {
     }
     JSValue Label::setLongMode(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Label,thisobj)
-        uint8_t longMode ;
-        if(JS_ToUint32(ctx, (uint32_t *) &longMode, val)!=0){
-            JSTHROW("arg %s of method %s.%s() must be a %s","longMode","Label","setLongMode","number")
+        // argv longMode
+        const char * cstr_val = JS_ToCString(ctx, val) ;
+        lv_label_long_mode_t longMode;
+        if(lv_label_long_mode_str_to_const(cstr_val,&longMode)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_label_long_mode_t",cstr_val) ;
+            JS_FreeCString(ctx, cstr_val) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_val) ;
         lv_label_set_long_mode(thisobj->lvobj(), longMode) ;
         return JS_UNDEFINED ;
     }
@@ -102,7 +105,6 @@ namespace be::lv {
         lv_label_set_text_selection_end(thisobj->lvobj(), textSelectionEnd) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -138,7 +140,6 @@ namespace be::lv {
             lv_label_cut_text( thisobj->lvobj(), pos, cnt ) ;
             return JS_UNDEFINED ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -1,8 +1,8 @@
 #include "LVModule.hpp"
 #include "all-widgets.hpp"
+#include "Style.hpp"
 
-namespace be {
-namespace lv {
+namespace be::lv {
 
     LVModule::LVModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
@@ -10,6 +10,8 @@ namespace lv {
         exportFunction("screen",screen,0) ;
         exportFunction("loadScreen",loadScreen,0) ;
         exportFunction("test",test,0) ;
+
+        exportClass<Style>() ;
 
 // AUTO GENERATE CODE START [EXPORT WIDGETS] --------
         exportClass<Obj>() ;
@@ -80,4 +82,4 @@ namespace lv {
         return JS_UNDEFINED ;
     }
 
-}}
+}
