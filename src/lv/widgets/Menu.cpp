@@ -14,7 +14,6 @@ namespace be::lv {
         JS_CGETSET_DEF("mainHeaderBackButton",Menu::getMainHeaderBackButton,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("sidebarHeader",Menu::getSidebarHeader,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("sidebarHeaderBackButton",Menu::getSidebarHeaderBackButton,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("contCreate", 0, Menu::jsContCreate),
@@ -24,7 +23,6 @@ namespace be::lv {
         JS_CFUNC_DEF("clearHistory", 0, Menu::jsClearHistory),
         // Unsupported arg type:
         // lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -128,7 +126,6 @@ namespace be::lv {
         JSValue retval = value? be::lv::Obj::wrap(ctx, (lv_obj_t*)value)->jsobj: JS_NULL ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -170,7 +167,6 @@ namespace be::lv {
             lv_menu_clear_history( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

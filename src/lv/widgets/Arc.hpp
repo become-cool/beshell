@@ -28,14 +28,12 @@ namespace be::lv {
         static JSValue setKnobOffset(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getMinValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMaxValue(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsBindValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsAlignObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsRotateObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -9,11 +9,9 @@ namespace be::lv {
         JS_CGETSET_DEF("startValue",Bar::getStartValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("minValue",Bar::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Bar::getMaxValue,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("isSymmetrical", 0, Bar::jsIsSymmetrical),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -74,7 +72,6 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -84,7 +81,6 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

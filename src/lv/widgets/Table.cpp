@@ -6,13 +6,11 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("rowCount",Table::getRowCount,Table::setRowCount) ,
         JS_CGETSET_DEF("columnCount",Table::getColumnCount,Table::setColumnCount) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addCellCtrl", 3, Table::jsAddCellCtrl),
         JS_CFUNC_DEF("clearCellCtrl", 3, Table::jsClearCellCtrl),
         JS_CFUNC_DEF("hasCellCtrl", 3, Table::jsHasCellCtrl),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -64,7 +62,6 @@ namespace be::lv {
         lv_table_set_column_count(thisobj->lvobj(), columnCount) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -125,7 +122,6 @@ namespace be::lv {
             JSValue jsretval = JS_NewBool(ctx, retval) ;
             return jsretval ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

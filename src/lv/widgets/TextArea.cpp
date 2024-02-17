@@ -19,7 +19,6 @@ namespace be::lv {
         JS_CGETSET_DEF("align",be::lv::Obj::invalidGetter,TextArea::setAlign) ,
         JS_CGETSET_DEF("label",TextArea::getLabel,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("currentChar",TextArea::getCurrentChar,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addChar", 1, TextArea::jsAddChar),
@@ -33,7 +32,6 @@ namespace be::lv {
         JS_CFUNC_DEF("cursorUp", 0, TextArea::jsCursorUp),
         // Unsupported arg type:
         // bool lv_textarea_text_is_selected(const lv_obj_t * obj)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -211,7 +209,6 @@ namespace be::lv {
         JSValue retval = JS_NewUint32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -278,7 +275,6 @@ namespace be::lv {
             lv_textarea_cursor_up( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

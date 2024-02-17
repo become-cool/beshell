@@ -35,7 +35,6 @@ namespace be::lv {
         static JSValue setAntialias(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getAlign(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -56,7 +55,6 @@ namespace be::lv {
         static JSValue jsDecoderAddToCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsDecoderPostProcess(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsCacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -22,12 +22,10 @@ namespace be::lv {
         static JSValue getMode(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setMode(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue setPopovers(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsDefEventCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

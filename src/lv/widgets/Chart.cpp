@@ -9,7 +9,6 @@ namespace be::lv {
         JS_CGETSET_DEF("updateMode",be::lv::Obj::invalidGetter,Chart::setUpdateMode) ,
         JS_CGETSET_DEF("pressedPoint",Chart::getPressedPoint,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("firstPointCenterOffset",Chart::getFirstPointCenterOffset,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("refresh", 0, Chart::jsRefresh),
@@ -18,7 +17,6 @@ namespace be::lv {
         // void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
         // void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
         // lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -101,7 +99,6 @@ namespace be::lv {
         JSValue retval = JS_NewInt32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -122,7 +119,6 @@ namespace be::lv {
 
         // Unsupported return type: lv_chart_cursor_t  *
         // lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

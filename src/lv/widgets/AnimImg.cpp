@@ -7,11 +7,9 @@ namespace be::lv {
         JS_CGETSET_DEF("duration",AnimImg::getDuration,AnimImg::setDuration) ,
         JS_CGETSET_DEF("repeatCount",AnimImg::getRepeatCount,AnimImg::setRepeatCount) ,
         JS_CGETSET_DEF("srcCount",AnimImg::getSrcCount,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("start", 0, AnimImg::jsStart),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -72,7 +70,6 @@ namespace be::lv {
         JSValue retval = JS_NewUint32(ctx, value) ;
         return retval ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -81,7 +78,6 @@ namespace be::lv {
             lv_animimg_start( thisobj->lvobj() ) ;
             return JS_UNDEFINED ;
         }
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

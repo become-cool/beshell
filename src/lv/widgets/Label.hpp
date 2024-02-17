@@ -26,7 +26,6 @@ namespace be::lv {
         static JSValue setTextSelectionStart(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getTextSelectionEnd(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setTextSelectionEnd(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -34,7 +33,6 @@ namespace be::lv {
         static JSValue jsIsCharUnderPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsInsText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsCutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

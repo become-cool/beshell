@@ -20,12 +20,10 @@ namespace be::lv {
         static JSValue setVisibleRowCount(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getSelected(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getOptionCount(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue jsBindValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -19,11 +19,9 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getYInvert(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setYInvert(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
 
 // AUTO GENERATE CODE END [METHODS] --------
     } ;

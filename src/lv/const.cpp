@@ -288,10 +288,10 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"ing")==0) {
         (*out) = LV_EVENT_PRESSING ;
     }
-    else if(strcmp(name,"-lost")==0) {
+    else if(strcmp(name,"lost")==0) {
         (*out) = LV_EVENT_PRESS_LOST ;
     }
-    else if(strcmp(name,"-clicked")==0) {
+    else if(strcmp(name,"clicked")==0) {
         (*out) = LV_EVENT_SHORT_CLICKED ;
     }
     else if(strcmp(name,"pressed")==0) {
@@ -336,10 +336,10 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"est")==0) {
         (*out) = LV_EVENT_HIT_TEST ;
     }
-    else if(strcmp(name,"-reset")==0) {
+    else if(strcmp(name,"reset")==0) {
         (*out) = LV_EVENT_INDEV_RESET ;
     }
-    else if(strcmp(name,"-check")==0) {
+    else if(strcmp(name,"check")==0) {
         (*out) = LV_EVENT_COVER_CHECK ;
     }
     else if(strcmp(name,"ext-draw-size")==0) {
@@ -366,7 +366,7 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"task-added")==0) {
         (*out) = LV_EVENT_DRAW_TASK_ADDED ;
     }
-    else if(strcmp(name,"-changed")==0) {
+    else if(strcmp(name,"changed")==0) {
         (*out) = LV_EVENT_VALUE_CHANGED ;
     }
     else if(strcmp(name,"t")==0) {
@@ -387,13 +387,13 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"e")==0) {
         (*out) = LV_EVENT_DELETE ;
     }
-    else if(strcmp(name,"-changed")==0) {
+    else if(strcmp(name,"changed")==0) {
         (*out) = LV_EVENT_CHILD_CHANGED ;
     }
-    else if(strcmp(name,"-created")==0) {
+    else if(strcmp(name,"created")==0) {
         (*out) = LV_EVENT_CHILD_CREATED ;
     }
-    else if(strcmp(name,"-deleted")==0) {
+    else if(strcmp(name,"deleted")==0) {
         (*out) = LV_EVENT_CHILD_DELETED ;
     }
     else if(strcmp(name,"n-unload-start")==0) {
@@ -411,7 +411,7 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"changed")==0) {
         (*out) = LV_EVENT_SIZE_CHANGED ;
     }
-    else if(strcmp(name,"-changed")==0) {
+    else if(strcmp(name,"changed")==0) {
         (*out) = LV_EVENT_STYLE_CHANGED ;
     }
     else if(strcmp(name,"t-changed")==0) {
@@ -426,7 +426,7 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"ution-changed")==0) {
         (*out) = LV_EVENT_RESOLUTION_CHANGED ;
     }
-    else if(strcmp(name,"-format-changed")==0) {
+    else if(strcmp(name,"format-changed")==0) {
         (*out) = LV_EVENT_COLOR_FORMAT_CHANGED ;
     }
     else if(strcmp(name,"request")==0) {
@@ -444,10 +444,10 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"r-ready")==0) {
         (*out) = LV_EVENT_RENDER_READY ;
     }
-    else if(strcmp(name,"-start")==0) {
+    else if(strcmp(name,"start")==0) {
         (*out) = LV_EVENT_FLUSH_START ;
     }
-    else if(strcmp(name,"-finish")==0) {
+    else if(strcmp(name,"finish")==0) {
         (*out) = LV_EVENT_FLUSH_FINISH ;
     }
     else if(strcmp(name,"")==0) {
@@ -477,8 +477,8 @@ const char * lv_event_code_const_to_str(lv_event_code_t code) {
         case LV_EVENT_ALL: return "";
         case LV_EVENT_PRESSED: return "ed";
         case LV_EVENT_PRESSING: return "ing";
-        case LV_EVENT_PRESS_LOST: return "-lost";
-        case LV_EVENT_SHORT_CLICKED: return "-clicked";
+        case LV_EVENT_PRESS_LOST: return "lost";
+        case LV_EVENT_SHORT_CLICKED: return "clicked";
         case LV_EVENT_LONG_PRESSED: return "pressed";
         case LV_EVENT_LONG_PRESSED_REPEAT: return "pressed-repeat";
         case LV_EVENT_CLICKED: return "ed";
@@ -493,8 +493,8 @@ const char * lv_event_code_const_to_str(lv_event_code_t code) {
         case LV_EVENT_DEFOCUSED: return "used";
         case LV_EVENT_LEAVE: return "";
         case LV_EVENT_HIT_TEST: return "est";
-        case LV_EVENT_INDEV_RESET: return "-reset";
-        case LV_EVENT_COVER_CHECK: return "-check";
+        case LV_EVENT_INDEV_RESET: return "reset";
+        case LV_EVENT_COVER_CHECK: return "check";
         case LV_EVENT_REFR_EXT_DRAW_SIZE: return "ext-draw-size";
         case LV_EVENT_DRAW_MAIN_BEGIN: return "main-begin";
         case LV_EVENT_DRAW_MAIN: return "main";
@@ -503,34 +503,34 @@ const char * lv_event_code_const_to_str(lv_event_code_t code) {
         case LV_EVENT_DRAW_POST: return "post";
         case LV_EVENT_DRAW_POST_END: return "post-end";
         case LV_EVENT_DRAW_TASK_ADDED: return "task-added";
-        case LV_EVENT_VALUE_CHANGED: return "-changed";
+        case LV_EVENT_VALUE_CHANGED: return "changed";
         case LV_EVENT_INSERT: return "t";
         case LV_EVENT_REFRESH: return "sh";
         case LV_EVENT_READY: return "";
         case LV_EVENT_CANCEL: return "l";
         case LV_EVENT_CREATE: return "e";
         case LV_EVENT_DELETE: return "e";
-        case LV_EVENT_CHILD_CHANGED: return "-changed";
-        case LV_EVENT_CHILD_CREATED: return "-created";
-        case LV_EVENT_CHILD_DELETED: return "-deleted";
+        case LV_EVENT_CHILD_CHANGED: return "changed";
+        case LV_EVENT_CHILD_CREATED: return "created";
+        case LV_EVENT_CHILD_DELETED: return "deleted";
         case LV_EVENT_SCREEN_UNLOAD_START: return "n-unload-start";
         case LV_EVENT_SCREEN_LOAD_START: return "n-load-start";
         case LV_EVENT_SCREEN_LOADED: return "n-loaded";
         case LV_EVENT_SCREEN_UNLOADED: return "n-unloaded";
         case LV_EVENT_SIZE_CHANGED: return "changed";
-        case LV_EVENT_STYLE_CHANGED: return "-changed";
+        case LV_EVENT_STYLE_CHANGED: return "changed";
         case LV_EVENT_LAYOUT_CHANGED: return "t-changed";
         case LV_EVENT_GET_SELF_SIZE: return "elf-size";
         case LV_EVENT_INVALIDATE_AREA: return "idate-area";
         case LV_EVENT_RESOLUTION_CHANGED: return "ution-changed";
-        case LV_EVENT_COLOR_FORMAT_CHANGED: return "-format-changed";
+        case LV_EVENT_COLOR_FORMAT_CHANGED: return "format-changed";
         case LV_EVENT_REFR_REQUEST: return "request";
         case LV_EVENT_REFR_START: return "start";
         case LV_EVENT_REFR_READY: return "ready";
         case LV_EVENT_RENDER_START: return "r-start";
         case LV_EVENT_RENDER_READY: return "r-ready";
-        case LV_EVENT_FLUSH_START: return "-start";
-        case LV_EVENT_FLUSH_FINISH: return "-finish";
+        case LV_EVENT_FLUSH_START: return "start";
+        case LV_EVENT_FLUSH_FINISH: return "finish";
         case LV_EVENT_VSYNC: return "";
         case _LV_EVENT_LAST: return "";
         case LV_EVENT_PREPROCESS: return "ocess";
@@ -741,13 +741,13 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"w-spread")==0) {
         (*out) = LV_STYLE_SHADOW_SPREAD ;
     }
-    else if(strcmp(name,"-opa")==0) {
+    else if(strcmp(name,"opa")==0) {
         (*out) = LV_STYLE_IMAGE_OPA ;
     }
-    else if(strcmp(name,"-recolor")==0) {
+    else if(strcmp(name,"recolor")==0) {
         (*out) = LV_STYLE_IMAGE_RECOLOR ;
     }
-    else if(strcmp(name,"-recolor-opa")==0) {
+    else if(strcmp(name,"recolor-opa")==0) {
         (*out) = LV_STYLE_IMAGE_RECOLOR_OPA ;
     }
     else if(strcmp(name,"width")==0) {
@@ -810,10 +810,10 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"ayered")==0) {
         (*out) = LV_STYLE_OPA_LAYERED ;
     }
-    else if(strcmp(name,"-filter-dsc")==0) {
+    else if(strcmp(name,"filter-dsc")==0) {
         (*out) = LV_STYLE_COLOR_FILTER_DSC ;
     }
-    else if(strcmp(name,"-filter-opa")==0) {
+    else if(strcmp(name,"filter-opa")==0) {
         (*out) = LV_STYLE_COLOR_FILTER_OPA ;
     }
     else if(strcmp(name,"")==0) {
@@ -825,7 +825,7 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"ition")==0) {
         (*out) = LV_STYLE_TRANSITION ;
     }
-    else if(strcmp(name,"-mode")==0) {
+    else if(strcmp(name,"mode")==0) {
         (*out) = LV_STYLE_BLEND_MODE ;
     }
     else if(strcmp(name,"form-width")==0) {
@@ -906,7 +906,7 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"cell-y-align")==0) {
         (*out) = LV_STYLE_GRID_CELL_Y_ALIGN ;
     }
-    else if(strcmp(name,"-built-in-prop")==0) {
+    else if(strcmp(name,"built-in-prop")==0) {
         (*out) = _LV_STYLE_LAST_BUILT_IN_PROP ;
     }
     else if(strcmp(name,"built-in-props")==0) {
@@ -915,7 +915,7 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"any")==0) {
         (*out) = LV_STYLE_PROP_ANY ;
     }
-    else if(strcmp(name,"-const")==0) {
+    else if(strcmp(name,"const")==0) {
         (*out) = _LV_STYLE_PROP_CONST ;
     }
 
@@ -987,9 +987,9 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_SHADOW_OFFSET_X: return "w-offset-x";
         case LV_STYLE_SHADOW_OFFSET_Y: return "w-offset-y";
         case LV_STYLE_SHADOW_SPREAD: return "w-spread";
-        case LV_STYLE_IMAGE_OPA: return "-opa";
-        case LV_STYLE_IMAGE_RECOLOR: return "-recolor";
-        case LV_STYLE_IMAGE_RECOLOR_OPA: return "-recolor-opa";
+        case LV_STYLE_IMAGE_OPA: return "opa";
+        case LV_STYLE_IMAGE_RECOLOR: return "recolor";
+        case LV_STYLE_IMAGE_RECOLOR_OPA: return "recolor-opa";
         case LV_STYLE_LINE_WIDTH: return "width";
         case LV_STYLE_LINE_DASH_WIDTH: return "dash-width";
         case LV_STYLE_LINE_DASH_GAP: return "dash-gap";
@@ -1010,12 +1010,12 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_TEXT_ALIGN: return "align";
         case LV_STYLE_OPA: return "";
         case LV_STYLE_OPA_LAYERED: return "ayered";
-        case LV_STYLE_COLOR_FILTER_DSC: return "-filter-dsc";
-        case LV_STYLE_COLOR_FILTER_OPA: return "-filter-opa";
+        case LV_STYLE_COLOR_FILTER_DSC: return "filter-dsc";
+        case LV_STYLE_COLOR_FILTER_OPA: return "filter-opa";
         case LV_STYLE_ANIM: return "";
         case LV_STYLE_ANIM_DURATION: return "duration";
         case LV_STYLE_TRANSITION: return "ition";
-        case LV_STYLE_BLEND_MODE: return "-mode";
+        case LV_STYLE_BLEND_MODE: return "mode";
         case LV_STYLE_TRANSFORM_WIDTH: return "form-width";
         case LV_STYLE_TRANSFORM_HEIGHT: return "form-height";
         case LV_STYLE_TRANSLATE_X: return "late-x";
@@ -1042,7 +1042,7 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_GRID_CELL_ROW_POS: return "cell-row-pos";
         case LV_STYLE_GRID_CELL_ROW_SPAN: return "cell-row-span";
         case LV_STYLE_GRID_CELL_Y_ALIGN: return "cell-y-align";
-        case _LV_STYLE_LAST_BUILT_IN_PROP: return "-built-in-prop";
+        case _LV_STYLE_LAST_BUILT_IN_PROP: return "built-in-prop";
         case _LV_STYLE_NUM_BUILT_IN_PROPS: return "built-in-props";
         case LV_STYLE_PROP_ANY: return "any";
 
@@ -1056,28 +1056,28 @@ JSValue lv_style_prop_const_to_jsstr(JSContext *ctx, lv_style_prop_t code) {
 
 // lv_keyboard_mode_t
 bool lv_keyboard_mode_str_to_const(const char * name, lv_keyboard_mode_t * out) {
-    if(strcmp(name,"text-lower")==0) {
+    if(strcmp(name,"mode-text-lower")==0) {
         (*out) = LV_KEYBOARD_MODE_TEXT_LOWER ;
     }
-    else if(strcmp(name,"text-upper")==0) {
+    else if(strcmp(name,"mode-text-upper")==0) {
         (*out) = LV_KEYBOARD_MODE_TEXT_UPPER ;
     }
-    else if(strcmp(name,"special")==0) {
+    else if(strcmp(name,"mode-special")==0) {
         (*out) = LV_KEYBOARD_MODE_SPECIAL ;
     }
-    else if(strcmp(name,"number")==0) {
+    else if(strcmp(name,"mode-number")==0) {
         (*out) = LV_KEYBOARD_MODE_NUMBER ;
     }
-    else if(strcmp(name,"user-1")==0) {
+    else if(strcmp(name,"mode-user-1")==0) {
         (*out) = LV_KEYBOARD_MODE_USER_1 ;
     }
-    else if(strcmp(name,"user-2")==0) {
+    else if(strcmp(name,"mode-user-2")==0) {
         (*out) = LV_KEYBOARD_MODE_USER_2 ;
     }
-    else if(strcmp(name,"user-3")==0) {
+    else if(strcmp(name,"mode-user-3")==0) {
         (*out) = LV_KEYBOARD_MODE_USER_3 ;
     }
-    else if(strcmp(name,"user-4")==0) {
+    else if(strcmp(name,"mode-user-4")==0) {
         (*out) = LV_KEYBOARD_MODE_USER_4 ;
     }
 
@@ -1095,14 +1095,14 @@ bool lv_keyboard_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_keyboard_
 const char * lv_keyboard_mode_const_to_str(lv_keyboard_mode_t code) {
 
     switch(code) {
-        case LV_KEYBOARD_MODE_TEXT_LOWER: return "text-lower";
-        case LV_KEYBOARD_MODE_TEXT_UPPER: return "text-upper";
-        case LV_KEYBOARD_MODE_SPECIAL: return "special";
-        case LV_KEYBOARD_MODE_NUMBER: return "number";
-        case LV_KEYBOARD_MODE_USER_1: return "user-1";
-        case LV_KEYBOARD_MODE_USER_2: return "user-2";
-        case LV_KEYBOARD_MODE_USER_3: return "user-3";
-        case LV_KEYBOARD_MODE_USER_4: return "user-4";
+        case LV_KEYBOARD_MODE_TEXT_LOWER: return "mode-text-lower";
+        case LV_KEYBOARD_MODE_TEXT_UPPER: return "mode-text-upper";
+        case LV_KEYBOARD_MODE_SPECIAL: return "mode-special";
+        case LV_KEYBOARD_MODE_NUMBER: return "mode-number";
+        case LV_KEYBOARD_MODE_USER_1: return "mode-user-1";
+        case LV_KEYBOARD_MODE_USER_2: return "mode-user-2";
+        case LV_KEYBOARD_MODE_USER_3: return "mode-user-3";
+        case LV_KEYBOARD_MODE_USER_4: return "mode-user-4";
 
         default:
             return "unknow";
@@ -1114,25 +1114,25 @@ JSValue lv_keyboard_mode_const_to_jsstr(JSContext *ctx, lv_keyboard_mode_t code)
 
 // lv_scale_mode_t
 bool lv_scale_mode_str_to_const(const char * name, lv_scale_mode_t * out) {
-    if(strcmp(name,"horizontal-top")==0) {
+    if(strcmp(name,"mode-horizontal-top")==0) {
         (*out) = LV_SCALE_MODE_HORIZONTAL_TOP ;
     }
-    else if(strcmp(name,"horizontal-bottom")==0) {
+    else if(strcmp(name,"mode-horizontal-bottom")==0) {
         (*out) = LV_SCALE_MODE_HORIZONTAL_BOTTOM ;
     }
-    else if(strcmp(name,"vertical-left")==0) {
+    else if(strcmp(name,"mode-vertical-left")==0) {
         (*out) = LV_SCALE_MODE_VERTICAL_LEFT ;
     }
-    else if(strcmp(name,"vertical-right")==0) {
+    else if(strcmp(name,"mode-vertical-right")==0) {
         (*out) = LV_SCALE_MODE_VERTICAL_RIGHT ;
     }
-    else if(strcmp(name,"round-inner")==0) {
+    else if(strcmp(name,"mode-round-inner")==0) {
         (*out) = LV_SCALE_MODE_ROUND_INNER ;
     }
-    else if(strcmp(name,"round-outer")==0) {
+    else if(strcmp(name,"mode-round-outer")==0) {
         (*out) = LV_SCALE_MODE_ROUND_OUTER ;
     }
-    else if(strcmp(name,"-last")==0) {
+    else if(strcmp(name,"mode-last")==0) {
         (*out) = _LV_SCALE_MODE_LAST ;
     }
 
@@ -1150,13 +1150,13 @@ bool lv_scale_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_scale_mode_t
 const char * lv_scale_mode_const_to_str(lv_scale_mode_t code) {
 
     switch(code) {
-        case LV_SCALE_MODE_HORIZONTAL_TOP: return "horizontal-top";
-        case LV_SCALE_MODE_HORIZONTAL_BOTTOM: return "horizontal-bottom";
-        case LV_SCALE_MODE_VERTICAL_LEFT: return "vertical-left";
-        case LV_SCALE_MODE_VERTICAL_RIGHT: return "vertical-right";
-        case LV_SCALE_MODE_ROUND_INNER: return "round-inner";
-        case LV_SCALE_MODE_ROUND_OUTER: return "round-outer";
-        case _LV_SCALE_MODE_LAST: return "-last";
+        case LV_SCALE_MODE_HORIZONTAL_TOP: return "mode-horizontal-top";
+        case LV_SCALE_MODE_HORIZONTAL_BOTTOM: return "mode-horizontal-bottom";
+        case LV_SCALE_MODE_VERTICAL_LEFT: return "mode-vertical-left";
+        case LV_SCALE_MODE_VERTICAL_RIGHT: return "mode-vertical-right";
+        case LV_SCALE_MODE_ROUND_INNER: return "mode-round-inner";
+        case LV_SCALE_MODE_ROUND_OUTER: return "mode-round-outer";
+        case _LV_SCALE_MODE_LAST: return "mode-last";
 
         default:
             return "unknow";
@@ -1192,13 +1192,13 @@ bool lv_buttonmatrix_ctrl_str_to_const(const char * name, lv_buttonmatrix_ctrl_t
     else if(strcmp(name,"popover")==0) {
         (*out) = LV_BUTTONMATRIX_CTRL_POPOVER ;
     }
-    else if(strcmp(name,"-reserved-1")==0) {
+    else if(strcmp(name,"reserved-1")==0) {
         (*out) = _LV_BUTTONMATRIX_CTRL_RESERVED_1 ;
     }
-    else if(strcmp(name,"-reserved-2")==0) {
+    else if(strcmp(name,"reserved-2")==0) {
         (*out) = _LV_BUTTONMATRIX_CTRL_RESERVED_2 ;
     }
-    else if(strcmp(name,"-reserved-3")==0) {
+    else if(strcmp(name,"reserved-3")==0) {
         (*out) = _LV_BUTTONMATRIX_CTRL_RESERVED_3 ;
     }
     else if(strcmp(name,"custom-1")==0) {
@@ -1230,9 +1230,9 @@ const char * lv_buttonmatrix_ctrl_const_to_str(lv_buttonmatrix_ctrl_t code) {
         case LV_BUTTONMATRIX_CTRL_CHECKED: return "checked";
         case LV_BUTTONMATRIX_CTRL_CLICK_TRIG: return "click-trig";
         case LV_BUTTONMATRIX_CTRL_POPOVER: return "popover";
-        case _LV_BUTTONMATRIX_CTRL_RESERVED_1: return "-reserved-1";
-        case _LV_BUTTONMATRIX_CTRL_RESERVED_2: return "-reserved-2";
-        case _LV_BUTTONMATRIX_CTRL_RESERVED_3: return "-reserved-3";
+        case _LV_BUTTONMATRIX_CTRL_RESERVED_1: return "reserved-1";
+        case _LV_BUTTONMATRIX_CTRL_RESERVED_2: return "reserved-2";
+        case _LV_BUTTONMATRIX_CTRL_RESERVED_3: return "reserved-3";
         case LV_BUTTONMATRIX_CTRL_CUSTOM_1: return "custom-1";
         case LV_BUTTONMATRIX_CTRL_CUSTOM_2: return "custom-2";
 
@@ -1288,10 +1288,10 @@ JSValue lv_chart_type_const_to_jsstr(JSContext *ctx, lv_chart_type_t code) {
 
 // lv_chart_update_mode_t
 bool lv_chart_update_mode_str_to_const(const char * name, lv_chart_update_mode_t * out) {
-    if(strcmp(name,"shift")==0) {
+    if(strcmp(name,"mode-shift")==0) {
         (*out) = LV_CHART_UPDATE_MODE_SHIFT ;
     }
-    else if(strcmp(name,"circular")==0) {
+    else if(strcmp(name,"mode-circular")==0) {
         (*out) = LV_CHART_UPDATE_MODE_CIRCULAR ;
     }
 
@@ -1309,8 +1309,8 @@ bool lv_chart_update_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_chart
 const char * lv_chart_update_mode_const_to_str(lv_chart_update_mode_t code) {
 
     switch(code) {
-        case LV_CHART_UPDATE_MODE_SHIFT: return "shift";
-        case LV_CHART_UPDATE_MODE_CIRCULAR: return "circular";
+        case LV_CHART_UPDATE_MODE_SHIFT: return "mode-shift";
+        case LV_CHART_UPDATE_MODE_CIRCULAR: return "mode-circular";
 
         default:
             return "unknow";
@@ -1334,7 +1334,7 @@ bool lv_chart_axis_str_to_const(const char * name, lv_chart_axis_t * out) {
     else if(strcmp(name,"secondary-x")==0) {
         (*out) = LV_CHART_AXIS_SECONDARY_X ;
     }
-    else if(strcmp(name,"-last")==0) {
+    else if(strcmp(name,"last")==0) {
         (*out) = _LV_CHART_AXIS_LAST ;
     }
 
@@ -1356,7 +1356,7 @@ const char * lv_chart_axis_const_to_str(lv_chart_axis_t code) {
         case LV_CHART_AXIS_SECONDARY_Y: return "secondary-y";
         case LV_CHART_AXIS_PRIMARY_X: return "primary-x";
         case LV_CHART_AXIS_SECONDARY_X: return "secondary-x";
-        case _LV_CHART_AXIS_LAST: return "-last";
+        case _LV_CHART_AXIS_LAST: return "last";
 
         default:
             return "unknow";
@@ -1368,16 +1368,16 @@ JSValue lv_chart_axis_const_to_jsstr(JSContext *ctx, lv_chart_axis_t code) {
 
 // lv_blend_mode_t
 bool lv_blend_mode_str_to_const(const char * name, lv_blend_mode_t * out) {
-    if(strcmp(name,"normal")==0) {
+    if(strcmp(name,"mode-normal")==0) {
         (*out) = LV_BLEND_MODE_NORMAL ;
     }
-    else if(strcmp(name,"additive")==0) {
+    else if(strcmp(name,"mode-additive")==0) {
         (*out) = LV_BLEND_MODE_ADDITIVE ;
     }
-    else if(strcmp(name,"subtractive")==0) {
+    else if(strcmp(name,"mode-subtractive")==0) {
         (*out) = LV_BLEND_MODE_SUBTRACTIVE ;
     }
-    else if(strcmp(name,"multiply")==0) {
+    else if(strcmp(name,"mode-multiply")==0) {
         (*out) = LV_BLEND_MODE_MULTIPLY ;
     }
 
@@ -1395,10 +1395,10 @@ bool lv_blend_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_blend_mode_t
 const char * lv_blend_mode_const_to_str(lv_blend_mode_t code) {
 
     switch(code) {
-        case LV_BLEND_MODE_NORMAL: return "normal";
-        case LV_BLEND_MODE_ADDITIVE: return "additive";
-        case LV_BLEND_MODE_SUBTRACTIVE: return "subtractive";
-        case LV_BLEND_MODE_MULTIPLY: return "multiply";
+        case LV_BLEND_MODE_NORMAL: return "mode-normal";
+        case LV_BLEND_MODE_ADDITIVE: return "mode-additive";
+        case LV_BLEND_MODE_SUBTRACTIVE: return "mode-subtractive";
+        case LV_BLEND_MODE_MULTIPLY: return "mode-multiply";
 
         default:
             return "unknow";
@@ -1440,7 +1440,7 @@ bool lv_image_align_str_to_const(const char * name, lv_image_align_t * out) {
     else if(strcmp(name,"center")==0) {
         (*out) = LV_IMAGE_ALIGN_CENTER ;
     }
-    else if(strcmp(name,"-auto-transform")==0) {
+    else if(strcmp(name,"auto-transform")==0) {
         (*out) = _LV_IMAGE_ALIGN_AUTO_TRANSFORM ;
     }
     else if(strcmp(name,"stretch")==0) {
@@ -1474,7 +1474,7 @@ const char * lv_image_align_const_to_str(lv_image_align_t code) {
         case LV_IMAGE_ALIGN_LEFT_MID: return "left-mid";
         case LV_IMAGE_ALIGN_RIGHT_MID: return "right-mid";
         case LV_IMAGE_ALIGN_CENTER: return "center";
-        case _LV_IMAGE_ALIGN_AUTO_TRANSFORM: return "-auto-transform";
+        case _LV_IMAGE_ALIGN_AUTO_TRANSFORM: return "auto-transform";
         case LV_IMAGE_ALIGN_STRETCH: return "stretch";
         case LV_IMAGE_ALIGN_TILE: return "tile";
 
@@ -1506,7 +1506,7 @@ bool lv_imagebutton_state_str_to_const(const char * name, lv_imagebutton_state_t
     else if(strcmp(name,"checked-disabled")==0) {
         (*out) = LV_IMAGEBUTTON_STATE_CHECKED_DISABLED ;
     }
-    else if(strcmp(name,"-num")==0) {
+    else if(strcmp(name,"num")==0) {
         (*out) = _LV_IMAGEBUTTON_STATE_NUM ;
     }
 
@@ -1530,7 +1530,7 @@ const char * lv_imagebutton_state_const_to_str(lv_imagebutton_state_t code) {
         case LV_IMAGEBUTTON_STATE_CHECKED_RELEASED: return "checked-released";
         case LV_IMAGEBUTTON_STATE_CHECKED_PRESSED: return "checked-pressed";
         case LV_IMAGEBUTTON_STATE_CHECKED_DISABLED: return "checked-disabled";
-        case _LV_IMAGEBUTTON_STATE_NUM: return "-num";
+        case _LV_IMAGEBUTTON_STATE_NUM: return "num";
 
         default:
             return "unknow";
@@ -1542,13 +1542,13 @@ JSValue lv_imagebutton_state_const_to_jsstr(JSContext *ctx, lv_imagebutton_state
 
 // lv_menu_mode_header_t
 bool lv_menu_mode_header_str_to_const(const char * name, lv_menu_mode_header_t * out) {
-    if(strcmp(name,"ixed")==0) {
+    if(strcmp(name,"top-fixed")==0) {
         (*out) = LV_MENU_HEADER_TOP_FIXED ;
     }
-    else if(strcmp(name,"nfixed")==0) {
+    else if(strcmp(name,"top-unfixed")==0) {
         (*out) = LV_MENU_HEADER_TOP_UNFIXED ;
     }
-    else if(strcmp(name,"m-fixed")==0) {
+    else if(strcmp(name,"bottom-fixed")==0) {
         (*out) = LV_MENU_HEADER_BOTTOM_FIXED ;
     }
 
@@ -1566,9 +1566,9 @@ bool lv_menu_mode_header_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_menu_m
 const char * lv_menu_mode_header_const_to_str(lv_menu_mode_header_t code) {
 
     switch(code) {
-        case LV_MENU_HEADER_TOP_FIXED: return "ixed";
-        case LV_MENU_HEADER_TOP_UNFIXED: return "nfixed";
-        case LV_MENU_HEADER_BOTTOM_FIXED: return "m-fixed";
+        case LV_MENU_HEADER_TOP_FIXED: return "top-fixed";
+        case LV_MENU_HEADER_TOP_UNFIXED: return "top-unfixed";
+        case LV_MENU_HEADER_BOTTOM_FIXED: return "bottom-fixed";
 
         default:
             return "unknow";
@@ -1580,10 +1580,10 @@ JSValue lv_menu_mode_header_const_to_jsstr(JSContext *ctx, lv_menu_mode_header_t
 
 // lv_menu_mode_root_back_button_t
 bool lv_menu_mode_root_back_button_str_to_const(const char * name, lv_menu_mode_root_back_button_t * out) {
-    if(strcmp(name,"led")==0) {
+    if(strcmp(name,"disabled")==0) {
         (*out) = LV_MENU_ROOT_BACK_BUTTON_DISABLED ;
     }
-    else if(strcmp(name,"ed")==0) {
+    else if(strcmp(name,"enabled")==0) {
         (*out) = LV_MENU_ROOT_BACK_BUTTON_ENABLED ;
     }
 
@@ -1601,8 +1601,8 @@ bool lv_menu_mode_root_back_button_jsstr_to_const(JSContext *ctx, JSValue jsstr,
 const char * lv_menu_mode_root_back_button_const_to_str(lv_menu_mode_root_back_button_t code) {
 
     switch(code) {
-        case LV_MENU_ROOT_BACK_BUTTON_DISABLED: return "led";
-        case LV_MENU_ROOT_BACK_BUTTON_ENABLED: return "ed";
+        case LV_MENU_ROOT_BACK_BUTTON_DISABLED: return "disabled";
+        case LV_MENU_ROOT_BACK_BUTTON_ENABLED: return "enabled";
 
         default:
             return "unknow";
@@ -1620,7 +1620,7 @@ bool lv_span_overflow_str_to_const(const char * name, lv_span_overflow_t * out) 
     else if(strcmp(name,"ellipsis")==0) {
         (*out) = LV_SPAN_OVERFLOW_ELLIPSIS ;
     }
-    else if(strcmp(name,"-last")==0) {
+    else if(strcmp(name,"last")==0) {
         (*out) = _LV_SPAN_OVERFLOW_LAST ;
     }
 
@@ -1640,7 +1640,7 @@ const char * lv_span_overflow_const_to_str(lv_span_overflow_t code) {
     switch(code) {
         case LV_SPAN_OVERFLOW_CLIP: return "clip";
         case LV_SPAN_OVERFLOW_ELLIPSIS: return "ellipsis";
-        case _LV_SPAN_OVERFLOW_LAST: return "-last";
+        case _LV_SPAN_OVERFLOW_LAST: return "last";
 
         default:
             return "unknow";
@@ -1652,16 +1652,16 @@ JSValue lv_span_overflow_const_to_jsstr(JSContext *ctx, lv_span_overflow_t code)
 
 // lv_span_mode_t
 bool lv_span_mode_str_to_const(const char * name, lv_span_mode_t * out) {
-    if(strcmp(name,"fixed")==0) {
+    if(strcmp(name,"mode-fixed")==0) {
         (*out) = LV_SPAN_MODE_FIXED ;
     }
-    else if(strcmp(name,"expand")==0) {
+    else if(strcmp(name,"mode-expand")==0) {
         (*out) = LV_SPAN_MODE_EXPAND ;
     }
-    else if(strcmp(name,"break")==0) {
+    else if(strcmp(name,"mode-break")==0) {
         (*out) = LV_SPAN_MODE_BREAK ;
     }
-    else if(strcmp(name,"-last")==0) {
+    else if(strcmp(name,"mode-last")==0) {
         (*out) = _LV_SPAN_MODE_LAST ;
     }
 
@@ -1679,10 +1679,10 @@ bool lv_span_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_span_mode_t* 
 const char * lv_span_mode_const_to_str(lv_span_mode_t code) {
 
     switch(code) {
-        case LV_SPAN_MODE_FIXED: return "fixed";
-        case LV_SPAN_MODE_EXPAND: return "expand";
-        case LV_SPAN_MODE_BREAK: return "break";
-        case _LV_SPAN_MODE_LAST: return "-last";
+        case LV_SPAN_MODE_FIXED: return "mode-fixed";
+        case LV_SPAN_MODE_EXPAND: return "mode-expand";
+        case LV_SPAN_MODE_BREAK: return "mode-break";
+        case _LV_SPAN_MODE_LAST: return "mode-last";
 
         default:
             return "unknow";

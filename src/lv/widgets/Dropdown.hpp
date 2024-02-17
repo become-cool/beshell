@@ -28,7 +28,6 @@ namespace be::lv {
         static JSValue setSelectedHighlight(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getList(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getOptionCount(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -38,7 +37,6 @@ namespace be::lv {
         static JSValue jsOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsClose(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsIsOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

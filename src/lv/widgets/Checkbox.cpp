@@ -6,10 +6,8 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("text",be::lv::Obj::invalidGetter,Checkbox::setText) ,
         JS_CGETSET_DEF("textStatic",be::lv::Obj::invalidGetter,Checkbox::setTextStatic) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -47,11 +45,9 @@ namespace be::lv {
         lv_checkbox_set_text_static(thisobj->lvobj(), textStatic) ;
         return JS_UNDEFINED ;
     }
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
 
 // AUTO GENERATE CODE END [METHODS] --------
 
