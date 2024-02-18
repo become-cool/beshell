@@ -69,7 +69,7 @@ namespace be::lv {
 
         char * value = (char *)lv_image_get_src(thisobj->lvobj()) ;
 
-        if( strncmp(value,"C:",2)!=0 ) {
+        if( strncmp(value,"C:",2)==0 ) {
             value+= 2 ;
         }
         string path = engine->beshell->fs->trimVFSPath(value) ;
@@ -84,11 +84,8 @@ namespace be::lv {
         THIS_NCLASS(Img,thisobj)
         const char * src = (char *)JS_ToCString(ctx, value) ;
 
-
         string path = string("C:") + engine->beshell->fs->toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
-
-        dstr(path)
 
         lv_image_set_src(thisobj->lvobj(), path.c_str()) ;
         return JS_UNDEFINED ;
