@@ -66,12 +66,13 @@ set(SRC_LIST
         demo/DemoModule.cpp
 
         )
-
-aux_source_directory(${CMAKE_SOURCE_DIR}/src/deps/quickjs SRC_LIST)
+message("quickjs:${CMAKE_SOURCE_DIR}/deps/quickjs")
+aux_source_directory(${CMAKE_SOURCE_DIR}/deps/quickjs SRC_LIST)
 
 
 include_directories(.)
 include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(mklfs/lfs)
 
 
 add_definitions(-ldl)
@@ -79,3 +80,10 @@ add_definitions(-ldl)
 
 # 添加可执行文件
 add_executable(${PROJECT_NAME} ${SRC_LIST})
+
+set(MKFS_SRC
+        mklfs/mklfs.c
+        mklfs/lfs/lfs.c
+        mklfs/lfs/lfs_util.c
+        )
+add_executable(mklfs ${MKFS_SRC})
