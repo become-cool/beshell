@@ -1045,343 +1045,343 @@ JSValue lv_anim_enable_const_to_jsstr(JSContext *ctx, lv_anim_enable_t code) {
 
 // lv_style_prop_t
 bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
-    if(strcmp(name,"inv")==0) {
+    if(strcmp(name,"prop-inv")==0) {
         (*out) = LV_STYLE_PROP_INV ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"width")==0) {
         (*out) = LV_STYLE_WIDTH ;
     }
-    else if(strcmp(name,"t")==0) {
+    else if(strcmp(name,"height")==0) {
         (*out) = LV_STYLE_HEIGHT ;
     }
-    else if(strcmp(name,"h")==0) {
+    else if(strcmp(name,"length")==0) {
         (*out) = LV_STYLE_LENGTH ;
     }
-    else if(strcmp(name,"idth")==0) {
+    else if(strcmp(name,"min-width")==0) {
         (*out) = LV_STYLE_MIN_WIDTH ;
     }
-    else if(strcmp(name,"idth")==0) {
+    else if(strcmp(name,"max-width")==0) {
         (*out) = LV_STYLE_MAX_WIDTH ;
     }
-    else if(strcmp(name,"eight")==0) {
+    else if(strcmp(name,"min-height")==0) {
         (*out) = LV_STYLE_MIN_HEIGHT ;
     }
-    else if(strcmp(name,"eight")==0) {
+    else if(strcmp(name,"max-height")==0) {
         (*out) = LV_STYLE_MAX_HEIGHT ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"x")==0) {
         (*out) = LV_STYLE_X ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"y")==0) {
         (*out) = LV_STYLE_Y ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"align")==0) {
         (*out) = LV_STYLE_ALIGN ;
     }
-    else if(strcmp(name,"s")==0) {
+    else if(strcmp(name,"radius")==0) {
         (*out) = LV_STYLE_RADIUS ;
     }
-    else if(strcmp(name,"op")==0) {
+    else if(strcmp(name,"pad-top")==0) {
         (*out) = LV_STYLE_PAD_TOP ;
     }
-    else if(strcmp(name,"ottom")==0) {
+    else if(strcmp(name,"pad-bottom")==0) {
         (*out) = LV_STYLE_PAD_BOTTOM ;
     }
-    else if(strcmp(name,"eft")==0) {
+    else if(strcmp(name,"pad-left")==0) {
         (*out) = LV_STYLE_PAD_LEFT ;
     }
-    else if(strcmp(name,"ight")==0) {
+    else if(strcmp(name,"pad-right")==0) {
         (*out) = LV_STYLE_PAD_RIGHT ;
     }
-    else if(strcmp(name,"ow")==0) {
+    else if(strcmp(name,"pad-row")==0) {
         (*out) = LV_STYLE_PAD_ROW ;
     }
-    else if(strcmp(name,"olumn")==0) {
+    else if(strcmp(name,"pad-column")==0) {
         (*out) = LV_STYLE_PAD_COLUMN ;
     }
-    else if(strcmp(name,"t")==0) {
+    else if(strcmp(name,"layout")==0) {
         (*out) = LV_STYLE_LAYOUT ;
     }
-    else if(strcmp(name,"n-top")==0) {
+    else if(strcmp(name,"margin-top")==0) {
         (*out) = LV_STYLE_MARGIN_TOP ;
     }
-    else if(strcmp(name,"n-bottom")==0) {
+    else if(strcmp(name,"margin-bottom")==0) {
         (*out) = LV_STYLE_MARGIN_BOTTOM ;
     }
-    else if(strcmp(name,"n-left")==0) {
+    else if(strcmp(name,"margin-left")==0) {
         (*out) = LV_STYLE_MARGIN_LEFT ;
     }
-    else if(strcmp(name,"n-right")==0) {
+    else if(strcmp(name,"margin-right")==0) {
         (*out) = LV_STYLE_MARGIN_RIGHT ;
     }
-    else if(strcmp(name,"lor")==0) {
+    else if(strcmp(name,"bg-color")==0) {
         (*out) = LV_STYLE_BG_COLOR ;
     }
-    else if(strcmp(name,"a")==0) {
+    else if(strcmp(name,"bg-opa")==0) {
         (*out) = LV_STYLE_BG_OPA ;
     }
-    else if(strcmp(name,"ad-dir")==0) {
+    else if(strcmp(name,"bg-grad-dir")==0) {
         (*out) = LV_STYLE_BG_GRAD_DIR ;
     }
-    else if(strcmp(name,"in-stop")==0) {
+    else if(strcmp(name,"bg-main-stop")==0) {
         (*out) = LV_STYLE_BG_MAIN_STOP ;
     }
-    else if(strcmp(name,"ad-stop")==0) {
+    else if(strcmp(name,"bg-grad-stop")==0) {
         (*out) = LV_STYLE_BG_GRAD_STOP ;
     }
-    else if(strcmp(name,"ad-color")==0) {
+    else if(strcmp(name,"bg-grad-color")==0) {
         (*out) = LV_STYLE_BG_GRAD_COLOR ;
     }
-    else if(strcmp(name,"in-opa")==0) {
+    else if(strcmp(name,"bg-main-opa")==0) {
         (*out) = LV_STYLE_BG_MAIN_OPA ;
     }
-    else if(strcmp(name,"ad-opa")==0) {
+    else if(strcmp(name,"bg-grad-opa")==0) {
         (*out) = LV_STYLE_BG_GRAD_OPA ;
     }
-    else if(strcmp(name,"ad")==0) {
+    else if(strcmp(name,"bg-grad")==0) {
         (*out) = LV_STYLE_BG_GRAD ;
     }
-    else if(strcmp(name,"dir")==0) {
+    else if(strcmp(name,"base-dir")==0) {
         (*out) = LV_STYLE_BASE_DIR ;
     }
-    else if(strcmp(name,"age-src")==0) {
+    else if(strcmp(name,"bg-image-src")==0) {
         (*out) = LV_STYLE_BG_IMAGE_SRC ;
     }
-    else if(strcmp(name,"age-opa")==0) {
+    else if(strcmp(name,"bg-image-opa")==0) {
         (*out) = LV_STYLE_BG_IMAGE_OPA ;
     }
-    else if(strcmp(name,"age-recolor")==0) {
+    else if(strcmp(name,"bg-image-recolor")==0) {
         (*out) = LV_STYLE_BG_IMAGE_RECOLOR ;
     }
-    else if(strcmp(name,"age-recolor-opa")==0) {
+    else if(strcmp(name,"bg-image-recolor-opa")==0) {
         (*out) = LV_STYLE_BG_IMAGE_RECOLOR_OPA ;
     }
-    else if(strcmp(name,"age-tiled")==0) {
+    else if(strcmp(name,"bg-image-tiled")==0) {
         (*out) = LV_STYLE_BG_IMAGE_TILED ;
     }
-    else if(strcmp(name,"corner")==0) {
+    else if(strcmp(name,"clip-corner")==0) {
         (*out) = LV_STYLE_CLIP_CORNER ;
     }
-    else if(strcmp(name,"r-width")==0) {
+    else if(strcmp(name,"border-width")==0) {
         (*out) = LV_STYLE_BORDER_WIDTH ;
     }
-    else if(strcmp(name,"r-color")==0) {
+    else if(strcmp(name,"border-color")==0) {
         (*out) = LV_STYLE_BORDER_COLOR ;
     }
-    else if(strcmp(name,"r-opa")==0) {
+    else if(strcmp(name,"border-opa")==0) {
         (*out) = LV_STYLE_BORDER_OPA ;
     }
-    else if(strcmp(name,"r-side")==0) {
+    else if(strcmp(name,"border-side")==0) {
         (*out) = LV_STYLE_BORDER_SIDE ;
     }
-    else if(strcmp(name,"r-post")==0) {
+    else if(strcmp(name,"border-post")==0) {
         (*out) = LV_STYLE_BORDER_POST ;
     }
-    else if(strcmp(name,"ne-width")==0) {
+    else if(strcmp(name,"outline-width")==0) {
         (*out) = LV_STYLE_OUTLINE_WIDTH ;
     }
-    else if(strcmp(name,"ne-color")==0) {
+    else if(strcmp(name,"outline-color")==0) {
         (*out) = LV_STYLE_OUTLINE_COLOR ;
     }
-    else if(strcmp(name,"ne-opa")==0) {
+    else if(strcmp(name,"outline-opa")==0) {
         (*out) = LV_STYLE_OUTLINE_OPA ;
     }
-    else if(strcmp(name,"ne-pad")==0) {
+    else if(strcmp(name,"outline-pad")==0) {
         (*out) = LV_STYLE_OUTLINE_PAD ;
     }
-    else if(strcmp(name,"w-width")==0) {
+    else if(strcmp(name,"shadow-width")==0) {
         (*out) = LV_STYLE_SHADOW_WIDTH ;
     }
-    else if(strcmp(name,"w-color")==0) {
+    else if(strcmp(name,"shadow-color")==0) {
         (*out) = LV_STYLE_SHADOW_COLOR ;
     }
-    else if(strcmp(name,"w-opa")==0) {
+    else if(strcmp(name,"shadow-opa")==0) {
         (*out) = LV_STYLE_SHADOW_OPA ;
     }
-    else if(strcmp(name,"w-offset-x")==0) {
+    else if(strcmp(name,"shadow-offset-x")==0) {
         (*out) = LV_STYLE_SHADOW_OFFSET_X ;
     }
-    else if(strcmp(name,"w-offset-y")==0) {
+    else if(strcmp(name,"shadow-offset-y")==0) {
         (*out) = LV_STYLE_SHADOW_OFFSET_Y ;
     }
-    else if(strcmp(name,"w-spread")==0) {
+    else if(strcmp(name,"shadow-spread")==0) {
         (*out) = LV_STYLE_SHADOW_SPREAD ;
     }
-    else if(strcmp(name,"opa")==0) {
+    else if(strcmp(name,"image-opa")==0) {
         (*out) = LV_STYLE_IMAGE_OPA ;
     }
-    else if(strcmp(name,"recolor")==0) {
+    else if(strcmp(name,"image-recolor")==0) {
         (*out) = LV_STYLE_IMAGE_RECOLOR ;
     }
-    else if(strcmp(name,"recolor-opa")==0) {
+    else if(strcmp(name,"image-recolor-opa")==0) {
         (*out) = LV_STYLE_IMAGE_RECOLOR_OPA ;
     }
-    else if(strcmp(name,"width")==0) {
+    else if(strcmp(name,"line-width")==0) {
         (*out) = LV_STYLE_LINE_WIDTH ;
     }
-    else if(strcmp(name,"dash-width")==0) {
+    else if(strcmp(name,"line-dash-width")==0) {
         (*out) = LV_STYLE_LINE_DASH_WIDTH ;
     }
-    else if(strcmp(name,"dash-gap")==0) {
+    else if(strcmp(name,"line-dash-gap")==0) {
         (*out) = LV_STYLE_LINE_DASH_GAP ;
     }
-    else if(strcmp(name,"rounded")==0) {
+    else if(strcmp(name,"line-rounded")==0) {
         (*out) = LV_STYLE_LINE_ROUNDED ;
     }
-    else if(strcmp(name,"color")==0) {
+    else if(strcmp(name,"line-color")==0) {
         (*out) = LV_STYLE_LINE_COLOR ;
     }
-    else if(strcmp(name,"opa")==0) {
+    else if(strcmp(name,"line-opa")==0) {
         (*out) = LV_STYLE_LINE_OPA ;
     }
-    else if(strcmp(name,"idth")==0) {
+    else if(strcmp(name,"arc-width")==0) {
         (*out) = LV_STYLE_ARC_WIDTH ;
     }
-    else if(strcmp(name,"ounded")==0) {
+    else if(strcmp(name,"arc-rounded")==0) {
         (*out) = LV_STYLE_ARC_ROUNDED ;
     }
-    else if(strcmp(name,"olor")==0) {
+    else if(strcmp(name,"arc-color")==0) {
         (*out) = LV_STYLE_ARC_COLOR ;
     }
-    else if(strcmp(name,"pa")==0) {
+    else if(strcmp(name,"arc-opa")==0) {
         (*out) = LV_STYLE_ARC_OPA ;
     }
-    else if(strcmp(name,"mage-src")==0) {
+    else if(strcmp(name,"arc-image-src")==0) {
         (*out) = LV_STYLE_ARC_IMAGE_SRC ;
     }
-    else if(strcmp(name,"color")==0) {
+    else if(strcmp(name,"text-color")==0) {
         (*out) = LV_STYLE_TEXT_COLOR ;
     }
-    else if(strcmp(name,"opa")==0) {
+    else if(strcmp(name,"text-opa")==0) {
         (*out) = LV_STYLE_TEXT_OPA ;
     }
-    else if(strcmp(name,"font")==0) {
+    else if(strcmp(name,"text-font")==0) {
         (*out) = LV_STYLE_TEXT_FONT ;
     }
-    else if(strcmp(name,"letter-space")==0) {
+    else if(strcmp(name,"text-letter-space")==0) {
         (*out) = LV_STYLE_TEXT_LETTER_SPACE ;
     }
-    else if(strcmp(name,"line-space")==0) {
+    else if(strcmp(name,"text-line-space")==0) {
         (*out) = LV_STYLE_TEXT_LINE_SPACE ;
     }
-    else if(strcmp(name,"decor")==0) {
+    else if(strcmp(name,"text-decor")==0) {
         (*out) = LV_STYLE_TEXT_DECOR ;
     }
-    else if(strcmp(name,"align")==0) {
+    else if(strcmp(name,"text-align")==0) {
         (*out) = LV_STYLE_TEXT_ALIGN ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"opa")==0) {
         (*out) = LV_STYLE_OPA ;
     }
-    else if(strcmp(name,"ayered")==0) {
+    else if(strcmp(name,"opa-layered")==0) {
         (*out) = LV_STYLE_OPA_LAYERED ;
     }
-    else if(strcmp(name,"filter-dsc")==0) {
+    else if(strcmp(name,"color-filter-dsc")==0) {
         (*out) = LV_STYLE_COLOR_FILTER_DSC ;
     }
-    else if(strcmp(name,"filter-opa")==0) {
+    else if(strcmp(name,"color-filter-opa")==0) {
         (*out) = LV_STYLE_COLOR_FILTER_OPA ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"anim")==0) {
         (*out) = LV_STYLE_ANIM ;
     }
-    else if(strcmp(name,"duration")==0) {
+    else if(strcmp(name,"anim-duration")==0) {
         (*out) = LV_STYLE_ANIM_DURATION ;
     }
-    else if(strcmp(name,"ition")==0) {
+    else if(strcmp(name,"transition")==0) {
         (*out) = LV_STYLE_TRANSITION ;
     }
-    else if(strcmp(name,"mode")==0) {
+    else if(strcmp(name,"blend-mode")==0) {
         (*out) = LV_STYLE_BLEND_MODE ;
     }
-    else if(strcmp(name,"form-width")==0) {
+    else if(strcmp(name,"transform-width")==0) {
         (*out) = LV_STYLE_TRANSFORM_WIDTH ;
     }
-    else if(strcmp(name,"form-height")==0) {
+    else if(strcmp(name,"transform-height")==0) {
         (*out) = LV_STYLE_TRANSFORM_HEIGHT ;
     }
-    else if(strcmp(name,"late-x")==0) {
+    else if(strcmp(name,"translate-x")==0) {
         (*out) = LV_STYLE_TRANSLATE_X ;
     }
-    else if(strcmp(name,"late-y")==0) {
+    else if(strcmp(name,"translate-y")==0) {
         (*out) = LV_STYLE_TRANSLATE_Y ;
     }
-    else if(strcmp(name,"form-scale-x")==0) {
+    else if(strcmp(name,"transform-scale-x")==0) {
         (*out) = LV_STYLE_TRANSFORM_SCALE_X ;
     }
-    else if(strcmp(name,"form-scale-y")==0) {
+    else if(strcmp(name,"transform-scale-y")==0) {
         (*out) = LV_STYLE_TRANSFORM_SCALE_Y ;
     }
-    else if(strcmp(name,"form-rotation")==0) {
+    else if(strcmp(name,"transform-rotation")==0) {
         (*out) = LV_STYLE_TRANSFORM_ROTATION ;
     }
-    else if(strcmp(name,"form-pivot-x")==0) {
+    else if(strcmp(name,"transform-pivot-x")==0) {
         (*out) = LV_STYLE_TRANSFORM_PIVOT_X ;
     }
-    else if(strcmp(name,"form-pivot-y")==0) {
+    else if(strcmp(name,"transform-pivot-y")==0) {
         (*out) = LV_STYLE_TRANSFORM_PIVOT_Y ;
     }
-    else if(strcmp(name,"form-skew-x")==0) {
+    else if(strcmp(name,"transform-skew-x")==0) {
         (*out) = LV_STYLE_TRANSFORM_SKEW_X ;
     }
-    else if(strcmp(name,"form-skew-y")==0) {
+    else if(strcmp(name,"transform-skew-y")==0) {
         (*out) = LV_STYLE_TRANSFORM_SKEW_Y ;
     }
-    else if(strcmp(name,"flow")==0) {
+    else if(strcmp(name,"flex-flow")==0) {
         (*out) = LV_STYLE_FLEX_FLOW ;
     }
-    else if(strcmp(name,"main-place")==0) {
+    else if(strcmp(name,"flex-main-place")==0) {
         (*out) = LV_STYLE_FLEX_MAIN_PLACE ;
     }
-    else if(strcmp(name,"cross-place")==0) {
+    else if(strcmp(name,"flex-cross-place")==0) {
         (*out) = LV_STYLE_FLEX_CROSS_PLACE ;
     }
-    else if(strcmp(name,"track-place")==0) {
+    else if(strcmp(name,"flex-track-place")==0) {
         (*out) = LV_STYLE_FLEX_TRACK_PLACE ;
     }
-    else if(strcmp(name,"grow")==0) {
+    else if(strcmp(name,"flex-grow")==0) {
         (*out) = LV_STYLE_FLEX_GROW ;
     }
-    else if(strcmp(name,"column-align")==0) {
+    else if(strcmp(name,"grid-column-align")==0) {
         (*out) = LV_STYLE_GRID_COLUMN_ALIGN ;
     }
-    else if(strcmp(name,"row-align")==0) {
+    else if(strcmp(name,"grid-row-align")==0) {
         (*out) = LV_STYLE_GRID_ROW_ALIGN ;
     }
-    else if(strcmp(name,"row-dsc-array")==0) {
+    else if(strcmp(name,"grid-row-dsc-array")==0) {
         (*out) = LV_STYLE_GRID_ROW_DSC_ARRAY ;
     }
-    else if(strcmp(name,"column-dsc-array")==0) {
+    else if(strcmp(name,"grid-column-dsc-array")==0) {
         (*out) = LV_STYLE_GRID_COLUMN_DSC_ARRAY ;
     }
-    else if(strcmp(name,"cell-column-pos")==0) {
+    else if(strcmp(name,"grid-cell-column-pos")==0) {
         (*out) = LV_STYLE_GRID_CELL_COLUMN_POS ;
     }
-    else if(strcmp(name,"cell-column-span")==0) {
+    else if(strcmp(name,"grid-cell-column-span")==0) {
         (*out) = LV_STYLE_GRID_CELL_COLUMN_SPAN ;
     }
-    else if(strcmp(name,"cell-x-align")==0) {
+    else if(strcmp(name,"grid-cell-x-align")==0) {
         (*out) = LV_STYLE_GRID_CELL_X_ALIGN ;
     }
-    else if(strcmp(name,"cell-row-pos")==0) {
+    else if(strcmp(name,"grid-cell-row-pos")==0) {
         (*out) = LV_STYLE_GRID_CELL_ROW_POS ;
     }
-    else if(strcmp(name,"cell-row-span")==0) {
+    else if(strcmp(name,"grid-cell-row-span")==0) {
         (*out) = LV_STYLE_GRID_CELL_ROW_SPAN ;
     }
-    else if(strcmp(name,"cell-y-align")==0) {
+    else if(strcmp(name,"grid-cell-y-align")==0) {
         (*out) = LV_STYLE_GRID_CELL_Y_ALIGN ;
     }
-    else if(strcmp(name,"built-in-prop")==0) {
+    else if(strcmp(name,"last-built-in-prop")==0) {
         (*out) = _LV_STYLE_LAST_BUILT_IN_PROP ;
     }
-    else if(strcmp(name,"built-in-props")==0) {
+    else if(strcmp(name,"num-built-in-props")==0) {
         (*out) = _LV_STYLE_NUM_BUILT_IN_PROPS ;
     }
-    else if(strcmp(name,"any")==0) {
+    else if(strcmp(name,"prop-any")==0) {
         (*out) = LV_STYLE_PROP_ANY ;
     }
-    else if(strcmp(name,"const")==0) {
+    else if(strcmp(name,"prop-const")==0) {
         (*out) = _LV_STYLE_PROP_CONST ;
     }
 
@@ -1399,118 +1399,118 @@ bool lv_style_prop_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_style_prop_t
 const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
 
     switch(code) {
-        case LV_STYLE_PROP_INV: return "inv";
-        case LV_STYLE_WIDTH: return "";
-        case LV_STYLE_HEIGHT: return "t";
-        case LV_STYLE_LENGTH: return "h";
-        case LV_STYLE_MIN_WIDTH: return "idth";
-        case LV_STYLE_MAX_WIDTH: return "idth";
-        case LV_STYLE_MIN_HEIGHT: return "eight";
-        case LV_STYLE_MAX_HEIGHT: return "eight";
-        case LV_STYLE_X: return "";
-        case LV_STYLE_Y: return "";
-        case LV_STYLE_ALIGN: return "";
-        case LV_STYLE_RADIUS: return "s";
-        case LV_STYLE_PAD_TOP: return "op";
-        case LV_STYLE_PAD_BOTTOM: return "ottom";
-        case LV_STYLE_PAD_LEFT: return "eft";
-        case LV_STYLE_PAD_RIGHT: return "ight";
-        case LV_STYLE_PAD_ROW: return "ow";
-        case LV_STYLE_PAD_COLUMN: return "olumn";
-        case LV_STYLE_LAYOUT: return "t";
-        case LV_STYLE_MARGIN_TOP: return "n-top";
-        case LV_STYLE_MARGIN_BOTTOM: return "n-bottom";
-        case LV_STYLE_MARGIN_LEFT: return "n-left";
-        case LV_STYLE_MARGIN_RIGHT: return "n-right";
-        case LV_STYLE_BG_COLOR: return "lor";
-        case LV_STYLE_BG_OPA: return "a";
-        case LV_STYLE_BG_GRAD_DIR: return "ad-dir";
-        case LV_STYLE_BG_MAIN_STOP: return "in-stop";
-        case LV_STYLE_BG_GRAD_STOP: return "ad-stop";
-        case LV_STYLE_BG_GRAD_COLOR: return "ad-color";
-        case LV_STYLE_BG_MAIN_OPA: return "in-opa";
-        case LV_STYLE_BG_GRAD_OPA: return "ad-opa";
-        case LV_STYLE_BG_GRAD: return "ad";
-        case LV_STYLE_BASE_DIR: return "dir";
-        case LV_STYLE_BG_IMAGE_SRC: return "age-src";
-        case LV_STYLE_BG_IMAGE_OPA: return "age-opa";
-        case LV_STYLE_BG_IMAGE_RECOLOR: return "age-recolor";
-        case LV_STYLE_BG_IMAGE_RECOLOR_OPA: return "age-recolor-opa";
-        case LV_STYLE_BG_IMAGE_TILED: return "age-tiled";
-        case LV_STYLE_CLIP_CORNER: return "corner";
-        case LV_STYLE_BORDER_WIDTH: return "r-width";
-        case LV_STYLE_BORDER_COLOR: return "r-color";
-        case LV_STYLE_BORDER_OPA: return "r-opa";
-        case LV_STYLE_BORDER_SIDE: return "r-side";
-        case LV_STYLE_BORDER_POST: return "r-post";
-        case LV_STYLE_OUTLINE_WIDTH: return "ne-width";
-        case LV_STYLE_OUTLINE_COLOR: return "ne-color";
-        case LV_STYLE_OUTLINE_OPA: return "ne-opa";
-        case LV_STYLE_OUTLINE_PAD: return "ne-pad";
-        case LV_STYLE_SHADOW_WIDTH: return "w-width";
-        case LV_STYLE_SHADOW_COLOR: return "w-color";
-        case LV_STYLE_SHADOW_OPA: return "w-opa";
-        case LV_STYLE_SHADOW_OFFSET_X: return "w-offset-x";
-        case LV_STYLE_SHADOW_OFFSET_Y: return "w-offset-y";
-        case LV_STYLE_SHADOW_SPREAD: return "w-spread";
-        case LV_STYLE_IMAGE_OPA: return "opa";
-        case LV_STYLE_IMAGE_RECOLOR: return "recolor";
-        case LV_STYLE_IMAGE_RECOLOR_OPA: return "recolor-opa";
-        case LV_STYLE_LINE_WIDTH: return "width";
-        case LV_STYLE_LINE_DASH_WIDTH: return "dash-width";
-        case LV_STYLE_LINE_DASH_GAP: return "dash-gap";
-        case LV_STYLE_LINE_ROUNDED: return "rounded";
-        case LV_STYLE_LINE_COLOR: return "color";
-        case LV_STYLE_LINE_OPA: return "opa";
-        case LV_STYLE_ARC_WIDTH: return "idth";
-        case LV_STYLE_ARC_ROUNDED: return "ounded";
-        case LV_STYLE_ARC_COLOR: return "olor";
-        case LV_STYLE_ARC_OPA: return "pa";
-        case LV_STYLE_ARC_IMAGE_SRC: return "mage-src";
-        case LV_STYLE_TEXT_COLOR: return "color";
-        case LV_STYLE_TEXT_OPA: return "opa";
-        case LV_STYLE_TEXT_FONT: return "font";
-        case LV_STYLE_TEXT_LETTER_SPACE: return "letter-space";
-        case LV_STYLE_TEXT_LINE_SPACE: return "line-space";
-        case LV_STYLE_TEXT_DECOR: return "decor";
-        case LV_STYLE_TEXT_ALIGN: return "align";
-        case LV_STYLE_OPA: return "";
-        case LV_STYLE_OPA_LAYERED: return "ayered";
-        case LV_STYLE_COLOR_FILTER_DSC: return "filter-dsc";
-        case LV_STYLE_COLOR_FILTER_OPA: return "filter-opa";
-        case LV_STYLE_ANIM: return "";
-        case LV_STYLE_ANIM_DURATION: return "duration";
-        case LV_STYLE_TRANSITION: return "ition";
-        case LV_STYLE_BLEND_MODE: return "mode";
-        case LV_STYLE_TRANSFORM_WIDTH: return "form-width";
-        case LV_STYLE_TRANSFORM_HEIGHT: return "form-height";
-        case LV_STYLE_TRANSLATE_X: return "late-x";
-        case LV_STYLE_TRANSLATE_Y: return "late-y";
-        case LV_STYLE_TRANSFORM_SCALE_X: return "form-scale-x";
-        case LV_STYLE_TRANSFORM_SCALE_Y: return "form-scale-y";
-        case LV_STYLE_TRANSFORM_ROTATION: return "form-rotation";
-        case LV_STYLE_TRANSFORM_PIVOT_X: return "form-pivot-x";
-        case LV_STYLE_TRANSFORM_PIVOT_Y: return "form-pivot-y";
-        case LV_STYLE_TRANSFORM_SKEW_X: return "form-skew-x";
-        case LV_STYLE_TRANSFORM_SKEW_Y: return "form-skew-y";
-        case LV_STYLE_FLEX_FLOW: return "flow";
-        case LV_STYLE_FLEX_MAIN_PLACE: return "main-place";
-        case LV_STYLE_FLEX_CROSS_PLACE: return "cross-place";
-        case LV_STYLE_FLEX_TRACK_PLACE: return "track-place";
-        case LV_STYLE_FLEX_GROW: return "grow";
-        case LV_STYLE_GRID_COLUMN_ALIGN: return "column-align";
-        case LV_STYLE_GRID_ROW_ALIGN: return "row-align";
-        case LV_STYLE_GRID_ROW_DSC_ARRAY: return "row-dsc-array";
-        case LV_STYLE_GRID_COLUMN_DSC_ARRAY: return "column-dsc-array";
-        case LV_STYLE_GRID_CELL_COLUMN_POS: return "cell-column-pos";
-        case LV_STYLE_GRID_CELL_COLUMN_SPAN: return "cell-column-span";
-        case LV_STYLE_GRID_CELL_X_ALIGN: return "cell-x-align";
-        case LV_STYLE_GRID_CELL_ROW_POS: return "cell-row-pos";
-        case LV_STYLE_GRID_CELL_ROW_SPAN: return "cell-row-span";
-        case LV_STYLE_GRID_CELL_Y_ALIGN: return "cell-y-align";
-        case _LV_STYLE_LAST_BUILT_IN_PROP: return "built-in-prop";
-        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "built-in-props";
-        case LV_STYLE_PROP_ANY: return "any";
+        case LV_STYLE_PROP_INV: return "prop-inv";
+        case LV_STYLE_WIDTH: return "width";
+        case LV_STYLE_HEIGHT: return "height";
+        case LV_STYLE_LENGTH: return "length";
+        case LV_STYLE_MIN_WIDTH: return "min-width";
+        case LV_STYLE_MAX_WIDTH: return "max-width";
+        case LV_STYLE_MIN_HEIGHT: return "min-height";
+        case LV_STYLE_MAX_HEIGHT: return "max-height";
+        case LV_STYLE_X: return "x";
+        case LV_STYLE_Y: return "y";
+        case LV_STYLE_ALIGN: return "align";
+        case LV_STYLE_RADIUS: return "radius";
+        case LV_STYLE_PAD_TOP: return "pad-top";
+        case LV_STYLE_PAD_BOTTOM: return "pad-bottom";
+        case LV_STYLE_PAD_LEFT: return "pad-left";
+        case LV_STYLE_PAD_RIGHT: return "pad-right";
+        case LV_STYLE_PAD_ROW: return "pad-row";
+        case LV_STYLE_PAD_COLUMN: return "pad-column";
+        case LV_STYLE_LAYOUT: return "layout";
+        case LV_STYLE_MARGIN_TOP: return "margin-top";
+        case LV_STYLE_MARGIN_BOTTOM: return "margin-bottom";
+        case LV_STYLE_MARGIN_LEFT: return "margin-left";
+        case LV_STYLE_MARGIN_RIGHT: return "margin-right";
+        case LV_STYLE_BG_COLOR: return "bg-color";
+        case LV_STYLE_BG_OPA: return "bg-opa";
+        case LV_STYLE_BG_GRAD_DIR: return "bg-grad-dir";
+        case LV_STYLE_BG_MAIN_STOP: return "bg-main-stop";
+        case LV_STYLE_BG_GRAD_STOP: return "bg-grad-stop";
+        case LV_STYLE_BG_GRAD_COLOR: return "bg-grad-color";
+        case LV_STYLE_BG_MAIN_OPA: return "bg-main-opa";
+        case LV_STYLE_BG_GRAD_OPA: return "bg-grad-opa";
+        case LV_STYLE_BG_GRAD: return "bg-grad";
+        case LV_STYLE_BASE_DIR: return "base-dir";
+        case LV_STYLE_BG_IMAGE_SRC: return "bg-image-src";
+        case LV_STYLE_BG_IMAGE_OPA: return "bg-image-opa";
+        case LV_STYLE_BG_IMAGE_RECOLOR: return "bg-image-recolor";
+        case LV_STYLE_BG_IMAGE_RECOLOR_OPA: return "bg-image-recolor-opa";
+        case LV_STYLE_BG_IMAGE_TILED: return "bg-image-tiled";
+        case LV_STYLE_CLIP_CORNER: return "clip-corner";
+        case LV_STYLE_BORDER_WIDTH: return "border-width";
+        case LV_STYLE_BORDER_COLOR: return "border-color";
+        case LV_STYLE_BORDER_OPA: return "border-opa";
+        case LV_STYLE_BORDER_SIDE: return "border-side";
+        case LV_STYLE_BORDER_POST: return "border-post";
+        case LV_STYLE_OUTLINE_WIDTH: return "outline-width";
+        case LV_STYLE_OUTLINE_COLOR: return "outline-color";
+        case LV_STYLE_OUTLINE_OPA: return "outline-opa";
+        case LV_STYLE_OUTLINE_PAD: return "outline-pad";
+        case LV_STYLE_SHADOW_WIDTH: return "shadow-width";
+        case LV_STYLE_SHADOW_COLOR: return "shadow-color";
+        case LV_STYLE_SHADOW_OPA: return "shadow-opa";
+        case LV_STYLE_SHADOW_OFFSET_X: return "shadow-offset-x";
+        case LV_STYLE_SHADOW_OFFSET_Y: return "shadow-offset-y";
+        case LV_STYLE_SHADOW_SPREAD: return "shadow-spread";
+        case LV_STYLE_IMAGE_OPA: return "image-opa";
+        case LV_STYLE_IMAGE_RECOLOR: return "image-recolor";
+        case LV_STYLE_IMAGE_RECOLOR_OPA: return "image-recolor-opa";
+        case LV_STYLE_LINE_WIDTH: return "line-width";
+        case LV_STYLE_LINE_DASH_WIDTH: return "line-dash-width";
+        case LV_STYLE_LINE_DASH_GAP: return "line-dash-gap";
+        case LV_STYLE_LINE_ROUNDED: return "line-rounded";
+        case LV_STYLE_LINE_COLOR: return "line-color";
+        case LV_STYLE_LINE_OPA: return "line-opa";
+        case LV_STYLE_ARC_WIDTH: return "arc-width";
+        case LV_STYLE_ARC_ROUNDED: return "arc-rounded";
+        case LV_STYLE_ARC_COLOR: return "arc-color";
+        case LV_STYLE_ARC_OPA: return "arc-opa";
+        case LV_STYLE_ARC_IMAGE_SRC: return "arc-image-src";
+        case LV_STYLE_TEXT_COLOR: return "text-color";
+        case LV_STYLE_TEXT_OPA: return "text-opa";
+        case LV_STYLE_TEXT_FONT: return "text-font";
+        case LV_STYLE_TEXT_LETTER_SPACE: return "text-letter-space";
+        case LV_STYLE_TEXT_LINE_SPACE: return "text-line-space";
+        case LV_STYLE_TEXT_DECOR: return "text-decor";
+        case LV_STYLE_TEXT_ALIGN: return "text-align";
+        case LV_STYLE_OPA: return "opa";
+        case LV_STYLE_OPA_LAYERED: return "opa-layered";
+        case LV_STYLE_COLOR_FILTER_DSC: return "color-filter-dsc";
+        case LV_STYLE_COLOR_FILTER_OPA: return "color-filter-opa";
+        case LV_STYLE_ANIM: return "anim";
+        case LV_STYLE_ANIM_DURATION: return "anim-duration";
+        case LV_STYLE_TRANSITION: return "transition";
+        case LV_STYLE_BLEND_MODE: return "blend-mode";
+        case LV_STYLE_TRANSFORM_WIDTH: return "transform-width";
+        case LV_STYLE_TRANSFORM_HEIGHT: return "transform-height";
+        case LV_STYLE_TRANSLATE_X: return "translate-x";
+        case LV_STYLE_TRANSLATE_Y: return "translate-y";
+        case LV_STYLE_TRANSFORM_SCALE_X: return "transform-scale-x";
+        case LV_STYLE_TRANSFORM_SCALE_Y: return "transform-scale-y";
+        case LV_STYLE_TRANSFORM_ROTATION: return "transform-rotation";
+        case LV_STYLE_TRANSFORM_PIVOT_X: return "transform-pivot-x";
+        case LV_STYLE_TRANSFORM_PIVOT_Y: return "transform-pivot-y";
+        case LV_STYLE_TRANSFORM_SKEW_X: return "transform-skew-x";
+        case LV_STYLE_TRANSFORM_SKEW_Y: return "transform-skew-y";
+        case LV_STYLE_FLEX_FLOW: return "flex-flow";
+        case LV_STYLE_FLEX_MAIN_PLACE: return "flex-main-place";
+        case LV_STYLE_FLEX_CROSS_PLACE: return "flex-cross-place";
+        case LV_STYLE_FLEX_TRACK_PLACE: return "flex-track-place";
+        case LV_STYLE_FLEX_GROW: return "flex-grow";
+        case LV_STYLE_GRID_COLUMN_ALIGN: return "grid-column-align";
+        case LV_STYLE_GRID_ROW_ALIGN: return "grid-row-align";
+        case LV_STYLE_GRID_ROW_DSC_ARRAY: return "grid-row-dsc-array";
+        case LV_STYLE_GRID_COLUMN_DSC_ARRAY: return "grid-column-dsc-array";
+        case LV_STYLE_GRID_CELL_COLUMN_POS: return "grid-cell-column-pos";
+        case LV_STYLE_GRID_CELL_COLUMN_SPAN: return "grid-cell-column-span";
+        case LV_STYLE_GRID_CELL_X_ALIGN: return "grid-cell-x-align";
+        case LV_STYLE_GRID_CELL_ROW_POS: return "grid-cell-row-pos";
+        case LV_STYLE_GRID_CELL_ROW_SPAN: return "grid-cell-row-span";
+        case LV_STYLE_GRID_CELL_Y_ALIGN: return "grid-cell-y-align";
+        case _LV_STYLE_LAST_BUILT_IN_PROP: return "last-built-in-prop";
+        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "num-built-in-props";
+        case LV_STYLE_PROP_ANY: return "prop-any";
 
         default:
             return "unknow";
