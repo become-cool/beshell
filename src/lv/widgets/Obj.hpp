@@ -33,6 +33,7 @@ namespace be::lv {
         Obj(JSContext * ctx, lv_obj_t * parent=nullptr) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static Obj * wrap(JSContext * ctx, lv_obj_t * lvobj) ;
+        ~Obj() ;
 
         lv_obj_t * lvobj() const ;
 

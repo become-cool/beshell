@@ -278,7 +278,9 @@ namespace be::lv {
         : NativeClass(ctx, build(ctx, jsobj))
         , _lvobj(lvobj)
     {
-        lv_obj_set_user_data(_lvobj, (void *)this) ;
+        if(!lv_obj_get_user_data(_lvobj)) {
+            lv_obj_set_user_data(_lvobj, (void *)this) ;
+        }
     }
 
     Obj::Obj(JSContext * ctx, lv_obj_t * parent)
@@ -294,19 +296,29 @@ namespace be::lv {
         return widget->jsobj ;
     }
 
+    Obj::~Obj() {
+        if(_lvobj) {
+            lv_obj_set_user_data(_lvobj, nullptr) ;
+            _lvobj = nullptr ;
+        }
+    }
+
     lv_obj_t * Obj::lvobj() const {
         return _lvobj ;
     }
     
-    #define CREATE_WIDGET(typename, classname)                                  \
-        if(lv_obj_check_type(lvobj, &lv_##typename##_class)) {                  \
-            return new classname(ctx, classname::build(ctx, JS_NULL), lvobj) ;  \
+    #define CREATE_WIDGET(typename, classname)                                      \
+        if(lv_obj_check_type(lvobj, &lv_##typename##_class)) {                      \
+            if(!widget) {                                                           \
+                return new classname(ctx, classname::build(ctx, JS_NULL), lvobj) ;  \
+            } else if(JS_IsNone(widget->jsobj)) {                                   \
+                widget->jsobj = classname::build(ctx) ;                             \
+                JS_SetOpaque(widget->jsobj, widget) ;                               \
+            }                                                                       \
         }
+
     Obj * Obj::wrap(JSContext * ctx, lv_obj_t * lvobj) {
         Obj * widget = (Obj *)lv_obj_get_user_data(lvobj) ;
-        if(widget) {
-            return widget ;
-        }
 
 // AUTO GENERATE CODE START [WRAP WIDGETS] --------
         CREATE_WIDGET(obj, Obj)
@@ -343,8 +355,10 @@ namespace be::lv {
         else CREATE_WIDGET(textarea, TextArea)
 // AUTO GENERATE CODE END [WRAP WIDGETS] --------
         else {
-            return new Obj(ctx, JS_NULL, lvobj) ;
+            return nullptr ;
         }
+
+        return widget ;
     }
 
     JSValue Obj::invalidGetter(JSContext *ctx, JSValueConst this_val) {

@@ -1,3 +1,4 @@
+
 #include "NativeClass.hpp"
 #include <string.h>
 
@@ -15,10 +16,11 @@ namespace be {
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;
+        JS_DupValue(ctx,jsobj) ;
     }
 
     NativeClass::~NativeClass() {
-        if(!JS_IsUndefined(jsobj)) {
+        if(!JS_IsNone(jsobj)) {
             JS_SetOpaque(jsobj, nullptr) ;
             JS_FreeValue(ctx,jsobj) ;
         }
@@ -50,6 +52,8 @@ namespace be {
 
         JSClassDef jsClassDef ;
         memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
+
+        dp(finalizer)
 
         jsClassDef.class_name = className ;
         jsClassDef.finalizer = finalizer ;
@@ -87,13 +91,13 @@ namespace be {
         return jscotr ;
     }
     JSValue NativeClass::defineClass(JSContext * ctx){
-        return JS_UNDEFINED ;
+        return JS_NULL ;
     }
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
             obj->self = nullptr ;
-            obj->jsobj = JS_UNDEFINED ;
+            obj->jsobj = JS_NULL ;
         }
     }
 }
