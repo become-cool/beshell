@@ -1,4 +1,9 @@
 #include "Img.hpp"
+#include "BeShell.hpp"
+#include <string.h>
+#include <cstring>
+
+using namespace std ;
 
 namespace be::lv {
     DEFINE_NCLASS_META(Img, Obj)
@@ -56,15 +61,36 @@ namespace be::lv {
 
 
     JSValue Img::getSrc(JSContext *ctx, JSValueConst this_val){
+        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
+        if(!engine || !engine->beshell || !engine->beshell) {
+            JSTHROW("sth wrong")
+        }
         THIS_NCLASS(Img,thisobj)
-        const char * value = (char *)lv_image_get_src(thisobj->lvobj()) ;
-        return value? JS_NewString(ctx, value): JS_NULL ;
+
+        char * value = (char *)lv_image_get_src(thisobj->lvobj()) ;
+
+        if( strncmp(value,"C:",2)!=0 ) {
+            value+= 2 ;
+        }
+        string path = engine->beshell->fs->trimVFSPath(value) ;
+
+        return value? JS_NewString(ctx, path.c_str()): JS_NULL ;
     }
     JSValue Img::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){
+        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
+        if(!engine || !engine->beshell || !engine->beshell) {
+            JSTHROW("sth wrong")
+        }
         THIS_NCLASS(Img,thisobj)
         const char * src = (char *)JS_ToCString(ctx, value) ;
-        lv_image_set_src(thisobj->lvobj(), src) ;
+
+
+        string path = string("C:") + engine->beshell->fs->toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
+
+        dstr(path)
+
+        lv_image_set_src(thisobj->lvobj(), path.c_str()) ;
         return JS_UNDEFINED ;
     }
 
