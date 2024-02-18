@@ -53,8 +53,6 @@ namespace be {
         JSClassDef jsClassDef ;
         memset(&jsClassDef, 0, sizeof(JSClassDef)) ;
 
-        dp(finalizer)
-
         jsClassDef.class_name = className ;
         jsClassDef.finalizer = finalizer ;
         JS_NewClass(JS_GetRuntime(ctx), classID, &jsClassDef);
