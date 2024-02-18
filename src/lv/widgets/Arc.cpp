@@ -13,10 +13,13 @@ namespace be::lv {
         JS_CGETSET_DEF("maxValue",Arc::getMaxValue,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("setRange", 2, Arc::setRange),
+        JS_CFUNC_DEF("alignObjToAngle", 2, Arc::alignObjToAngle),
+        JS_CFUNC_DEF("rotateObjToAngle", 2, Arc::rotateObjToAngle),
         // Unsupported arg type:
         // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
-        // void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
-        // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
+        // void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
+        // void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -151,14 +154,53 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
+    // Unsupported arg type: lv_value_precise_t
+    // void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
+    // Unsupported arg type: lv_value_precise_t
+    // void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
+
+    JSValue Arc::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t min ;
+        if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","min","Arc","setRange","number")
+        }
+        int32_t max ;
+        if(JS_ToInt32(ctx, (int32_t *) &max, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","max","Arc","setRange","number")
+        }
+        lv_arc_set_range( thisobj->lvobj(), min, max ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Arc::alignObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        JSVALUE_TO_LVOBJ(argv[0],obj_to_align)
+        int32_t r_offset ;
+        if(JS_ToInt32(ctx, (int32_t *) &r_offset, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","r_offset","Arc","alignObjToAngle","number")
+        }
+        lv_arc_align_obj_to_angle( thisobj->lvobj(), obj_to_align, r_offset ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Arc::rotateObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        JSVALUE_TO_LVOBJ(argv[0],obj_to_rotate)
+        int32_t r_offset ;
+        if(JS_ToInt32(ctx, (int32_t *) &r_offset, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","r_offset","Arc","rotateObjToAngle","number")
+        }
+        lv_arc_rotate_obj_to_angle( thisobj->lvobj(), obj_to_rotate, r_offset ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

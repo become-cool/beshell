@@ -7,9 +7,14 @@ namespace be::lv {
         JS_CGETSET_DEF("btnmatrix",Calendar::getBtnmatrix,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("headerArrowCreate", 0, Calendar::jsHeaderArrowCreate),
-        JS_CFUNC_DEF("headerDropdownCreate", 0, Calendar::jsHeaderDropdownCreate),
-        JS_CFUNC_DEF("headerDropdownSetYearList", 1, Calendar::jsHeaderDropdownSetYearList),
+        JS_CFUNC_DEF("setTodayDate", 3, Calendar::setTodayDate),
+        JS_CFUNC_DEF("setShowedDate", 2, Calendar::setShowedDate),
+        JS_CFUNC_DEF("headerArrowCreate", 0, Calendar::headerArrowCreate),
+        JS_CFUNC_DEF("headerDropdownCreate", 0, Calendar::headerDropdownCreate),
+        JS_CFUNC_DEF("headerDropdownSetYearList", 1, Calendar::headerDropdownSetYearList),
+        // Unsupported arg type:
+        // void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
+        // lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -55,27 +60,67 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Calendar::jsHeaderArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_calendar_header_arrow_create( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
+    JSValue Calendar::setTodayDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        uint32_t year ;
+        if(JS_ToUint32(ctx, (uint32_t *) &year, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","year","Calendar","setTodayDate","number")
         }
+        uint32_t month ;
+        if(JS_ToUint32(ctx, (uint32_t *) &month, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","month","Calendar","setTodayDate","number")
+        }
+        uint32_t day ;
+        if(JS_ToUint32(ctx, (uint32_t *) &day, argv[2])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","day","Calendar","setTodayDate","number")
+        }
+        lv_calendar_set_today_date( thisobj->lvobj(), year, month, day ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Calendar::jsHeaderDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_calendar_header_dropdown_create( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
+    JSValue Calendar::setShowedDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t year ;
+        if(JS_ToUint32(ctx, (uint32_t *) &year, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","year","Calendar","setShowedDate","number")
         }
+        uint32_t month ;
+        if(JS_ToUint32(ctx, (uint32_t *) &month, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","month","Calendar","setShowedDate","number")
+        }
+        lv_calendar_set_showed_date( thisobj->lvobj(), year, month ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Calendar::jsHeaderDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * years_list = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_calendar_header_dropdown_set_year_list( thisobj->lvobj(), years_list ) ;
-            return JS_UNDEFINED ;
-        }
+    // Unsupported arg type: lv_calendar_date_t*
+    // void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
+
+    // Unsupported arg type: lv_calendar_date_t *
+    // lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date)
+
+    JSValue Calendar::headerArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_calendar_header_arrow_create( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
+
+    JSValue Calendar::headerDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_calendar_header_dropdown_create( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
+
+    JSValue Calendar::headerDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * years_list = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_calendar_header_dropdown_set_year_list( thisobj->lvobj(), years_list ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

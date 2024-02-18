@@ -26,9 +26,12 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsClearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsClearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsHasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setButtonWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue hasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

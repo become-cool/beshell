@@ -7,9 +7,11 @@ namespace be::lv {
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addText", 1, List::jsAddText),
+        JS_CFUNC_DEF("addText", 1, List::addText),
+        JS_CFUNC_DEF("setButtonText", 2, List::setButtonText),
         // Unsupported arg type:
         // lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+        // const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -35,17 +37,30 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue List::jsAddText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_obj_t * retval = lv_list_add_text( thisobj->lvobj(), txt ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue List::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_obj_t * retval = lv_list_add_text( thisobj->lvobj(), txt ) ;
+            JS_FreeCString(ctx, txt) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: const void *
-        // lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+    // Unsupported arg type: const void *
+    // lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+
+        // Unsupported return type: const char *
+        // const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
+
+    JSValue List::setButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        JSVALUE_TO_LVOBJ(argv[0],btn)
+        char * txt = (char *)JS_ToCString(ctx, argv[1]) ;
+        lv_list_set_button_text( thisobj->lvobj(), btn, txt ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

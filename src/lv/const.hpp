@@ -81,6 +81,26 @@ bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) ;
 const char * lv_opa_const_to_str(lv_opa_t code) ;
 JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) ;
 
+bool lv_grad_dir_str_to_const(const char * str, lv_grad_dir_t* out) ;
+bool lv_grad_dir_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grad_dir_t* out) ;
+const char * lv_grad_dir_const_to_str(lv_grad_dir_t code) ;
+JSValue lv_grad_dir_const_to_jsstr(JSContext *ctx, lv_grad_dir_t code) ;
+
+bool lv_text_decor_str_to_const(const char * str, lv_text_decor_t* out) ;
+bool lv_text_decor_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_text_decor_t* out) ;
+const char * lv_text_decor_const_to_str(lv_text_decor_t code) ;
+JSValue lv_text_decor_const_to_jsstr(JSContext *ctx, lv_text_decor_t code) ;
+
+bool lv_blend_mode_str_to_const(const char * str, lv_blend_mode_t* out) ;
+bool lv_blend_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_blend_mode_t* out) ;
+const char * lv_blend_mode_const_to_str(lv_blend_mode_t code) ;
+JSValue lv_blend_mode_const_to_jsstr(JSContext *ctx, lv_blend_mode_t code) ;
+
+bool lv_grid_align_str_to_const(const char * str, lv_grid_align_t* out) ;
+bool lv_grid_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grid_align_t* out) ;
+const char * lv_grid_align_const_to_str(lv_grid_align_t code) ;
+JSValue lv_grid_align_const_to_jsstr(JSContext *ctx, lv_grid_align_t code) ;
+
 bool lv_keyboard_mode_str_to_const(const char * str, lv_keyboard_mode_t* out) ;
 bool lv_keyboard_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_keyboard_mode_t* out) ;
 const char * lv_keyboard_mode_const_to_str(lv_keyboard_mode_t code) ;
@@ -121,11 +141,6 @@ bool lv_chart_axis_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_chart_axis_t
 const char * lv_chart_axis_const_to_str(lv_chart_axis_t code) ;
 JSValue lv_chart_axis_const_to_jsstr(JSContext *ctx, lv_chart_axis_t code) ;
 
-bool lv_blend_mode_str_to_const(const char * str, lv_blend_mode_t* out) ;
-bool lv_blend_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_blend_mode_t* out) ;
-const char * lv_blend_mode_const_to_str(lv_blend_mode_t code) ;
-JSValue lv_blend_mode_const_to_jsstr(JSContext *ctx, lv_blend_mode_t code) ;
-
 bool lv_image_align_str_to_const(const char * str, lv_image_align_t* out) ;
 bool lv_image_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_image_align_t* out) ;
 const char * lv_image_align_const_to_str(lv_image_align_t code) ;
@@ -155,6 +170,11 @@ bool lv_menu_mode_root_back_button_str_to_const(const char * str, lv_menu_mode_r
 bool lv_menu_mode_root_back_button_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_menu_mode_root_back_button_t* out) ;
 const char * lv_menu_mode_root_back_button_const_to_str(lv_menu_mode_root_back_button_t code) ;
 JSValue lv_menu_mode_root_back_button_const_to_jsstr(JSContext *ctx, lv_menu_mode_root_back_button_t code) ;
+
+bool lv_roller_mode_str_to_const(const char * str, lv_roller_mode_t* out) ;
+bool lv_roller_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_roller_mode_t* out) ;
+const char * lv_roller_mode_const_to_str(lv_roller_mode_t code) ;
+JSValue lv_roller_mode_const_to_jsstr(JSContext *ctx, lv_roller_mode_t code) ;
 
 bool lv_span_overflow_str_to_const(const char * str, lv_span_overflow_t* out) ;
 bool lv_span_overflow_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_span_overflow_t* out) ;

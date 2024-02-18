@@ -13,8 +13,11 @@ namespace be::lv {
         JS_CGETSET_DEF("maxLineHeight",Span::getMaxLineHeight,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("newSpan", 0, Span::jsNewSpan),
-        JS_CFUNC_DEF("refrMode", 0, Span::jsRefrMode),
+        JS_CFUNC_DEF("newSpan", 0, Span::newSpan),
+        JS_CFUNC_DEF("getChild", 1, Span::getChild),
+        JS_CFUNC_DEF("getExpandWidth", 1, Span::getExpandWidth),
+        JS_CFUNC_DEF("getExpandHeight", 1, Span::getExpandHeight),
+        JS_CFUNC_DEF("refrMode", 0, Span::refrMode),
         // Unsupported arg type:
         // void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -143,21 +146,57 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Span::jsNewSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_span_t * retval = lv_spangroup_new_span( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue Span::newSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_span_t * retval = lv_spangroup_new_span( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: lv_span_t *
-        // void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
+    // Unsupported arg type: lv_span_t *
+    // void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
 
-        JSValue Span::jsRefrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_spangroup_refr_mode( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Span::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        int32_t id ;
+        if(JS_ToInt32(ctx, (int32_t *) &id, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","id","Span","getChild","number")
         }
+        lv_span_t * retval = lv_spangroup_get_child( thisobj->lvobj(), id ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
+
+    JSValue Span::getExpandWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        uint32_t max_width ;
+        if(JS_ToUint32(ctx, (uint32_t *) &max_width, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","max_width","Span","getExpandWidth","number")
+        }
+        uint32_t retval = lv_spangroup_get_expand_width( thisobj->lvobj(), max_width ) ;
+        JSValue jsretval = JS_NewUint32(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Span::getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        int32_t width ;
+        if(JS_ToInt32(ctx, (int32_t *) &width, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","width","Span","getExpandHeight","number")
+        }
+        int32_t retval = lv_spangroup_get_expand_height( thisobj->lvobj(), width ) ;
+        JSValue jsretval = JS_NewInt32(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Span::refrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_spangroup_refr_mode( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

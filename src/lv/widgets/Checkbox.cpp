@@ -37,12 +37,14 @@ namespace be::lv {
         THIS_NCLASS(Checkbox,thisobj)
         char * text = (char *)JS_ToCString(ctx, val) ;
         lv_checkbox_set_text(thisobj->lvobj(), text) ;
+        JS_FreeCString(ctx, text) ;
         return JS_UNDEFINED ;
     }
     JSValue Checkbox::setTextStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Checkbox,thisobj)
         char * textStatic = (char *)JS_ToCString(ctx, val) ;
         lv_checkbox_set_text_static(thisobj->lvobj(), textStatic) ;
+        JS_FreeCString(ctx, textStatic) ;
         return JS_UNDEFINED ;
     }
 // AUTO GENERATE CODE END [GETSETS] --------

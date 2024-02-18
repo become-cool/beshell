@@ -11,7 +11,10 @@ namespace be::lv {
         JS_CGETSET_DEF("maxValue",Bar::getMaxValue,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("isSymmetrical", 0, Bar::jsIsSymmetrical),
+        JS_CFUNC_DEF("setValue", 2, Bar::setValue),
+        JS_CFUNC_DEF("setStartValue", 2, Bar::setStartValue),
+        JS_CFUNC_DEF("setRange", 2, Bar::setRange),
+        JS_CFUNC_DEF("isSymmetrical", 0, Bar::isSymmetrical),
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -80,12 +83,67 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Bar::jsIsSymmetrical(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_bar_is_symmetrical( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+    JSValue Bar::setValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t value ;
+        if(JS_ToInt32(ctx, (int32_t *) &value, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","value","Bar","setValue","number")
         }
+        // argv anim
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_anim_enable_t anim;
+        if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_bar_set_value( thisobj->lvobj(), value, anim ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Bar::setStartValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t start_value ;
+        if(JS_ToInt32(ctx, (int32_t *) &start_value, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","start_value","Bar","setStartValue","number")
+        }
+        // argv anim
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_anim_enable_t anim;
+        if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_bar_set_start_value( thisobj->lvobj(), start_value, anim ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Bar::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t min ;
+        if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","min","Bar","setRange","number")
+        }
+        int32_t max ;
+        if(JS_ToInt32(ctx, (int32_t *) &max, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","max","Bar","setRange","number")
+        }
+        lv_bar_set_range( thisobj->lvobj(), min, max ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Bar::isSymmetrical(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_bar_is_symmetrical( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

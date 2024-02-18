@@ -7,9 +7,9 @@ namespace be::lv {
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("isDragged", 0, Slider::isDragged),
         // Unsupported arg type:
         // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
-        // bool lv_slider_is_dragged(const lv_obj_t * obj)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -35,11 +35,15 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_slider_is_dragged(const lv_obj_t * obj)
+    JSValue Slider::isDragged(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_slider_is_dragged( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

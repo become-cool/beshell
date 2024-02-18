@@ -40,23 +40,25 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsSrcGetType(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsBufSetPalette(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsBufFree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderGetInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderGetArea(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderClose(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderDelete(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderGetNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderSetInfoCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderSetOpenCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderSetGetAreaCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderSetCloseCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderSetCacheFreeCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderAddToCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecoderPostProcess(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue srcGetType(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue bufSetPalette(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue bufFree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderGetInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderGetArea(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderClose(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderDelete(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderGetNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderSetInfoCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderSetOpenCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderSetGetAreaCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderSetCloseCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderSetCacheFreeCb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderAddToCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decoderPostProcess(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cacheDrop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -10,9 +10,13 @@ namespace be::lv {
         JS_CGETSET_DEF("popovers",BtnMatrix::getPopovers,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("clearButtonCtrl", 2, BtnMatrix::jsClearButtonCtrl),
-        JS_CFUNC_DEF("clearButtonCtrlAll", 1, BtnMatrix::jsClearButtonCtrlAll),
-        JS_CFUNC_DEF("hasButtonCtrl", 2, BtnMatrix::jsHasButtonCtrl),
+        JS_CFUNC_DEF("setButtonCtrl", 2, BtnMatrix::setButtonCtrl),
+        JS_CFUNC_DEF("clearButtonCtrl", 2, BtnMatrix::clearButtonCtrl),
+        JS_CFUNC_DEF("clearButtonCtrlAll", 1, BtnMatrix::clearButtonCtrlAll),
+        JS_CFUNC_DEF("setButtonWidth", 2, BtnMatrix::setButtonWidth),
+        JS_CFUNC_DEF("hasButtonCtrl", 2, BtnMatrix::hasButtonCtrl),
+        // Unsupported arg type:
+        // const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -93,62 +97,100 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue BtnMatrix::jsClearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t btn_id ;
-            if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","clearButtonCtrl","number")
-            }
-            // argv ctrl
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_buttonmatrix_ctrl_t ctrl;
-            if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_1_,&ctrl)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
-            JS_FreeCString(ctx, cstr_argv_1_) ;
-            lv_buttonmatrix_clear_button_ctrl( thisobj->lvobj(), btn_id, ctrl ) ;
-            return JS_UNDEFINED ;
+    JSValue BtnMatrix::setButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t btn_id ;
+        if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","setButtonCtrl","number")
         }
+        // argv ctrl
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_buttonmatrix_ctrl_t ctrl;
+        if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_1_,&ctrl)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_buttonmatrix_set_button_ctrl( thisobj->lvobj(), btn_id, ctrl ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue BtnMatrix::jsClearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv ctrl
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_buttonmatrix_ctrl_t ctrl;
-            if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_0_,&ctrl)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue BtnMatrix::clearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t btn_id ;
+        if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","clearButtonCtrl","number")
+        }
+        // argv ctrl
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_buttonmatrix_ctrl_t ctrl;
+        if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_1_,&ctrl)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_buttonmatrix_clear_button_ctrl( thisobj->lvobj(), btn_id, ctrl ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue BtnMatrix::clearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv ctrl
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_buttonmatrix_ctrl_t ctrl;
+        if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_0_,&ctrl)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_buttonmatrix_clear_button_ctrl_all( thisobj->lvobj(), ctrl ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_buttonmatrix_clear_button_ctrl_all( thisobj->lvobj(), ctrl ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue BtnMatrix::jsHasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t btn_id ;
-            if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","hasButtonCtrl","number")
-            }
-            // argv ctrl
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_buttonmatrix_ctrl_t ctrl;
-            if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_1_,&ctrl)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
-            JS_FreeCString(ctx, cstr_argv_1_) ;
-            bool retval = lv_buttonmatrix_has_button_ctrl( thisobj->lvobj(), btn_id, ctrl ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+    JSValue BtnMatrix::setButtonWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t btn_id ;
+        if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","setButtonWidth","number")
         }
+        uint32_t width ;
+        if(JS_ToUint32(ctx, (uint32_t *) &width, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","width","BtnMatrix","setButtonWidth","number")
+        }
+        lv_buttonmatrix_set_button_width( thisobj->lvobj(), btn_id, width ) ;
+        return JS_UNDEFINED ;
+    }
+
+        // Unsupported return type: const char *
+        // const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
+
+    JSValue BtnMatrix::hasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t btn_id ;
+        if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","hasButtonCtrl","number")
+        }
+        // argv ctrl
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_buttonmatrix_ctrl_t ctrl;
+        if(lv_buttonmatrix_ctrl_str_to_const(cstr_argv_1_,&ctrl)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_buttonmatrix_ctrl_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        bool retval = lv_buttonmatrix_has_button_ctrl( thisobj->lvobj(), btn_id, ctrl ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

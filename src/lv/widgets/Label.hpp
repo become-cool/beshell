@@ -29,10 +29,13 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsBindText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsIsCharUnderPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsInsText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue bindText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setTextFmt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getLetterPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getLetterOn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isCharUnderPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue insText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

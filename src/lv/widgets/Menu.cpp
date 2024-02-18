@@ -16,11 +16,12 @@ namespace be::lv {
         JS_CGETSET_DEF("sidebarHeaderBackButton",Menu::getSidebarHeaderBackButton,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("contCreate", 0, Menu::jsContCreate),
-        JS_CFUNC_DEF("sectionCreate", 0, Menu::jsSectionCreate),
-        JS_CFUNC_DEF("separatorCreate", 0, Menu::jsSeparatorCreate),
-        JS_CFUNC_DEF("backButtonIsRoot", 1, Menu::jsBackButtonIsRoot),
-        JS_CFUNC_DEF("clearHistory", 0, Menu::jsClearHistory),
+        JS_CFUNC_DEF("contCreate", 0, Menu::contCreate),
+        JS_CFUNC_DEF("sectionCreate", 0, Menu::sectionCreate),
+        JS_CFUNC_DEF("separatorCreate", 0, Menu::separatorCreate),
+        JS_CFUNC_DEF("setLoadPageEvent", 2, Menu::setLoadPageEvent),
+        JS_CFUNC_DEF("backButtonIsRoot", 1, Menu::backButtonIsRoot),
+        JS_CFUNC_DEF("clearHistory", 0, Menu::clearHistory),
         // Unsupported arg type:
         // lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -129,44 +130,53 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: char const * const
-        // lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
+    // Unsupported arg type: char const * const
+    // lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 
-        JSValue Menu::jsContCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_menu_cont_create( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue Menu::contCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_menu_cont_create( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue Menu::jsSectionCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_menu_section_create( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue Menu::sectionCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_menu_section_create( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue Menu::jsSeparatorCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_menu_separator_create( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue Menu::separatorCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_menu_separator_create( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue Menu::jsBackButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            JSVALUE_TO_LVOBJ(argv[0],obj)
-            bool retval = lv_menu_back_button_is_root( thisobj->lvobj(), obj ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
-        }
+    JSValue Menu::setLoadPageEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        JSVALUE_TO_LVOBJ(argv[0],obj)
+        JSVALUE_TO_LVOBJ(argv[1],page)
+        lv_menu_set_load_page_event( thisobj->lvobj(), obj, page ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Menu::jsClearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_menu_clear_history( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Menu::backButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        JSVALUE_TO_LVOBJ(argv[0],obj)
+        bool retval = lv_menu_back_button_is_root( thisobj->lvobj(), obj ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Menu::clearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_menu_clear_history( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

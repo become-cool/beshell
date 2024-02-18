@@ -34,9 +34,12 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsAddSection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsSectionSetRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsSectionSetStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setLineNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setImageNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addSection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sectionSetRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sectionSetStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

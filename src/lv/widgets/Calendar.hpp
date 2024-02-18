@@ -21,9 +21,13 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsHeaderArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsHeaderDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsHeaderDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setTodayDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setShowedDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setHighlightedDates(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getPressedDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue headerArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue headerDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue headerDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

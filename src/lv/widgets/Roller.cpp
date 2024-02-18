@@ -9,6 +9,9 @@ namespace be::lv {
         JS_CGETSET_DEF("optionCount",Roller::getOptionCount,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("setOptions", 2, Roller::setOptions),
+        JS_CFUNC_DEF("setSelected", 2, Roller::setSelected),
+        JS_CFUNC_DEF("getSelectedStr", 2, Roller::getSelectedStr),
         // Unsupported arg type:
         // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -59,8 +62,57 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
+    JSValue Roller::setOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        char * options = (char *)JS_ToCString(ctx, argv[0]) ;
+        // argv mode
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_roller_mode_t mode;
+        if(lv_roller_mode_str_to_const(cstr_argv_1_,&mode)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_roller_mode_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_roller_set_options( thisobj->lvobj(), options, mode ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Roller::setSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t sel_opt ;
+        if(JS_ToUint32(ctx, (uint32_t *) &sel_opt, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","sel_opt","Roller","setSelected","number")
+        }
+        // argv anim
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_anim_enable_t anim;
+        if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_roller_set_selected( thisobj->lvobj(), sel_opt, anim ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Roller::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        char * buf = (char *)JS_ToCString(ctx, argv[0]) ;
+        uint32_t buf_size ;
+        if(JS_ToUint32(ctx, (uint32_t *) &buf_size, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","buf_size","Roller","getSelectedStr","number")
+        }
+        lv_roller_get_selected_str( thisobj->lvobj(), buf, buf_size ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

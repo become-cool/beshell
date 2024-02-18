@@ -30,12 +30,13 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsPageCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsContCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsSectionCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsSeparatorCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsBackButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsClearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue pageCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue contCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sectionCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue separatorCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setLoadPageEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue backButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

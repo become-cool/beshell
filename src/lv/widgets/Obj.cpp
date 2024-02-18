@@ -17,6 +17,7 @@ namespace be::lv {
     
     std::vector<JSCFunctionListEntry> Obj::methods = {
         JS_CFUNC_DEF("dbginfo", 0, dbginfo),
+        JS_CFUNC_DEF("child", 1, Obj::getChild),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
@@ -52,52 +53,65 @@ namespace be::lv {
         JS_CGETSET_DEF("flexGrow",be::lv::Obj::invalidGetter,Obj::setFlexGrow) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addFlag", 1, Obj::jsAddFlag),
-        JS_CFUNC_DEF("removeFlag", 1, Obj::jsRemoveFlag),
-        JS_CFUNC_DEF("updateFlag", 2, Obj::jsUpdateFlag),
-        JS_CFUNC_DEF("addState", 1, Obj::jsAddState),
-        JS_CFUNC_DEF("removeState", 1, Obj::jsRemoveState),
-        JS_CFUNC_DEF("allocateSpecAttr", 0, Obj::jsAllocateSpecAttr),
-        JS_CFUNC_DEF("classInitObj", 0, Obj::jsClassInitObj),
-        JS_CFUNC_DEF("isEditable", 0, Obj::jsIsEditable),
-        JS_CFUNC_DEF("isGroupDef", 0, Obj::jsIsGroupDef),
-        JS_CFUNC_DEF("calculateExtDrawSize", 1, Obj::jsCalculateExtDrawSize),
-        JS_CFUNC_DEF("refreshExtDrawSize", 0, Obj::jsRefreshExtDrawSize),
-        JS_CFUNC_DEF("removeEvent", 1, Obj::jsRemoveEvent),
-        JS_CFUNC_DEF("refrSize", 0, Obj::jsRefrSize),
-        JS_CFUNC_DEF("markLayoutAsDirty", 0, Obj::jsMarkLayoutAsDirty),
-        JS_CFUNC_DEF("alignTo", 4, Obj::jsAlignTo),
-        JS_CFUNC_DEF("refreshSelfSize", 0, Obj::jsRefreshSelfSize),
-        JS_CFUNC_DEF("refrPos", 0, Obj::jsRefrPos),
-        JS_CFUNC_DEF("moveTo", 2, Obj::jsMoveTo),
-        JS_CFUNC_DEF("moveChildrenBy", 3, Obj::jsMoveChildrenBy),
-        JS_CFUNC_DEF("scrollBy", 3, Obj::jsScrollBy),
-        JS_CFUNC_DEF("scrollByBounded", 3, Obj::jsScrollByBounded),
-        JS_CFUNC_DEF("scrollTo", 3, Obj::jsScrollTo),
-        JS_CFUNC_DEF("scrollToX", 2, Obj::jsScrollToX),
-        JS_CFUNC_DEF("scrollToY", 2, Obj::jsScrollToY),
-        JS_CFUNC_DEF("scrollToView", 1, Obj::jsScrollToView),
-        JS_CFUNC_DEF("scrollToViewRecursive", 1, Obj::jsScrollToViewRecursive),
-        JS_CFUNC_DEF("updateSnap", 1, Obj::jsUpdateSnap),
-        JS_CFUNC_DEF("scrollbarInvalidate", 0, Obj::jsScrollbarInvalidate),
-        JS_CFUNC_DEF("readjustScroll", 1, Obj::jsReadjustScroll),
-        JS_CFUNC_DEF("removeStyleAll", 0, Obj::jsRemoveStyleAll),
-        JS_CFUNC_DEF("fadeIn", 2, Obj::jsFadeIn),
-        JS_CFUNC_DEF("fadeOut", 2, Obj::jsFadeOut),
-        JS_CFUNC_DEF("delete", 0, Obj::jsDelete),
-        JS_CFUNC_DEF("clean", 0, Obj::jsClean),
-        JS_CFUNC_DEF("deleteDelayed", 1, Obj::jsDeleteDelayed),
-        JS_CFUNC_DEF("deleteAsync", 0, Obj::jsDeleteAsync),
-        JS_CFUNC_DEF("swap", 1, Obj::jsSwap),
-        JS_CFUNC_DEF("moveToIndex", 1, Obj::jsMoveToIndex),
-        JS_CFUNC_DEF("dumpTree", 0, Obj::jsDumpTree),
+        JS_CFUNC_DEF("addFlag", 1, Obj::addFlag),
+        JS_CFUNC_DEF("removeFlag", 1, Obj::removeFlag),
+        JS_CFUNC_DEF("updateFlag", 2, Obj::updateFlag),
+        JS_CFUNC_DEF("addState", 1, Obj::addState),
+        JS_CFUNC_DEF("removeState", 1, Obj::removeState),
+        JS_CFUNC_DEF("setState", 2, Obj::setState),
+        JS_CFUNC_DEF("hasFlag", 1, Obj::hasFlag),
+        JS_CFUNC_DEF("hasFlagAny", 1, Obj::hasFlagAny),
+        JS_CFUNC_DEF("hasState", 1, Obj::hasState),
+        JS_CFUNC_DEF("allocateSpecAttr", 0, Obj::allocateSpecAttr),
+        JS_CFUNC_DEF("isValid", 0, Obj::isValid),
+        JS_CFUNC_DEF("classInitObj", 0, Obj::classInitObj),
+        JS_CFUNC_DEF("isEditable", 0, Obj::isEditable),
+        JS_CFUNC_DEF("isGroupDef", 0, Obj::isGroupDef),
+        JS_CFUNC_DEF("calculateExtDrawSize", 1, Obj::calculateExtDrawSize),
+        JS_CFUNC_DEF("refreshExtDrawSize", 0, Obj::refreshExtDrawSize),
+        JS_CFUNC_DEF("removeEvent", 1, Obj::removeEvent),
+        JS_CFUNC_DEF("setPos", 2, Obj::setPos),
+        JS_CFUNC_DEF("setSize", 2, Obj::setSize),
+        JS_CFUNC_DEF("refrSize", 0, Obj::refrSize),
+        JS_CFUNC_DEF("isLayoutPositioned", 0, Obj::isLayoutPositioned),
+        JS_CFUNC_DEF("markLayoutAsDirty", 0, Obj::markLayoutAsDirty),
+        JS_CFUNC_DEF("updateLayout", 0, Obj::updateLayout),
+        JS_CFUNC_DEF("alignTo", 4, Obj::alignTo),
+        JS_CFUNC_DEF("refreshSelfSize", 0, Obj::refreshSelfSize),
+        JS_CFUNC_DEF("refrPos", 0, Obj::refrPos),
+        JS_CFUNC_DEF("moveTo", 2, Obj::moveTo),
+        JS_CFUNC_DEF("moveChildrenBy", 3, Obj::moveChildrenBy),
+        JS_CFUNC_DEF("invalidate", 0, Obj::invalidate),
+        JS_CFUNC_DEF("isVisible", 0, Obj::isVisible),
+        JS_CFUNC_DEF("scrollBy", 3, Obj::scrollBy),
+        JS_CFUNC_DEF("scrollByBounded", 3, Obj::scrollByBounded),
+        JS_CFUNC_DEF("scrollTo", 3, Obj::scrollTo),
+        JS_CFUNC_DEF("scrollToX", 2, Obj::scrollToX),
+        JS_CFUNC_DEF("scrollToY", 2, Obj::scrollToY),
+        JS_CFUNC_DEF("scrollToView", 1, Obj::scrollToView),
+        JS_CFUNC_DEF("scrollToViewRecursive", 1, Obj::scrollToViewRecursive),
+        JS_CFUNC_DEF("isScrolling", 0, Obj::isScrolling),
+        JS_CFUNC_DEF("updateSnap", 1, Obj::updateSnap),
+        JS_CFUNC_DEF("scrollbarInvalidate", 0, Obj::scrollbarInvalidate),
+        JS_CFUNC_DEF("readjustScroll", 1, Obj::readjustScroll),
+        JS_CFUNC_DEF("removeStyleAll", 0, Obj::removeStyleAll),
+        JS_CFUNC_DEF("fadeIn", 2, Obj::fadeIn),
+        JS_CFUNC_DEF("fadeOut", 2, Obj::fadeOut),
+        JS_CFUNC_DEF("delete", 0, Obj::_delete),
+        JS_CFUNC_DEF("clean", 0, Obj::clean),
+        JS_CFUNC_DEF("deleteDelayed", 1, Obj::deleteDelayed),
+        JS_CFUNC_DEF("deleteAsync", 0, Obj::deleteAsync),
+        JS_CFUNC_DEF("swap", 1, Obj::swap),
+        JS_CFUNC_DEF("moveToIndex", 1, Obj::moveToIndex),
+        JS_CFUNC_DEF("getChild", 1, Obj::getChild),
+        JS_CFUNC_DEF("getSibling", 1, Obj::getSibling),
+        JS_CFUNC_DEF("dumpTree", 0, Obj::dumpTree),
+        JS_CFUNC_DEF("setFlexAlign", 3, Obj::setFlexAlign),
+        JS_CFUNC_DEF("setGridAlign", 2, Obj::setGridAlign),
+        JS_CFUNC_DEF("setGridCell", 6, Obj::setGridCell),
         // Unsupported arg type:
-        // bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
-        // bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
-        // bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
         // bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
         // bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
-        // bool lv_obj_is_valid(const lv_obj_t * obj)
         // lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
         // void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
         // void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
@@ -107,29 +121,151 @@ namespace be::lv {
         // lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
         // lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
         // void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+        // lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
         // bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
         // uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
-        // bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
-        // void lv_obj_update_layout(const lv_obj_t * obj)
+        // void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
+        // void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
         // void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
+        // void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive, bool inv)
         // void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
-        // void lv_obj_invalidate(const lv_obj_t * obj)
         // bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
-        // bool lv_obj_is_visible(const lv_obj_t * obj)
+        // void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
         // bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
-        // bool lv_obj_is_scrolling(const lv_obj_t * obj)
+        // lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
+        // lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count)
+        // lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
+        // void lv_obj_get_scroll_end(lv_obj_t * obj, lv_point_t * end)
+        // void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor, lv_area_t * ver)
         // void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
         // bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style, lv_style_selector_t selector)
         // void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
         // void lv_obj_report_style_change(lv_style_t * style)
         // void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         // void lv_obj_enable_style_refresh(bool en)
+        // lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
         // bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
+        // void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector)
+        // lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value, lv_style_selector_t selector)
         // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
         // lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
+        // lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
+        // void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_min_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_max_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_min_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_max_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_length(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_align(lv_obj_t * obj, lv_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_translate_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_translate_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_scale_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_scale_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_rotation(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_pivot_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_pivot_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_skew_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transform_skew_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_bottom(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_left(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_right(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_row(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_pad_column(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_margin_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_margin_bottom(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_margin_left(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_margin_right(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_grad_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_grad_dir(lv_obj_t * obj, lv_grad_dir_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_main_stop(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_grad_stop(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_main_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_grad_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_grad(lv_obj_t * obj, const lv_grad_dsc_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_image_src(lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_bg_image_tiled(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+        // void lv_obj_set_style_border_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_border_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_border_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_border_side(lv_obj_t * obj, lv_border_side_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_border_post(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+        // void lv_obj_set_style_outline_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_outline_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_outline_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_outline_pad(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_offset_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_offset_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_spread(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_dash_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_dash_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_rounded(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_line_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_arc_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_arc_rounded(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+        // void lv_obj_set_style_arc_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_arc_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_arc_image_src(lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_font(lv_obj_t * obj, const lv_font_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_letter_space(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_line_space(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_decor(lv_obj_t * obj, lv_text_decor_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_text_align(lv_obj_t * obj, lv_text_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_clip_corner(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+        // void lv_obj_set_style_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_blend_mode(lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_layout(lv_obj_t * obj, uint16_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_base_dir(lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_column_dsc_array(lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_column_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_row_dsc_array(lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_row_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_column_pos(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_column_span(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_row_pos(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+        // void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
         // void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
+        // lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+        // lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+        // uint32_t lv_obj_get_child_count_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+        // int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
         // void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
         // void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
+        // void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const int32_t row_dsc[])
         // lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
         // lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
         // lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
@@ -559,621 +695,1237 @@ namespace be::lv {
 
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Obj::jsAddFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv f
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_obj_flag_t f;
-            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::addFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv f
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_obj_flag_t f;
+        if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_add_flag( thisobj->lvobj(), f ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_add_flag( thisobj->lvobj(), f ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsRemoveFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv f
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_obj_flag_t f;
-            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::removeFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv f
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_obj_flag_t f;
+        if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_remove_flag( thisobj->lvobj(), f ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_remove_flag( thisobj->lvobj(), f ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsUpdateFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            // argv f
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_obj_flag_t f;
-            if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::updateFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        // argv f
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_obj_flag_t f;
+        if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            bool v = JS_ToBool(ctx, argv[1]) ;
-            lv_obj_update_flag( thisobj->lvobj(), f, v ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        bool v = JS_ToBool(ctx, argv[1]) ;
+        lv_obj_update_flag( thisobj->lvobj(), f, v ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsAddState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv state
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_state_t state;
-            if(lv_state_str_to_const(cstr_argv_0_,&state)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::addState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv state
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_state_t state;
+        if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_add_state( thisobj->lvobj(), state ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_add_state( thisobj->lvobj(), state ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsRemoveState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv state
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_state_t state;
-            if(lv_state_str_to_const(cstr_argv_0_,&state)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::removeState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv state
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_state_t state;
+        if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_remove_state( thisobj->lvobj(), state ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_remove_state( thisobj->lvobj(), state ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
-
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
-
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
-
-        JSValue Obj::jsAllocateSpecAttr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_allocate_spec_attr( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::setState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        // argv state
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_state_t state;
+        if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        bool v = JS_ToBool(ctx, argv[1]) ;
+        lv_obj_set_state( thisobj->lvobj(), state, v ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
-
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
-
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_is_valid(const lv_obj_t * obj)
-
-        // Unsupported arg type: const lv_obj_class_t *
-        // lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
-
-        JSValue Obj::jsClassInitObj(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_class_init_obj( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::hasFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv f
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_obj_flag_t f;
+        if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        bool retval = lv_obj_has_flag( thisobj->lvobj(), f ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsIsEditable(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_obj_is_editable( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+    JSValue Obj::hasFlagAny(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv f
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_obj_flag_t f;
+        if(lv__obj_flag_str_to_const(cstr_argv_0_,&f)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_obj_flag_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        bool retval = lv_obj_has_flag_any( thisobj->lvobj(), f ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsIsGroupDef(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_obj_is_group_def( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+    JSValue Obj::hasState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv state
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_state_t state;
+        if(lv_state_str_to_const(cstr_argv_0_,&state)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_state_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        bool retval = lv_obj_has_state( thisobj->lvobj(), state ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: lv_draw_rect_dsc_t *
-        // void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
+    JSValue Obj::allocateSpecAttr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_allocate_spec_attr( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: lv_draw_label_dsc_t *
-        // void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
+    // Unsupported arg type: const lv_obj_class_t *
+    // bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
-        // Unsupported arg type: lv_draw_image_dsc_t *
-        // void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc_t * draw_dsc)
+    // Unsupported arg type: const lv_obj_class_t *
+    // bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
-        // Unsupported arg type: lv_draw_line_dsc_t *
-        // void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
+    JSValue Obj::isValid(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_valid( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: lv_draw_arc_dsc_t *
-        // void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
+    // Unsupported arg type: const lv_obj_class_t *
+    // lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
 
-        JSValue Obj::jsCalculateExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            uint32_t part ;
-            if(JS_ToUint32(ctx, (uint32_t *) &part, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","part","Obj","calculateExtDrawSize","number")
-            }
-            int32_t retval = lv_obj_calculate_ext_draw_size( thisobj->lvobj(), part ) ;
-            JSValue jsretval = JS_NewInt32(ctx, retval) ;
-            return jsretval ;
+    JSValue Obj::classInitObj(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_class_init_obj( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::isEditable(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_editable( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Obj::isGroupDef(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_group_def( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    // Unsupported arg type: lv_draw_rect_dsc_t *
+    // void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
+
+    // Unsupported arg type: lv_draw_label_dsc_t *
+    // void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
+
+    // Unsupported arg type: lv_draw_image_dsc_t *
+    // void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc_t * draw_dsc)
+
+    // Unsupported arg type: lv_draw_line_dsc_t *
+    // void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
+
+    // Unsupported arg type: lv_draw_arc_dsc_t *
+    // void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
+
+    JSValue Obj::calculateExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        uint32_t part ;
+        if(JS_ToUint32(ctx, (uint32_t *) &part, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","part","Obj","calculateExtDrawSize","number")
         }
+        int32_t retval = lv_obj_calculate_ext_draw_size( thisobj->lvobj(), part ) ;
+        JSValue jsretval = JS_NewInt32(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsRefreshExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_refresh_ext_draw_size( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::refreshExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_refresh_ext_draw_size( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    // Unsupported arg type: void *
+    // lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+
+    // Unsupported arg type: const lv_obj_class_t *
+    // lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+
+    // Unsupported arg type: lv_event_cb_t
+    // void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+
+        // Unsupported return type: lv_event_dsc_t *
+        // lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
+
+    JSValue Obj::removeEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        uint32_t index ;
+        if(JS_ToUint32(ctx, (uint32_t *) &index, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","removeEvent","number")
         }
+        bool retval = lv_obj_remove_event( thisobj->lvobj(), index ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: void *
-        // lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+    // Unsupported arg type: lv_event_cb_t
+    // bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 
-        // Unsupported arg type: const lv_obj_class_t *
-        // lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+    // Unsupported arg type: lv_event_cb_t
+    // uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 
-        // Unsupported arg type: lv_event_cb_t
-        // void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
-
-        JSValue Obj::jsRemoveEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            uint32_t index ;
-            if(JS_ToUint32(ctx, (uint32_t *) &index, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","removeEvent","number")
-            }
-            bool retval = lv_obj_remove_event( thisobj->lvobj(), index ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+    JSValue Obj::setPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","setPos","number")
         }
-
-        // Unsupported arg type: lv_event_cb_t
-        // bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
-
-        // Unsupported arg type: lv_event_cb_t
-        // uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
-
-        JSValue Obj::jsRefrSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_obj_refr_size( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","setPos","number")
         }
+        lv_obj_set_pos( thisobj->lvobj(), x, y ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
-
-        JSValue Obj::jsMarkLayoutAsDirty(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_mark_layout_as_dirty( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::setSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t w ;
+        if(JS_ToInt32(ctx, (int32_t *) &w, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","w","Obj","setSize","number")
         }
+        int32_t h ;
+        if(JS_ToInt32(ctx, (int32_t *) &h, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","h","Obj","setSize","number")
+        }
+        lv_obj_set_size( thisobj->lvobj(), w, h ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_obj_update_layout(const lv_obj_t * obj)
+    JSValue Obj::refrSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_refr_size( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsAlignTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(4)
-            JSVALUE_TO_LVOBJ(argv[0],base)
-            // argv align
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_align_t align;
-            if(lv_align_str_to_const(cstr_argv_1_,&align)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_align_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::isLayoutPositioned(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_layout_positioned( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Obj::markLayoutAsDirty(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_mark_layout_as_dirty( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::updateLayout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_update_layout( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::alignTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(4)
+        JSVALUE_TO_LVOBJ(argv[0],base)
+        // argv align
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_align_t align;
+        if(lv_align_str_to_const(cstr_argv_1_,&align)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_align_t",cstr_argv_1_) ;
             JS_FreeCString(ctx, cstr_argv_1_) ;
-            int32_t x_ofs ;
-            if(JS_ToInt32(ctx, (int32_t *) &x_ofs, argv[2])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x_ofs","Obj","alignTo","number")
-            }
-            int32_t y_ofs ;
-            if(JS_ToInt32(ctx, (int32_t *) &y_ofs, argv[3])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y_ofs","Obj","alignTo","number")
-            }
-            lv_obj_align_to( thisobj->lvobj(), base, align, x_ofs, y_ofs ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
-
-        JSValue Obj::jsRefreshSelfSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_obj_refresh_self_size( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        int32_t x_ofs ;
+        if(JS_ToInt32(ctx, (int32_t *) &x_ofs, argv[2])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x_ofs","Obj","alignTo","number")
         }
-
-        JSValue Obj::jsRefrPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_refr_pos( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+        int32_t y_ofs ;
+        if(JS_ToInt32(ctx, (int32_t *) &y_ofs, argv[3])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y_ofs","Obj","alignTo","number")
         }
+        lv_obj_align_to( thisobj->lvobj(), base, align, x_ofs, y_ofs ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsMoveTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            int32_t x ;
-            if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","moveTo","number")
-            }
-            int32_t y ;
-            if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","moveTo","number")
-            }
-            lv_obj_move_to( thisobj->lvobj(), x, y ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: lv_area_t *
+    // void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
+
+    // Unsupported arg type: lv_area_t *
+    // void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
+
+    JSValue Obj::refreshSelfSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_refresh_self_size( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    JSValue Obj::refrPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_refr_pos( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::moveTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","moveTo","number")
         }
-
-        JSValue Obj::jsMoveChildrenBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(3)
-            int32_t x_diff ;
-            if(JS_ToInt32(ctx, (int32_t *) &x_diff, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x_diff","Obj","moveChildrenBy","number")
-            }
-            int32_t y_diff ;
-            if(JS_ToInt32(ctx, (int32_t *) &y_diff, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y_diff","Obj","moveChildrenBy","number")
-            }
-            bool ignore_floating = JS_ToBool(ctx, argv[2]) ;
-            lv_obj_move_children_by( thisobj->lvobj(), x_diff, y_diff, ignore_floating ) ;
-            return JS_UNDEFINED ;
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","moveTo","number")
         }
+        lv_obj_move_to( thisobj->lvobj(), x, y ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
+    JSValue Obj::moveChildrenBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        int32_t x_diff ;
+        if(JS_ToInt32(ctx, (int32_t *) &x_diff, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x_diff","Obj","moveChildrenBy","number")
+        }
+        int32_t y_diff ;
+        if(JS_ToInt32(ctx, (int32_t *) &y_diff, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y_diff","Obj","moveChildrenBy","number")
+        }
+        bool ignore_floating = JS_ToBool(ctx, argv[2]) ;
+        lv_obj_move_children_by( thisobj->lvobj(), x_diff, y_diff, ignore_floating ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
+    // Unsupported arg type: lv_point_t *
+    // void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
 
-        // Unsupported arg type: const lv_obj_t *
-        // void lv_obj_invalidate(const lv_obj_t * obj)
+    // Unsupported arg type: lv_area_t *
+    // void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive, bool inv)
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
+    // Unsupported arg type: const lv_area_t *
+    // void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_is_visible(const lv_obj_t * obj)
+    JSValue Obj::invalidate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_invalidate( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_point_t *
-        // bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
+    // Unsupported arg type: lv_area_t *
+    // bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
-        JSValue Obj::jsScrollBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(3)
-            int32_t x ;
-            if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollBy","number")
-            }
-            int32_t y ;
-            if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollBy","number")
-            }
-            // argv anim_en
-            const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
-                JS_FreeCString(ctx, cstr_argv_2_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::isVisible(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_visible( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
+
+    // Unsupported arg type: lv_area_t *
+    // void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
+
+    // Unsupported arg type: const lv_point_t *
+    // bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
+
+    // Unsupported arg type: const lv_property_t *
+    // lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
+
+    // Unsupported arg type: const lv_property_t *
+    // lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count)
+
+    // Unsupported arg type: lv_prop_id_t
+    // lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
+
+    // Unsupported arg type: lv_point_t *
+    // void lv_obj_get_scroll_end(lv_obj_t * obj, lv_point_t * end)
+
+    JSValue Obj::scrollBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollBy","number")
+        }
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollBy","number")
+        }
+        // argv anim_en
+        const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
             JS_FreeCString(ctx, cstr_argv_2_) ;
-            lv_obj_scroll_by( thisobj->lvobj(), x, y, anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_2_) ;
+        lv_obj_scroll_by( thisobj->lvobj(), x, y, anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollByBounded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(3)
-            int32_t dx ;
-            if(JS_ToInt32(ctx, (int32_t *) &dx, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","dx","Obj","scrollByBounded","number")
-            }
-            int32_t dy ;
-            if(JS_ToInt32(ctx, (int32_t *) &dy, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","dy","Obj","scrollByBounded","number")
-            }
-            // argv anim_en
-            const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
-                JS_FreeCString(ctx, cstr_argv_2_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollByBounded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        int32_t dx ;
+        if(JS_ToInt32(ctx, (int32_t *) &dx, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","dx","Obj","scrollByBounded","number")
+        }
+        int32_t dy ;
+        if(JS_ToInt32(ctx, (int32_t *) &dy, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","dy","Obj","scrollByBounded","number")
+        }
+        // argv anim_en
+        const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
             JS_FreeCString(ctx, cstr_argv_2_) ;
-            lv_obj_scroll_by_bounded( thisobj->lvobj(), dx, dy, anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_2_) ;
+        lv_obj_scroll_by_bounded( thisobj->lvobj(), dx, dy, anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(3)
-            int32_t x ;
-            if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollTo","number")
-            }
-            int32_t y ;
-            if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollTo","number")
-            }
-            // argv anim_en
-            const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
-                JS_FreeCString(ctx, cstr_argv_2_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollTo","number")
+        }
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollTo","number")
+        }
+        // argv anim_en
+        const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_2_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_2_) ;
             JS_FreeCString(ctx, cstr_argv_2_) ;
-            lv_obj_scroll_to( thisobj->lvobj(), x, y, anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_2_) ;
+        lv_obj_scroll_to( thisobj->lvobj(), x, y, anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollToX(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            int32_t x ;
-            if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollToX","number")
-            }
-            // argv anim_en
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollToX(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollToX","number")
+        }
+        // argv anim_en
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
             JS_FreeCString(ctx, cstr_argv_1_) ;
-            lv_obj_scroll_to_x( thisobj->lvobj(), x, anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_obj_scroll_to_x( thisobj->lvobj(), x, anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollToY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            int32_t y ;
-            if(JS_ToInt32(ctx, (int32_t *) &y, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollToY","number")
-            }
-            // argv anim_en
-            const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
-                JS_FreeCString(ctx, cstr_argv_1_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollToY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollToY","number")
+        }
+        // argv anim_en
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_1_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_1_) ;
             JS_FreeCString(ctx, cstr_argv_1_) ;
-            lv_obj_scroll_to_y( thisobj->lvobj(), y, anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_obj_scroll_to_y( thisobj->lvobj(), y, anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollToView(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv anim_en
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollToView(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv anim_en
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_scroll_to_view( thisobj->lvobj(), anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_scroll_to_view( thisobj->lvobj(), anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollToViewRecursive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv anim_en
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollToViewRecursive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv anim_en
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_scroll_to_view_recursive( thisobj->lvobj(), anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_scroll_to_view_recursive( thisobj->lvobj(), anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_is_scrolling(const lv_obj_t * obj)
+    JSValue Obj::isScrolling(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_obj_is_scrolling( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsUpdateSnap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv anim_en
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::updateSnap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv anim_en
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_update_snap( thisobj->lvobj(), anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_update_snap( thisobj->lvobj(), anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsScrollbarInvalidate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_scrollbar_invalidate( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    // Unsupported arg type: lv_area_t *
+    // void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor, lv_area_t * ver)
 
-        JSValue Obj::jsReadjustScroll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            // argv anim_en
-            const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
-            lv_anim_enable_t anim_en;
-            if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
-                JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
-                JS_FreeCString(ctx, cstr_argv_0_) ;
-                return JS_EXCEPTION ;
-            }
+    JSValue Obj::scrollbarInvalidate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_scrollbar_invalidate( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::readjustScroll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        // argv anim_en
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_anim_enable_t anim_en;
+        if(lv_anim_enable_str_to_const(cstr_argv_0_,&anim_en)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_anim_enable_t",cstr_argv_0_) ;
             JS_FreeCString(ctx, cstr_argv_0_) ;
-            lv_obj_readjust_scroll( thisobj->lvobj(), anim_en ) ;
-            return JS_UNDEFINED ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        lv_obj_readjust_scroll( thisobj->lvobj(), anim_en ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_style_t *
-        // void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+    // Unsupported arg type: const lv_style_t *
+    // void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 
-        // Unsupported arg type: const lv_style_t *
-        // bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style, lv_style_selector_t selector)
+    // Unsupported arg type: const lv_style_t *
+    // bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style, lv_style_selector_t selector)
 
-        // Unsupported arg type: const lv_style_t *
-        // void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+    // Unsupported arg type: const lv_style_t *
+    // void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 
-        JSValue Obj::jsRemoveStyleAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_remove_style_all( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::removeStyleAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_remove_style_all( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    // Unsupported arg type: lv_style_t *
+    // void lv_obj_report_style_change(lv_style_t * style)
+
+    // Unsupported arg type: lv_part_t
+    // void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+
+    // Unsupported arg type: bool
+    // void lv_obj_enable_style_refresh(bool en)
+
+    // Unsupported arg type: lv_part_t
+    // lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+
+    // Unsupported arg type: lv_style_selector_t
+    // bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
+
+    // Unsupported arg type: lv_style_value_t
+    // void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_value_t *
+    // lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
+
+    JSValue Obj::fadeIn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t time ;
+        if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeIn","number")
         }
-
-        // Unsupported arg type: lv_style_t *
-        // void lv_obj_report_style_change(lv_style_t * style)
-
-        // Unsupported arg type: lv_part_t
-        // void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
-
-        // Unsupported arg type: bool
-        // void lv_obj_enable_style_refresh(bool en)
-
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
-
-        // Unsupported arg type: lv_style_selector_t
-        // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
-
-        JSValue Obj::jsFadeIn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t time ;
-            if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeIn","number")
-            }
-            uint32_t delay ;
-            if(JS_ToUint32(ctx, (uint32_t *) &delay, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","delay","Obj","fadeIn","number")
-            }
-            lv_obj_fade_in( thisobj->lvobj(), time, delay ) ;
-            return JS_UNDEFINED ;
+        uint32_t delay ;
+        if(JS_ToUint32(ctx, (uint32_t *) &delay, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","delay","Obj","fadeIn","number")
         }
+        lv_obj_fade_in( thisobj->lvobj(), time, delay ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsFadeOut(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t time ;
-            if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeOut","number")
-            }
-            uint32_t delay ;
-            if(JS_ToUint32(ctx, (uint32_t *) &delay, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","delay","Obj","fadeOut","number")
-            }
-            lv_obj_fade_out( thisobj->lvobj(), time, delay ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::fadeOut(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t time ;
+        if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeOut","number")
         }
-
-        // Unsupported arg type: const lv_obj_t *
-        // lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
-
-        JSValue Obj::jsDelete(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_delete( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+        uint32_t delay ;
+        if(JS_ToUint32(ctx, (uint32_t *) &delay, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","delay","Obj","fadeOut","number")
         }
+        lv_obj_fade_out( thisobj->lvobj(), time, delay ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsClean(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_clean( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: lv_part_t
+    // lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
+
+    // Unsupported arg type: lv_part_t
+    // lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_min_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_max_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_min_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_max_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_length(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_align(lv_obj_t * obj, lv_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_height(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_translate_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_translate_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_scale_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_scale_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_rotation(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_pivot_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_pivot_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_skew_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_transform_skew_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_bottom(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_left(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_right(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_row(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_pad_column(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_margin_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_margin_bottom(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_margin_left(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_margin_right(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_grad_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_grad_dir(lv_obj_t * obj, lv_grad_dir_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_main_stop(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_grad_stop(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_main_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_grad_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const lv_grad_dsc_t *
+    // void lv_obj_set_style_bg_grad(lv_obj_t * obj, const lv_grad_dsc_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const void *
+    // void lv_obj_set_style_bg_image_src(lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_bg_image_tiled(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_border_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_border_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_border_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_border_side(lv_obj_t * obj, lv_border_side_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_border_post(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_outline_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_outline_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_outline_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_outline_pad(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_offset_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_offset_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_spread(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_dash_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_dash_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_rounded(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_line_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_arc_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_arc_rounded(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_arc_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_arc_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const void *
+    // void lv_obj_set_style_arc_image_src(lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const lv_font_t *
+    // void lv_obj_set_style_text_font(lv_obj_t * obj, const lv_font_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_letter_space(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_line_space(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_decor(lv_obj_t * obj, lv_text_decor_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_text_align(lv_obj_t * obj, lv_text_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_clip_corner(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const lv_color_filter_dsc_t *
+    // void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const lv_anim_t *
+    // void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const lv_style_transition_dsc_t *
+    // void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_blend_mode(lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_layout(lv_obj_t * obj, uint16_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_base_dir(lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const int32_t *
+    // void lv_obj_set_style_grid_column_dsc_array(lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_column_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: const int32_t *
+    // void lv_obj_set_style_grid_row_dsc_array(lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_row_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_column_pos(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_column_span(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_row_pos(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+
+    // Unsupported arg type: lv_style_selector_t
+    // void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+
+    JSValue Obj::_delete(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_delete( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::clean(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_clean( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::deleteDelayed(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        uint32_t delay_ms ;
+        if(JS_ToUint32(ctx, (uint32_t *) &delay_ms, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","delay_ms","Obj","deleteDelayed","number")
         }
+        lv_obj_delete_delayed( thisobj->lvobj(), delay_ms ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Obj::jsDeleteDelayed(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            uint32_t delay_ms ;
-            if(JS_ToUint32(ctx, (uint32_t *) &delay_ms, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","delay_ms","Obj","deleteDelayed","number")
-            }
-            lv_obj_delete_delayed( thisobj->lvobj(), delay_ms ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: lv_anim_t *
+    // void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
+
+    JSValue Obj::deleteAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_delete_async( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::swap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        JSVALUE_TO_LVOBJ(argv[0],obj2)
+        lv_obj_swap( thisobj->lvobj(), obj2 ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::moveToIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        int32_t index ;
+        if(JS_ToInt32(ctx, (int32_t *) &index, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","moveToIndex","number")
         }
+        lv_obj_move_to_index( thisobj->lvobj(), index ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: lv_anim_t *
-        // void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
-
-        JSValue Obj::jsDeleteAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_delete_async( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Obj::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        int32_t idx ;
+        if(JS_ToInt32(ctx, (int32_t *) &idx, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","idx","Obj","getChild","number")
         }
+        lv_obj_t * retval = lv_obj_get_child( thisobj->lvobj(), idx ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsSwap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            JSVALUE_TO_LVOBJ(argv[0],obj2)
-            lv_obj_swap( thisobj->lvobj(), obj2 ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: const lv_obj_class_t *
+    // lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+
+    JSValue Obj::getSibling(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        int32_t idx ;
+        if(JS_ToInt32(ctx, (int32_t *) &idx, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","idx","Obj","getSibling","number")
         }
+        lv_obj_t * retval = lv_obj_get_sibling( thisobj->lvobj(), idx ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue Obj::jsMoveToIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            int32_t index ;
-            if(JS_ToInt32(ctx, (int32_t *) &index, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","moveToIndex","number")
-            }
-            lv_obj_move_to_index( thisobj->lvobj(), index ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: const lv_obj_class_t *
+    // lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+
+    // Unsupported arg type: const lv_obj_class_t *
+    // uint32_t lv_obj_get_child_count_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+
+    // Unsupported arg type: const lv_obj_class_t *
+    // int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+
+    // Unsupported arg type: lv_obj_tree_walk_cb_t
+    // void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
+
+    JSValue Obj::dumpTree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_dump_tree( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    // Unsupported arg type: lv_layer_t *
+    // void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
+
+    JSValue Obj::setFlexAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        // argv main_place
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_flex_align_t main_place;
+        if(lv_flex_align_str_to_const(cstr_argv_0_,&main_place)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_flex_align_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
-
-        // Unsupported arg type: lv_obj_tree_walk_cb_t
-        // void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
-
-        JSValue Obj::jsDumpTree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_dump_tree( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        // argv cross_place
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_flex_align_t cross_place;
+        if(lv_flex_align_str_to_const(cstr_argv_1_,&cross_place)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_flex_align_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        // argv track_cross_place
+        const char * cstr_argv_2_ = JS_ToCString(ctx, argv[2]) ;
+        lv_flex_align_t track_cross_place;
+        if(lv_flex_align_str_to_const(cstr_argv_2_,&track_cross_place)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_flex_align_t",cstr_argv_2_) ;
+            JS_FreeCString(ctx, cstr_argv_2_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_2_) ;
+        lv_obj_set_flex_align( thisobj->lvobj(), main_place, cross_place, track_cross_place ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: lv_layer_t *
-        // void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
+    // Unsupported arg type: const int32_t*
+    // void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const int32_t row_dsc[])
 
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+    JSValue Obj::setGridAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        // argv column_align
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_grid_align_t column_align;
+        if(lv_grid_align_str_to_const(cstr_argv_0_,&column_align)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_grid_align_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        // argv row_align
+        const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
+        lv_grid_align_t row_align;
+        if(lv_grid_align_str_to_const(cstr_argv_1_,&row_align)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_grid_align_t",cstr_argv_1_) ;
+            JS_FreeCString(ctx, cstr_argv_1_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_1_) ;
+        lv_obj_set_grid_align( thisobj->lvobj(), column_align, row_align ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+    JSValue Obj::setGridCell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(6)
+        // argv column_align
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_grid_align_t column_align;
+        if(lv_grid_align_str_to_const(cstr_argv_0_,&column_align)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_grid_align_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        int32_t col_pos ;
+        if(JS_ToInt32(ctx, (int32_t *) &col_pos, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","col_pos","Obj","setGridCell","number")
+        }
+        int32_t col_span ;
+        if(JS_ToInt32(ctx, (int32_t *) &col_span, argv[2])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","col_span","Obj","setGridCell","number")
+        }
+        // argv row_align
+        const char * cstr_argv_3_ = JS_ToCString(ctx, argv[3]) ;
+        lv_grid_align_t row_align;
+        if(lv_grid_align_str_to_const(cstr_argv_3_,&row_align)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_grid_align_t",cstr_argv_3_) ;
+            JS_FreeCString(ctx, cstr_argv_3_) ;
+            return JS_EXCEPTION ;
+        }
+        JS_FreeCString(ctx, cstr_argv_3_) ;
+        int32_t row_pos ;
+        if(JS_ToInt32(ctx, (int32_t *) &row_pos, argv[4])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","row_pos","Obj","setGridCell","number")
+        }
+        int32_t row_span ;
+        if(JS_ToInt32(ctx, (int32_t *) &row_span, argv[5])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","row_span","Obj","setGridCell","number")
+        }
+        lv_obj_set_grid_cell( thisobj->lvobj(), column_align, col_pos, col_span, row_align, row_pos, row_span ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 // AUTO GENERATE CODE END [METHODS] --------
 }

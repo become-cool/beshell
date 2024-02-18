@@ -28,10 +28,12 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsStepNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsStepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsIncrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDecrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setDigitFormat(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue stepNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue stepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue increment(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue decrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

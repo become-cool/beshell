@@ -14,11 +14,13 @@ namespace be::lv {
         JS_CGETSET_DEF("optionCount",Dropdown::getOptionCount,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addOption", 2, Dropdown::jsAddOption),
-        JS_CFUNC_DEF("clearOptions", 0, Dropdown::jsClearOptions),
-        JS_CFUNC_DEF("open", 0, Dropdown::jsOpen),
-        JS_CFUNC_DEF("close", 0, Dropdown::jsClose),
-        JS_CFUNC_DEF("isOpen", 0, Dropdown::jsIsOpen),
+        JS_CFUNC_DEF("addOption", 2, Dropdown::addOption),
+        JS_CFUNC_DEF("clearOptions", 0, Dropdown::clearOptions),
+        JS_CFUNC_DEF("getSelectedStr", 2, Dropdown::getSelectedStr),
+        JS_CFUNC_DEF("getOptionIndex", 1, Dropdown::getOptionIndex),
+        JS_CFUNC_DEF("open", 0, Dropdown::open),
+        JS_CFUNC_DEF("close", 0, Dropdown::close),
+        JS_CFUNC_DEF("isOpen", 0, Dropdown::isOpen),
         // Unsupported arg type:
         // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -49,6 +51,7 @@ namespace be::lv {
         THIS_NCLASS(Dropdown,thisobj)
         char * text = (char *)JS_ToCString(ctx, val) ;
         lv_dropdown_set_text(thisobj->lvobj(), text) ;
+        JS_FreeCString(ctx, text) ;
         return JS_UNDEFINED ;
     }
     // unspported type: const char *
@@ -58,12 +61,14 @@ namespace be::lv {
         THIS_NCLASS(Dropdown,thisobj)
         char * options = (char *)JS_ToCString(ctx, val) ;
         lv_dropdown_set_options(thisobj->lvobj(), options) ;
+        JS_FreeCString(ctx, options) ;
         return JS_UNDEFINED ;
     }
     JSValue Dropdown::setOptionsStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Dropdown,thisobj)
         char * optionsStatic = (char *)JS_ToCString(ctx, val) ;
         lv_dropdown_set_options_static(thisobj->lvobj(), optionsStatic) ;
+        JS_FreeCString(ctx, optionsStatic) ;
         return JS_UNDEFINED ;
     }
     JSValue Dropdown::getSelected(JSContext *ctx, JSValueConst this_val){
@@ -134,45 +139,67 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
-        JSValue Dropdown::jsAddOption(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            char * option = (char *)JS_ToCString(ctx, argv[0]) ;
-            uint32_t pos ;
-            if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","pos","Dropdown","addOption","number")
-            }
-            lv_dropdown_add_option( thisobj->lvobj(), option, pos ) ;
-            return JS_UNDEFINED ;
+    JSValue Dropdown::addOption(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        char * option = (char *)JS_ToCString(ctx, argv[0]) ;
+        uint32_t pos ;
+        if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","pos","Dropdown","addOption","number")
         }
+        lv_dropdown_add_option( thisobj->lvobj(), option, pos ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Dropdown::jsClearOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_dropdown_clear_options( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Dropdown::clearOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_dropdown_clear_options( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Dropdown::jsOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_dropdown_open( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Dropdown::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        char * buf = (char *)JS_ToCString(ctx, argv[0]) ;
+        uint32_t buf_size ;
+        if(JS_ToUint32(ctx, (uint32_t *) &buf_size, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","buf_size","Dropdown","getSelectedStr","number")
         }
+        lv_dropdown_get_selected_str( thisobj->lvobj(), buf, buf_size ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Dropdown::jsClose(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_dropdown_close( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Dropdown::getOptionIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * option = (char *)JS_ToCString(ctx, argv[0]) ;
+        int32_t retval = lv_dropdown_get_option_index( thisobj->lvobj(), option ) ;
+            JS_FreeCString(ctx, option) ;
+        JSValue jsretval = JS_NewInt32(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue Dropdown::jsIsOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            bool retval = lv_dropdown_is_open( thisobj->lvobj() ) ;
-            JSValue jsretval = JS_NewBool(ctx, retval) ;
-            return jsretval ;
-        }
+    JSValue Dropdown::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_dropdown_open( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Dropdown::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_dropdown_close( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Dropdown::isOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_dropdown_is_open( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

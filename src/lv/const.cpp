@@ -1590,6 +1590,178 @@ JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) {
     return JS_NewString(ctx, lv_opa_const_to_str(code));
 }
 
+// lv_grad_dir_t
+bool lv_grad_dir_str_to_const(const char * name, lv_grad_dir_t * out) {
+    if(strcmp(name,"none")==0) {
+        (*out) = LV_GRAD_DIR_NONE ;
+    }
+    else if(strcmp(name,"ver")==0) {
+        (*out) = LV_GRAD_DIR_VER ;
+    }
+    else if(strcmp(name,"hor")==0) {
+        (*out) = LV_GRAD_DIR_HOR ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_grad_dir_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grad_dir_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_grad_dir_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_grad_dir_const_to_str(lv_grad_dir_t code) {
+
+    switch(code) {
+        case LV_GRAD_DIR_NONE: return "none";
+        case LV_GRAD_DIR_VER: return "ver";
+        case LV_GRAD_DIR_HOR: return "hor";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_grad_dir_const_to_jsstr(JSContext *ctx, lv_grad_dir_t code) {
+    return JS_NewString(ctx, lv_grad_dir_const_to_str(code));
+}
+
+// lv_text_decor_t
+bool lv_text_decor_str_to_const(const char * name, lv_text_decor_t * out) {
+    if(strcmp(name,"none")==0) {
+        (*out) = LV_TEXT_DECOR_NONE ;
+    }
+    else if(strcmp(name,"underline")==0) {
+        (*out) = LV_TEXT_DECOR_UNDERLINE ;
+    }
+    else if(strcmp(name,"strikethrough")==0) {
+        (*out) = LV_TEXT_DECOR_STRIKETHROUGH ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_text_decor_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_text_decor_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_text_decor_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_text_decor_const_to_str(lv_text_decor_t code) {
+
+    switch(code) {
+        case LV_TEXT_DECOR_NONE: return "none";
+        case LV_TEXT_DECOR_UNDERLINE: return "underline";
+        case LV_TEXT_DECOR_STRIKETHROUGH: return "strikethrough";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_text_decor_const_to_jsstr(JSContext *ctx, lv_text_decor_t code) {
+    return JS_NewString(ctx, lv_text_decor_const_to_str(code));
+}
+
+// lv_blend_mode_t
+bool lv_blend_mode_str_to_const(const char * name, lv_blend_mode_t * out) {
+    if(strcmp(name,"mode-normal")==0) {
+        (*out) = LV_BLEND_MODE_NORMAL ;
+    }
+    else if(strcmp(name,"mode-additive")==0) {
+        (*out) = LV_BLEND_MODE_ADDITIVE ;
+    }
+    else if(strcmp(name,"mode-subtractive")==0) {
+        (*out) = LV_BLEND_MODE_SUBTRACTIVE ;
+    }
+    else if(strcmp(name,"mode-multiply")==0) {
+        (*out) = LV_BLEND_MODE_MULTIPLY ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_blend_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_blend_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_blend_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_blend_mode_const_to_str(lv_blend_mode_t code) {
+
+    switch(code) {
+        case LV_BLEND_MODE_NORMAL: return "mode-normal";
+        case LV_BLEND_MODE_ADDITIVE: return "mode-additive";
+        case LV_BLEND_MODE_SUBTRACTIVE: return "mode-subtractive";
+        case LV_BLEND_MODE_MULTIPLY: return "mode-multiply";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_blend_mode_const_to_jsstr(JSContext *ctx, lv_blend_mode_t code) {
+    return JS_NewString(ctx, lv_blend_mode_const_to_str(code));
+}
+
+// lv_grid_align_t
+bool lv_grid_align_str_to_const(const char * name, lv_grid_align_t * out) {
+    if(strcmp(name,"start")==0) {
+        (*out) = LV_GRID_ALIGN_START ;
+    }
+    else if(strcmp(name,"center")==0) {
+        (*out) = LV_GRID_ALIGN_CENTER ;
+    }
+    else if(strcmp(name,"end")==0) {
+        (*out) = LV_GRID_ALIGN_END ;
+    }
+    else if(strcmp(name,"stretch")==0) {
+        (*out) = LV_GRID_ALIGN_STRETCH ;
+    }
+    else if(strcmp(name,"space-evenly")==0) {
+        (*out) = LV_GRID_ALIGN_SPACE_EVENLY ;
+    }
+    else if(strcmp(name,"space-around")==0) {
+        (*out) = LV_GRID_ALIGN_SPACE_AROUND ;
+    }
+    else if(strcmp(name,"space-between")==0) {
+        (*out) = LV_GRID_ALIGN_SPACE_BETWEEN ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_grid_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grid_align_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_grid_align_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_grid_align_const_to_str(lv_grid_align_t code) {
+
+    switch(code) {
+        case LV_GRID_ALIGN_START: return "start";
+        case LV_GRID_ALIGN_CENTER: return "center";
+        case LV_GRID_ALIGN_END: return "end";
+        case LV_GRID_ALIGN_STRETCH: return "stretch";
+        case LV_GRID_ALIGN_SPACE_EVENLY: return "space-evenly";
+        case LV_GRID_ALIGN_SPACE_AROUND: return "space-around";
+        case LV_GRID_ALIGN_SPACE_BETWEEN: return "space-between";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_grid_align_const_to_jsstr(JSContext *ctx, lv_grid_align_t code) {
+    return JS_NewString(ctx, lv_grid_align_const_to_str(code));
+}
+
 // lv_keyboard_mode_t
 bool lv_keyboard_mode_str_to_const(const char * name, lv_keyboard_mode_t * out) {
     if(strcmp(name,"mode-text-lower")==0) {
@@ -1990,48 +2162,6 @@ JSValue lv_chart_axis_const_to_jsstr(JSContext *ctx, lv_chart_axis_t code) {
     return JS_NewString(ctx, lv_chart_axis_const_to_str(code));
 }
 
-// lv_blend_mode_t
-bool lv_blend_mode_str_to_const(const char * name, lv_blend_mode_t * out) {
-    if(strcmp(name,"mode-normal")==0) {
-        (*out) = LV_BLEND_MODE_NORMAL ;
-    }
-    else if(strcmp(name,"mode-additive")==0) {
-        (*out) = LV_BLEND_MODE_ADDITIVE ;
-    }
-    else if(strcmp(name,"mode-subtractive")==0) {
-        (*out) = LV_BLEND_MODE_SUBTRACTIVE ;
-    }
-    else if(strcmp(name,"mode-multiply")==0) {
-        (*out) = LV_BLEND_MODE_MULTIPLY ;
-    }
-
-    else {
-        return false ;
-    }
-    return true ;
-}
-bool lv_blend_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_blend_mode_t* out) {
-    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
-    bool suc = lv_blend_mode_str_to_const(cstr, out) ;
-    JS_FreeCString(ctx, cstr) ;
-    return suc ;
-}
-const char * lv_blend_mode_const_to_str(lv_blend_mode_t code) {
-
-    switch(code) {
-        case LV_BLEND_MODE_NORMAL: return "mode-normal";
-        case LV_BLEND_MODE_ADDITIVE: return "mode-additive";
-        case LV_BLEND_MODE_SUBTRACTIVE: return "mode-subtractive";
-        case LV_BLEND_MODE_MULTIPLY: return "mode-multiply";
-
-        default:
-            return "unknow";
-    }
-}
-JSValue lv_blend_mode_const_to_jsstr(JSContext *ctx, lv_blend_mode_t code) {
-    return JS_NewString(ctx, lv_blend_mode_const_to_str(code));
-}
-
 // lv_image_align_t
 bool lv_image_align_str_to_const(const char * name, lv_image_align_t * out) {
     if(strcmp(name,"default")==0) {
@@ -2318,6 +2448,40 @@ const char * lv_menu_mode_root_back_button_const_to_str(lv_menu_mode_root_back_b
 }
 JSValue lv_menu_mode_root_back_button_const_to_jsstr(JSContext *ctx, lv_menu_mode_root_back_button_t code) {
     return JS_NewString(ctx, lv_menu_mode_root_back_button_const_to_str(code));
+}
+
+// lv_roller_mode_t
+bool lv_roller_mode_str_to_const(const char * name, lv_roller_mode_t * out) {
+    if(strcmp(name,"mode-normal")==0) {
+        (*out) = LV_ROLLER_MODE_NORMAL ;
+    }
+    else if(strcmp(name,"mode-infinite")==0) {
+        (*out) = LV_ROLLER_MODE_INFINITE ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_roller_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_roller_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_roller_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_roller_mode_const_to_str(lv_roller_mode_t code) {
+
+    switch(code) {
+        case LV_ROLLER_MODE_NORMAL: return "mode-normal";
+        case LV_ROLLER_MODE_INFINITE: return "mode-infinite";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_roller_mode_const_to_jsstr(JSContext *ctx, lv_roller_mode_t code) {
+    return JS_NewString(ctx, lv_roller_mode_const_to_str(code));
 }
 
 // lv_span_overflow_t

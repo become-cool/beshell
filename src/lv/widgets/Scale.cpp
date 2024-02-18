@@ -15,6 +15,9 @@ namespace be::lv {
         JS_CGETSET_DEF("rangeMaxValue",Scale::getRangeMaxValue,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("setRange", 2, Scale::setRange),
+        JS_CFUNC_DEF("setLineNeedleValue", 3, Scale::setLineNeedleValue),
+        JS_CFUNC_DEF("setImageNeedleValue", 2, Scale::setImageNeedleValue),
         // Unsupported arg type:
         // lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
         // void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
@@ -150,14 +153,57 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+    JSValue Scale::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t min ;
+        if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","min","Scale","setRange","number")
+        }
+        int32_t max ;
+        if(JS_ToInt32(ctx, (int32_t *) &max, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","max","Scale","setRange","number")
+        }
+        lv_scale_set_range( thisobj->lvobj(), min, max ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Scale::setLineNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        JSVALUE_TO_LVOBJ(argv[0],needle_line)
+        int32_t needle_length ;
+        if(JS_ToInt32(ctx, (int32_t *) &needle_length, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","needle_length","Scale","setLineNeedleValue","number")
+        }
+        int32_t value ;
+        if(JS_ToInt32(ctx, (int32_t *) &value, argv[2])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","value","Scale","setLineNeedleValue","number")
+        }
+        lv_scale_set_line_needle_value( thisobj->lvobj(), needle_line, needle_length, value ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Scale::setImageNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        JSVALUE_TO_LVOBJ(argv[0],needle_img)
+        int32_t value ;
+        if(JS_ToInt32(ctx, (int32_t *) &value, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","value","Scale","setImageNeedleValue","number")
+        }
+        lv_scale_set_image_needle_value( thisobj->lvobj(), needle_img, value ) ;
+        return JS_UNDEFINED ;
+    }
+
         // Unsupported return type: lv_scale_section_t *
         // lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 
-        // Unsupported arg type: lv_scale_section_t *
-        // void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
+    // Unsupported arg type: lv_scale_section_t *
+    // void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
 
-        // Unsupported arg type: lv_scale_section_t *
-        // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
+    // Unsupported arg type: lv_scale_section_t *
+    // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

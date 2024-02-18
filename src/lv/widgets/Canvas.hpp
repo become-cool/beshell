@@ -20,10 +20,14 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsCopyBuf(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsFillBg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsInitLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsFinishLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setBuffer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setPx(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setPalette(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getPx(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue copyBuf(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue fillBg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue initLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue finishLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

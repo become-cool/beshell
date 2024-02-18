@@ -42,16 +42,16 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsAddChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsAddText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDeleteChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDeleteCharForward(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsTextIsSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsClearSelection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCursorRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsCursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue deleteChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue deleteCharForward(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue textIsSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearSelection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cursorRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

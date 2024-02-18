@@ -10,6 +10,7 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
+        // void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_buttonmatrix_ctrl_t ctrl_map[])
         // void lv_keyboard_def_event_cb(lv_event_t * e)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -73,8 +74,11 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_event_t *
-        // void lv_keyboard_def_event_cb(lv_event_t * e)
+    // Unsupported arg type: const char **
+    // void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_buttonmatrix_ctrl_t ctrl_map[])
+
+    // Unsupported arg type: lv_event_t *
+    // void lv_keyboard_def_event_cb(lv_event_t * e)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

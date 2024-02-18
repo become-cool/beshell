@@ -9,7 +9,9 @@ namespace be::lv {
         JS_CGETSET_DEF("srcCount",AnimImg::getSrcCount,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("start", 0, AnimImg::jsStart),
+        JS_CFUNC_DEF("start", 0, AnimImg::start),
+        // Unsupported arg type:
+        // void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -73,11 +75,14 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue AnimImg::jsStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_animimg_start( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    // Unsupported arg type: const void **
+    // void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num)
+
+    JSValue AnimImg::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_animimg_start( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

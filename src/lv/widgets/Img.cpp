@@ -21,6 +21,7 @@ namespace be::lv {
         JS_CGETSET_DEF("align",Img::getAlign,Img::setAlign) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("setPivot", 2, Img::setPivot),
         // Unsupported arg type:
         // lv_image_src_t lv_image_src_get_type(const void * src)
         // void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
@@ -39,6 +40,7 @@ namespace be::lv {
         // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
         // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
         // void lv_image_cache_drop(const void * src)
+        // void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -245,56 +247,74 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: const void *
-        // lv_image_src_t lv_image_src_get_type(const void * src)
+    // Unsupported arg type: const void *
+    // lv_image_src_t lv_image_src_get_type(const void * src)
 
-        // Unsupported arg type: lv_image_dsc_t *
-        // void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
+    // Unsupported arg type: lv_image_dsc_t *
+    // void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 
-        // Unsupported arg type: lv_image_dsc_t *
-        // void lv_image_buf_free(lv_image_dsc_t * dsc)
+    // Unsupported arg type: lv_image_dsc_t *
+    // void lv_image_buf_free(lv_image_dsc_t * dsc)
 
-        // Unsupported arg type: const void *
-        // lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
+    // Unsupported arg type: const void *
+    // lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 
-        // Unsupported arg type: lv_image_decoder_dsc_t *
-        // lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
+    // Unsupported arg type: lv_image_decoder_dsc_t *
+    // lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
 
-        // Unsupported arg type: lv_image_decoder_dsc_t *
-        // lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area)
+    // Unsupported arg type: lv_image_decoder_dsc_t *
+    // lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area)
 
-        // Unsupported arg type: lv_image_decoder_dsc_t *
-        // void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
+    // Unsupported arg type: lv_image_decoder_dsc_t *
+    // void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_delete(lv_image_decoder_t * decoder)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_delete(lv_image_decoder_t * decoder)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder)
+    // Unsupported arg type: lv_image_decoder_t *
+    // lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_set_info_cb(lv_image_decoder_t * decoder, lv_image_decoder_info_f_t info_cb)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_set_info_cb(lv_image_decoder_t * decoder, lv_image_decoder_info_f_t info_cb)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder_open_f_t open_cb)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder_open_f_t open_cb)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t read_line_cb)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t read_line_cb)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb)
+    // Unsupported arg type: lv_image_decoder_t *
+    // void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb)
 
-        // Unsupported arg type: lv_image_decoder_t *
-        // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
+    // Unsupported arg type: lv_image_decoder_t *
+    // lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder, lv_image_cache_data_t * search_key, const lv_draw_buf_t * decoded, void * user_data)
 
-        // Unsupported arg type: lv_image_decoder_dsc_t *
-        // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
+    // Unsupported arg type: lv_image_decoder_dsc_t *
+    // lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
 
-        // Unsupported arg type: const void *
-        // void lv_image_cache_drop(const void * src)
+    // Unsupported arg type: const void *
+    // void lv_image_cache_drop(const void * src)
+
+    JSValue Img::setPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t x ;
+        if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","x","Img","setPivot","number")
+        }
+        int32_t y ;
+        if(JS_ToInt32(ctx, (int32_t *) &y, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","y","Img","setPivot","number")
+        }
+        lv_image_set_pivot( thisobj->lvobj(), x, y ) ;
+        return JS_UNDEFINED ;
+    }
+
+    // Unsupported arg type: lv_point_t *
+    // void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

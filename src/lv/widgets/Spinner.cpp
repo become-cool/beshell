@@ -7,7 +7,7 @@ namespace be::lv {
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-
+        JS_CFUNC_DEF("setAnimParams", 2, Spinner::setAnimParams),
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -33,7 +33,20 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
+    JSValue Spinner::setAnimParams(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t t ;
+        if(JS_ToUint32(ctx, (uint32_t *) &t, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","t","Spinner","setAnimParams","number")
+        }
+        uint32_t angle ;
+        if(JS_ToUint32(ctx, (uint32_t *) &angle, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","angle","Spinner","setAnimParams","number")
+        }
+        lv_spinner_set_anim_params( thisobj->lvobj(), t, angle ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

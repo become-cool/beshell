@@ -21,17 +21,16 @@ namespace be::lv {
         JS_CGETSET_DEF("currentChar",TextArea::getCurrentChar,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addChar", 1, TextArea::jsAddChar),
-        JS_CFUNC_DEF("addText", 1, TextArea::jsAddText),
-        JS_CFUNC_DEF("deleteChar", 0, TextArea::jsDeleteChar),
-        JS_CFUNC_DEF("deleteCharForward", 0, TextArea::jsDeleteCharForward),
-        JS_CFUNC_DEF("clearSelection", 0, TextArea::jsClearSelection),
-        JS_CFUNC_DEF("cursorRight", 0, TextArea::jsCursorRight),
-        JS_CFUNC_DEF("cursorLeft", 0, TextArea::jsCursorLeft),
-        JS_CFUNC_DEF("cursorDown", 0, TextArea::jsCursorDown),
-        JS_CFUNC_DEF("cursorUp", 0, TextArea::jsCursorUp),
-        // Unsupported arg type:
-        // bool lv_textarea_text_is_selected(const lv_obj_t * obj)
+        JS_CFUNC_DEF("addChar", 1, TextArea::addChar),
+        JS_CFUNC_DEF("addText", 1, TextArea::addText),
+        JS_CFUNC_DEF("deleteChar", 0, TextArea::deleteChar),
+        JS_CFUNC_DEF("deleteCharForward", 0, TextArea::deleteCharForward),
+        JS_CFUNC_DEF("textIsSelected", 0, TextArea::textIsSelected),
+        JS_CFUNC_DEF("clearSelection", 0, TextArea::clearSelection),
+        JS_CFUNC_DEF("cursorRight", 0, TextArea::cursorRight),
+        JS_CFUNC_DEF("cursorLeft", 0, TextArea::cursorLeft),
+        JS_CFUNC_DEF("cursorDown", 0, TextArea::cursorDown),
+        JS_CFUNC_DEF("cursorUp", 0, TextArea::cursorUp),
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -60,6 +59,7 @@ namespace be::lv {
         THIS_NCLASS(TextArea,thisobj)
         char * text = (char *)JS_ToCString(ctx, val) ;
         lv_textarea_set_text(thisobj->lvobj(), text) ;
+        JS_FreeCString(ctx, text) ;
         return JS_UNDEFINED ;
     }
     // unspported type: const char *
@@ -69,6 +69,7 @@ namespace be::lv {
         THIS_NCLASS(TextArea,thisobj)
         char * placeholderText = (char *)JS_ToCString(ctx, val) ;
         lv_textarea_set_placeholder_text(thisobj->lvobj(), placeholderText) ;
+        JS_FreeCString(ctx, placeholderText) ;
         return JS_UNDEFINED ;
     }
     JSValue TextArea::getCursorPos(JSContext *ctx, JSValueConst this_val){
@@ -117,6 +118,7 @@ namespace be::lv {
         THIS_NCLASS(TextArea,thisobj)
         char * passwordBullet = (char *)JS_ToCString(ctx, val) ;
         lv_textarea_set_password_bullet(thisobj->lvobj(), passwordBullet) ;
+        JS_FreeCString(ctx, passwordBullet) ;
         return JS_UNDEFINED ;
     }
     JSValue TextArea::getOneLine(JSContext *ctx, JSValueConst this_val){
@@ -138,6 +140,7 @@ namespace be::lv {
         THIS_NCLASS(TextArea,thisobj)
         char * acceptedChars = (char *)JS_ToCString(ctx, val) ;
         lv_textarea_set_accepted_chars(thisobj->lvobj(), acceptedChars) ;
+        JS_FreeCString(ctx, acceptedChars) ;
         return JS_UNDEFINED ;
     }
     JSValue TextArea::getMaxLength(JSContext *ctx, JSValueConst this_val){
@@ -159,6 +162,7 @@ namespace be::lv {
         THIS_NCLASS(TextArea,thisobj)
         char * insertReplace = (char *)JS_ToCString(ctx, val) ;
         lv_textarea_set_insert_replace(thisobj->lvobj(), insertReplace) ;
+        JS_FreeCString(ctx, insertReplace) ;
         return JS_UNDEFINED ;
     }
     JSValue TextArea::getTextSelection(JSContext *ctx, JSValueConst this_val){
@@ -217,69 +221,73 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue TextArea::jsAddChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            uint32_t c ;
-            if(JS_ToUint32(ctx, (uint32_t *) &c, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","c","TextArea","addChar","number")
-            }
-            lv_textarea_add_char( thisobj->lvobj(), c ) ;
-            return JS_UNDEFINED ;
+    JSValue TextArea::addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        uint32_t c ;
+        if(JS_ToUint32(ctx, (uint32_t *) &c, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","c","TextArea","addChar","number")
         }
+        lv_textarea_add_char( thisobj->lvobj(), c ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsAddText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_textarea_add_text( thisobj->lvobj(), txt ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_textarea_add_text( thisobj->lvobj(), txt ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsDeleteChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_delete_char( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::deleteChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_delete_char( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsDeleteCharForward(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_delete_char_forward( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::deleteCharForward(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_delete_char_forward( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_textarea_text_is_selected(const lv_obj_t * obj)
+    JSValue TextArea::textIsSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool retval = lv_textarea_text_is_selected( thisobj->lvobj() ) ;
+        JSValue jsretval = JS_NewBool(ctx, retval) ;
+        return jsretval ;
+    }
 
-        JSValue TextArea::jsClearSelection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_clear_selection( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::clearSelection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_clear_selection( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsCursorRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_cursor_right( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::cursorRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_cursor_right( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsCursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_cursor_left( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::cursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_cursor_left( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsCursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_cursor_down( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::cursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_cursor_down( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue TextArea::jsCursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_textarea_cursor_up( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue TextArea::cursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_textarea_cursor_up( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

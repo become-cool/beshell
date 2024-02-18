@@ -11,12 +11,29 @@ namespace be::lv {
         JS_CGETSET_DEF("firstPointCenterOffset",Chart::getFirstPointCenterOffset,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("refresh", 0, Chart::jsRefresh),
+        JS_CFUNC_DEF("setRange", 3, Chart::setRange),
+        JS_CFUNC_DEF("setDivLineCount", 2, Chart::setDivLineCount),
+        JS_CFUNC_DEF("refresh", 0, Chart::refresh),
         // Unsupported arg type:
+        // uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
+        // void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
         // lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_chart_axis_t axis)
         // void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
         // void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
+        // void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
+        // void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id)
+        // lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser)
         // lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
+        // void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
+        // void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint32_t point_id)
+        // lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
+        // void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+        // void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+        // void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value)
+        // void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
+        // void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
+        // int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
+        // int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -102,23 +119,107 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Chart::jsRefresh(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_chart_refresh( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue Chart::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(3)
+        // argv axis
+        const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
+        lv_chart_axis_t axis;
+        if(lv_chart_axis_str_to_const(cstr_argv_0_,&axis)) {
+            JS_ThrowReferenceError(ctx,"unknow %s value: %s","lv_chart_axis_t",cstr_argv_0_) ;
+            JS_FreeCString(ctx, cstr_argv_0_) ;
+            return JS_EXCEPTION ;
         }
+        JS_FreeCString(ctx, cstr_argv_0_) ;
+        int32_t min ;
+        if(JS_ToInt32(ctx, (int32_t *) &min, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","min","Chart","setRange","number")
+        }
+        int32_t max ;
+        if(JS_ToInt32(ctx, (int32_t *) &max, argv[2])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","max","Chart","setRange","number")
+        }
+        lv_chart_set_range( thisobj->lvobj(), axis, min, max ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Chart::setDivLineCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint8_t hdiv ;
+        if(JS_ToUint32(ctx, (uint32_t *) &hdiv, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","hdiv","Chart","setDivLineCount","number")
+        }
+        uint8_t vdiv ;
+        if(JS_ToUint32(ctx, (uint32_t *) &vdiv, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","vdiv","Chart","setDivLineCount","number")
+        }
+        lv_chart_set_div_line_count( thisobj->lvobj(), hdiv, vdiv ) ;
+        return JS_UNDEFINED ;
+    }
+
+    // Unsupported arg type: lv_chart_series_t *
+    // uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
+
+    JSValue Chart::refresh(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_chart_refresh( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
         // Unsupported return type: lv_chart_series_t *
         // lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_chart_axis_t axis)
 
-        // Unsupported arg type: lv_chart_series_t *
-        // void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 
-        // Unsupported arg type: lv_chart_series_t *
-        // void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id)
+
+    // Unsupported arg type: const lv_chart_series_t *
+    // lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser)
 
         // Unsupported return type: lv_chart_cursor_t  *
         // lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
+
+    // Unsupported arg type: lv_chart_cursor_t *
+    // void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
+
+    // Unsupported arg type: lv_chart_cursor_t *
+    // void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint32_t point_id)
+
+    // Unsupported arg type: lv_chart_cursor_t *
+    // lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
+
+    // Unsupported arg type: lv_chart_series_t *
+    // void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
+
+    // Unsupported arg type: lv_chart_series_t *
+    // int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
+
+    // Unsupported arg type: lv_chart_series_t *
+    // int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

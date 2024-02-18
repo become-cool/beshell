@@ -11,10 +11,12 @@ namespace be::lv {
         JS_CGETSET_DEF("digitStepDirection",be::lv::Obj::invalidGetter,SpinBox::setDigitStepDirection) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("stepNext", 0, SpinBox::jsStepNext),
-        JS_CFUNC_DEF("stepPrev", 0, SpinBox::jsStepPrev),
-        JS_CFUNC_DEF("increment", 0, SpinBox::jsIncrement),
-        JS_CFUNC_DEF("decrement", 0, SpinBox::jsDecrement),
+        JS_CFUNC_DEF("setDigitFormat", 2, SpinBox::setDigitFormat),
+        JS_CFUNC_DEF("setRange", 2, SpinBox::setRange),
+        JS_CFUNC_DEF("stepNext", 0, SpinBox::stepNext),
+        JS_CFUNC_DEF("stepPrev", 0, SpinBox::stepPrev),
+        JS_CFUNC_DEF("increment", 0, SpinBox::increment),
+        JS_CFUNC_DEF("decrement", 0, SpinBox::decrement),
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -104,29 +106,59 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue SpinBox::jsStepNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_spinbox_step_next( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue SpinBox::setDigitFormat(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t digit_count ;
+        if(JS_ToUint32(ctx, (uint32_t *) &digit_count, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","digit_count","SpinBox","setDigitFormat","number")
         }
+        uint32_t sep_pos ;
+        if(JS_ToUint32(ctx, (uint32_t *) &sep_pos, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","sep_pos","SpinBox","setDigitFormat","number")
+        }
+        lv_spinbox_set_digit_format( thisobj->lvobj(), digit_count, sep_pos ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue SpinBox::jsStepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_spinbox_step_prev( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
+    JSValue SpinBox::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t range_min ;
+        if(JS_ToInt32(ctx, (int32_t *) &range_min, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","range_min","SpinBox","setRange","number")
         }
+        int32_t range_max ;
+        if(JS_ToInt32(ctx, (int32_t *) &range_max, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","range_max","SpinBox","setRange","number")
+        }
+        lv_spinbox_set_range( thisobj->lvobj(), range_min, range_max ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue SpinBox::jsIncrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_spinbox_increment( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue SpinBox::stepNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_spinbox_step_next( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue SpinBox::jsDecrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_spinbox_decrement( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue SpinBox::stepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_spinbox_step_prev( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue SpinBox::increment(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_spinbox_increment( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue SpinBox::decrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_spinbox_decrement( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

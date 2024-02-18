@@ -10,12 +10,12 @@ namespace be::lv {
         JS_CGETSET_DEF("title",MsgBox::getTitle,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addTitle", 1, MsgBox::jsAddTitle),
-        JS_CFUNC_DEF("addText", 1, MsgBox::jsAddText),
-        JS_CFUNC_DEF("addFooterButton", 1, MsgBox::jsAddFooterButton),
-        JS_CFUNC_DEF("addCloseButton", 0, MsgBox::jsAddCloseButton),
-        JS_CFUNC_DEF("close", 0, MsgBox::jsClose),
-        JS_CFUNC_DEF("closeAsync", 0, MsgBox::jsCloseAsync),
+        JS_CFUNC_DEF("addTitle", 1, MsgBox::addTitle),
+        JS_CFUNC_DEF("addText", 1, MsgBox::addText),
+        JS_CFUNC_DEF("addFooterButton", 1, MsgBox::addFooterButton),
+        JS_CFUNC_DEF("addCloseButton", 0, MsgBox::addCloseButton),
+        JS_CFUNC_DEF("close", 0, MsgBox::close),
+        JS_CFUNC_DEF("closeAsync", 0, MsgBox::closeAsync),
         // Unsupported arg type:
         // lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -66,54 +66,57 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue MsgBox::jsAddTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * title = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_obj_t * retval = lv_msgbox_add_title( thisobj->lvobj(), title ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue MsgBox::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * title = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_obj_t * retval = lv_msgbox_add_title( thisobj->lvobj(), title ) ;
+            JS_FreeCString(ctx, title) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: const void *
-        // lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
+    // Unsupported arg type: const void *
+    // lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 
-        JSValue MsgBox::jsAddText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * text = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_obj_t * retval = lv_msgbox_add_text( thisobj->lvobj(), text ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue MsgBox::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * text = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_obj_t * retval = lv_msgbox_add_text( thisobj->lvobj(), text ) ;
+            JS_FreeCString(ctx, text) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue MsgBox::jsAddFooterButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * text = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_obj_t * retval = lv_msgbox_add_footer_button( thisobj->lvobj(), text ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue MsgBox::addFooterButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * text = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_obj_t * retval = lv_msgbox_add_footer_button( thisobj->lvobj(), text ) ;
+            JS_FreeCString(ctx, text) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue MsgBox::jsAddCloseButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_obj_t * retval = lv_msgbox_add_close_button( thisobj->lvobj() ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue MsgBox::addCloseButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_t * retval = lv_msgbox_add_close_button( thisobj->lvobj() ) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        JSValue MsgBox::jsClose(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_msgbox_close( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue MsgBox::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_msgbox_close( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue MsgBox::jsCloseAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_msgbox_close_async( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue MsgBox::closeAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_msgbox_close_async( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

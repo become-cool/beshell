@@ -11,10 +11,13 @@ namespace be::lv {
         JS_CGETSET_DEF("textSelectionEnd",Label::getTextSelectionEnd,Label::setTextSelectionEnd) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("insText", 2, Label::jsInsText),
-        JS_CFUNC_DEF("cutText", 2, Label::jsCutText),
+        JS_CFUNC_DEF("insText", 2, Label::insText),
+        JS_CFUNC_DEF("cutText", 2, Label::cutText),
         // Unsupported arg type:
         // lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
+        // void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
+        // void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
+        // uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool bidi)
         // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -47,12 +50,14 @@ namespace be::lv {
         THIS_NCLASS(Label,thisobj)
         char * text = (char *)JS_ToCString(ctx, val) ;
         lv_label_set_text(thisobj->lvobj(), text) ;
+        JS_FreeCString(ctx, text) ;
         return JS_UNDEFINED ;
     }
     JSValue Label::setTextStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Label,thisobj)
         char * textStatic = (char *)JS_ToCString(ctx, val) ;
         lv_label_set_text_static(thisobj->lvobj(), textStatic) ;
+        JS_FreeCString(ctx, textStatic) ;
         return JS_UNDEFINED ;
     }
     JSValue Label::getLongMode(JSContext *ctx, JSValueConst this_val){
@@ -108,38 +113,47 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
 
-        // Unsupported arg type: const lv_obj_t *
-        // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
+    // Unsupported arg type: 
+    // void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
-        JSValue Label::jsInsText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t pos ;
-            if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","insText","number")
-            }
-            char * txt = (char *)JS_ToCString(ctx, argv[1]) ;
-            lv_label_ins_text( thisobj->lvobj(), pos, txt ) ;
-            return JS_UNDEFINED ;
+    // Unsupported arg type: lv_point_t *
+    // void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
+
+    // Unsupported arg type: lv_point_t *
+    // uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool bidi)
+
+    // Unsupported arg type: lv_point_t *
+    // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
+
+    JSValue Label::insText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t pos ;
+        if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","insText","number")
         }
+        char * txt = (char *)JS_ToCString(ctx, argv[1]) ;
+        lv_label_ins_text( thisobj->lvobj(), pos, txt ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Label::jsCutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(2)
-            uint32_t pos ;
-            if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","cutText","number")
-            }
-            uint32_t cnt ;
-            if(JS_ToUint32(ctx, (uint32_t *) &cnt, argv[1])!=0){
-                JSTHROW("arg %s of method %s.%s() must be a %s","cnt","Label","cutText","number")
-            }
-            lv_label_cut_text( thisobj->lvobj(), pos, cnt ) ;
-            return JS_UNDEFINED ;
+    JSValue Label::cutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        uint32_t pos ;
+        if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","cutText","number")
         }
+        uint32_t cnt ;
+        if(JS_ToUint32(ctx, (uint32_t *) &cnt, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","cnt","Label","cutText","number")
+        }
+        lv_label_cut_text( thisobj->lvobj(), pos, cnt ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

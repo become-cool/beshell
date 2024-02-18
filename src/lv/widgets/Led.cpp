@@ -8,9 +8,9 @@ namespace be::lv {
         JS_CGETSET_DEF("brightness",Led::getBrightness,Led::setBrightness) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("on", 0, Led::jsOn),
-        JS_CFUNC_DEF("off", 0, Led::jsOff),
-        JS_CFUNC_DEF("toggle", 0, Led::jsToggle),
+        JS_CFUNC_DEF("on", 0, Led::on),
+        JS_CFUNC_DEF("off", 0, Led::off),
+        JS_CFUNC_DEF("toggle", 0, Led::toggle),
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -59,23 +59,23 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Led::jsOn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_led_on( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Led::on(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_led_on( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Led::jsOff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_led_off( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Led::off(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_led_off( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 
-        JSValue Led::jsToggle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            lv_led_toggle( thisobj->lvobj() ) ;
-            return JS_UNDEFINED ;
-        }
+    JSValue Led::toggle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_led_toggle( thisobj->lvobj() ) ;
+        return JS_UNDEFINED ;
+    }
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

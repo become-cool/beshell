@@ -7,7 +7,11 @@ namespace be::lv {
         JS_CGETSET_DEF("state",be::lv::Obj::invalidGetter,ImgBtn::setState) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-
+        // Unsupported arg type:
+        // void lv_imagebutton_set_src(lv_obj_t * imagebutton, lv_imagebutton_state_t state, const void * src_left, const void * src_mid, const void * src_right)
+        // const void * lv_imagebutton_get_src_left(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
+        // const void * lv_imagebutton_get_src_middle(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
+        // const void * lv_imagebutton_get_src_right(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -46,7 +50,17 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+    // Unsupported arg type: const void *
+    // void lv_imagebutton_set_src(lv_obj_t * imagebutton, lv_imagebutton_state_t state, const void * src_left, const void * src_mid, const void * src_right)
 
+        // Unsupported return type: const void *
+        // const void * lv_imagebutton_get_src_left(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
+
+        // Unsupported return type: const void *
+        // const void * lv_imagebutton_get_src_middle(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
+
+        // Unsupported return type: const void *
+        // const void * lv_imagebutton_get_src_right(lv_obj_t * imagebutton, lv_imagebutton_state_t state)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

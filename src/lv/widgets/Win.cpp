@@ -8,7 +8,7 @@ namespace be::lv {
         JS_CGETSET_DEF("content",Win::getContent,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
-        JS_CFUNC_DEF("addTitle", 1, Win::jsAddTitle),
+        JS_CFUNC_DEF("addTitle", 1, Win::addTitle),
         // Unsupported arg type:
         // lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
 // AUTO GENERATE CODE END [METHOD LIST] --------
@@ -47,17 +47,18 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        JSValue Win::jsAddTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Obj,thisobj)
-            CHECK_ARGC(1)
-            char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
-            lv_obj_t * retval = lv_win_add_title( thisobj->lvobj(), txt ) ;
-            JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
-            return jsretval ;
-        }
+    JSValue Win::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
+        lv_obj_t * retval = lv_win_add_title( thisobj->lvobj(), txt ) ;
+            JS_FreeCString(ctx, txt) ;
+        JSValue jsretval = retval? be::lv::Obj::wrap(ctx, (lv_obj_t*)retval)->jsobj: JS_NULL ;
+        return jsretval ;
+    }
 
-        // Unsupported arg type: const void *
-        // lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
+    // Unsupported arg type: const void *
+    // lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

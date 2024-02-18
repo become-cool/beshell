@@ -34,8 +34,8 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        // Unsupported arg type: lv_subject_t *
-        // lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
+    // Unsupported arg type: lv_subject_t *
+    // lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

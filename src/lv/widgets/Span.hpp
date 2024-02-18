@@ -32,9 +32,12 @@ namespace be::lv {
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-        static JSValue jsNewSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsDeleteSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsRefrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue newSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue deleteSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getExpandWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue refrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 
