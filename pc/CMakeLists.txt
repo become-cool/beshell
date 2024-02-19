@@ -29,7 +29,7 @@ SET(CMAKE_C_FLAGS_DEBUG "-O0")
 
 
 set(SRC_LIST
-        main.cpp
+
         ${CMAKE_SOURCE_DIR}/src/BeShell.cpp
         ${CMAKE_SOURCE_DIR}/src/JSTimer.cpp
         ${CMAKE_SOURCE_DIR}/src/JSEngine.cpp
@@ -66,24 +66,21 @@ set(SRC_LIST
         demo/DemoModule.cpp
 
         )
-message("quickjs:${CMAKE_SOURCE_DIR}/deps/quickjs")
+
 aux_source_directory(${CMAKE_SOURCE_DIR}/deps/quickjs SRC_LIST)
 
 
 include_directories(.)
 include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(mklfs/lfs)
+include_directories(${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs)
+
+
 
 
 add_definitions(-ldl)
 
 
 # 添加可执行文件
-add_executable(${PROJECT_NAME} ${SRC_LIST})
+add_executable(${PROJECT_NAME}  main.cpp ${SRC_LIST})
 
-set(MKFS_SRC
-        mklfs/mklfs.c
-        mklfs/lfs/lfs.c
-        mklfs/lfs/lfs_util.c
-        )
-add_executable(mklfs ${MKFS_SRC})
+add_executable(mklfs  mklfs/mklfs.c ${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs/lfs.c ${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs/lfs_util.c ${SRC_LIST})

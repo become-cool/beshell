@@ -65,7 +65,7 @@ JSValue setXxx(JSContext *ctx, JSValueConst this_val, JSValueConst value){
 
 DEFINE_NCLASS_META(DemoChild,Demo)
 std::vector<JSCFunctionListEntry> DemoChild::methods = {
-    JS_CFUNC_DEF("method2", 0, jsMethod2),b.x
+    JS_CFUNC_DEF("method2", 0, jsMethod2),
     JS_CFUNC_DEF("method3", 0, jsMethod3),
     JS_CGETSET_DEF("xxx", getXxx, setXxx)
 } ;
