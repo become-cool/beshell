@@ -2,7 +2,7 @@
  * @file lv_conf.h
  * Configuration file for v9.0.1-dev
  */
-
+#include "debug.h"
 /*
  * Copy this file as `lv_conf.h`
  * 1. simply next to the `lvgl` folder

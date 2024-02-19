@@ -150,6 +150,9 @@ namespace be::lv {
     {}
 
     JSValue Obj::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if(!lv_display_get_default()) {
+            JSTHROW("not create display")
+        }
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
