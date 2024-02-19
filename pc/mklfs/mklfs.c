@@ -99,8 +99,6 @@ static void create_file(char *src, char *destination) {
 
     path = strchr(src, '/');
     if (path) {
-        fprintf(stdout, "%s\r\n", path);
-
         // Open source file
         FILE *srcf = fopen(src, "rb");
         if (!srcf) {
@@ -157,10 +155,10 @@ static void compact(char *root, char *src) {
                     size_t src_length = strlen(root);
                     memmove(src_position, src_position + src_length, strlen(src_position + src_length) + 1);
                 }
-                fprintf(stdout, "\r\n================\r\n", destination);
-                fprintf(stdout, "fs path:%s\r\n", curr_path);
-                fprintf(stdout, "destination:%s\r\n", destination);
-                fprintf(stdout, "================\r\n\r\n", destination);
+                fprintf(stdout, "\r\n================================================\r\n", destination);
+                fprintf(stdout, "|--> src path: <-- %s\r\n", destination);
+                fprintf(stdout, "|--> fs path : <-- %s\r\n", curr_path);
+                fprintf(stdout, "================================================\r\n\r\n", destination);
                 if (ent->d_type == DT_DIR) {
                     create_dir(curr_path);
                     compact(root, destination);
