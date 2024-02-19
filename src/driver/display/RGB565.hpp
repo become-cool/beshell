@@ -7,26 +7,31 @@
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+
 namespace be::driver::display {
 
-class RGB565: public Display {
-    DECLARE_NCLASS_META
-    static std::vector<JSCFunctionListEntry> methods ;
-    // static std::vector<JSCFunctionListEntry> staticMethods ;
+    class RGB565: public Display {
+        DECLARE_NCLASS_META
+        static std::vector<JSCFunctionListEntry> methods ;
+        // static std::vector<JSCFunctionListEntry> staticMethods ;
+    private:
 
-protected:
-    esp_lcd_panel_handle_t handle = nullptr;
+    protected:
+        esp_lcd_panel_handle_t handle = nullptr;
 
-public:
-    RGB565(JSContext * ctx, JSValue jsobj=JS_NULL, uint16_t width=0, uint16_t height=0) ;
-    
-    bool createBuff() ;
+    public:
+        RGB565(JSContext * ctx, JSValue jsobj=JS_NULL, uint16_t width=0, uint16_t height=0) ;
+        
+        bool createBuff() ;
 
-    static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-    void drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) ;
+        void drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) ;
 
-    static JSValue jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-} ;
+        static JSValue jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+    } ;
 
 }

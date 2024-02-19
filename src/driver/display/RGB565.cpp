@@ -60,6 +60,22 @@ namespace be::driver::display {
 //     } flags;                             /*!< LCD RGB panel configuration flags */
 // } esp_lcd_rgb_panel_config_t;
 
+    
+    SemaphoreHandle_t sem_vsync_end;
+    SemaphoreHandle_t sem_gui_ready;
+
+    // static bool rgb_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
+    // {
+    //     BaseType_t high_task_awoken = pdFALSE;
+    // #if CONFIG_EXAMPLE_AVOID_TEAR_EFFECT_WITH_SEM
+    //     if (xSemaphoreTakeFromISR(sem_gui_ready, &high_task_awoken) == pdTRUE) {
+    //         xSemaphoreGiveFromISR(sem_vsync_end, &high_task_awoken);
+    //     }
+    // #endif
+    //     return high_task_awoken == pdTRUE;
+    // }
+
+
     DEFINE_NCLASS_META(RGB565, Display)
     std::vector<JSCFunctionListEntry> RGB565::methods = {
         JS_CFUNC_DEF("test", 0, RGB565::jsTest),
@@ -77,9 +93,9 @@ namespace be::driver::display {
         panel_config.data_width = 16 ; // RGB565 in parallel mode, thus 16bit in width
         panel_config.psram_trans_align = 64 ;
 
-    // #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
-        // panel_config.bounce_buffer_size_px = 10 * LCD_WIDTH,
-    // #endif   
+        // bounce_buffer_size_px 的性能说明：
+        // https://gitee.com/aleeshadow/esp32-s3-lcd-ev-baord-docs/blob/master/Development%20guide/zh_CN/esp_lcd_rgb.md
+        panel_config.bounce_buffer_size_px = 10 * _width ; 
 
         panel_config.clk_src = LCD_CLK_SRC_DEFAULT;
         panel_config.disp_gpio_num = GPIO_NUM_NC;
@@ -123,9 +139,9 @@ namespace be::driver::display {
                 // .flags.hsync_idle_low = true,
             // },
         panel_config.flags.fb_in_psram = true; // allocate frame buffer in PSRAM
-    // #if CONFIG_EXAMPLE_DOUBLE_FB
         panel_config.flags.double_fb = true;   // allocate double frame buffer
-    // #endif // CONFIG_EXAMPLE_DOUBLE_FB
+
+
         // };
         ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &handle));
 
@@ -133,11 +149,22 @@ namespace be::driver::display {
         // esp_lcd_rgb_panel_event_callbacks_t cbs = {
         //     .on_vsync = rgb_on_vsync_event,
         // };
-        // ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(handle, &cbs, &disp_drv));
+        // ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(handle, &cbs, (void *)this));
 
         /* Initialize RGB LCD panel */
         ESP_ERROR_CHECK(esp_lcd_panel_reset(handle));
         ESP_ERROR_CHECK(esp_lcd_panel_init(handle));
+
+
+        
+        /* Create semaphores */
+        // sem_vsync_end = xSemaphoreCreateBinary();
+        // assert(sem_vsync_end);
+        // sem_gui_ready = xSemaphoreCreateBinary();
+        // assert(sem_gui_ready);
+
+        // lvgl_mutex = xSemaphoreCreateMutex();
+        // xTaskCreatePinnedToCore(lv_tick_task, "lv_tick_task", 1024 * 5, NULL, 5, &lvgl_task_handle, 1);
     }
 
     // void RGB565::setup() {
@@ -147,6 +174,10 @@ namespace be::driver::display {
 
     void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
         assert(handle) ;
+        
+        // xSemaphoreGive(sem_gui_ready);
+        // xSemaphoreTake(sem_vsync_end, portMAX_DELAY);
+
         esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
     }
 

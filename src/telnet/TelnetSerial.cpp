@@ -149,7 +149,7 @@ namespace be {
         uart_pattern_queue_reset(UART_NUM, 20);
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
-        xTaskCreatePinnedToCore(&TelnetSerial::task2, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;   
+        xTaskCreatePinnedToCore(&TelnetSerial::task2, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;
     }
 
     void TelnetSerial::loop () {
@@ -165,7 +165,7 @@ namespace be {
     }
 
     void TelnetSerial::sendData (const char * data, size_t datalen) {
-        if(datalen && datalen) {
+        if(data && datalen) {
             uart_write_bytes(UART_NUM, data, datalen);
         }
     }
