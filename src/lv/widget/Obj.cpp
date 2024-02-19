@@ -485,7 +485,7 @@ namespace be::lv {
         if(!sizeValue(ctx,val,value)) {
             JSTHROW("arg %s of method %s.%s() must be a %s","height","Obj","setHeight","number")
         }
-        lv_obj_set_width(thisobj->lvobj(), value) ;
+        lv_obj_set_height(thisobj->lvobj(), value) ;
         return JS_UNDEFINED ;
     }
     

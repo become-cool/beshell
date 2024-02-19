@@ -36,7 +36,15 @@ namespace be::lv {
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
+        char * text = nullptr ;
+        if(argc>1) {
+            text = (char *)JS_ToCString(ctx, argv[1]) ;
+        }
         Label * widget = new Label(ctx,lvparent) ;
+        if(text) {
+            lv_label_set_text(widget->lvobj(),text) ;
+            JS_FreeCString(ctx,text) ;
+        }
         return widget->jsobj ;
     }
 

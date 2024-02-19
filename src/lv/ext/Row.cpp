@@ -20,9 +20,11 @@ namespace be::lv {
         : Row(ctx, JS_NULL, lv_obj_create(parent))
     {}
 
-    JSValue Row::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        auto obj = new Row(ctx) ;
-        obj->self = std::shared_ptr<Row> (obj) ;
+    JSValue Row::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {        lv_obj_t * lvparent = nullptr ;
+        if(argc>0) {
+            JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
+        }
+        auto obj = new Row(ctx,lvparent) ;
         return obj->jsobj ;
     }
 

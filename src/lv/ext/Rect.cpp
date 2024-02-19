@@ -13,17 +13,21 @@ namespace be::lv {
     Rect::Rect(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
         : Obj(ctx, Rect::build(ctx,jsobj), lvobj)
     {
-        
-        // this.removeStyleAll()
-        // this.setStyle("pad-top", 0)
-        // this.setStyle("pad-bottom", 0)
-        // this.setStyle("pad-left", 0)
-        // this.setStyle("pad-right", 0)
-        // this.setStyle("border-width", 0)
-        // this.setStyle("radius", 0)
-        // this.setStyle("bg-opa", 0)
-        // this.clearFlag("scrollable")
+        lv_obj_remove_style(_lvobj, NULL, LV_PART_ANY | LV_STATE_ANY);
 
+        lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT ;
+        lv_style_value_t value ;
+        value.num = 0 ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_PAD_TOP, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_PAD_BOTTOM, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_PAD_RIGHT, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_PAD_LEFT, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_BORDER_WIDTH, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_BORDER_WIDTH, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_RADIUS, value, selector) ;
+        lv_obj_set_local_style_prop(_lvobj, LV_STYLE_BG_OPA, value, selector) ;
+
+        lv_obj_clear_flag(_lvobj, LV_OBJ_FLAG_SCROLLABLE) ;
     }
 
     Rect::Rect(JSContext * ctx, lv_obj_t * parent)

@@ -513,97 +513,97 @@ JSValue lv_scroll_snap_const_to_jsstr(JSContext *ctx, lv_scroll_snap_t code) {
 
 // lv_obj_flag_t
 bool lv__obj_flag_str_to_const(const char * name, lv_obj_flag_t * out) {
-    if(strcmp(name,"idden")==0) {
+    if(strcmp(name,"hidden")==0) {
         (*out) = LV_OBJ_FLAG_HIDDEN ;
     }
-    else if(strcmp(name,"lickable")==0) {
+    else if(strcmp(name,"clickable")==0) {
         (*out) = LV_OBJ_FLAG_CLICKABLE ;
     }
-    else if(strcmp(name,"lick-focusable")==0) {
+    else if(strcmp(name,"click-focusable")==0) {
         (*out) = LV_OBJ_FLAG_CLICK_FOCUSABLE ;
     }
-    else if(strcmp(name,"heckable")==0) {
+    else if(strcmp(name,"checkable")==0) {
         (*out) = LV_OBJ_FLAG_CHECKABLE ;
     }
-    else if(strcmp(name,"crollable")==0) {
+    else if(strcmp(name,"scrollable")==0) {
         (*out) = LV_OBJ_FLAG_SCROLLABLE ;
     }
-    else if(strcmp(name,"croll-elastic")==0) {
+    else if(strcmp(name,"scroll-elastic")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_ELASTIC ;
     }
-    else if(strcmp(name,"croll-momentum")==0) {
+    else if(strcmp(name,"scroll-momentum")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_MOMENTUM ;
     }
-    else if(strcmp(name,"croll-one")==0) {
+    else if(strcmp(name,"scroll-one")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_ONE ;
     }
-    else if(strcmp(name,"croll-chain-hor")==0) {
+    else if(strcmp(name,"scroll-chain-hor")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_CHAIN_HOR ;
     }
-    else if(strcmp(name,"croll-chain-ver")==0) {
+    else if(strcmp(name,"scroll-chain-ver")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_CHAIN_VER ;
     }
-    else if(strcmp(name,"croll-chain")==0) {
+    else if(strcmp(name,"scroll-chain")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_CHAIN ;
     }
-    else if(strcmp(name,"croll-on-focus")==0) {
+    else if(strcmp(name,"scroll-on-focus")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_ON_FOCUS ;
     }
-    else if(strcmp(name,"croll-with-arrow")==0) {
+    else if(strcmp(name,"scroll-with-arrow")==0) {
         (*out) = LV_OBJ_FLAG_SCROLL_WITH_ARROW ;
     }
-    else if(strcmp(name,"nappable")==0) {
+    else if(strcmp(name,"snappable")==0) {
         (*out) = LV_OBJ_FLAG_SNAPPABLE ;
     }
-    else if(strcmp(name,"ress-lock")==0) {
+    else if(strcmp(name,"press-lock")==0) {
         (*out) = LV_OBJ_FLAG_PRESS_LOCK ;
     }
-    else if(strcmp(name,"vent-bubble")==0) {
+    else if(strcmp(name,"event-bubble")==0) {
         (*out) = LV_OBJ_FLAG_EVENT_BUBBLE ;
     }
-    else if(strcmp(name,"esture-bubble")==0) {
+    else if(strcmp(name,"gesture-bubble")==0) {
         (*out) = LV_OBJ_FLAG_GESTURE_BUBBLE ;
     }
-    else if(strcmp(name,"dv-hittest")==0) {
+    else if(strcmp(name,"adv-hittest")==0) {
         (*out) = LV_OBJ_FLAG_ADV_HITTEST ;
     }
-    else if(strcmp(name,"gnore-layout")==0) {
+    else if(strcmp(name,"ignore-layout")==0) {
         (*out) = LV_OBJ_FLAG_IGNORE_LAYOUT ;
     }
-    else if(strcmp(name,"loating")==0) {
+    else if(strcmp(name,"floating")==0) {
         (*out) = LV_OBJ_FLAG_FLOATING ;
     }
-    else if(strcmp(name,"end-draw-task-events")==0) {
+    else if(strcmp(name,"send-draw-task-events")==0) {
         (*out) = LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS ;
     }
-    else if(strcmp(name,"verflow-visible")==0) {
+    else if(strcmp(name,"overflow-visible")==0) {
         (*out) = LV_OBJ_FLAG_OVERFLOW_VISIBLE ;
     }
-    else if(strcmp(name,"lex-in-new-track")==0) {
+    else if(strcmp(name,"flex-in-new-track")==0) {
         (*out) = LV_OBJ_FLAG_FLEX_IN_NEW_TRACK ;
     }
-    else if(strcmp(name,"ayout-1")==0) {
+    else if(strcmp(name,"layout-1")==0) {
         (*out) = LV_OBJ_FLAG_LAYOUT_1 ;
     }
-    else if(strcmp(name,"ayout-2")==0) {
+    else if(strcmp(name,"layout-2")==0) {
         (*out) = LV_OBJ_FLAG_LAYOUT_2 ;
     }
-    else if(strcmp(name,"idget-1")==0) {
+    else if(strcmp(name,"widget-1")==0) {
         (*out) = LV_OBJ_FLAG_WIDGET_1 ;
     }
-    else if(strcmp(name,"idget-2")==0) {
+    else if(strcmp(name,"widget-2")==0) {
         (*out) = LV_OBJ_FLAG_WIDGET_2 ;
     }
-    else if(strcmp(name,"ser-1")==0) {
+    else if(strcmp(name,"user-1")==0) {
         (*out) = LV_OBJ_FLAG_USER_1 ;
     }
-    else if(strcmp(name,"ser-2")==0) {
+    else if(strcmp(name,"user-2")==0) {
         (*out) = LV_OBJ_FLAG_USER_2 ;
     }
-    else if(strcmp(name,"ser-3")==0) {
+    else if(strcmp(name,"user-3")==0) {
         (*out) = LV_OBJ_FLAG_USER_3 ;
     }
-    else if(strcmp(name,"ser-4")==0) {
+    else if(strcmp(name,"user-4")==0) {
         (*out) = LV_OBJ_FLAG_USER_4 ;
     }
 
@@ -621,37 +621,37 @@ bool lv__obj_flag_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_obj_flag_t* o
 const char * lv__obj_flag_const_to_str(lv_obj_flag_t code) {
 
     switch(code) {
-        case LV_OBJ_FLAG_HIDDEN: return "idden";
-        case LV_OBJ_FLAG_CLICKABLE: return "lickable";
-        case LV_OBJ_FLAG_CLICK_FOCUSABLE: return "lick-focusable";
-        case LV_OBJ_FLAG_CHECKABLE: return "heckable";
-        case LV_OBJ_FLAG_SCROLLABLE: return "crollable";
-        case LV_OBJ_FLAG_SCROLL_ELASTIC: return "croll-elastic";
-        case LV_OBJ_FLAG_SCROLL_MOMENTUM: return "croll-momentum";
-        case LV_OBJ_FLAG_SCROLL_ONE: return "croll-one";
-        case LV_OBJ_FLAG_SCROLL_CHAIN_HOR: return "croll-chain-hor";
-        case LV_OBJ_FLAG_SCROLL_CHAIN_VER: return "croll-chain-ver";
-        case LV_OBJ_FLAG_SCROLL_CHAIN: return "croll-chain";
-        case LV_OBJ_FLAG_SCROLL_ON_FOCUS: return "croll-on-focus";
-        case LV_OBJ_FLAG_SCROLL_WITH_ARROW: return "croll-with-arrow";
-        case LV_OBJ_FLAG_SNAPPABLE: return "nappable";
-        case LV_OBJ_FLAG_PRESS_LOCK: return "ress-lock";
-        case LV_OBJ_FLAG_EVENT_BUBBLE: return "vent-bubble";
-        case LV_OBJ_FLAG_GESTURE_BUBBLE: return "esture-bubble";
-        case LV_OBJ_FLAG_ADV_HITTEST: return "dv-hittest";
-        case LV_OBJ_FLAG_IGNORE_LAYOUT: return "gnore-layout";
-        case LV_OBJ_FLAG_FLOATING: return "loating";
-        case LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS: return "end-draw-task-events";
-        case LV_OBJ_FLAG_OVERFLOW_VISIBLE: return "verflow-visible";
-        case LV_OBJ_FLAG_FLEX_IN_NEW_TRACK: return "lex-in-new-track";
-        case LV_OBJ_FLAG_LAYOUT_1: return "ayout-1";
-        case LV_OBJ_FLAG_LAYOUT_2: return "ayout-2";
-        case LV_OBJ_FLAG_WIDGET_1: return "idget-1";
-        case LV_OBJ_FLAG_WIDGET_2: return "idget-2";
-        case LV_OBJ_FLAG_USER_1: return "ser-1";
-        case LV_OBJ_FLAG_USER_2: return "ser-2";
-        case LV_OBJ_FLAG_USER_3: return "ser-3";
-        case LV_OBJ_FLAG_USER_4: return "ser-4";
+        case LV_OBJ_FLAG_HIDDEN: return "hidden";
+        case LV_OBJ_FLAG_CLICKABLE: return "clickable";
+        case LV_OBJ_FLAG_CLICK_FOCUSABLE: return "click-focusable";
+        case LV_OBJ_FLAG_CHECKABLE: return "checkable";
+        case LV_OBJ_FLAG_SCROLLABLE: return "scrollable";
+        case LV_OBJ_FLAG_SCROLL_ELASTIC: return "scroll-elastic";
+        case LV_OBJ_FLAG_SCROLL_MOMENTUM: return "scroll-momentum";
+        case LV_OBJ_FLAG_SCROLL_ONE: return "scroll-one";
+        case LV_OBJ_FLAG_SCROLL_CHAIN_HOR: return "scroll-chain-hor";
+        case LV_OBJ_FLAG_SCROLL_CHAIN_VER: return "scroll-chain-ver";
+        case LV_OBJ_FLAG_SCROLL_CHAIN: return "scroll-chain";
+        case LV_OBJ_FLAG_SCROLL_ON_FOCUS: return "scroll-on-focus";
+        case LV_OBJ_FLAG_SCROLL_WITH_ARROW: return "scroll-with-arrow";
+        case LV_OBJ_FLAG_SNAPPABLE: return "snappable";
+        case LV_OBJ_FLAG_PRESS_LOCK: return "press-lock";
+        case LV_OBJ_FLAG_EVENT_BUBBLE: return "event-bubble";
+        case LV_OBJ_FLAG_GESTURE_BUBBLE: return "gesture-bubble";
+        case LV_OBJ_FLAG_ADV_HITTEST: return "adv-hittest";
+        case LV_OBJ_FLAG_IGNORE_LAYOUT: return "ignore-layout";
+        case LV_OBJ_FLAG_FLOATING: return "floating";
+        case LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS: return "send-draw-task-events";
+        case LV_OBJ_FLAG_OVERFLOW_VISIBLE: return "overflow-visible";
+        case LV_OBJ_FLAG_FLEX_IN_NEW_TRACK: return "flex-in-new-track";
+        case LV_OBJ_FLAG_LAYOUT_1: return "layout-1";
+        case LV_OBJ_FLAG_LAYOUT_2: return "layout-2";
+        case LV_OBJ_FLAG_WIDGET_1: return "widget-1";
+        case LV_OBJ_FLAG_WIDGET_2: return "widget-2";
+        case LV_OBJ_FLAG_USER_1: return "user-1";
+        case LV_OBJ_FLAG_USER_2: return "user-2";
+        case LV_OBJ_FLAG_USER_3: return "user-3";
+        case LV_OBJ_FLAG_USER_4: return "user-4";
 
         default:
             return "unknow";
