@@ -30,50 +30,50 @@ SET(CMAKE_C_FLAGS_DEBUG "-O0")
 
 set(SRC_LIST
 
-        ${CMAKE_SOURCE_DIR}/src/BeShell.cpp
-        ${CMAKE_SOURCE_DIR}/src/JSTimer.cpp
-        ${CMAKE_SOURCE_DIR}/src/JSEngine.cpp
-        ${CMAKE_SOURCE_DIR}/src/repl/REPL.cpp
-        ${CMAKE_SOURCE_DIR}/src/path.cpp
-        ${CMAKE_SOURCE_DIR}/src/string_utils.cpp
-        ${CMAKE_SOURCE_DIR}/src/qjs_utils.c
-        ${CMAKE_SOURCE_DIR}/src/mallocf.c
+        ..//src/BeShell.cpp
+        ..//src/JSTimer.cpp
+        ..//src/JSEngine.cpp
+        ..//src/repl/REPL.cpp
+        ..//src/path.cpp
+        ..//src/string_utils.cpp
+        ..//src/qjs_utils.c
+        ..//src/mallocf.c
 
-        ${CMAKE_SOURCE_DIR}/src/NativeClass.cpp
-        ${CMAKE_SOURCE_DIR}/src/NativeModule.cpp
-        ${CMAKE_SOURCE_DIR}/src/ModuleLoader.cpp
+        ..//src/NativeClass.cpp
+        ..//src/NativeModule.cpp
+        ..//src/ModuleLoader.cpp
 
-        ${CMAKE_SOURCE_DIR}/src/module/PathModule.cpp
-        ${CMAKE_SOURCE_DIR}/src/module/ProcessModule.cpp
-        ${CMAKE_SOURCE_DIR}/src/module/NVSModule.cpp
+        ..//src/module/PathModule.cpp
+        ..//src/module/ProcessModule.cpp
+        ..//src/module/NVSModule.cpp
 
-        ${CMAKE_SOURCE_DIR}/src/basic/Console.cpp
-        # ${CMAKE_SOURCE_DIR}/src/driver/display/DisplayModule.cpp
-        # ${CMAKE_SOURCE_DIR}/src/driver/display/Display.cpp
-        # ${CMAKE_SOURCE_DIR}/src/driver/display/Bus8080.cpp
-        # ${CMAKE_SOURCE_DIR}/src/driver/display/Display8080.cpp
+        ..//src/basic/Console.cpp
+        # ..//src/driver/display/DisplayModule.cpp
+        # ..//src/driver/display/Display.cpp
+        # ..//src/driver/display/Bus8080.cpp
+        # ..//src/driver/display/Display8080.cpp
 
-        ${CMAKE_SOURCE_DIR}/src/telnet/Protocal.cpp
-        ${CMAKE_SOURCE_DIR}/src/telnet/Telnet.cpp
-        ${CMAKE_SOURCE_DIR}/src/telnet/TelnetChannel.cpp
-        ${CMAKE_SOURCE_DIR}/src/telnet/TelnetStdIO.cpp
-        ${CMAKE_SOURCE_DIR}/src/telnet/TelnetWS.cpp
+        ..//src/telnet/Protocal.cpp
+        ..//src/telnet/Telnet.cpp
+        ..//src/telnet/TelnetChannel.cpp
+        ..//src/telnet/TelnetStdIO.cpp
+        ..//src/telnet/TelnetWS.cpp
 
-        ${CMAKE_SOURCE_DIR}/src/fs/FS.cpp
-        ${CMAKE_SOURCE_DIR}/src/fs/FSModule.cpp
+        ..//src/fs/FS.cpp
+        ..//src/fs/FSModule.cpp
 
         demo/Demo.cpp
         demo/DemoModule.cpp
 
         )
 
-aux_source_directory(${CMAKE_SOURCE_DIR}/deps/quickjs SRC_LIST)
+aux_source_directory(..//deps/quickjs SRC_LIST)
 
 
 include_directories(.)
-include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/deps)
-include_directories(${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs)
+include_directories(..//src)
+include_directories(..//deps)
+include_directories(..//deps/littlefs/src/littlefs)
 
 
 
@@ -84,4 +84,4 @@ add_definitions(-ldl)
 # 添加可执行文件
 add_executable(${PROJECT_NAME}  main.cpp ${SRC_LIST})
 
-add_executable(mklfs  mklfs/mklfs.c ${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs/lfs.c ${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs/lfs_util.c ${SRC_LIST})
+add_executable(mklfs  mklfs/mklfs.c ..//deps/littlefs/src/littlefs/lfs.c ..//deps/littlefs/src/littlefs/lfs_util.c ${SRC_LIST})
