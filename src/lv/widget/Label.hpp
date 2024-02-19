@@ -15,6 +15,8 @@ namespace be::lv {
         Label(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static JSValue getFont(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue setFont(JSContext *ctx, JSValueConst this_val, JSValueConst val) ;
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getText(JSContext *ctx, JSValueConst this_val) ;
