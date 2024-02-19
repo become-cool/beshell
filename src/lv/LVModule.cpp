@@ -8,10 +8,15 @@ namespace be::lv {
         : NativeModule(ctx, name, 0)
     {
         exportFunction("screen",screen,0) ;
-        exportFunction("loadScreen",loadScreen,0) ;
+        exportFunction("load",loadScreen,0) ;
+        exportFunction("pct",pct,0) ;
         exportFunction("test",test,0) ;
 
         exportClass<Style>() ;
+        exportClass<Row>() ;
+        exportClass<Column>() ;
+        exportClass<Rect>() ;
+
 
 // AUTO GENERATE CODE START [EXPORT WIDGETS] --------
         exportClass<Obj>() ;
@@ -72,6 +77,12 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+    JSValue LVModule::pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT16(0,val)
+        return JS_NewUint32(ctx,LV_PCT(val)) ;
+    }
+
     JSValue LVModule::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         lv_obj_t * parent = lv_screen_active() ;
         dp(parent)

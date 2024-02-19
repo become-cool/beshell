@@ -13,7 +13,8 @@
 #define DECLARE_NCLASS_META                                             \
     public:                                                             \
         static const char * className ;                                 \
-        static JSValue build(JSContext * ctx, JSValue jsobj=JS_NULL) ;  \
+        static JSValue build(JSContext * ctx) ;                         \
+        static JSValue build(JSContext * ctx, JSValue jsobj) ;          \
         static JSValue defineClass(JSContext * ctx) ;                   \
     protected:                                                          \
         static JSClassID classID ;                                      \
@@ -22,12 +23,15 @@
 #define DEFINE_NCLASS_META(CLASS,PARENT_CLASS)                          \
     const char * CLASS::className = #CLASS ;                            \
     JSClassID CLASS::classID = 0 ;                                      \
-    JSValue CLASS::build(JSContext * ctx, JSValue jsobj) {              \
-        if(!JS_IsNull(jsobj)) {                                         \
-            return jsobj ;                                              \
-        }                                                               \
+    JSValue CLASS::build(JSContext * ctx) {                             \
         CLASS::defineClass(ctx) ;                                       \
         return JS_NewObjectClass(ctx, CLASS::classID) ;                 \
+    }                                                                   \
+    JSValue CLASS::build(JSContext * ctx, JSValue jsobj) {              \
+        if(!JS_IsNone(jsobj)) {                                         \
+            return jsobj ;                                              \
+        }                                                               \
+        return CLASS::build(ctx) ;                                      \
     }                                                                   \
     JSValue CLASS::defineClass(JSContext * ctx) {                       \
         if(PARENT_CLASS::classID==0) {                                  \
