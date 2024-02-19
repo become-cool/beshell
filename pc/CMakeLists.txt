@@ -72,6 +72,7 @@ aux_source_directory(${CMAKE_SOURCE_DIR}/deps/quickjs SRC_LIST)
 
 include_directories(.)
 include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/deps)
 include_directories(${CMAKE_SOURCE_DIR}/deps/littlefs/src/littlefs)
 
 
