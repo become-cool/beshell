@@ -32,8 +32,6 @@ namespace be {
         assert(ctx) ;
         assert(m) ;
 
-        dp(ctx)
-
         i2c0 = new I2C(ctx, I2C_NUM_0) ;
         i2c1 = new I2C(ctx, I2C_NUM_1) ;
         exportValue("i2c0", JS_DupValue(ctx,i2c0->jsobj)) ;

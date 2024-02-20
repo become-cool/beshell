@@ -77,9 +77,6 @@ namespace be::driver::display {
 
 
     DEFINE_NCLASS_META(RGB565, Display)
-    std::vector<JSCFunctionListEntry> RGB565::methods = {
-        JS_CFUNC_DEF("test", 0, RGB565::jsTest),
-    } ;
 
     RGB565::RGB565(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : Display(ctx, build(ctx, _jsobj), width, height)
@@ -174,23 +171,9 @@ namespace be::driver::display {
 
     void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
         assert(handle) ;
-        
         // xSemaphoreGive(sem_gui_ready);
         // xSemaphoreTake(sem_vsync_end, portMAX_DELAY);
-
         esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
-    }
-
-    JSValue RGB565::jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        RGB565 * disp = (RGB565*)fromJS(this_val) ;
-        assert(disp) ;
-
-        void * buff = malloc(100 * 100 * 2) ;
-        memset((void*)buff, 255, 100*100*2) ;
-
-        esp_lcd_panel_draw_bitmap(disp->handle, 0, 0, 100, 100, (void *)buff);
-
-        return JS_UNDEFINED ;
     }
 
     JSValue RGB565::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

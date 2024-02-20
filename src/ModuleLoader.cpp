@@ -1,6 +1,7 @@
 #include "ModuleLoader.hpp"
 #include "module/ProcessModule.hpp"
 #include "module/PathModule.hpp"
+#include "driver/DriverModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -78,6 +79,7 @@ namespace be {
     ModuleLoader::ModuleLoader() {
         add<JSLoader>("loader") ;
         add<ProcessModule>("process") ;
+        add<driver::DriverModule>("driver") ;
     }
     
     ModuleLoader::~ModuleLoader() {

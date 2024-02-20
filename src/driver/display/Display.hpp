@@ -18,7 +18,6 @@ namespace be::driver::display {
 
     protected:
         static std::vector<JSCFunctionListEntry> methods ;
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
 
         uint16_t _width = 0 ;
         uint16_t _height = 0 ;

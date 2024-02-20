@@ -15,8 +15,6 @@ namespace be::driver::display {
 
     class RGB565: public Display {
         DECLARE_NCLASS_META
-        static std::vector<JSCFunctionListEntry> methods ;
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
     private:
 
     protected:
@@ -30,8 +28,6 @@ namespace be::driver::display {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         void drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) ;
-
-        static JSValue jsTest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
 }
