@@ -62,11 +62,11 @@ namespace be {
             factory(ctx, m) ;
         }
 
-        nmodule->import() ;
+        nmodule->import(ctx) ;
 
         return 0 ;
     }
     
-    void NativeModule::import() {}
+    void NativeModule::import(JSContext *ctx) {}
 
 }

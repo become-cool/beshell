@@ -10,7 +10,7 @@
 namespace be {
     class SerialModule: public NativeModule {
     protected:
-        void import() ;
+        void import(JSContext *ctx) ;
     public:
         I2C * i2c0 = nullptr ;
         I2C * i2c1 = nullptr ;

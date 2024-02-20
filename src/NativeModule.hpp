@@ -29,7 +29,7 @@ namespace be {
     protected:
         JSContext * ctx = nullptr ;
         JSModuleDef * m = nullptr ;
-        virtual void import() ;
+        virtual void import(JSContext *ctx) ;
 
     public:
         static const char * name ;

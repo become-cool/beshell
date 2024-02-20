@@ -28,19 +28,21 @@ namespace be {
         DELETE_MEMBER(spi3)
     }
 
-    void SerialModule::import() {
+    void SerialModule::import(JSContext *ctx) {
         assert(ctx) ;
         assert(m) ;
 
-        i2c0 = new I2C(ctx, 0) ;
-        i2c1 = new I2C(ctx, 1) ;
+        dp(ctx)
+
+        i2c0 = new I2C(ctx, I2C_NUM_0) ;
+        i2c1 = new I2C(ctx, I2C_NUM_1) ;
         
         spi1 = new SPI(ctx, 1) ;
         spi2 = new SPI(ctx, 2) ;
         spi3 = new SPI(ctx, 3) ;
         
-        exportValue("i2c0", i2c0->jsobj) ;
-        exportValue("i2c0", i2c1->jsobj) ;
+        exportValue("i2c0", JS_DupValue(ctx,i2c1->jsobj)) ;
+        exportValue("i2c0", JS_DupValue(ctx,i2c1->jsobj)) ;
 
         exportValue("spi1", spi1->jsobj) ;
         exportValue("spi2", spi2->jsobj) ;
