@@ -36,17 +36,16 @@ namespace be {
 
         i2c0 = new I2C(ctx, I2C_NUM_0) ;
         i2c1 = new I2C(ctx, I2C_NUM_1) ;
+        exportValue("i2c0", JS_DupValue(ctx,i2c0->jsobj)) ;
+        exportValue("i2c1", JS_DupValue(ctx,i2c1->jsobj)) ;
         
-        spi1 = new SPI(ctx, 1) ;
-        spi2 = new SPI(ctx, 2) ;
-        spi3 = new SPI(ctx, 3) ;
-        
-        exportValue("i2c0", JS_DupValue(ctx,i2c1->jsobj)) ;
-        exportValue("i2c0", JS_DupValue(ctx,i2c1->jsobj)) ;
+        // spi1 = new SPI(ctx, 1) ;
+        // spi2 = new SPI(ctx, 2) ;
+        // spi3 = new SPI(ctx, 3) ;
 
-        exportValue("spi1", spi1->jsobj) ;
-        exportValue("spi2", spi2->jsobj) ;
-        exportValue("spi3", spi3->jsobj) ;
+        // exportValue("spi1", spi1->jsobj) ;
+        // exportValue("spi2", spi2->jsobj) ;
+        // exportValue("spi3", spi3->jsobj) ;
     }
     
 }
