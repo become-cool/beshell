@@ -138,12 +138,12 @@ namespace be {
     }
 })", "EventEmitter.js", {})
 
-        JSValue proto = NativeClass::mapCtxClassID2Proto[ctx][EventEmitter::classID] ;
+        JSValue proto = JS_GetPropertyStr(ctx,jscotr,"prototype") ;
         JS_SetPropertyStr(ctx, proto, "on", jsOn) ;
         JS_SetPropertyStr(ctx, proto, "once", jsOnce) ;
         JS_SetPropertyStr(ctx, proto, "race", jsRace) ;
         JS_SetPropertyStr(ctx, proto, "off", jsOff) ;
-        JS_SetPropertyStr(ctx, proto, "originHanle", jsOriginHanlde) ;
+        JS_SetPropertyStr(ctx, proto, "originHandle", jsOriginHanlde) ;
         JS_SetPropertyStr(ctx, proto, "isListening", jsIsListening) ;
         JS_SetPropertyStr(ctx, proto, "emit", jsEmit) ;
         JS_SetPropertyStr(ctx, proto, "destroy", jsDestroy) ;

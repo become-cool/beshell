@@ -28,7 +28,7 @@ namespace be {
 
         NativeClass(JSContext * ctx, JSValue jsobj) ;
 
-        static std::map<JSContext*, std::map<JSClassID, JSValue>> mapCtxClassID2Proto ;
+        static std::map<JSContext*, std::map<JSClassID, JSValue>> mapCtxClassID2Constructor ;
         static const JSClassID classID ;
 
     public:

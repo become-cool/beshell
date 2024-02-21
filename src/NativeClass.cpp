@@ -5,7 +5,7 @@ using namespace std;
 namespace be {
 
     const JSClassID NativeClass::classID = 0 ;
-    std::map<JSContext*, std::map<JSClassID, JSValue>> NativeClass::mapCtxClassID2Proto ;
+    std::map<JSContext*, std::map<JSClassID, JSValue>> NativeClass::mapCtxClassID2Constructor ;
     std::vector<JSCFunctionListEntry> NativeClass::methods ;
     std::vector<JSCFunctionListEntry> NativeClass::staticMethods ;
 
@@ -45,8 +45,8 @@ namespace be {
     ) {
         JS_NewClassID(&classID);
 
-        if(mapCtxClassID2Proto[ctx].count(classID)>0) {
-            return mapCtxClassID2Proto[ctx][classID] ;
+        if(mapCtxClassID2Constructor[ctx].count(classID)>0) {
+            return mapCtxClassID2Constructor[ctx][classID] ;
         }
 
         JSClassDef jsClassDef ;
@@ -71,14 +71,14 @@ namespace be {
         }
         
         JS_DupValue(ctx, jscotr) ;
-        mapCtxClassID2Proto[ctx][classID] = jscotr ;
+        mapCtxClassID2Constructor[ctx][classID] = jscotr ;
         
         // printf("classname: %s, classid: %d\n", className, classID) ;
 
         if(parentClassID>0) {
             // printf("classid: %d -> parentclassid: %d\n", classID, parentClassID) ;
-            if(mapCtxClassID2Proto[ctx].count(parentClassID)>0) {
-                JSValue parent = mapCtxClassID2Proto[ctx][parentClassID] ;
+            if(mapCtxClassID2Constructor[ctx].count(parentClassID)>0) {
+                JSValue parent = mapCtxClassID2Constructor[ctx][parentClassID] ;
                 JSValue parentProto = JS_GetPropertyStr(ctx,parent,"prototype") ;
                 JS_DupValue(ctx, parentProto) ;
                 JS_SetPropertyStr(ctx, proto, "__proto__", parentProto);
@@ -101,9 +101,9 @@ namespace be {
     }
 
     JSValue NativeClass::getClass(JSContext * ctx, const JSClassID & classID) {
-        if(mapCtxClassID2Proto.count(ctx) || mapCtxClassID2Proto[ctx].count(classID)<1) {
+        if(mapCtxClassID2Constructor.count(ctx)<1 || mapCtxClassID2Constructor[ctx].count(classID)<1) {
             return JS_NULL ;
         }
-        return JS_GetPropertyStr(ctx, mapCtxClassID2Proto[ctx][classID], "constructor") ;
+        return mapCtxClassID2Constructor[ctx][classID] ;
     }
 }
