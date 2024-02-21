@@ -1,4 +1,3 @@
-
 #include "NativeClass.hpp"
 #include <string.h>
 
@@ -16,11 +15,10 @@ namespace be {
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;
-        JS_DupValue(ctx,jsobj) ;
     }
 
     NativeClass::~NativeClass() {
-        if(!JS_IsNone(jsobj)) {
+        if(!JS_IsUndefined(jsobj)) {
             JS_SetOpaque(jsobj, nullptr) ;
             JS_FreeValue(ctx,jsobj) ;
         }
@@ -65,7 +63,9 @@ namespace be {
         }
 
         JSValue jscotr = JS_NewCFunction2(ctx, constructor, className, 1, JS_CFUNC_constructor, 0) ;
+        dref(jscotr)
         JS_SetConstructor(ctx, jscotr, proto) ;
+        dref(jscotr)
 
         if(staticMethods.size()) {
             JS_SetPropertyFunctionList(ctx, jscotr, staticMethods.data(), staticMethods.size());
@@ -89,13 +89,20 @@ namespace be {
         return jscotr ;
     }
     JSValue NativeClass::defineClass(JSContext * ctx){
-        return JS_NULL ;
+        return JS_UNDEFINED ;
     }
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
             obj->self = nullptr ;
-            obj->jsobj = JS_NULL ;
+            obj->jsobj = JS_UNDEFINED ;
         }
+    }
+
+    JSValue NativeClass::getClass(JSContext * ctx, const JSClassID & classID) {
+        if(mapCtxClassID2Proto.count(ctx) || mapCtxClassID2Proto[ctx].count(classID)<1) {
+            return JS_NULL ;
+        }
+        return JS_GetPropertyStr(ctx, mapCtxClassID2Proto[ctx][classID], "constructor") ;
     }
 }

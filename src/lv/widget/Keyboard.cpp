@@ -7,10 +7,12 @@ namespace be::lv {
         JS_CGETSET_DEF("textarea",Keyboard::getTextarea,Keyboard::setTextarea) ,
         JS_CGETSET_DEF("mode",Keyboard::getMode,Keyboard::setMode) ,
         JS_CGETSET_DEF("popovers",be::lv::Obj::invalidGetter,Keyboard::setPopovers) ,
+        JS_CGETSET_DEF("selectedButton",Keyboard::getSelectedButton,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_buttonmatrix_ctrl_t ctrl_map[])
+        // static inline const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
         // void lv_keyboard_def_event_cb(lv_event_t * e)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -81,11 +83,25 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    // unspported type: const char **
+    // JSValue Keyboard::getMapArray(JSContext *ctx, JSValueConst this_val){}
+    // static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
+    #ifndef GETTER_Keyboard_SelectedButton
+    JSValue Keyboard::getSelectedButton(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Keyboard,thisobj)
+        uint32_t value = lv_keyboard_get_selected_button(thisobj->lvobj()) ;
+        JSValue retval = JS_NewUint32(ctx, value) ;
+        return retval ;
+    }
+    #endif
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
     // Unsupported arg type: const char **
     // void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[], const lv_buttonmatrix_ctrl_t ctrl_map[])
+
+        // Unsupported return type: const char *
+        // static inline const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 
     // Unsupported arg type: lv_event_t *
     // void lv_keyboard_def_event_cb(lv_event_t * e)

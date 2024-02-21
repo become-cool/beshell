@@ -26,6 +26,7 @@ namespace be::lv {
         // lv_image_src_t lv_image_src_get_type(const void * src)
         // void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
         // void lv_image_buf_free(lv_image_dsc_t * dsc)
+        // static inline void lv_image_header_init(lv_image_header_t * header, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride, lv_image_flags_t flags)
         // lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
         // lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
         // lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area)
@@ -291,6 +292,9 @@ namespace be::lv {
 
     // Unsupported arg type: lv_image_dsc_t *
     // void lv_image_buf_free(lv_image_dsc_t * dsc)
+
+    // Unsupported arg type: lv_image_header_t *
+    // static inline void lv_image_header_init(lv_image_header_t * header, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride, lv_image_flags_t flags)
 
     // Unsupported arg type: const void *
     // lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)

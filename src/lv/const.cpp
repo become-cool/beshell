@@ -1520,76 +1520,6 @@ JSValue lv_style_prop_const_to_jsstr(JSContext *ctx, lv_style_prop_t code) {
     return JS_NewString(ctx, lv_style_prop_const_to_str(code));
 }
 
-// lv_opa_t
-bool lv_opa_str_to_const(const char * name, lv_opa_t * out) {
-    if(strcmp(name,"0")==0) {
-        (*out) = LV_OPA_0 ;
-    }
-    else if(strcmp(name,"10")==0) {
-        (*out) = LV_OPA_10 ;
-    }
-    else if(strcmp(name,"20")==0) {
-        (*out) = LV_OPA_20 ;
-    }
-    else if(strcmp(name,"30")==0) {
-        (*out) = LV_OPA_30 ;
-    }
-    else if(strcmp(name,"40")==0) {
-        (*out) = LV_OPA_40 ;
-    }
-    else if(strcmp(name,"50")==0) {
-        (*out) = LV_OPA_50 ;
-    }
-    else if(strcmp(name,"60")==0) {
-        (*out) = LV_OPA_60 ;
-    }
-    else if(strcmp(name,"70")==0) {
-        (*out) = LV_OPA_70 ;
-    }
-    else if(strcmp(name,"80")==0) {
-        (*out) = LV_OPA_80 ;
-    }
-    else if(strcmp(name,"90")==0) {
-        (*out) = LV_OPA_90 ;
-    }
-    else if(strcmp(name,"100")==0) {
-        (*out) = LV_OPA_100 ;
-    }
-
-    else {
-        return false ;
-    }
-    return true ;
-}
-bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) {
-    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
-    bool suc = lv_opa_str_to_const(cstr, out) ;
-    JS_FreeCString(ctx, cstr) ;
-    return suc ;
-}
-const char * lv_opa_const_to_str(lv_opa_t code) {
-
-    switch(code) {
-        case LV_OPA_0: return "0";
-        case LV_OPA_10: return "10";
-        case LV_OPA_20: return "20";
-        case LV_OPA_30: return "30";
-        case LV_OPA_40: return "40";
-        case LV_OPA_50: return "50";
-        case LV_OPA_60: return "60";
-        case LV_OPA_70: return "70";
-        case LV_OPA_80: return "80";
-        case LV_OPA_90: return "90";
-        case LV_OPA_100: return "100";
-
-        default:
-            return "unknow";
-    }
-}
-JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) {
-    return JS_NewString(ctx, lv_opa_const_to_str(code));
-}
-
 // lv_grad_dir_t
 bool lv_grad_dir_str_to_const(const char * name, lv_grad_dir_t * out) {
     if(strcmp(name,"none")==0) {
@@ -1760,6 +1690,76 @@ const char * lv_grid_align_const_to_str(lv_grid_align_t code) {
 }
 JSValue lv_grid_align_const_to_jsstr(JSContext *ctx, lv_grid_align_t code) {
     return JS_NewString(ctx, lv_grid_align_const_to_str(code));
+}
+
+// lv_opa_t
+bool lv_opa_str_to_const(const char * name, lv_opa_t * out) {
+    if(strcmp(name,"0")==0) {
+        (*out) = LV_OPA_0 ;
+    }
+    else if(strcmp(name,"10")==0) {
+        (*out) = LV_OPA_10 ;
+    }
+    else if(strcmp(name,"20")==0) {
+        (*out) = LV_OPA_20 ;
+    }
+    else if(strcmp(name,"30")==0) {
+        (*out) = LV_OPA_30 ;
+    }
+    else if(strcmp(name,"40")==0) {
+        (*out) = LV_OPA_40 ;
+    }
+    else if(strcmp(name,"50")==0) {
+        (*out) = LV_OPA_50 ;
+    }
+    else if(strcmp(name,"60")==0) {
+        (*out) = LV_OPA_60 ;
+    }
+    else if(strcmp(name,"70")==0) {
+        (*out) = LV_OPA_70 ;
+    }
+    else if(strcmp(name,"80")==0) {
+        (*out) = LV_OPA_80 ;
+    }
+    else if(strcmp(name,"90")==0) {
+        (*out) = LV_OPA_90 ;
+    }
+    else if(strcmp(name,"100")==0) {
+        (*out) = LV_OPA_100 ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_opa_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_opa_const_to_str(lv_opa_t code) {
+
+    switch(code) {
+        case LV_OPA_0: return "0";
+        case LV_OPA_10: return "10";
+        case LV_OPA_20: return "20";
+        case LV_OPA_30: return "30";
+        case LV_OPA_40: return "40";
+        case LV_OPA_50: return "50";
+        case LV_OPA_60: return "60";
+        case LV_OPA_70: return "70";
+        case LV_OPA_80: return "80";
+        case LV_OPA_90: return "90";
+        case LV_OPA_100: return "100";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) {
+    return JS_NewString(ctx, lv_opa_const_to_str(code));
 }
 
 // lv_keyboard_mode_t
@@ -2284,6 +2284,44 @@ const char * lv_label_long_mode_const_to_str(lv_label_long_mode_t code) {
 }
 JSValue lv_label_long_mode_const_to_jsstr(JSContext *ctx, lv_label_long_mode_t code) {
     return JS_NewString(ctx, lv_label_long_mode_const_to_str(code));
+}
+
+// lv_slider_mode_t
+bool lv_slider_mode_str_to_const(const char * name, lv_slider_mode_t * out) {
+    if(strcmp(name,"mode-normal")==0) {
+        (*out) = LV_SLIDER_MODE_NORMAL ;
+    }
+    else if(strcmp(name,"mode-symmetrical")==0) {
+        (*out) = LV_SLIDER_MODE_SYMMETRICAL ;
+    }
+    else if(strcmp(name,"mode-range")==0) {
+        (*out) = LV_SLIDER_MODE_RANGE ;
+    }
+
+    else {
+        return false ;
+    }
+    return true ;
+}
+bool lv_slider_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_slider_mode_t* out) {
+    char * cstr = (char *)JS_ToCString(ctx, jsstr) ;
+    bool suc = lv_slider_mode_str_to_const(cstr, out) ;
+    JS_FreeCString(ctx, cstr) ;
+    return suc ;
+}
+const char * lv_slider_mode_const_to_str(lv_slider_mode_t code) {
+
+    switch(code) {
+        case LV_SLIDER_MODE_NORMAL: return "mode-normal";
+        case LV_SLIDER_MODE_SYMMETRICAL: return "mode-symmetrical";
+        case LV_SLIDER_MODE_RANGE: return "mode-range";
+
+        default:
+            return "unknow";
+    }
+}
+JSValue lv_slider_mode_const_to_jsstr(JSContext *ctx, lv_slider_mode_t code) {
+    return JS_NewString(ctx, lv_slider_mode_const_to_str(code));
 }
 
 // lv_bar_mode_t
