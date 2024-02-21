@@ -15,6 +15,7 @@ namespace be {
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;
+        // JS_DupValue(ctx,jsobj) ;
     }
 
     NativeClass::~NativeClass() {
@@ -92,8 +93,10 @@ namespace be {
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
+            if(obj->jsobj==val) {
+                obj->jsobj = JS_UNDEFINED ;
+            }
             obj->self = nullptr ;
-            obj->jsobj = JS_UNDEFINED ;
         }
     }
 

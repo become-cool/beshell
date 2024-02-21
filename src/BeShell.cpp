@@ -48,7 +48,6 @@ namespace be {
     void BeShell::useBasic() {
         useFS() ;
         useREPL() ;
-        
         NVSModule::use(this) ;
     }
     
