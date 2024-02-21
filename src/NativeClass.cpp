@@ -63,9 +63,7 @@ namespace be {
         }
 
         JSValue jscotr = JS_NewCFunction2(ctx, constructor, className, 1, JS_CFUNC_constructor, 0) ;
-        dref(jscotr)
         JS_SetConstructor(ctx, jscotr, proto) ;
-        dref(jscotr)
 
         if(staticMethods.size()) {
             JS_SetPropertyFunctionList(ctx, jscotr, staticMethods.data(), staticMethods.size());
