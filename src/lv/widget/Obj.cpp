@@ -22,6 +22,7 @@ namespace be::lv {
         JS_CFUNC_DEF("child", 1, Obj::getChild),
         JS_CFUNC_DEF("style", 1, Obj::style),
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
+        JS_CFUNC_DEF("center", 2, Obj::center),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
