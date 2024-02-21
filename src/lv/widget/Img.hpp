@@ -43,7 +43,6 @@ namespace be::lv {
         static JSValue srcGetType(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue bufSetPalette(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue bufFree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue headerInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue decoderGetInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue decoderOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue decoderGetArea(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

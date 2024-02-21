@@ -16,7 +16,6 @@ namespace be::lv {
         // void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf, const lv_area_t * dest_area)
         // void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
         // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-        // static inline uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -122,9 +121,6 @@ namespace be::lv {
 
     // Unsupported arg type: lv_layer_t *
     // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-
-    // Unsupported arg type: int32_t
-    // static inline uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

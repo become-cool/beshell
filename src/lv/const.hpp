@@ -76,6 +76,11 @@ bool lv_style_prop_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_style_prop_t
 const char * lv_style_prop_const_to_str(lv_style_prop_t code) ;
 JSValue lv_style_prop_const_to_jsstr(JSContext *ctx, lv_style_prop_t code) ;
 
+bool lv_opa_str_to_const(const char * str, lv_opa_t* out) ;
+bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) ;
+const char * lv_opa_const_to_str(lv_opa_t code) ;
+JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) ;
+
 bool lv_grad_dir_str_to_const(const char * str, lv_grad_dir_t* out) ;
 bool lv_grad_dir_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grad_dir_t* out) ;
 const char * lv_grad_dir_const_to_str(lv_grad_dir_t code) ;
@@ -95,11 +100,6 @@ bool lv_grid_align_str_to_const(const char * str, lv_grid_align_t* out) ;
 bool lv_grid_align_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_grid_align_t* out) ;
 const char * lv_grid_align_const_to_str(lv_grid_align_t code) ;
 JSValue lv_grid_align_const_to_jsstr(JSContext *ctx, lv_grid_align_t code) ;
-
-bool lv_opa_str_to_const(const char * str, lv_opa_t* out) ;
-bool lv_opa_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_opa_t* out) ;
-const char * lv_opa_const_to_str(lv_opa_t code) ;
-JSValue lv_opa_const_to_jsstr(JSContext *ctx, lv_opa_t code) ;
 
 bool lv_keyboard_mode_str_to_const(const char * str, lv_keyboard_mode_t* out) ;
 bool lv_keyboard_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_keyboard_mode_t* out) ;
@@ -150,11 +150,6 @@ bool lv_label_long_mode_str_to_const(const char * str, lv_label_long_mode_t* out
 bool lv_label_long_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_label_long_mode_t* out) ;
 const char * lv_label_long_mode_const_to_str(lv_label_long_mode_t code) ;
 JSValue lv_label_long_mode_const_to_jsstr(JSContext *ctx, lv_label_long_mode_t code) ;
-
-bool lv_slider_mode_str_to_const(const char * str, lv_slider_mode_t* out) ;
-bool lv_slider_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_slider_mode_t* out) ;
-const char * lv_slider_mode_const_to_str(lv_slider_mode_t code) ;
-JSValue lv_slider_mode_const_to_jsstr(JSContext *ctx, lv_slider_mode_t code) ;
 
 bool lv_bar_mode_str_to_const(const char * str, lv_bar_mode_t* out) ;
 bool lv_bar_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_bar_mode_t* out) ;
