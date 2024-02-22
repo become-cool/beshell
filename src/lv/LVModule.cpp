@@ -1,6 +1,8 @@
 #include "LVModule.hpp"
 #include "all-widgets.hpp"
+#include <cassert>
 #include "Style.hpp"
+#include "driver/input/InDevPointer.hpp"
 
 namespace be::lv {
 
@@ -10,6 +12,8 @@ namespace be::lv {
         exportFunction("screen",screen,0) ;
         exportFunction("load",loadScreen,0) ;
         exportFunction("pct",pct,0) ;
+        exportFunction("registerDisplay",registerDisplay,0) ;
+        exportFunction("registerInputDevice",registerInputDevice,0) ;
         exportFunction("test",test,0) ;
 
         exportClass<Style>() ;
@@ -83,6 +87,55 @@ namespace be::lv {
         return JS_NewUint32(ctx,LV_PCT(val)) ;
     }
 
+    JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        return JS_UNDEFINED ;
+    }
+
+
+    typedef struct {
+        shared_ptr<be::driver::InDevPointer> ptr ;
+        uint16_t x;
+        uint16_t y;
+    } indev_pointer_data_t ;
+
+    static void pointer_read(lv_indev_t * indev, lv_indev_data_t * data) {
+
+
+        indev_pointer_data_t * indev_opa = (indev_pointer_data_t*)lv_indev_get_user_data(indev) ;
+        assert(indev_opa) ;
+
+        if( indev_opa->ptr->readPointCount()>0 ) {
+            indev_opa->ptr->readPos(0, indev_opa->x, indev_opa->y);
+            dn2(indev_opa->x, indev_opa->y)
+            data->state = LV_INDEV_STATE_PR;
+        } else {
+            data->state = LV_INDEV_STATE_REL;
+        }
+
+        data->point.x = (lv_coord_t)indev_opa->x;
+        data->point.y = (lv_coord_t)indev_opa->y;
+    }
+
+    JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
+
+        // @todo
+        // unregister 的时候回收 indev_pointer_data_t
+        auto data = new indev_pointer_data_t() ;
+        data->x = 0 ;
+        data->y = 0 ;
+        data->ptr = (std::shared_ptr<be::driver::InDevPointer>) indev->shared() ;
+
+        lv_indev_t * lvindev = lv_indev_create();
+        lv_indev_set_user_data(lvindev, (void *)data) ;
+        lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
+        lv_indev_set_read_cb(lvindev, pointer_read);
+
+        return JS_UNDEFINED ;
+    }
+    
     JSValue LVModule::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         lv_obj_t * parent = lv_screen_active() ;
         dp(parent)

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <NativeClass.hpp>
+#include "InDevPointer.hpp"
 #include "driver/DriverModule.hpp"
 #include "module/serial/I2C.hpp"
 
 namespace be::driver {
 
-    class GT911: public be::NativeClass {
+    class GT911: public be::driver::InDevPointer {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
@@ -21,6 +21,7 @@ namespace be::driver {
         bool reset() ;
         uint8_t readConfigVersion() ;
         
+        bool dataReady() ;
         bool readPos(uint8_t i, uint16_t &x, uint16_t &y) ;
         uint8_t readPointCount() ;
 

@@ -18,14 +18,14 @@ using namespace std ;
 
 namespace be::driver {
 
-    DEFINE_NCLASS_META(GT911, NativeClass)
+    DEFINE_NCLASS_META(GT911, InDevPointer)
 
     std::vector<JSCFunctionListEntry> GT911::methods = {
         JS_CFUNC_DEF("setup", 0, GT911::setup),
     } ;
 
     GT911::GT911(JSContext * ctx, be::I2C * _i2c, uint8_t _addr)
-        : NativeClass(ctx,build(ctx))
+        : InDevPointer(ctx,build(ctx))
         , addr(_addr)
         , i2c(_i2c)
     {}
@@ -54,6 +54,59 @@ namespace be::driver {
         uint8_t data = 0 ;
         i2c->read<uint16_t, uint8_t>(addr, GT_CFGS_REG, data) ;
         return data ;
+    }
+    
+    bool GT911::dataReady() {
+        assert(i2c) ;
+        uint8_t data = 0;
+        if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
+            return false ;
+        }
+        return data & 0x80 ;
+    }
+
+    bool GT911::readPos(uint8_t i, uint16_t &x, uint16_t &y) {
+        assert(i2c) ;
+        if(!this->dataReady()) {
+            return false ;
+        }
+        uint16_t arrTpReg[] = {
+            GT_TP1_REG,
+            GT_TP2_REG,
+            GT_TP3_REG,
+            GT_TP4_REG,
+            GT_TP5_REG
+        } ;
+        if(i>=sizeof(arrTpReg)/sizeof(uint16_t)) {
+            printf("GT911::readPos() invalid arg i = %d\n",i) ;
+            return false ;
+        }
+        uint8_t data[4] = {0} ;
+        if( !i2c->read<uint16_t>(addr, arrTpReg[i], data, 4) ){
+            return false ;
+        }
+        x = ((data[1] & 0x0f) << 8) + data[0];
+        y = ((data[3] & 0x0f) << 8) + data[2];
+        
+        data[0] = 0 ;
+        return i2c->write<uint16_t,uint8_t>(addr, GT_GSTID_REG, data[0]);
+    }
+
+    uint8_t GT911::readPointCount() {
+        assert(i2c) ;
+        uint8_t data = 0;
+        if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
+            return 0 ;
+        }
+        uint8_t touchs = 0 ;
+        if (data & 0x80) {
+            touchs = data & 0x0F;
+        }
+        
+        uint8_t temp = 0;
+        i2c->write<uint16_t,uint8_t>(addr, GT_GSTID_REG, temp);
+
+        return touchs ;
     }
 
     JSValue GT911::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

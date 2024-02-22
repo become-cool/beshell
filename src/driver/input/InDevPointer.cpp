@@ -11,10 +11,9 @@ using namespace std ;
         JS_CFUNC_DEF("readPointCount", 0, InDevPointer::readPointCount),
     } ;
 
-    InDevPointer::InDevPointer(JSContext * ctx)
-        : NativeClass(ctx,build(ctx))
-    {
-    }
+    InDevPointer::InDevPointer(JSContext * ctx, JSValue jsobj)
+        : NativeClass(ctx,jsobj)
+    {}
 
         
     JSValue InDevPointer::readPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

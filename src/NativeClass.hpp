@@ -36,7 +36,7 @@ namespace be {
         JSValue jsobj ;
 
         virtual ~NativeClass() ;
-
+        const std::shared_ptr<NativeClass> & shared() ;
 
         static NativeClass * fromJS(JSValue jsObj) ;
 

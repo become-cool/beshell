@@ -9,8 +9,9 @@ namespace be::driver {
         static std::vector<JSCFunctionListEntry> methods ;
 
     public:
-        InDevPointer(JSContext * ctx) ;
+        InDevPointer(JSContext * ctx, JSValue jsobj) ;
         
+        virtual bool dataReady() = 0 ;
         virtual bool readPos(uint8_t i, uint16_t &x, uint16_t &y) = 0 ;
         virtual uint8_t readPointCount() = 0 ;
         
