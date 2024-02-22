@@ -9,7 +9,6 @@ namespace be::lv {
         JS_CGETSET_DEF("updateMode",be::lv::Obj::invalidGetter,Chart::setUpdateMode) ,
         JS_CGETSET_DEF("pressedPoint",Chart::getPressedPoint,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("firstPointCenterOffset",Chart::getFirstPointCenterOffset,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setRange", 3, Chart::setRange),
@@ -35,7 +34,6 @@ namespace be::lv {
         // void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
         // int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
         // int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -132,7 +130,6 @@ namespace be::lv {
         return retval ;
     }
     #endif
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -243,7 +240,6 @@ namespace be::lv {
 
     // Unsupported arg type: lv_chart_series_t *
     // int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -13,7 +13,6 @@ namespace be::lv {
         JS_CGETSET_DEF("postDraw",be::lv::Obj::invalidGetter,Scale::setPostDraw) ,
         JS_CGETSET_DEF("rangeMinValue",Scale::getRangeMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("rangeMaxValue",Scale::getRangeMaxValue,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setRange", 2, Scale::setRange),
@@ -23,7 +22,6 @@ namespace be::lv {
         // lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
         // void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
         // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -180,7 +178,6 @@ namespace be::lv {
         return retval ;
     }
     #endif
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -241,7 +238,6 @@ namespace be::lv {
 
     // Unsupported arg type: lv_scale_section_t *
     // void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

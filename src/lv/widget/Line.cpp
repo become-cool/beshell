@@ -5,12 +5,10 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Line::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("yInvert",Line::getYInvert,Line::setYInvert) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         // Unsupported arg type:
         // void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -48,13 +46,11 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
     // Unsupported arg type: const lv_point_precise_t*
     // void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

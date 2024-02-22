@@ -36,6 +36,11 @@ bool lv_base_dir_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_base_dir_t* ou
 const char * lv_base_dir_const_to_str(lv_base_dir_t code) ;
 JSValue lv_base_dir_const_to_jsstr(JSContext *ctx, lv_base_dir_t code) ;
 
+bool lv__part_str_to_const(const char * str, _lv_part_t* out) ;
+bool lv__part_jsstr_to_const(JSContext *ctx, JSValue jsstr, _lv_part_t* out) ;
+const char * lv__part_const_to_str(_lv_part_t code) ;
+JSValue lv__part_const_to_jsstr(JSContext *ctx, _lv_part_t code) ;
+
 bool lv_scrollbar_mode_str_to_const(const char * str, lv_scrollbar_mode_t* out) ;
 bool lv_scrollbar_mode_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_scrollbar_mode_t* out) ;
 const char * lv_scrollbar_mode_const_to_str(lv_scrollbar_mode_t code) ;

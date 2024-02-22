@@ -18,7 +18,6 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue setState(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -26,7 +25,6 @@ namespace be::lv {
         static JSValue getSrcLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getSrcMiddle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getSrcRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

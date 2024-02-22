@@ -11,7 +11,6 @@ namespace be::lv {
         JS_CGETSET_DEF("knobOffset",Arc::getKnobOffset,Arc::setKnobOffset) ,
         JS_CGETSET_DEF("minValue",Arc::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Arc::getMaxValue,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setRange", 2, Arc::setRange),
@@ -21,7 +20,6 @@ namespace be::lv {
         // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         // void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
         // void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -175,7 +173,6 @@ namespace be::lv {
         return retval ;
     }
     #endif
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -232,7 +229,6 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

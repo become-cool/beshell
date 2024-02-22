@@ -17,11 +17,9 @@ namespace be::lv {
 
 
 // AUTO GENERATE CODE START [GETSETS] --------
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
-
 
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
