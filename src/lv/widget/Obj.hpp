@@ -42,6 +42,7 @@ namespace be::lv {
 
         static JSValue style(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue center(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getState(JSContext *ctx, JSValueConst this_val) ;

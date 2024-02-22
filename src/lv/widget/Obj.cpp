@@ -22,6 +22,7 @@ namespace be::lv {
         JS_CFUNC_DEF("child", 1, Obj::getChild),
         JS_CFUNC_DEF("style", 1, Obj::style),
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
+        JS_CFUNC_DEF("center", 2, Obj::center),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
@@ -445,6 +446,12 @@ namespace be::lv {
         }
 
         JS_FreeCString(ctx, jsStyleName) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Obj::center(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        JSVALUE_TO_LVOBJ(this_val,lvobj)
+        lv_obj_align(lvobj, LV_ALIGN_CENTER, 0, 0);
         return JS_UNDEFINED ;
     }
 

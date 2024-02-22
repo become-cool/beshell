@@ -66,14 +66,16 @@ namespace be::driver::display {
     }
 
 #ifdef MODULE_LV
+    typedef struct {
+        shared_ptr<be::NativeClass> display ;
+    } disp_drv_opa_t ;
+
     void disp_flush_cb(lv_display_t * lvdisp, const lv_area_t * area, unsigned char * color_p) {
-
-        Display* disp = (Display*)lv_display_get_driver_data(lvdisp) ;
-        if(disp) {
-            disp->drawRect(area->x1,area->y1,area->x2,area->y2, (color_t*)color_p) ;
+        disp_drv_opa_t* opa = (disp_drv_opa_t*)lv_display_get_driver_data(lvdisp) ;
+        if(opa) {
+            ((Display*)(opa->display.get()))->drawRect(area->x1,area->y1,area->x2,area->y2, (color_t*)color_p) ;
         }
-
-        dn4(area->x1,area->y1,area->x2,area->y2)
+        // dn4(area->x1,area->y1,area->x2,area->y2)
         lv_display_flush_ready(lvdisp);
     }
 
@@ -111,7 +113,13 @@ namespace be::driver::display {
 
         lv_display_set_flush_cb(lv_display, disp_flush_cb);
 
-        lv_display_set_driver_data(lv_display,this) ;
+        
+        // @todo
+        // unregister 时销毁这个 shared_ptr 指针
+        disp_drv_opa_t * opa = new disp_drv_opa_t ;
+        opa->display = this->self ;
+
+        lv_display_set_driver_data(lv_display,opa) ;
 
         return true ;
     }

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "debug.h"
 #include "ModuleLoader.hpp"
+#include "EventEmitter.hpp"
 #include "module/ProcessModule.hpp"
 #include <cassert>
 #include <iostream>
@@ -115,6 +116,9 @@ namespace be {
 
         engine->console = new Console(ctx) ;
         setGlobalValue(ctx, "console", engine->console->jsobj) ;
+
+        EventEmitter::defineClass(ctx) ;
+        setGlobalValue(ctx, "EventEmitter", JS_DupValue(ctx,NativeClass::getClass(ctx,EventEmitter::classID)) ) ;
 
         return ctx;
     }
