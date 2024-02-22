@@ -1011,10 +1011,10 @@ JSValue lv_event_code_const_to_jsstr(JSContext *ctx, lv_event_code_t code) {
 
 // lv_anim_enable_t
 bool lv_anim_enable_str_to_const(const char * name, lv_anim_enable_t * out) {
-    if(strcmp(name,"")==0) {
+    if(strcmp(name,"off")==0) {
         (*out) = LV_ANIM_OFF ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"on")==0) {
         (*out) = LV_ANIM_ON ;
     }
 
@@ -1032,8 +1032,8 @@ bool lv_anim_enable_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_anim_enable
 const char * lv_anim_enable_const_to_str(lv_anim_enable_t code) {
 
     switch(code) {
-        case LV_ANIM_OFF: return "";
-        case LV_ANIM_ON: return "";
+        case LV_ANIM_OFF: return "off";
+        case LV_ANIM_ON: return "on";
 
         default:
             return "unknow";
@@ -1372,16 +1372,16 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"grid-cell-y-align")==0) {
         (*out) = LV_STYLE_GRID_CELL_Y_ALIGN ;
     }
-    else if(strcmp(name,"last-built-in-prop")==0) {
+    else if(strcmp(name,"e-last-built-in-prop")==0) {
         (*out) = _LV_STYLE_LAST_BUILT_IN_PROP ;
     }
-    else if(strcmp(name,"num-built-in-props")==0) {
+    else if(strcmp(name,"e-num-built-in-props")==0) {
         (*out) = _LV_STYLE_NUM_BUILT_IN_PROPS ;
     }
     else if(strcmp(name,"prop-any")==0) {
         (*out) = LV_STYLE_PROP_ANY ;
     }
-    else if(strcmp(name,"prop-const")==0) {
+    else if(strcmp(name,"e-prop-const")==0) {
         (*out) = _LV_STYLE_PROP_CONST ;
     }
 
@@ -1508,8 +1508,8 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_GRID_CELL_ROW_POS: return "grid-cell-row-pos";
         case LV_STYLE_GRID_CELL_ROW_SPAN: return "grid-cell-row-span";
         case LV_STYLE_GRID_CELL_Y_ALIGN: return "grid-cell-y-align";
-        case _LV_STYLE_LAST_BUILT_IN_PROP: return "last-built-in-prop";
-        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "num-built-in-props";
+        case _LV_STYLE_LAST_BUILT_IN_PROP: return "e-last-built-in-prop";
+        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "e-num-built-in-props";
         case LV_STYLE_PROP_ANY: return "prop-any";
 
         default:
