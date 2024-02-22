@@ -62,6 +62,7 @@ namespace be::driver {
         if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
             return false ;
         }
+        dn(data)
         return data & 0x80 ;
     }
 
@@ -87,7 +88,6 @@ namespace be::driver {
         }
         x = ((data[1] & 0x0f) << 8) + data[0];
         y = ((data[3] & 0x0f) << 8) + data[2];
-        
         data[0] = 0 ;
         return i2c->write<uint16_t,uint8_t>(addr, GT_GSTID_REG, data[0]);
     }
@@ -103,8 +103,10 @@ namespace be::driver {
             touchs = data & 0x0F;
         }
         
-        uint8_t temp = 0;
-        i2c->write<uint16_t,uint8_t>(addr, GT_GSTID_REG, temp);
+        if(!touchs) {
+            uint8_t temp = 0;
+            i2c->write<uint16_t,uint8_t>(addr, GT_GSTID_REG, temp);
+        }
 
         return touchs ;
     }
@@ -112,7 +114,6 @@ namespace be::driver {
     JSValue GT911::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(GT911, thisobj)
         thisobj->reset() ;
-        dn(thisobj->readConfigVersion()) ;
         return JS_UNDEFINED ;
     }
 
