@@ -91,6 +91,11 @@ namespace be {
     JSValue NativeClass::defineClass(JSContext * ctx){
         return JS_NULL ;
     }
+
+    JSValue NativeClass::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
+    }
+
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
