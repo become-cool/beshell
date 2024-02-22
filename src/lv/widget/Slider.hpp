@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Obj.hpp"
+#include "Bar.hpp"
 #include "lvgl.h"
 
 namespace be::lv {
 
-    class Slider: public Obj {
+    class Slider: public Bar {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
@@ -17,11 +17,13 @@ namespace be::lv {
 
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue bindValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isDragged(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

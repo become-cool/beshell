@@ -22,11 +22,13 @@ namespace be::lv {
         static JSValue getRepeatCount(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setRepeatCount(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getSrcCount(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue setSrc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

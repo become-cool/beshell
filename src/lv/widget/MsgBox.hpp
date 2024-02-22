@@ -21,6 +21,7 @@ namespace be::lv {
         static JSValue getFooter(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getContent(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getTitle(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -31,6 +32,7 @@ namespace be::lv {
         static JSValue addCloseButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue closeAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

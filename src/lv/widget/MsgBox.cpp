@@ -8,6 +8,7 @@ namespace be::lv {
         JS_CGETSET_DEF("footer",MsgBox::getFooter,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("content",MsgBox::getContent,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("title",MsgBox::getTitle,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTitle", 1, MsgBox::addTitle),
@@ -18,6 +19,7 @@ namespace be::lv {
         JS_CFUNC_DEF("closeAsync", 0, MsgBox::closeAsync),
         // Unsupported arg type:
         // lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -71,6 +73,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -137,6 +140,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

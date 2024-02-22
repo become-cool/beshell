@@ -8,6 +8,7 @@ namespace be::lv {
         JS_CGETSET_DEF("buttonCtrlAll",be::lv::Obj::invalidGetter,BtnMatrix::setButtonCtrlAll) ,
         JS_CGETSET_DEF("oneChecked",BtnMatrix::getOneChecked,BtnMatrix::setOneChecked) ,
         JS_CGETSET_DEF("popovers",BtnMatrix::getPopovers,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setButtonCtrl", 2, BtnMatrix::setButtonCtrl),
@@ -17,6 +18,7 @@ namespace be::lv {
         JS_CFUNC_DEF("hasButtonCtrl", 2, BtnMatrix::hasButtonCtrl),
         // Unsupported arg type:
         // const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -106,6 +108,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -213,6 +216,7 @@ namespace be::lv {
         return jsretval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -9,6 +9,7 @@ namespace be::lv {
         JS_CGETSET_DEF("step",SpinBox::getStep,SpinBox::setStep) ,
         JS_CGETSET_DEF("cursorPos",be::lv::Obj::invalidGetter,SpinBox::setCursorPos) ,
         JS_CGETSET_DEF("digitStepDirection",be::lv::Obj::invalidGetter,SpinBox::setDigitStepDirection) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setDigitFormat", 2, SpinBox::setDigitFormat),
@@ -17,6 +18,7 @@ namespace be::lv {
         JS_CFUNC_DEF("stepPrev", 0, SpinBox::stepPrev),
         JS_CFUNC_DEF("increment", 0, SpinBox::increment),
         JS_CFUNC_DEF("decrement", 0, SpinBox::decrement),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -119,6 +121,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -187,6 +190,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

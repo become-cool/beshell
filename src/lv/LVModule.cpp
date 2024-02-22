@@ -87,7 +87,7 @@ namespace be::lv {
         return JS_NewUint32(ctx,LV_PCT(val)) ;
     }
 
-    JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue LVModule::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         return JS_UNDEFINED ;
     }
@@ -117,21 +117,21 @@ namespace be::lv {
         data->point.y = (lv_coord_t)indev_opa->y;
     }
 
-    JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
-        JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
+        // JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
 
-        // @todo
-        // unregister 的时候回收 indev_pointer_data_t
-        auto data = new indev_pointer_data_t() ;
-        data->x = 0 ;
-        data->y = 0 ;
-        data->ptr = (std::shared_ptr<be::driver::InDevPointer>) indev->shared() ;
+        // // @todo
+        // // unregister 的时候回收 indev_pointer_data_t
+        // auto data = new indev_pointer_data_t() ;
+        // data->x = 0 ;
+        // data->y = 0 ;
+        // data->ptr = (std::shared_ptr<be::driver::InDevPointer>) indev->shared() ;
 
-        lv_indev_t * lvindev = lv_indev_create();
-        lv_indev_set_user_data(lvindev, (void *)data) ;
-        lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
-        lv_indev_set_read_cb(lvindev, pointer_read);
+        // lv_indev_t * lvindev = lv_indev_create();
+        // lv_indev_set_user_data(lvindev, (void *)data) ;
+        // lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
+        // lv_indev_set_read_cb(lvindev, pointer_read);
 
         return JS_UNDEFINED ;
     }

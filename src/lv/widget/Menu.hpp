@@ -27,6 +27,7 @@ namespace be::lv {
         static JSValue getMainHeaderBackButton(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getSidebarHeader(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getSidebarHeaderBackButton(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -37,6 +38,7 @@ namespace be::lv {
         static JSValue setLoadPageEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue backButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue clearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

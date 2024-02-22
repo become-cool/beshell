@@ -5,6 +5,7 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Calendar::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("btnmatrix",Calendar::getBtnmatrix,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setTodayDate", 3, Calendar::setTodayDate),
@@ -15,6 +16,7 @@ namespace be::lv {
         // Unsupported arg type:
         // void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
         // lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -59,6 +61,7 @@ namespace be::lv {
     // unspported type: size_t
     // JSValue Calendar::getHighlightedDatesNum(JSContext *ctx, JSValueConst this_val){}
     // size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -133,6 +136,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

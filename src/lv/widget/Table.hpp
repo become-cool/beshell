@@ -21,6 +21,7 @@ namespace be::lv {
         static JSValue setRowCount(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getColumnCount(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setColumnCount(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -35,6 +36,7 @@ namespace be::lv {
         static JSValue hasCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getSelectedCell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getCellUserData(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 

@@ -5,11 +5,13 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> TileView::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("tileActive",TileView::getTileActive,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTile", 3, TileView::addTile),
         JS_CFUNC_DEF("setTile", 2, TileView::setTile),
         JS_CFUNC_DEF("setTileByIndex", 3, TileView::setTileByIndex),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -39,6 +41,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -113,6 +116,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

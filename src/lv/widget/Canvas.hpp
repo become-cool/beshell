@@ -17,6 +17,7 @@ namespace be::lv {
 
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -28,6 +29,7 @@ namespace be::lv {
         static JSValue fillBg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue initLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue finishLayer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
     } ;
 
