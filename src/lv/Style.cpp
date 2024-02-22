@@ -22,8 +22,6 @@ namespace be::lv {
         return obj->jsobj ;
     }
 
-    
-
 // AUTO GENERATE CODE START [VALUE CONVERT FUNC] --------
     JSValue Style::propToJS(JSContext * ctx, lv_style_prop_t prop, lv_style_value_t value) {
         if( prop==LV_STYLE_FLEX_FLOW ){

@@ -22,6 +22,7 @@ namespace be {
 
         static std::vector<JSCFunctionListEntry> methods ;
         static std::vector<JSCFunctionListEntry> staticMethods ;
+        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static void finalizer(JSRuntime *rt, JSValue val) ;
 
     protected :
@@ -35,7 +36,7 @@ namespace be {
         JSValue jsobj ;
 
         virtual ~NativeClass() ;
-
+        const std::shared_ptr<NativeClass> & shared() ;
 
         static NativeClass * fromJS(JSValue jsObj) ;
 

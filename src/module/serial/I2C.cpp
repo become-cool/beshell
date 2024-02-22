@@ -6,7 +6,12 @@ using namespace std ;
 namespace be {
     
     DEFINE_NCLASS_META(I2C, NativeClass)
+
+    I2C * I2C::i2c0 = nullptr ;
+    I2C * I2C::i2c1 = nullptr ;
+
     std::vector<JSCFunctionListEntry> I2C::methods = {
+        JS_CFUNC_DEF("setup", 1, I2C::setup),
         JS_CFUNC_DEF("ping", 1, I2C::ping),
         JS_CFUNC_DEF("send", 2, I2C::send),
         JS_CFUNC_DEF("write8", 2, I2C::write8),
@@ -43,6 +48,56 @@ namespace be {
     }
     void I2C::give() {
         xSemaphoreGive(sema) ;
+    }
+    
+    I2C * I2C::flyweight(JSContext * ctx, i2c_port_t bus) {
+        if(bus==I2C_NUM_0) {
+            if(!i2c0) {
+                i2c0 = new I2C(ctx, I2C_NUM_0) ;
+            }
+            return i2c0 ;
+        }
+        else if(bus==I2C_NUM_1) {
+            if(!i2c1) {
+                i2c1 = new I2C(ctx, I2C_NUM_1) ;
+            }
+            return i2c1 ;
+        }
+        return nullptr ;
+    }
+    
+    JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2C, thisobj)
+        CHECK_ARGC(2)
+        ARGV_TO_UINT8(0, sda) ;
+        ARGV_TO_UINT8(1, scl) ;
+        ARGV_TO_UINT32_OPT(2, freq, 400000) ;
+        ARGV_TO_UINT32_OPT(3, timeout, 1000) ;
+
+        dn4(sda,scl,freq,timeout)
+
+        i2c_config_t i2c_config = {
+            .mode = I2C_MODE_MASTER,
+            .sda_io_num = sda,
+            .scl_io_num = scl,
+            .sda_pullup_en = GPIO_PULLUP_ENABLE,
+            .scl_pullup_en = GPIO_PULLUP_ENABLE,
+            .clk_flags = 0
+        };
+        i2c_config.master.clk_speed = freq;
+
+        if(i2c_param_config(thisobj->busnum, &i2c_config)!=ESP_OK) {
+            return JS_FALSE ;
+        }
+        i2c_driver_delete(thisobj->busnum) ;
+        esp_err_t res = i2c_driver_install(thisobj->busnum, I2C_MODE_MASTER, 0, 0, 0) ;
+        if(res!=ESP_OK) {
+            return JS_FALSE ;
+        }
+        
+	    // i2c_set_timeout(thisobj->busnum, timeout) ;
+
+        return JS_TRUE ;
     }
 
     bool I2C::ping(uint8_t addr) {

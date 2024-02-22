@@ -15,9 +15,7 @@ namespace be {
 
     #define I2C_COMMIT(bus)                                                     \
         i2c_master_stop(cmd);                                                   \
-        take() ;                                                                \
         esp_err_t res=i2c_master_cmd_begin(bus, cmd, 10/portTICK_PERIOD_MS) ;   \
-        give() ;                                                                \
         i2c_cmd_link_delete(cmd);
 
 
@@ -30,11 +28,16 @@ namespace be {
         i2c_port_t busnum ;
         SemaphoreHandle_t sema ;
 
+        static I2C * i2c0 ;
+        static I2C * i2c1 ;
+
     public:
         I2C(JSContext * ctx, i2c_port_t busnum) ;
         ~I2C() ;
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static I2C * flyweight(JSContext *, i2c_port_t) ;
 
         inline void take() ;
         inline void give() ;
@@ -78,6 +81,7 @@ namespace be {
             return read<TR>(addr,reg,&out,sizeof(TV)) ;
         }
 
+        static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

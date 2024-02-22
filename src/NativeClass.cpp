@@ -15,7 +15,6 @@ namespace be {
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;
-        // JS_DupValue(ctx,jsobj) ;
     }
 
     NativeClass::~NativeClass() {
@@ -90,6 +89,11 @@ namespace be {
     JSValue NativeClass::defineClass(JSContext * ctx){
         return JS_UNDEFINED ;
     }
+
+    JSValue NativeClass::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
+    }
+
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
@@ -105,5 +109,12 @@ namespace be {
             return JS_NULL ;
         }
         return mapCtxClassID2Constructor[ctx][classID] ;
+    }
+
+    const std::shared_ptr<NativeClass> & NativeClass::shared() {
+        if(!self) {
+            self = std::shared_ptr<NativeClass>(this) ;
+        }
+        return self ;
     }
 }
