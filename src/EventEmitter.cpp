@@ -18,7 +18,7 @@ namespace be {
 
     JSValue EventEmitter::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new EventEmitter(ctx) ;
-        obj->self = std::shared_ptr<EventEmitter> (obj) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
     
@@ -35,6 +35,9 @@ namespace be {
         ) ;
         
     JSValue DEF_JS_FUNC(jsOn, R"(function(event, handle, norepeat) {
+    if(typeof(handle)!="function") {
+        throw new Error("handle is not a function")
+    }
     if(typeof(event)=="string") {
         if(!this._handlers[event]){
             this._handlers[event] = []
@@ -44,6 +47,7 @@ namespace be {
         if(!norepeat || !this.isListening(event, handle)) {
             this._handlers[event].push(handle)
         }
+
     }
     else if(event instanceof Array) {
         for(var eventName of event) {
@@ -51,17 +55,17 @@ namespace be {
         }
     }
     return this
-})", "EventEmitter.js", {})
+})", "on()", {})
 
     JSValue DEF_JS_FUNC(jsOnce, R"(function(eventName, handle, norepeat) {
     var wrapper =  (...args) => {
         this.off(eventName, wrapper.__origin)
         handle.apply(this, args)
     }
-    wrapper.__origin = this.originHanlde(handle)
+    wrapper.__origin = this.originHandle(handle)
     this.on(eventName, wrapper, norepeat)
     return this
-})", "EventEmitter.js", {})
+})", "once()", {})
 
     JSValue DEF_JS_FUNC(jsRace, R"(function(events, callback) {
     let h = (evt, ...args) => {
@@ -73,14 +77,14 @@ namespace be {
     }
     this.on("*", h)
     return this
-})", "EventEmitter.js", {})
+})", "race()", {})
 
     JSValue DEF_JS_FUNC(jsOff, R"(function(eventName, handle, all) {
     if(!this._handlers[eventName]) {
         return
     }
     for(let h=this._handlers[eventName].length-1; h>=0; h--) {
-        let func = this.originHanlde(this._handlers[eventName][h])
+        let func = this.originHandle(this._handlers[eventName][h])
         if(!handle || handle==func) {
             this._handlers[eventName][h].__origin = null
             this._handlers[eventName].splice(h,1)
@@ -95,25 +99,25 @@ namespace be {
             this.emit("#EVENT.CLEAR#",eventName)
     }
     return this
-})", "EventEmitter.js", {})
+})", "off()", {})
 
-    JSValue DEF_JS_FUNC(jsOriginHanlde, R"(function(handle) {
+    JSValue DEF_JS_FUNC(jsOriginHandle, R"(function(handle) {
     for(var h=handle; h.__origin; h=h.__origin){}
     return h
-})", "EventEmitter.js", {})
+})", "originHandle()", {})
 
     JSValue DEF_JS_FUNC(jsIsListening, R"(function(event, handle) {
     if(!this._handlers[event])
         return false
     for(let cb of this._handlers[event]) {
-        if( this.originHanlde(cb)==handle )
+        if( this.originHandle(cb)==handle )
             return true
     }
     return false
-})", "EventEmitter.js", {})
+})", "isListening()", {})
 
-    JSValue DEF_JS_FUNC(jsEmit, R"((eventName, ...args) {
-    if(eventName!='*'&&this._handlers&&this._handlers[eventName]) {
+    JSValue DEF_JS_FUNC(jsEmit, R"(function(eventName, ...args){
+    if(eventName!='*'&&this._handlers[eventName]) {
         for(let handle of this._handlers[eventName]) {
             handle.apply(this, args)
         }
@@ -124,7 +128,7 @@ namespace be {
         }
     }
     return this
-})", "EventEmitter.js", {})
+})", "emit()", {})
 
     JSValue DEF_JS_FUNC(jsDestroy, R"(function() {
     for(let eventName in this._handlers) {
@@ -136,14 +140,14 @@ namespace be {
         this._handlers[eventName].splice(0)
         delete this._handlers[eventName]
     }
-})", "EventEmitter.js", {})
+})", "destroy", {})
 
         JSValue proto = JS_GetPropertyStr(ctx,jscotr,"prototype") ;
         JS_SetPropertyStr(ctx, proto, "on", jsOn) ;
         JS_SetPropertyStr(ctx, proto, "once", jsOnce) ;
         JS_SetPropertyStr(ctx, proto, "race", jsRace) ;
         JS_SetPropertyStr(ctx, proto, "off", jsOff) ;
-        JS_SetPropertyStr(ctx, proto, "originHandle", jsOriginHanlde) ;
+        JS_SetPropertyStr(ctx, proto, "originHandle", jsOriginHandle) ;
         JS_SetPropertyStr(ctx, proto, "isListening", jsIsListening) ;
         JS_SetPropertyStr(ctx, proto, "emit", jsEmit) ;
         JS_SetPropertyStr(ctx, proto, "destroy", jsDestroy) ;

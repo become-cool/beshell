@@ -62,7 +62,6 @@ namespace be::driver {
         if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
             return false ;
         }
-        dn(data)
         return data & 0x80 ;
     }
 

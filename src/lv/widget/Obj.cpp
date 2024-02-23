@@ -8,7 +8,7 @@ using namespace std ;
 
 namespace be::lv {
 
-    DEFINE_NCLASS_META(Obj, NativeClass)
+    DEFINE_NCLASS_META(Obj, EventEmitter)
     
     JSValue dbginfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
@@ -280,7 +280,7 @@ namespace be::lv {
 
     
     Obj::Obj(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : NativeClass(ctx, build(ctx, jsobj))
+        : EventEmitter(ctx, build(ctx, jsobj))
         , _lvobj(lvobj)
     {
         if(_lvobj && !lv_obj_get_user_data(_lvobj)) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NativeClass.hpp"
+#include "EventEmitter.hpp"
 #include "lvgl.h"
 #include "../const.hpp"
 
@@ -20,7 +20,7 @@
 
 namespace be::lv {
 
-    class Obj: public NativeClass {
+    class Obj: public EventEmitter {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
