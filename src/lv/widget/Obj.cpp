@@ -23,6 +23,7 @@ namespace be::lv {
         JS_CFUNC_DEF("style", 1, Obj::style),
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
         JS_CFUNC_DEF("center", 2, Obj::center),
+        JS_CFUNC_DEF("enableEvent", 1, Obj::enableEvent),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
@@ -286,6 +287,8 @@ namespace be::lv {
         if(_lvobj && !lv_obj_get_user_data(_lvobj)) {
             lv_obj_set_user_data(_lvobj, (void *)this) ;
         }
+
+        lv_obj_add_event_cb(_lvobj, eventCallback, LV_EVENT_DELETE, ctx) ;
     }
 
     Obj::Obj(JSContext * ctx, lv_obj_t * parent)
@@ -480,7 +483,66 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
 
-    
+    void Obj::eventCallback(lv_event_t * e) {
+        if(!e->user_data) {
+            printf("event->user_data==NULL, no ctx.") ;
+            return ;
+        }
+        JSContext *ctx = (JSContext *)e->user_data ;
+        if(!e->current_target) {
+            return ;
+        }
+        Obj * obj = (Obj *)lv_obj_get_user_data((lv_obj_t*)e->current_target) ;
+        if(!obj) {
+            return ;
+        }
+        
+        JSValue jsname = lv_event_code_const_to_jsstr(ctx, e->code) ;
+
+        // param
+        JSValue param = JS_UNDEFINED ;
+        if(e->code==LV_EVENT_GESTURE && e->param) {
+            // printf("--------- gesture\n") ;
+            lv_dir_t dir = lv_indev_get_gesture_dir((const lv_indev_t *)e->param) ;
+            param = lv_dir_const_to_jsstr(ctx, dir) ;
+        }
+
+        obj->emit(jsname, {jsname, obj->jsobj, param}) ;
+
+        JS_FreeValue(ctx,jsname) ;
+
+        // @todo 引用
+        if(e->code==LV_EVENT_DELETE){
+            JS_SetOpaque(obj->jsobj, NULL) ;
+        }
+    }
+
+    lv_event_dsc_t * Obj::findEventDsc(lv_obj_t* obj, lv_event_code_t e) {
+        uint32_t count = lv_obj_get_event_count(obj) ;
+        for(int i=0; i<count; i++) {
+            lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i) ;
+            
+            if(dsc->cb!=eventCallback)
+                continue ;
+            if(dsc->filter==LV_EVENT_ALL || dsc->filter==e) {
+                return dsc ;
+            }
+        }
+        return NULL ;
+    }
+    JSValue Obj::enableEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(1)
+        lv_event_code_t event ;
+        if(!lv_event_code_jsstr_to_const(ctx, argv[0], &event)) {
+            return JS_UNDEFINED ;
+        }
+        if(findEventDsc(thisobj->_lvobj, event)==NULL) {
+            lv_obj_add_event_cb(thisobj->_lvobj, eventCallback, event, ctx) ;
+        }
+        return JS_UNDEFINED ;
+    }
+
     static bool sizeValue(JSContext *ctx, JSValueConst var, int32_t & value) {
         bool success = true ;
         const char * cvalue = JS_ToCString(ctx, var) ;

@@ -24,6 +24,9 @@ namespace be::lv {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
+        
+        static lv_event_dsc_t * findEventDsc(lv_obj_t* obj, lv_event_code_t e) ;
+        static void eventCallback(lv_event_t * event) ;
 
     protected:
         lv_obj_t * _lvobj = nullptr ;
@@ -43,6 +46,7 @@ namespace be::lv {
         static JSValue style(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue center(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue enableEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getState(JSContext *ctx, JSValueConst this_val) ;

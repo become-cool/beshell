@@ -107,7 +107,7 @@ namespace be::lv {
 
         if( indev_opa->ptr->readPointCount()>0 ) {
             indev_opa->ptr->readPos(0, indev_opa->x, indev_opa->y);
-            dn2(indev_opa->x, indev_opa->y)
+            // dn2(indev_opa->x, indev_opa->y)
             data->state = LV_INDEV_STATE_PR;
         } else {
             data->state = LV_INDEV_STATE_REL;

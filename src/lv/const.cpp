@@ -819,7 +819,7 @@ bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
     else if(strcmp(name,"lost")==0) {
         (*out) = LV_EVENT_PRESS_LOST ;
     }
-    else if(strcmp(name,"clicked")==0) {
+    else if(strcmp(name,"short-clicked")==0) {
         (*out) = LV_EVENT_SHORT_CLICKED ;
     }
     else if(strcmp(name,"pressed")==0) {
@@ -1002,15 +1002,15 @@ bool lv_event_code_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_event_code_t
 const char * lv_event_code_const_to_str(lv_event_code_t code) {
 
     switch(code) {
-        case LV_EVENT_ALL: return "";
-        case LV_EVENT_PRESSED: return "ed";
-        case LV_EVENT_PRESSING: return "ing";
-        case LV_EVENT_PRESS_LOST: return "lost";
-        case LV_EVENT_SHORT_CLICKED: return "clicked";
-        case LV_EVENT_LONG_PRESSED: return "pressed";
-        case LV_EVENT_LONG_PRESSED_REPEAT: return "pressed-repeat";
-        case LV_EVENT_CLICKED: return "ed";
-        case LV_EVENT_RELEASED: return "sed";
+        case LV_EVENT_ALL: return "alee";
+        case LV_EVENT_PRESSED: return "pressed";
+        case LV_EVENT_PRESSING: return "pressing";
+        case LV_EVENT_PRESS_LOST: return "press-lost";
+        case LV_EVENT_SHORT_CLICKED: return "short-clicked";
+        case LV_EVENT_LONG_PRESSED: return "long-pressed";
+        case LV_EVENT_LONG_PRESSED_REPEAT: return "long-pressed-repeat";
+        case LV_EVENT_CLICKED: return "clicked";
+        case LV_EVENT_RELEASED: return "released";
         case LV_EVENT_SCROLL_BEGIN: return "l-begin";
         case LV_EVENT_SCROLL_THROW_BEGIN: return "l-throw-begin";
         case LV_EVENT_SCROLL_END: return "l-end";
