@@ -155,7 +155,7 @@ namespace be {
         return jscotr ;
     }
 
-    void EventEmitter::emit(const JSValue & eventName, std::initializer_list<JSValue> args) {
+    void EventEmitter::emit(JSContext * ctx, const JSValue & eventName, std::initializer_list<JSValue> args) {
         JSValue * jsargv = new JSValue[args.size()+1] ;
         jsargv[0] = eventName ;
         int i = 0 ;
@@ -163,10 +163,7 @@ namespace be {
             jsargv[i+1] = arg ;
             ++ i ;
         }
-
         JSValue func_emit = js_get_prop(ctx, jsobj, 1, "emit") ;
-        //dvar(eventName)
-
         JSValue ret = JS_Call(ctx, func_emit, jsobj, 4, jsargv) ;
         if(JS_IsException(ret)) {
             js_std_dump_error(ctx) ;

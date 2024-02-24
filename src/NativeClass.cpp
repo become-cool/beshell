@@ -97,7 +97,7 @@ namespace be {
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
-            if(obj->jsobj==val) {
+            if( JS_VALUE_GET_PTR(obj->jsobj)==JS_VALUE_GET_PTR(val) ) {
                 obj->jsobj = JS_UNDEFINED ;
             }
             obj->self = nullptr ;

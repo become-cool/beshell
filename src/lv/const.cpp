@@ -807,184 +807,184 @@ JSValue lv_state_const_to_jsstr(JSContext *ctx, lv_state_t code) {
 
 // lv_event_code_t
 bool lv_event_code_str_to_const(const char * name, lv_event_code_t * out) {
-    if(strcmp(name,"")==0) {
+    if(strcmp(name,"all")==0) {
         (*out) = LV_EVENT_ALL ;
     }
-    else if(strcmp(name,"ed")==0) {
+    else if(strcmp(name,"pressed")==0) {
         (*out) = LV_EVENT_PRESSED ;
     }
-    else if(strcmp(name,"ing")==0) {
+    else if(strcmp(name,"pressing")==0) {
         (*out) = LV_EVENT_PRESSING ;
     }
-    else if(strcmp(name,"lost")==0) {
+    else if(strcmp(name,"press-lost")==0) {
         (*out) = LV_EVENT_PRESS_LOST ;
     }
     else if(strcmp(name,"short-clicked")==0) {
         (*out) = LV_EVENT_SHORT_CLICKED ;
     }
-    else if(strcmp(name,"pressed")==0) {
+    else if(strcmp(name,"long-pressed")==0) {
         (*out) = LV_EVENT_LONG_PRESSED ;
     }
-    else if(strcmp(name,"pressed-repeat")==0) {
+    else if(strcmp(name,"long-pressed-repeat")==0) {
         (*out) = LV_EVENT_LONG_PRESSED_REPEAT ;
     }
-    else if(strcmp(name,"ed")==0) {
+    else if(strcmp(name,"clicked")==0) {
         (*out) = LV_EVENT_CLICKED ;
     }
-    else if(strcmp(name,"sed")==0) {
+    else if(strcmp(name,"released")==0) {
         (*out) = LV_EVENT_RELEASED ;
     }
-    else if(strcmp(name,"l-begin")==0) {
+    else if(strcmp(name,"scroll-begin")==0) {
         (*out) = LV_EVENT_SCROLL_BEGIN ;
     }
-    else if(strcmp(name,"l-throw-begin")==0) {
+    else if(strcmp(name,"scroll-throw-begin")==0) {
         (*out) = LV_EVENT_SCROLL_THROW_BEGIN ;
     }
-    else if(strcmp(name,"l-end")==0) {
+    else if(strcmp(name,"scroll-end")==0) {
         (*out) = LV_EVENT_SCROLL_END ;
     }
-    else if(strcmp(name,"l")==0) {
+    else if(strcmp(name,"scroll")==0) {
         (*out) = LV_EVENT_SCROLL ;
     }
-    else if(strcmp(name,"re")==0) {
+    else if(strcmp(name,"gesture")==0) {
         (*out) = LV_EVENT_GESTURE ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"key")==0) {
         (*out) = LV_EVENT_KEY ;
     }
-    else if(strcmp(name,"ed")==0) {
+    else if(strcmp(name,"focused")==0) {
         (*out) = LV_EVENT_FOCUSED ;
     }
-    else if(strcmp(name,"used")==0) {
+    else if(strcmp(name,"defocused")==0) {
         (*out) = LV_EVENT_DEFOCUSED ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"leave")==0) {
         (*out) = LV_EVENT_LEAVE ;
     }
-    else if(strcmp(name,"est")==0) {
+    else if(strcmp(name,"hit-test")==0) {
         (*out) = LV_EVENT_HIT_TEST ;
     }
-    else if(strcmp(name,"reset")==0) {
+    else if(strcmp(name,"indev-reset")==0) {
         (*out) = LV_EVENT_INDEV_RESET ;
     }
-    else if(strcmp(name,"check")==0) {
+    else if(strcmp(name,"cover-check")==0) {
         (*out) = LV_EVENT_COVER_CHECK ;
     }
-    else if(strcmp(name,"ext-draw-size")==0) {
+    else if(strcmp(name,"refr-ext-draw-size")==0) {
         (*out) = LV_EVENT_REFR_EXT_DRAW_SIZE ;
     }
-    else if(strcmp(name,"main-begin")==0) {
+    else if(strcmp(name,"draw-main-begin")==0) {
         (*out) = LV_EVENT_DRAW_MAIN_BEGIN ;
     }
-    else if(strcmp(name,"main")==0) {
+    else if(strcmp(name,"draw-main")==0) {
         (*out) = LV_EVENT_DRAW_MAIN ;
     }
-    else if(strcmp(name,"main-end")==0) {
+    else if(strcmp(name,"draw-main-end")==0) {
         (*out) = LV_EVENT_DRAW_MAIN_END ;
     }
-    else if(strcmp(name,"post-begin")==0) {
+    else if(strcmp(name,"draw-post-begin")==0) {
         (*out) = LV_EVENT_DRAW_POST_BEGIN ;
     }
-    else if(strcmp(name,"post")==0) {
+    else if(strcmp(name,"draw-post")==0) {
         (*out) = LV_EVENT_DRAW_POST ;
     }
-    else if(strcmp(name,"post-end")==0) {
+    else if(strcmp(name,"draw-post-end")==0) {
         (*out) = LV_EVENT_DRAW_POST_END ;
     }
-    else if(strcmp(name,"task-added")==0) {
+    else if(strcmp(name,"draw-task-added")==0) {
         (*out) = LV_EVENT_DRAW_TASK_ADDED ;
     }
-    else if(strcmp(name,"changed")==0) {
+    else if(strcmp(name,"value-changed")==0) {
         (*out) = LV_EVENT_VALUE_CHANGED ;
     }
-    else if(strcmp(name,"t")==0) {
+    else if(strcmp(name,"insert")==0) {
         (*out) = LV_EVENT_INSERT ;
     }
-    else if(strcmp(name,"sh")==0) {
+    else if(strcmp(name,"refresh")==0) {
         (*out) = LV_EVENT_REFRESH ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"ready")==0) {
         (*out) = LV_EVENT_READY ;
     }
-    else if(strcmp(name,"l")==0) {
+    else if(strcmp(name,"cancel")==0) {
         (*out) = LV_EVENT_CANCEL ;
     }
-    else if(strcmp(name,"e")==0) {
+    else if(strcmp(name,"create")==0) {
         (*out) = LV_EVENT_CREATE ;
     }
-    else if(strcmp(name,"e")==0) {
+    else if(strcmp(name,"delete")==0) {
         (*out) = LV_EVENT_DELETE ;
     }
-    else if(strcmp(name,"changed")==0) {
+    else if(strcmp(name,"child-changed")==0) {
         (*out) = LV_EVENT_CHILD_CHANGED ;
     }
-    else if(strcmp(name,"created")==0) {
+    else if(strcmp(name,"child-created")==0) {
         (*out) = LV_EVENT_CHILD_CREATED ;
     }
-    else if(strcmp(name,"deleted")==0) {
+    else if(strcmp(name,"child-deleted")==0) {
         (*out) = LV_EVENT_CHILD_DELETED ;
     }
-    else if(strcmp(name,"n-unload-start")==0) {
+    else if(strcmp(name,"screen-unload-start")==0) {
         (*out) = LV_EVENT_SCREEN_UNLOAD_START ;
     }
-    else if(strcmp(name,"n-load-start")==0) {
+    else if(strcmp(name,"screen-load-start")==0) {
         (*out) = LV_EVENT_SCREEN_LOAD_START ;
     }
-    else if(strcmp(name,"n-loaded")==0) {
+    else if(strcmp(name,"screen-loaded")==0) {
         (*out) = LV_EVENT_SCREEN_LOADED ;
     }
-    else if(strcmp(name,"n-unloaded")==0) {
+    else if(strcmp(name,"screen-unloaded")==0) {
         (*out) = LV_EVENT_SCREEN_UNLOADED ;
     }
-    else if(strcmp(name,"changed")==0) {
+    else if(strcmp(name,"size-changed")==0) {
         (*out) = LV_EVENT_SIZE_CHANGED ;
     }
-    else if(strcmp(name,"changed")==0) {
+    else if(strcmp(name,"style-changed")==0) {
         (*out) = LV_EVENT_STYLE_CHANGED ;
     }
-    else if(strcmp(name,"t-changed")==0) {
+    else if(strcmp(name,"layout-changed")==0) {
         (*out) = LV_EVENT_LAYOUT_CHANGED ;
     }
-    else if(strcmp(name,"elf-size")==0) {
+    else if(strcmp(name,"get-self-size")==0) {
         (*out) = LV_EVENT_GET_SELF_SIZE ;
     }
-    else if(strcmp(name,"idate-area")==0) {
+    else if(strcmp(name,"invalidate-area")==0) {
         (*out) = LV_EVENT_INVALIDATE_AREA ;
     }
-    else if(strcmp(name,"ution-changed")==0) {
+    else if(strcmp(name,"resolution-changed")==0) {
         (*out) = LV_EVENT_RESOLUTION_CHANGED ;
     }
-    else if(strcmp(name,"format-changed")==0) {
+    else if(strcmp(name,"color-format-changed")==0) {
         (*out) = LV_EVENT_COLOR_FORMAT_CHANGED ;
     }
-    else if(strcmp(name,"request")==0) {
+    else if(strcmp(name,"refr-request")==0) {
         (*out) = LV_EVENT_REFR_REQUEST ;
     }
-    else if(strcmp(name,"start")==0) {
+    else if(strcmp(name,"refr-start")==0) {
         (*out) = LV_EVENT_REFR_START ;
     }
-    else if(strcmp(name,"ready")==0) {
+    else if(strcmp(name,"refr-ready")==0) {
         (*out) = LV_EVENT_REFR_READY ;
     }
-    else if(strcmp(name,"r-start")==0) {
+    else if(strcmp(name,"render-start")==0) {
         (*out) = LV_EVENT_RENDER_START ;
     }
-    else if(strcmp(name,"r-ready")==0) {
+    else if(strcmp(name,"render-ready")==0) {
         (*out) = LV_EVENT_RENDER_READY ;
     }
-    else if(strcmp(name,"start")==0) {
+    else if(strcmp(name,"flush-start")==0) {
         (*out) = LV_EVENT_FLUSH_START ;
     }
-    else if(strcmp(name,"finish")==0) {
+    else if(strcmp(name,"flush-finish")==0) {
         (*out) = LV_EVENT_FLUSH_FINISH ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"vsync")==0) {
         (*out) = LV_EVENT_VSYNC ;
     }
-    else if(strcmp(name,"")==0) {
+    else if(strcmp(name,"last")==0) {
         (*out) = _LV_EVENT_LAST ;
     }
-    else if(strcmp(name,"ocess")==0) {
+    else if(strcmp(name,"preprocess")==0) {
         (*out) = LV_EVENT_PREPROCESS ;
     }
 
@@ -1002,7 +1002,7 @@ bool lv_event_code_jsstr_to_const(JSContext *ctx, JSValue jsstr, lv_event_code_t
 const char * lv_event_code_const_to_str(lv_event_code_t code) {
 
     switch(code) {
-        case LV_EVENT_ALL: return "alee";
+        case LV_EVENT_ALL: return "all";
         case LV_EVENT_PRESSED: return "pressed";
         case LV_EVENT_PRESSING: return "pressing";
         case LV_EVENT_PRESS_LOST: return "press-lost";
@@ -1011,57 +1011,57 @@ const char * lv_event_code_const_to_str(lv_event_code_t code) {
         case LV_EVENT_LONG_PRESSED_REPEAT: return "long-pressed-repeat";
         case LV_EVENT_CLICKED: return "clicked";
         case LV_EVENT_RELEASED: return "released";
-        case LV_EVENT_SCROLL_BEGIN: return "l-begin";
-        case LV_EVENT_SCROLL_THROW_BEGIN: return "l-throw-begin";
-        case LV_EVENT_SCROLL_END: return "l-end";
-        case LV_EVENT_SCROLL: return "l";
-        case LV_EVENT_GESTURE: return "re";
-        case LV_EVENT_KEY: return "";
-        case LV_EVENT_FOCUSED: return "ed";
-        case LV_EVENT_DEFOCUSED: return "used";
-        case LV_EVENT_LEAVE: return "";
-        case LV_EVENT_HIT_TEST: return "est";
-        case LV_EVENT_INDEV_RESET: return "reset";
-        case LV_EVENT_COVER_CHECK: return "check";
-        case LV_EVENT_REFR_EXT_DRAW_SIZE: return "ext-draw-size";
-        case LV_EVENT_DRAW_MAIN_BEGIN: return "main-begin";
-        case LV_EVENT_DRAW_MAIN: return "main";
-        case LV_EVENT_DRAW_MAIN_END: return "main-end";
-        case LV_EVENT_DRAW_POST_BEGIN: return "post-begin";
-        case LV_EVENT_DRAW_POST: return "post";
-        case LV_EVENT_DRAW_POST_END: return "post-end";
-        case LV_EVENT_DRAW_TASK_ADDED: return "task-added";
-        case LV_EVENT_VALUE_CHANGED: return "changed";
-        case LV_EVENT_INSERT: return "t";
-        case LV_EVENT_REFRESH: return "sh";
-        case LV_EVENT_READY: return "";
-        case LV_EVENT_CANCEL: return "l";
-        case LV_EVENT_CREATE: return "e";
-        case LV_EVENT_DELETE: return "e";
-        case LV_EVENT_CHILD_CHANGED: return "changed";
-        case LV_EVENT_CHILD_CREATED: return "created";
-        case LV_EVENT_CHILD_DELETED: return "deleted";
-        case LV_EVENT_SCREEN_UNLOAD_START: return "n-unload-start";
-        case LV_EVENT_SCREEN_LOAD_START: return "n-load-start";
-        case LV_EVENT_SCREEN_LOADED: return "n-loaded";
-        case LV_EVENT_SCREEN_UNLOADED: return "n-unloaded";
-        case LV_EVENT_SIZE_CHANGED: return "changed";
-        case LV_EVENT_STYLE_CHANGED: return "changed";
-        case LV_EVENT_LAYOUT_CHANGED: return "t-changed";
-        case LV_EVENT_GET_SELF_SIZE: return "elf-size";
-        case LV_EVENT_INVALIDATE_AREA: return "idate-area";
-        case LV_EVENT_RESOLUTION_CHANGED: return "ution-changed";
-        case LV_EVENT_COLOR_FORMAT_CHANGED: return "format-changed";
-        case LV_EVENT_REFR_REQUEST: return "request";
-        case LV_EVENT_REFR_START: return "start";
-        case LV_EVENT_REFR_READY: return "ready";
-        case LV_EVENT_RENDER_START: return "r-start";
-        case LV_EVENT_RENDER_READY: return "r-ready";
-        case LV_EVENT_FLUSH_START: return "start";
-        case LV_EVENT_FLUSH_FINISH: return "finish";
-        case LV_EVENT_VSYNC: return "";
-        case _LV_EVENT_LAST: return "";
-        case LV_EVENT_PREPROCESS: return "ocess";
+        case LV_EVENT_SCROLL_BEGIN: return "scroll-begin";
+        case LV_EVENT_SCROLL_THROW_BEGIN: return "scroll-throw-begin";
+        case LV_EVENT_SCROLL_END: return "scroll-end";
+        case LV_EVENT_SCROLL: return "scroll";
+        case LV_EVENT_GESTURE: return "gesture";
+        case LV_EVENT_KEY: return "key";
+        case LV_EVENT_FOCUSED: return "focused";
+        case LV_EVENT_DEFOCUSED: return "defocused";
+        case LV_EVENT_LEAVE: return "leave";
+        case LV_EVENT_HIT_TEST: return "hit-test";
+        case LV_EVENT_INDEV_RESET: return "indev-reset";
+        case LV_EVENT_COVER_CHECK: return "cover-check";
+        case LV_EVENT_REFR_EXT_DRAW_SIZE: return "refr-ext-draw-size";
+        case LV_EVENT_DRAW_MAIN_BEGIN: return "draw-main-begin";
+        case LV_EVENT_DRAW_MAIN: return "draw-main";
+        case LV_EVENT_DRAW_MAIN_END: return "draw-main-end";
+        case LV_EVENT_DRAW_POST_BEGIN: return "draw-post-begin";
+        case LV_EVENT_DRAW_POST: return "draw-post";
+        case LV_EVENT_DRAW_POST_END: return "draw-post-end";
+        case LV_EVENT_DRAW_TASK_ADDED: return "draw-task-added";
+        case LV_EVENT_VALUE_CHANGED: return "value-changed";
+        case LV_EVENT_INSERT: return "insert";
+        case LV_EVENT_REFRESH: return "refresh";
+        case LV_EVENT_READY: return "ready";
+        case LV_EVENT_CANCEL: return "cancel";
+        case LV_EVENT_CREATE: return "create";
+        case LV_EVENT_DELETE: return "delete";
+        case LV_EVENT_CHILD_CHANGED: return "child-changed";
+        case LV_EVENT_CHILD_CREATED: return "child-created";
+        case LV_EVENT_CHILD_DELETED: return "child-deleted";
+        case LV_EVENT_SCREEN_UNLOAD_START: return "screen-unload-start";
+        case LV_EVENT_SCREEN_LOAD_START: return "screen-load-start";
+        case LV_EVENT_SCREEN_LOADED: return "screen-loaded";
+        case LV_EVENT_SCREEN_UNLOADED: return "screen-unloaded";
+        case LV_EVENT_SIZE_CHANGED: return "size-changed";
+        case LV_EVENT_STYLE_CHANGED: return "style-changed";
+        case LV_EVENT_LAYOUT_CHANGED: return "layout-changed";
+        case LV_EVENT_GET_SELF_SIZE: return "get-self-size";
+        case LV_EVENT_INVALIDATE_AREA: return "invalidate-area";
+        case LV_EVENT_RESOLUTION_CHANGED: return "resolution-changed";
+        case LV_EVENT_COLOR_FORMAT_CHANGED: return "color-format-changed";
+        case LV_EVENT_REFR_REQUEST: return "refr-request";
+        case LV_EVENT_REFR_START: return "refr-start";
+        case LV_EVENT_REFR_READY: return "refr-ready";
+        case LV_EVENT_RENDER_START: return "render-start";
+        case LV_EVENT_RENDER_READY: return "render-ready";
+        case LV_EVENT_FLUSH_START: return "flush-start";
+        case LV_EVENT_FLUSH_FINISH: return "flush-finish";
+        case LV_EVENT_VSYNC: return "vsync";
+        case _LV_EVENT_LAST: return "last";
+        case LV_EVENT_PREPROCESS: return "preprocess";
 
         default:
             return "unknow";
