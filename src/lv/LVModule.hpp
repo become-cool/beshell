@@ -21,6 +21,7 @@ namespace lv {
         static JSValue pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 

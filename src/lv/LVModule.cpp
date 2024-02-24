@@ -16,6 +16,7 @@ namespace be::lv {
         exportFunction("pct",pct,0) ;
         exportFunction("registerDisplay",registerDisplay,0) ;
         exportFunction("registerInputDevice",registerInputDevice,0) ;
+        exportFunction("loadFont",loadFont,2) ;
         exportFunction("test",test,0) ;
 
         exportClass<Style>() ;
