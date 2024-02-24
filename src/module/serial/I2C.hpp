@@ -42,6 +42,7 @@ namespace be {
         inline void take() ;
         inline void give() ;
         bool ping(uint8_t addr) ;
+        void scan(uint8_t from=0, uint8_t to=127) ;
         bool send(uint8_t addr, uint8_t * data, size_t data_len) ;
 
         template <typename TR, typename TV>
@@ -83,6 +84,7 @@ namespace be {
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

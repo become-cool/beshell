@@ -13,6 +13,7 @@ namespace be {
     std::vector<JSCFunctionListEntry> I2C::methods = {
         JS_CFUNC_DEF("setup", 1, I2C::setup),
         JS_CFUNC_DEF("ping", 1, I2C::ping),
+        JS_CFUNC_DEF("scan", 1, I2C::scan),
         JS_CFUNC_DEF("send", 2, I2C::send),
         JS_CFUNC_DEF("write8", 2, I2C::write8),
         JS_CFUNC_DEF("write16", 2, I2C::write16),
@@ -74,8 +75,6 @@ namespace be {
         ARGV_TO_UINT32_OPT(2, freq, 400000) ;
         ARGV_TO_UINT32_OPT(3, timeout, 1000) ;
 
-        dn4(sda,scl,freq,timeout)
-
         i2c_config_t i2c_config = {
             .mode = I2C_MODE_MASTER,
             .sda_io_num = sda,
@@ -105,6 +104,15 @@ namespace be {
         I2C_COMMIT(busnum)
         return res==ESP_OK;
     }
+
+    void I2C::scan(uint8_t from, uint8_t to) {
+        for(uint8_t addr=from; addr<=to; addr++) {
+            if( ping(addr) ){
+                printf("found device: 0x%02x\n", addr) ;
+            }
+        }
+    }
+
     bool I2C::send(uint8_t addr, uint8_t * data, size_t data_len) {
         I2C_BEGIN_WRITE(addr)
         if(data_len>0 && data) {
@@ -119,6 +127,14 @@ namespace be {
         THIS_NCLASS(I2C, thisobj)
         ARGV_TO_UINT8(0, addr)
         return thisobj->ping(addr)? JS_TRUE: JS_FALSE ;
+    }
+    
+    JSValue I2C::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2C, thisobj)
+        ARGV_TO_UINT8_OPT(0, from, 0)
+        ARGV_TO_UINT8_OPT(1, to, 127)
+        thisobj->scan(from,to) ;
+        return JS_UNDEFINED ;
     }
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(2)
