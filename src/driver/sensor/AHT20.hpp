@@ -1,8 +1,10 @@
 #pragma once
 
+#include "driver/DriverModule.hpp"
 #include <NativeClass.hpp>
+#include "module/serial/I2C.hpp"
 
-namespace be{
+namespace be::driver {
     class AHT20: public be::NativeClass {
         DECLARE_NCLASS_META
     private:

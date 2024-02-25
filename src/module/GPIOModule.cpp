@@ -1,4 +1,5 @@
 #include "GPIOModule.hpp"
+#include "driver/gpio.h"
 
 using namespace std ;
 
@@ -29,7 +30,7 @@ namespace be {
         CHECK_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_UINT8(1, value)
-        gpio_set_level(pin, value);
+        gpio_set_level((gpio_num_t)pin, value);
         return JS_UNDEFINED ;
     }
     JSValue GPIOModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

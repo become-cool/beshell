@@ -2,8 +2,9 @@
 #include <iostream>
 
 using namespace std ;
+using namespace be ;
 
-namespace be{
+namespace be::driver {
     DEFINE_NCLASS_META(AHT20, NativeClass)
     std::vector<JSCFunctionListEntry> AHT20::methods = {
         JS_CFUNC_DEF("method", 0, AHT20::jsMethod),
@@ -26,7 +27,7 @@ namespace be{
 
     
     void AHT20::provider(DriverModule * dm) {
-        dm->exportClass<BMP280>() ;
+        dm->exportClass<AHT20>() ;
     }
     void AHT20::use() {
         DriverModule::providers.push_back(provider) ;
