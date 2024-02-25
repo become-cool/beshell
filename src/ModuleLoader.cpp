@@ -1,4 +1,5 @@
 #include "ModuleLoader.hpp"
+#include "module/GPIOModule.hpp"
 #include "module/ProcessModule.hpp"
 #include "module/PathModule.hpp"
 #include "driver/DriverModule.hpp"
@@ -80,6 +81,10 @@ namespace be {
         add<JSLoader>("loader") ;
         add<ProcessModule>("process") ;
         add<driver::DriverModule>("driver") ;
+#ifdef ESP_PLATFORM 
+        dd
+        add<GPIOModule>("gpio") ;
+#endif
     }
     
     ModuleLoader::~ModuleLoader() {
