@@ -75,7 +75,6 @@ namespace be::driver::display {
         if(opa) {
             ((Display*)(opa->display.get()))->drawRect(area->x1,area->y1,area->x2,area->y2, (color_t*)color_p) ;
         }
-        // dn4(area->x1,area->y1,area->x2,area->y2)
         lv_display_flush_ready(lvdisp);
     }
 

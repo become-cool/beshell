@@ -79,7 +79,7 @@ namespace be {
         
         template <typename TR, typename TV>
         bool read(uint8_t addr, TR reg, TV & out) {
-            return read<TR>(addr,reg,&out,sizeof(TV)) ;
+            return read<TR>(addr,reg,(uint8_t *)&out,sizeof(TV)) ;
         }
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

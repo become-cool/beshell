@@ -136,6 +136,7 @@ namespace be {
         thisobj->scan(from,to) ;
         return JS_UNDEFINED ;
     }
+    
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(2)
         THIS_NCLASS(I2C, thisobj)

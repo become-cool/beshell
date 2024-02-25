@@ -123,7 +123,7 @@ extern "C" {
     const char * var = JS_ToCStringLen(ctx, &len, argv[i]) ;
 #define ARGV_TO_STRING_LEN_E(i, var, len, msg)              \
     if(!JS_IsString(argv[i])) {                             \
-        JSTHROW(msg)                                \
+        JSTHROW(msg)                                        \
     }                                                       \
     ARGV_TO_STRING_LEN(i, var, len)
 
@@ -137,18 +137,18 @@ extern "C" {
     }
 
 
-#define ARGV_TO_CSTRING(i, var)                              \
+#define ARGV_TO_CSTRING(i, var)                             \
     const char * var = JS_ToCString(ctx, argv[i]) ;
 
-#define ARGV_AS_CSTRING_E(i, var, msg)                       \
+#define ARGV_AS_CSTRING_E(i, var, msg)                      \
     var = NULL ;                                            \
     if(!JS_IsString(argv[i])) {                             \
-        JSTHROW(msg)                                \
+        JSTHROW(msg)                                        \
     }                                                       \
     var = JS_ToCString(ctx, argv[i]) ;
 #define ARGV_TO_CSTRING_E(i, var, msg)  const char * ARGV_AS_STRING_E(i, var, msg)
 
-#define ARGV_AS_CSTRING_C(i, var, err_code)                  \
+#define ARGV_AS_CSTRING_C(i, var, err_code)                 \
     var = NULL ;                                            \
     if(!JS_IsString(argv[i])) {                             \
         err_code                                            \
@@ -160,7 +160,7 @@ extern "C" {
     size_t varlen = 0;                                                              \
     uint8_t * var = (uint8_t *)JS_GetArrayBuffer(ctx, &varlen, argv[i]) ;           \
     if(!var) {                                                                      \
-        JSTHROW("argv is not a ArrayBuffer")                                \
+        JSTHROW("argv is not a ArrayBuffer")                                        \
     }
 
 
