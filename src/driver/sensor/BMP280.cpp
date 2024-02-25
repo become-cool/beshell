@@ -24,16 +24,16 @@ namespace be::driver {
         return obj->jsobj ;
     }
     
-        #define READ_REG(reg, var, vartype, initvalue, errorcode)   \
-            var = initvalue ;                                       \
-            if(i2c->read<uint8_t,vartype>(addr, reg, var)) {        \
-                return errorcode ;                                  \
-            }
-        #define READ_CAL(reg, var)                                  \
-            var = 0 ;                                               \
-            if(!i2c->read<uint8_t,uint16_t>(addr, reg, var)) {      \
-                return -7 ;                                         \
-            }
+    #define READ_REG(reg, var, vartype, initvalue, errorcode)   \
+        var = initvalue ;                                       \
+        if(i2c->read<uint8_t,vartype>(addr, reg, var)) {        \
+            return errorcode ;                                  \
+        }
+    #define READ_CAL(reg, var)                                  \
+        var = 0 ;                                               \
+        if(!i2c->read<uint8_t,uint16_t>(addr, reg, var)) {      \
+            return -7 ;                                         \
+        }
 
     int BMP280::begin(I2C * _i2c, uint8_t _addr) {
         if(!_i2c) {

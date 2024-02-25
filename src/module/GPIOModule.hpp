@@ -1,13 +1,32 @@
 #pragma once
+
+#include "BeShell.hpp"
 #include "NativeModule.hpp"
 
 namespace be {
-    class GPIOModule: public NativeModule {
-    private:
+
+
+    class GPIOModule: public be::NativeModule {
     public:
-        using NativeModule::NativeModule;
-        static NativeModule* factory(JSContext * ctx, const char * name) ;
-        
-        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        GPIOModule(JSContext * ctx, const char * name) ;
+
+        // void import(JSContext *ctx) ;
+
+        inline static void use(be::BeShell & beshell) {
+            beshell.addModule<GPIOModule>("gpio") ;
+        }
+
+        static JSValue mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
+
+
