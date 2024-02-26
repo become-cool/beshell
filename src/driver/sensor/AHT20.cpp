@@ -105,6 +105,6 @@ namespace be::driver {
     }
 
     JSValue AHT20:: readTemperatureHumidity(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-
+        return JS_UNDEFINED ;
     }
 }
