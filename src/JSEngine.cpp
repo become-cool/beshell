@@ -28,6 +28,16 @@ namespace be {
         }
         return JS_NewStringLen(ctx, buff, size) ;
     }
+    static JSValue js_ArrayBuffer_toArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {        size_t size ;
+        char * buff = (char *)JS_GetArrayBuffer(ctx, &size, this_val) ;
+        JSValue array = JS_NewArray(ctx) ;
+        if(buff) {
+            for(int i=0;i<size;i++) {
+                JS_SetPropertyUint32(ctx, array, i, JS_NewUint32(ctx, buff[i])) ;
+            }
+        }
+        return array ;
+    }
 
 
     JSEngine::JSEngine(BeShell * _beshell)
@@ -102,9 +112,9 @@ namespace be {
         // eval_rc_script(ctx, "/lib/base/require.js") ;
 
         
-        // ArrayBuffer.prototype.asString()
         JSValue ArrayBufferProto = js_get_prop(ctx, global, 2, "ArrayBuffer", "prototype") ;
         JS_SetPropertyStr(ctx, ArrayBufferProto, "asString", JS_NewCFunction(ctx, js_ArrayBuffer_asString, "asString", 0));
+        JS_SetPropertyStr(ctx, ArrayBufferProto, "toArray", JS_NewCFunction(ctx, js_ArrayBuffer_toArray, "toArray", 0));
 	    JS_FreeValue(ctx, ArrayBufferProto);
 
 

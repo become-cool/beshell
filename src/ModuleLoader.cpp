@@ -81,8 +81,7 @@ namespace be {
         add<JSLoader>("loader") ;
         add<ProcessModule>("process") ;
         add<driver::DriverModule>("driver") ;
-#ifdef ESP_PLATFORM 
-        dd
+#ifdef ESP_PLATFORM
         add<GPIOModule>("gpio") ;
 #endif
     }

@@ -170,10 +170,10 @@ namespace be {
     }
     
     bool I2C::recv(uint8_t addr, uint8_t * buff, size_t buffsize) {
-        I2C_BEGIN_READ(addr)        
+        I2C_BEGIN_READ(addr)
         i2c_master_read(cmd, buff, buffsize, I2C_MASTER_LAST_NACK) ;
         I2C_COMMIT(busnum)
-        return ESP_OK!=res ;
+        return ESP_OK==res ;
     }
 
     #define I2C_WRITE(type, ARGV_CONVERT)   \
