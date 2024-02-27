@@ -16,6 +16,7 @@ namespace be::driver {
     std::vector<JSCFunctionListEntry> AHT20::methods = {
             JS_CFUNC_DEF("begin", 0, AHT20::begin),
             JS_CFUNC_DEF("read", 0, AHT20::read),
+            JS_CFUNC_DEF("measure", 0, AHT20::measure),
     };
 
     AHT20::AHT20(JSContext *ctx, JSValue _jsobj)
@@ -36,12 +37,12 @@ namespace be::driver {
         return 0 ;
     }
 
-    bool AHT20::triggerMeasurement() {
+    bool AHT20::measure() {
         if(!i2c || !addr) {
             return false ;
         }
-        uint8_t buf[] = {0x33, 0x00};
-        return i2c->write<u_int8_t, u_int8_t *>(addr, 0xAC, buf);
+        uint8_t buf[] = {0xAC, 0x33, 0x00};
+        return i2c->send(addr, buf, sizeof(buf));
     }
 
     int AHT20::read(float *humidity,float *temperature) {
@@ -51,8 +52,9 @@ namespace be::driver {
         
         uint8_t data[7];
         if (!i2c->recv(addr, data,7 )) {
-            return -2;
+            return -2 ;
         }
+        
         if (!(data[0] & BIT(AT581X_STATUS_Calibration_Enable)) ||
             !(data[0] & BIT(AT581X_STATUS_CRC_FLAG)) ||
             ((data[0] & BIT(AT581X_STATUS_BUSY_INDICATION)) != 0))
@@ -61,6 +63,7 @@ namespace be::driver {
         }
         
         // if (aht20_calc_crc(data, 6) != buf[6]) {
+        //  return -4 ;
         // }
 
         uint32_t rh = ( ((uint32_t)data[1] << 16) | ((uint32_t)data[2] << 8) | (data[3]) ) >> 4 ;
@@ -106,8 +109,13 @@ namespace be::driver {
         }
         return JS_UNDEFINED ;
     }
+    
+    JSValue AHT20::measure(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(AHT20, thisobj)
+        return thisobj->measure()? JS_TRUE: JS_FALSE ;
+    }
 
-    JSValue AHT20:: read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue AHT20::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         THIS_NCLASS(AHT20, thisobj)
         float temperature, humidity ;
         int ret = thisobj->read(&temperature,&humidity) ;

@@ -17,12 +17,13 @@ namespace be::driver {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         int begin(be::I2C *, uint8_t addr) ;
-        bool triggerMeasurement() ;
+        bool measure() ;
         int read(float *humidity,float *temperature);
         static uint8_t aht20_calc_crc(uint8_t *data, uint8_t len);
 
         static JSValue begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue measure(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static void provider(DriverModule * dm) ;
         static void use();
