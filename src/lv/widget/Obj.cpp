@@ -302,15 +302,28 @@ namespace be::lv {
         : Obj(ctx, JS_NULL, lv_obj_create(parent))
     {}
 
-    JSValue Obj::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Obj::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         if(!lv_display_get_default()) {
             JSTHROW("not create display")
         }
+
+        JSValue obj = JS_NULL ;
+
+        // 派生子类
+        JSValue proto = JS_GetPropertyStr(ctx,ctor,"prototype") ;
+        JS_FreeValue(ctx,proto) ;
+
+        JSClassID classId = 0 ;
+        if(!JS_GetClassIDFromProto(ctx,proto,&classId)){
+            obj = JS_NewObject(ctx) ;
+            JS_SetPropertyStr(ctx,obj,"__proto__",JS_DupValue(ctx,proto)) ;
+        }
+
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Obj * widget = new Obj(ctx,lvparent) ;
+        Obj * widget = new Obj(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 
