@@ -37,8 +37,5 @@ namespace be::driver {
         static JSValue setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getPinMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setPinMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
-        static void provider(DriverModule * dm) ;
-        static void use();
     } ;
 }

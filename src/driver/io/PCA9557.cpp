@@ -80,7 +80,7 @@ namespace be::driver {
         }
         return i2c->read<uint8_t,uint8_t>(addr, 3, regVal_Mode) ;
     }
-    
+
     bool PCA9557::setMode(uint8_t mode) {
         if(!i2c || !addr) {
             return false ;
@@ -150,14 +150,5 @@ namespace be::driver {
     }
     JSValue PCA9557::setPinMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
-    }
-
-    
-
-    void PCA9557::provider(DriverModule *dm) {
-        dm->exportClass<PCA9557>();
-    }
-    void PCA9557::use() {
-        DriverModule::providers.push_back(provider);
     }
 }
