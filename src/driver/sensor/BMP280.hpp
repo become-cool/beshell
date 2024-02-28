@@ -1,13 +1,11 @@
 #pragma once
 
-#include "driver/DriverModule.hpp"
-#include <NativeClass.hpp>
-#include "module/serial/I2C.hpp"
+#include "driver/I2CDevice.hpp"
 
 namespace be::driver {
 
-    class BMP280: public be::NativeClass {
-        DECLARE_NCLASS_META
+    class BMP280: public I2CDevice {
+    DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
 
@@ -36,13 +34,9 @@ namespace be::driver {
         int readTemperature(double & value) ;
         int readPressure(double & value) ;
 
-        static JSValue begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readPressure(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readAltitude(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
-        static void provider(DriverModule * dm) ;
-        static void use() ;
     } ;
 
 }

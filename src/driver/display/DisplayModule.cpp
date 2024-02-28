@@ -60,4 +60,8 @@ namespace be::driver::display {
     JSValue DisplayModule::jsToRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
+
+    void use(be::BeShell & beshell) {
+        beshell.addModule<DisplayModule>("driver/display") ;
+    }
 }

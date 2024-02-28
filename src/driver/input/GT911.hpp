@@ -28,8 +28,5 @@ namespace be::driver {
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pid(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
-        static void provider(DriverModule * dm) ;
-        static void use() ;
     } ;
 }

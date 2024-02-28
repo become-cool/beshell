@@ -11,30 +11,21 @@ using namespace std;
 using namespace be;
 
 namespace be::driver {
-    DEFINE_NCLASS_META(AHT20, NativeClass)
+    DEFINE_NCLASS_META(AHT20, I2CDevice)
 
     std::vector<JSCFunctionListEntry> AHT20::methods = {
-            JS_CFUNC_DEF("begin", 0, AHT20::begin),
+            JS_CFUNC_DEF("begin", 0, I2CDevice::begin),
             JS_CFUNC_DEF("read", 0, AHT20::read),
             JS_CFUNC_DEF("measure", 0, AHT20::measure),
     };
 
     AHT20::AHT20(JSContext *ctx, JSValue _jsobj)
-            : NativeClass(ctx, build(ctx, _jsobj)) {
+            : I2CDevice(ctx, build(ctx, _jsobj)) {
     }
 
     JSValue AHT20::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new AHT20(ctx);
         return obj->jsobj;
-    }
-    
-    int AHT20::begin(I2C * _i2c, uint8_t _addr) {
-        if(!_i2c) {
-            return -1 ;
-        }
-        i2c = _i2c ;
-        addr = _addr ;
-        return 0 ;
     }
 
     bool AHT20::measure() {
@@ -94,22 +85,6 @@ namespace be::driver {
         return crc;
     }
     
-    JSValue AHT20::begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(AHT20, thisobj)
-        CHECK_ARGC(1)
-        ARGV_TO_UINT8(0, busnum)
-        ARGV_TO_UINT8_OPT(1, addr, 0x38)
-        I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;
-        if(!i2c) {
-            JSTHROW("invalid i2c port number:%d", busnum)
-        }
-        int ret = thisobj->begin(i2c, addr) ;
-        if( ret!=0 ){
-            JSTHROW("%s.%s() failed, error: %d", "AHT20", "begin", ret)
-        }
-        return JS_UNDEFINED ;
-    }
-    
     JSValue AHT20::measure(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(AHT20, thisobj)
         return thisobj->measure()? JS_TRUE: JS_FALSE ;
@@ -126,13 +101,5 @@ namespace be::driver {
         JS_SetPropertyUint32(ctx,value,0,JS_NewFloat64(ctx,temperature));
         JS_SetPropertyUint32(ctx,value,1,JS_NewFloat64(ctx,humidity));
         return value ;
-    }
-    
-
-    void AHT20::provider(DriverModule *dm) {
-        dm->exportClass<AHT20>();
-    }
-    void AHT20::use() {
-        DriverModule::providers.push_back(provider);
     }
 }
