@@ -6,16 +6,16 @@ using namespace be ;
 namespace be::driver {
 
 
-    DEFINE_NCLASS_META(BMP280, NativeClass)
+    DEFINE_NCLASS_META(BMP280, I2CDevice)
     std::vector<JSCFunctionListEntry> BMP280::methods = {
-        JS_CFUNC_DEF("begin", 0, BMP280::begin),
+        JS_CFUNC_DEF("begin", 0, I2CDevice::begin),
         JS_CFUNC_DEF("readTemperature", 0, BMP280::readTemperature),
         JS_CFUNC_DEF("readPressure", 0, BMP280::readPressure),
         JS_CFUNC_DEF("readAltitude", 0, BMP280::readAltitude),
     } ;
 
     BMP280::BMP280(JSContext * ctx, JSValue _jsobj)
-        : NativeClass(ctx,build(ctx,_jsobj))
+        : I2CDevice(ctx,build(ctx,_jsobj))
     {}
 
     JSValue BMP280::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -36,33 +36,32 @@ namespace be::driver {
         }
 
     int BMP280::begin(I2C * _i2c, uint8_t _addr) {
-        if(!_i2c) {
-            return -1 ;
+        int ret = I2CDevice::begin(_i2c,_addr) ;
+        if( ret<0 ) {
+            return ret ;
         }
-        i2c = _i2c ;
-        addr = _addr ;
 
         uint8_t id = 0 ;
         if( !i2c->read<uint8_t,uint8_t>(addr, 0xd0, id) ){
-            return -2 ;
+            return -12 ;
         }
         if( id!=0x58 ) {
-            return -3 ;
+            return -13 ;
         }
 
         // clear all status
         if( !i2c->write(addr, 0xe0, 0xb6) ){
-            return -4 ;
+            return -14 ;
         }
 
         // Normal Mode(20Bit)
         if( !i2c->write<uint8_t,uint8_t>(addr, 0xf4, 0xff) ){
-            return -5 ;
+            return -15 ;
         }
 
         // Filter (0.5ms)
         if( !i2c->write<uint8_t,uint8_t>(addr, 0xf5, 0x00) ){
-            return -6 ;
+            return -16 ;
         }
 
         READ_CAL(0x88, dig_T1)
@@ -144,21 +143,6 @@ namespace be::driver {
         return 0 ;
     }
 
-    JSValue BMP280::begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(BMP280, thisobj)
-        CHECK_ARGC(1)
-        ARGV_TO_UINT8(0, busnum)
-        ARGV_TO_UINT8_OPT(1, addr, 0x76)
-        I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;
-        if(!i2c) {
-            JSTHROW("invalid i2c port number:%d", busnum)
-        }
-        int ret = thisobj->begin(i2c, addr) ;
-        if( ret!=0 ){
-            JSTHROW("%s.%s() failed, error: %d", "BMP280", "begin", ret)
-        }
-        return JS_UNDEFINED ;
-    }
     JSValue BMP280::readTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(BMP280, thisobj)
         double tmp = 0 ;
@@ -220,12 +204,4 @@ namespace be::driver {
     //   }
     //   return 0;
     // }
-
-    
-    void BMP280::provider(DriverModule * dm) {
-        dm->exportClass<BMP280>() ;
-    }
-    void BMP280::use() {
-        DriverModule::providers.push_back(provider) ;
-    }
 }

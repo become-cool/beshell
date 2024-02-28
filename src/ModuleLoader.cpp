@@ -139,7 +139,9 @@ namespace be {
 
         assert(fs) ;
 
-        std::string fullpath = base_dir ;
+        dp(base_dir)
+
+        std::string fullpath = base_dir? base_dir: "" ;
         fullpath+= "/" ;
         fullpath+= module_name ;
 

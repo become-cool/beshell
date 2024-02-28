@@ -115,11 +115,4 @@ namespace be::driver {
         thisobj->reset() ;
         return JS_UNDEFINED ;
     }
-
-    void GT911::provider(DriverModule * dm) {
-        dm->exportClass<GT911>() ;
-    }
-    void GT911::use() {
-        DriverModule::providers.push_back(provider) ;
-    }
 }

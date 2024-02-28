@@ -15,9 +15,7 @@ namespace be::driver::display {
         static JSValue jsToRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
-    inline void use(be::BeShell & beshell) {
-        beshell.addModule<DisplayModule>("driver/display") ;
-    }
+    void use(be::BeShell & beshell) ;
 
     uint16_t fromRGB(uint8_t r,uint8_t g,uint8_t b) ;
     uint16_t fromRGB565(uint8_t r,uint8_t g,uint8_t b) ;
