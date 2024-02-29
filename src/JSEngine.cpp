@@ -220,7 +220,8 @@ namespace be {
 
         JSValue ret = JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
         if( JS_IsException(ret) ){
-            dumpError() ;
+            string str = getExceptionStr() ;
+            cout << str << endl ;
         }
         return ret ;
     }
