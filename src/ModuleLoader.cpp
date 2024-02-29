@@ -160,9 +160,19 @@ namespace be {
             }
         }
         
-        fullpath = fullpath+= ".bin" ;
-        if(fs->isFile(fullpath.c_str())) {
-            return fullpath ;
+        std::string trypath = fullpath + ".js" ;
+        if(fs->isFile(trypath.c_str())) {
+            return trypath ;
+        }
+
+        trypath = fullpath + ".bin" ;
+        if(fs->isFile(trypath.c_str())) {
+            return trypath ;
+        }
+        
+        trypath = trypath + ".js.bin" ;
+        if(fs->isFile(trypath.c_str())) {
+            return trypath ;
         }
 
         return std::string("") ;
