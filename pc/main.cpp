@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     path_dirname(argv[0],dirname) ;
 
     string scriptpath(dirname) ;
-    scriptpath+= "/../../pc/esptool-js/index.js" ;
+    scriptpath+= "/../demo.js" ;
     cout << scriptpath ;
 
     // if(argc>1) {

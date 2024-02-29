@@ -1,8 +1,10 @@
-import * as demo from "demo"
+import * as demo from "demox"
 
-global.demo = demo
+console.log("xxxxxxxxxxxx")
 
-import CCC from "./demo2.js"
-import {__dirname,__filename} from "loader"
+// global.demo = demo
 
-console.log(__dirname())
+// import CCC from "./demo2.js"
+// import {__dirname,__filename} from "loader"
+
+// console.log(__dirname())

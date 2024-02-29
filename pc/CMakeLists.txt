@@ -30,50 +30,51 @@ SET(CMAKE_C_FLAGS_DEBUG "-O0")
 
 set(SRC_LIST
 
-        ..//src/BeShell.cpp
-        ..//src/JSTimer.cpp
-        ..//src/JSEngine.cpp
-        ..//src/repl/REPL.cpp
-        ..//src/path.cpp
-        ..//src/string_utils.cpp
-        ..//src/qjs_utils.c
-        ..//src/mallocf.c
+        ../src/BeShell.cpp
+        ../src/JSTimer.cpp
+        ../src/JSEngine.cpp
+        ../src/repl/REPL.cpp
+        ../src/path.cpp
+        ../src/string_utils.cpp
+        ../src/qjs_utils.c
+        ../src/mallocf.c
 
-        ..//src/NativeClass.cpp
-        ..//src/NativeModule.cpp
-        ..//src/ModuleLoader.cpp
+        ../src/NativeClass.cpp
+        ../src/EventEmitter.cpp
+        ../src/NativeModule.cpp
+        ../src/ModuleLoader.cpp
 
-        ..//src/module/PathModule.cpp
-        ..//src/module/ProcessModule.cpp
-        ..//src/module/NVSModule.cpp
+        ../src/module/PathModule.cpp
+        ../src/module/ProcessModule.cpp
+        ../src/module/NVSModule.cpp
 
-        ..//src/basic/Console.cpp
-        # ..//src/driver/display/DisplayModule.cpp
-        # ..//src/driver/display/Display.cpp
-        # ..//src/driver/display/Bus8080.cpp
-        # ..//src/driver/display/Display8080.cpp
+        ../src/basic/Console.cpp
+        # ../src/driver/display/DisplayModule.cpp
+        # ../src/driver/display/Display.cpp
+        # ../src/driver/display/Bus8080.cpp
+        # ../src/driver/display/Display8080.cpp
 
-        ..//src/telnet/Protocal.cpp
-        ..//src/telnet/Telnet.cpp
-        ..//src/telnet/TelnetChannel.cpp
-        ..//src/telnet/TelnetStdIO.cpp
-        ..//src/telnet/TelnetWS.cpp
+        ../src/telnet/Protocal.cpp
+        ../src/telnet/Telnet.cpp
+        ../src/telnet/TelnetChannel.cpp
+        ../src/telnet/TelnetStdIO.cpp
+        ../src/telnet/TelnetWS.cpp
 
-        ..//src/fs/FS.cpp
-        ..//src/fs/FSModule.cpp
+        ../src/fs/FS.cpp
+        ../src/fs/FSModule.cpp
 
         demo/Demo.cpp
         demo/DemoModule.cpp
 
         )
 
-aux_source_directory(..//deps/quickjs SRC_LIST)
+aux_source_directory(../deps/quickjs SRC_LIST)
 
 
 include_directories(.)
-include_directories(..//src)
-include_directories(..//deps)
-include_directories(..//deps/littlefs/src/littlefs)
+include_directories(../src)
+include_directories(../deps)
+include_directories(../deps/littlefs/src/littlefs)
 
 
 
@@ -84,4 +85,4 @@ add_definitions(-ldl)
 # 添加可执行文件
 add_executable(${PROJECT_NAME}  main.cpp ${SRC_LIST})
 
-add_executable(mklfs  mklfs/mklfs.c ..//deps/littlefs/src/littlefs/lfs.c ..//deps/littlefs/src/littlefs/lfs_util.c ${SRC_LIST})
+add_executable(mklfs  mklfs/mklfs.c ../deps/littlefs/src/littlefs/lfs.c ../deps/littlefs/src/littlefs/lfs_util.c ${SRC_LIST})

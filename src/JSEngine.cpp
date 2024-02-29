@@ -218,12 +218,7 @@ namespace be {
 
         string code(content.get(), readed) ;
 
-        JSValue ret = JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
-        if( JS_IsException(ret) ){
-            string str = getExceptionStr() ;
-            cout << str << endl ;
-        }
-        return ret ;
+        return JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
     }
 
     void JSEngine::setGlobalValue(JSContext * ctx, const char * name, JSValue value) {

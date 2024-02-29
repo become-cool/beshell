@@ -80,8 +80,8 @@ namespace be {
     ModuleLoader::ModuleLoader() {
         add<JSLoader>("loader") ;
         add<ProcessModule>("process") ;
-        add<driver::DriverModule>("driver") ;
 #ifdef ESP_PLATFORM
+        add<driver::DriverModule>("driver") ;
         add<GPIOModule>("gpio") ;
 #endif
     }
@@ -173,6 +173,7 @@ namespace be {
         ModuleLoader * mloader = (ModuleLoader *)opaque ;
 
         if(mloader->modules.count(ctx)<1) {
+            printf("invalid ctx in ModuleLoader::normalize()\n") ;
             return nullptr ;
         }
 
@@ -210,8 +211,9 @@ namespace be {
                 fullpath = resovleFS(engine->beshell->fs, module_name, "/opt") ;
             }
         }
-
+        
         if(!fullpath.length()) {
+            JS_ThrowReferenceError(ctx, " Cannot find module: %s", module_name) ;
             return nullptr ;
         }
 
