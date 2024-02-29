@@ -11,6 +11,10 @@
 
 using namespace be ;
 
+extern const uint8_t src_js_wifi_js_start[] asm("_binary_src_js_wifi_js_start");
+extern const uint8_t src_js_wifi_js_end[] asm("_binary_src_js_wifi_js_end");
+
+
 #define DEFAULT_SCAN_LIST_SIZE 16
 
 #define MAX_SSID_CHARLEN        31
@@ -203,19 +207,32 @@ namespace be {
         exportFunction("apStarted",apStarted,0) ;
     }
 
+    #define ESP_API(code)       \
+            res = code ;        \
+            if(res!=ESP_OK) {   \
+                printf("%s failed, return error code:%d\n", #code, res) ; \
+            }
+
     void WiFiModule::use(be::BeShell & beshell) {
+
+        dp(src_js_wifi_js_start)
+        size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
+        dn(size)
+
         beshell.addModule<WiFiModule>("wifi") ;
         
-        ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id));
-        ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip));
+        esp_err_t res ;
+        ESP_API(esp_event_loop_create_default())
+        ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id))
+        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip))
 
-        ESP_ERROR_CHECK(esp_netif_init());
+        ESP_API(esp_netif_init())
 
         netif_sta = esp_netif_create_default_wifi_sta();
         netif_ap = esp_netif_create_default_wifi_ap();
 
         wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-        ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+        ESP_API(esp_wifi_init(&cfg))
 
         wifi_inited = true ;
     }
@@ -241,7 +258,7 @@ namespace be {
      * * 1 最小
      * * 2 最大
      * 
-     * @beapi beapi.wifi.setPS
+     * @beapi wifi.setPS
      * @param mode:0|1|2
      * @return number
      */
@@ -262,7 +279,7 @@ namespace be {
      * 
      * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
-     * @beapi beapi.wifi.setMode
+     * @beapi wifi.setMode
      * @param mode:0|1|2|3
      * @return number
      */
@@ -280,7 +297,7 @@ namespace be {
      * * 2 AP
      * * 3 STA + AP
      * 
-     * @beapi beapi.wifi.getMode
+     * @beapi wifi.getMode
      * @return number
      */
     JSValue WiFiModule::mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -354,11 +371,63 @@ namespace be {
     //     WIFI_AUTH_MAX
     // } wifi_auth_mode_t;
 
+    /**
+     * 设置 wifi AP 模式的参数
+     * 
+     * 参数 mode :
+     * ```
+     * {
+     *     ssid: string ,
+     *     password?: string ,
+     *     "threshold.authmode"?: 0-8 ,
+     *     channel?: 1-13 ,
+     *     max_connection?: number = 4 , // 最大客户连接数
+     *     ssid_hidden?:bool = false ,    // 热点不会被扫描到
+     *     beacon_interval?: number ,
+     *     pairwise_cipher?: number ,
+     *     ftm_responder?: bool ,        // Enable FTM Responder mode
+     * }
+     * ```
+     * 
+     * 如果 `password` 为空, 则 `threshold.authmode` 自动设置为 `WIFI_AUTH_OPEN`
+     * 
+     * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
+     * 
+     * @beapi wifi.setAPConfig
+     * @param config:object
+     * @return number
+     */
     JSValue WiFiModule::setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
-    }
+        CHECK_WIFI_INITED
+        CHECK_ARGC(1)
+        if(!JS_IsObject(argv[0])) {
+            JSTHROW("missing options arg")
+        }
+        
+        wifi_config_t wifi_config ;
+        memset(&wifi_config, 0, sizeof(wifi_config_t)) ;
 
+        wifi_config.ap.ssid_len = 0;
+        wifi_config.ap.channel = 1;
+        wifi_config.ap.max_connection = 4;
+        wifi_config.ap.authmode = WIFI_AUTH_WPA_WPA2_PSK;
+        wifi_config.ap.ssid_hidden = 0;
+
+        SET_MEMBER_STRING(ap, ssid, MAX_SSID_CHARLEN)
+        SET_MEMBER_STRING(ap, password, MAX_PASSWORD_CHARLEN)
+        if(password_len==0) {
+            wifi_config.ap.authmode = WIFI_AUTH_OPEN ;
+        }
+
+        SET_MEMBER_INT(ap, channel)
+        SET_MEMBER_INT(ap, max_connection)
+        SET_MEMBER_INT(ap, ssid_hidden)
+        SET_MEMBER_INT(ap, beacon_interval)
+        SET_MEMBER_INT(ap, pairwise_cipher)
+        SET_MEMBER_BOOL(ap, ftm_responder)
+
+        return JS_NewInt32(ctx, esp_wifi_set_config(WIFI_IF_AP, &wifi_config) );
+    }
     
     /**
      * 设置 wifi STA 模式的参数
@@ -380,7 +449,7 @@ namespace be {
      * 
      * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
-     * @beapi beapi.wifi.setStaConfig
+     * @beapi wifi.setStaConfig
      * @param config:object
      * @return number
      */
@@ -411,69 +480,370 @@ namespace be {
         // SET_MEMBER_INT(sta, rm_enabled)
         // SET_MEMBER_INT(sta, btm_enabled)
 
-        // dn(wifi_config.sta.threshold.authmode)
-        // ds(wifi_config.sta.ssid)
-        // ds(wifi_config.sta.password)
-
         return JS_NewInt32(ctx, esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
     }
+    
+    /**
+     * 返回 wifi 的工作参数
+     * 
+     * 返回的对象可参考 `setStaConfig()` 和 `setAPConfig()` 的 `mode` 参数
+     * 
+     * @beapi wifi.getConfig
+     * @param mode:1|2  1代表 sta , 2代表 ap
+     * @return object
+     */
     JSValue WiFiModule::config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        CHECK_ARGC(1)
+        ARGV_TO_UINT8(0,netif)
+
+        wifi_config_t conf ;
+
+        JSValue jsconf = JS_NewObject(ctx) ;
+        if( netif==WIFI_MODE_STA ) {
+            esp_err_t err = esp_wifi_get_config(WIFI_IF_STA, &conf) ;
+            if(err!=ESP_OK) {
+                JSTHROW("esp_wifi_get_config() failed: %d", err)
+            }
+            JS_SetPropertyStr(ctx, jsconf, "ssid", JS_NewString(ctx, (const char *)conf.sta.ssid)) ;
+            JS_SetPropertyStr(ctx, jsconf, "password", JS_NewString(ctx, (const char *)conf.sta.password)) ;
+            JS_SetPropertyStr(ctx, jsconf, "authmode", JS_NewInt32(ctx, conf.sta.threshold.authmode)) ;
+            JS_SetPropertyStr(ctx, jsconf, "channel", JS_NewInt32(ctx, conf.sta.channel)) ;
+            JS_SetPropertyStr(ctx, jsconf, "scan_method", JS_NewInt32(ctx, conf.sta.scan_method)) ;
+            JS_SetPropertyStr(ctx, jsconf, "listen_interval", JS_NewInt32(ctx, conf.sta.listen_interval)) ;
+            JS_SetPropertyStr(ctx, jsconf, "sort_method", JS_NewInt32(ctx, conf.sta.sort_method)) ;
+            JS_SetPropertyStr(ctx, jsconf, "rm_enabled", JS_NewInt32(ctx, conf.sta.rm_enabled)) ;
+            JS_SetPropertyStr(ctx, jsconf, "btm_enabled", JS_NewInt32(ctx, conf.sta.btm_enabled)) ;
+        }
+        else if(netif==WIFI_MODE_AP) {
+            esp_err_t err = esp_wifi_get_config(WIFI_IF_AP, &conf) ;
+            if(err!=ESP_OK) {
+                JSTHROW("esp_wifi_get_config() failed: %d", err)
+            }
+            JS_SetPropertyStr(ctx, jsconf, "ssid", JS_NewString(ctx, (const char *)conf.ap.ssid)) ;
+            JS_SetPropertyStr(ctx, jsconf, "password", JS_NewString(ctx, (const char *)conf.ap.password)) ;
+            JS_SetPropertyStr(ctx, jsconf, "channel", JS_NewInt32(ctx, conf.ap.channel)) ;
+            JS_SetPropertyStr(ctx, jsconf, "authmode", JS_NewInt32(ctx, conf.ap.authmode)) ;
+            JS_SetPropertyStr(ctx, jsconf, "ssid_hidden", JS_NewInt32(ctx, conf.ap.ssid_hidden)) ;
+            JS_SetPropertyStr(ctx, jsconf, "max_connection", JS_NewInt32(ctx, conf.ap.max_connection)) ;
+            JS_SetPropertyStr(ctx, jsconf, "beacon_interval", JS_NewInt32(ctx, conf.ap.beacon_interval)) ;
+            JS_SetPropertyStr(ctx, jsconf, "ftm_responder", JS_NewInt32(ctx, conf.ap.ftm_responder)) ;
+        }
+        else{
+            JSTHROW("unknow netif: %d", netif)
+        }
+
+        return jsconf ;
     }
+
+    /**
+     * WiFi STA 连接到热点
+     * 
+     * ssid, password 等参数需要通过 wifi.setStaConfig() 设置
+     * 
+     * 返回 0 仅表示api函数调用成功; 非 0 代表对应的错误
+     * 
+     * 连接成功或失败回触发回调函数, 回调函数由 wifi.registerEventHandle() 设置
+     * 
+     * @beapi wifi.connect
+     * @return number
+     */
     JSValue WiFiModule::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        if( JS_IsFunction(ctx, __event_handle) ) {
+            MAKE_ARGV2(argv, JS_NewInt32(__event_handle_ctx, 1), JS_NewInt32(__event_handle_ctx, WIFI_EVENT_STA_CONNECTING))
+            JS_Call(ctx, __event_handle, JS_UNDEFINED, 2, argv) ;
+            free(argv) ;
+        }
+        return JS_NewInt32(ctx, esp_wifi_connect()) ;
     }
+    /**
+     * WiFi STA 断开连接
+     * 
+     * 返回 0 表示成功; 非 0 代表对应的错误
+     * 
+     * @beapi wifi.disconnect
+     * @return number
+     */
     JSValue WiFiModule::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        return JS_NewInt32(ctx, esp_wifi_disconnect()) ;
     }
+
+    /**
+     * 返回 AP/STA 的 IP 
+     * 
+     * @beapi wifi.getIpInfo
+     * @param type:number 1代表 sta, 2代表 ap
+     * @return {ip:string,netmask:string,gw:string} 
+     */
     JSValue WiFiModule::getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        CHECK_ARGC(1)
+        ARGV_TO_UINT8(0,type)
+
+        esp_netif_ip_info_t ipinfo;
+        bzero(&ipinfo, sizeof(esp_netif_ip_info_t));
+
+        if( type==WIFI_MODE_STA ) {
+            esp_netif_get_ip_info(netif_sta, &ipinfo);
+        }
+        else if(type==WIFI_MODE_AP) {
+            esp_netif_get_ip_info(netif_ap, &ipinfo);
+        }
+        else{
+            JSTHROW("unknow netif type: %d", type)
+        }
+
+        JSValue status = JS_NewObject(ctx) ;
+
+        char ip[16] ;
+        sprintf(ip,IPSTR, IP2STR((&ipinfo.ip))) ;
+        JS_SetPropertyStr(ctx, status, "ip", JS_NewString(ctx, ip)) ;
+
+        sprintf(ip,IPSTR, IP2STR((&ipinfo.netmask))) ;
+        JS_SetPropertyStr(ctx, status, "netmask", JS_NewString(ctx, ip)) ;
+
+        sprintf(ip,IPSTR, IP2STR((&ipinfo.gw))) ;
+        JS_SetPropertyStr(ctx, status, "gw", JS_NewString(ctx, ip)) ;
+
+        return status ;
     }
+
+    /**
+     * 返回设置 wifi 的在局域网中可被显示的主机名
+     * 
+     * @beapi wifi.setHostname
+     * @param nane:string
+     */
     JSValue WiFiModule::setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
+        CHECK_WIFI_INITED
+        CHECK_ARGC(1)
+
+        const char * hostname = JS_ToCString(ctx, argv[0]) ;
+        esp_netif_set_hostname(netif_sta, hostname);
+        esp_netif_set_hostname(netif_ap, hostname);
+
+        JS_FreeCString(ctx, hostname) ;
+
         return JS_UNDEFINED ;
     }
+
+    // typedef struct {
+    //     uint8_t mac[6];  /**< mac address */
+    //     int8_t  rssi;    /**< current average rssi of sta connected */
+    //     uint32_t phy_11b:1;      /**< bit: 0 flag to identify if 11b mode is enabled or not */
+    //     uint32_t phy_11g:1;      /**< bit: 1 flag to identify if 11g mode is enabled or not */
+    //     uint32_t phy_11n:1;      /**< bit: 2 flag to identify if 11n mode is enabled or not */
+    //     uint32_t phy_lr:1;       /**< bit: 3 flag to identify if low rate is enabled or not */
+    //     uint32_t reserved:28;    /**< bit: 4..31 reserved */
+    // } wifi_sta_info_t;
+
+    // #define ESP_WIFI_MAX_CONN_NUM  (10)       /**< max number of stations which can connect to ESP32 soft-AP */
+
+    // /** @brief List of stations associated with the ESP32 Soft-AP */
+    // typedef struct {
+    //     wifi_sta_info_t sta[ESP_WIFI_MAX_CONN_NUM]; /**< station list */
+    //     int       num; /**< number of stations in the list (other entries are invalid) */
+    // } wifi_sta_list_t;
+
+    /**
+     * 返回所有连接到本机AP的客户机
+     * 
+     * @beapi wifi.allSta
+     * @return {mac:string,rssi:string}[]
+     */
     JSValue WiFiModule::allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        wifi_sta_list_t clients;
+        if(esp_wifi_ap_get_sta_list(&clients) != ESP_OK) {
+            JSTHROW("esp_wifi_ap_get_sta_list() failed")
+        }
+
+        JSValue arr = JS_NewArray(ctx) ;
+        for(int i=0; i<clients.num; i++) {
+            JSValue obj = JS_NewObject(ctx) ;
+            JS_SetPropertyStr(ctx, obj, "mac", JS_NewString(ctx, "unimplemented")) ;
+            JS_SetPropertyStr(ctx, obj, "rssi", JS_NewInt32(ctx, clients.sta[i].rssi)) ;
+            JS_SetPropertyUint32(ctx, arr, i, obj) ;
+        }
+
+        return arr ;
     }
     JSValue WiFiModule::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
+        CHECK_ARGC(1)
+        if( !JS_IsFunction(ctx, argv[0]) ){
+            JSTHROW("wifi event handle must be a function")
+        }
+        __event_handle = JS_DupValue(ctx, argv[0]) ;
+        __event_handle_ctx = ctx ;
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 开始扫描附近的AP
+     * 
+     * > wifi STA 模式必须启动
+     * 
+     * @beapi wifi.scanStart
+     * @return bool
+     */
     JSValue WiFiModule::scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
-    }
-    JSValue WiFiModule::scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
-    }
-    JSValue WiFiModule::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
-    }
-    JSValue WiFiModule::scanRecords(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        CHECK_WIFI_INITED
+        wifi_scan_config_t scanConf = {
+            .ssid = NULL,
+            .bssid = NULL,
+            .channel = 0,
+            .show_hidden = true
+        };
+
+        esp_err_t ret = esp_wifi_scan_start(&scanConf, false) ;
+        if( ret == ESP_OK) {
+            _scanning = true ;
+            return JS_TRUE ;
+        }
+        else{
+            printf("esp_wifi_scan_start() failed:(%d) %s\n",ret, esp_err_to_name(ret)) ;
+            _scanning = false ;
+            return JS_FALSE ;
+        }
     }
 
+    /**
+     * 停止AP扫描
+     * 
+     * @beapi wifi.scanStop
+     * @return bool
+     */
+    JSValue WiFiModule::scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_WIFI_INITED
+        return esp_wifi_scan_stop() == ESP_OK? JS_TRUE : JS_FALSE;
+    }
+    
+    /**
+     * 返回 AP 扫描是否正在进行
+     * 
+     * @beapi wifi.isScanning
+     * @return bool
+     */
+    JSValue WiFiModule::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_WIFI_INITED
+        return _scanning? JS_TRUE : JS_FALSE;
+    }
+    
+    // typedef enum {
+    //     WIFI_AUTH_OPEN = 0,         /**< authenticate mode : open */
+    //     WIFI_AUTH_WEP,              /**< authenticate mode : WEP */
+    //     WIFI_AUTH_WPA_PSK,          /**< authenticate mode : WPA_PSK */
+    //     WIFI_AUTH_WPA2_PSK,         /**< authenticate mode : WPA2_PSK */
+    //     WIFI_AUTH_WPA_WPA2_PSK,     /**< authenticate mode : WPA_WPA2_PSK */
+    //     WIFI_AUTH_WPA2_ENTERPRISE,  /**< authenticate mode : WPA2_ENTERPRISE */
+    //     WIFI_AUTH_WPA3_PSK,         /**< authenticate mode : WPA3_PSK */
+    //     WIFI_AUTH_WPA2_WPA3_PSK,    /**< authenticate mode : WPA2_WPA3_PSK */
+    //     WIFI_AUTH_WAPI_PSK,         /**< authenticate mode : WAPI_PSK */
+    //     WIFI_AUTH_OWE,              /**< authenticate mode : OWE */
+    //     WIFI_AUTH_MAX
+    // } wifi_auth_mode_t;
+    static char * authmode_names(wifi_auth_mode_t auto_mode) {
+        switch(auto_mode) {
+            case WIFI_AUTH_OPEN: return "OPEN" ;
+            case WIFI_AUTH_WEP: return "WEP" ;
+            case WIFI_AUTH_WPA_PSK: return "WPA_PSK" ;
+            case WIFI_AUTH_WPA2_PSK: return "WPA2_PSK" ;
+            case WIFI_AUTH_WPA_WPA2_PSK: return "WPA_WPA2_PSK" ;
+            case WIFI_AUTH_WPA2_ENTERPRISE: return "WPA_WPA2_PSK" ;
+            case WIFI_AUTH_WPA3_PSK: return "WPA3_PSK" ;
+            case WIFI_AUTH_WPA2_WPA3_PSK: return "WPA2_WPA3_PSK" ;
+            case WIFI_AUTH_WAPI_PSK: return "WAPI_PSK" ;
+            // case WIFI_AUTH_OWE: return "OWE" ;
+            default:
+                return "unknow" ;
+        }
+    }
+
+    /**
+     * 取回 AP 扫描的结果
+     * 
+     * AP对象的格式:
+     * ```
+     * {
+     *     bssid:string ,
+     *     ssid:string ,
+     *     channel:number ,
+     *     rssi:number ,
+     *     authmode:number ,
+     * }
+     * ```
+     * 
+     * @beapi wifi.scanRecords
+     * @return object[]
+     */
+    JSValue WiFiModule::scanRecords(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_WIFI_INITED
+        JSValue array = JS_NewArray(ctx) ;
+
+        uint16_t apCount = 0;
+        esp_wifi_scan_get_ap_num(&apCount);
+
+        // printf("Number of access points found: %d\n",event->event_info.scan_done.number);
+        if (apCount == 0) {
+            return array ;
+        }
+
+        wifi_ap_record_t *list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * apCount);
+        if(!list) {
+            JSTHROW("out of memory?")
+        }
+
+        esp_wifi_scan_get_ap_records(&apCount, list) ;
+
+        for (int i=0; i<apCount; i++) {        
+            JSValue apobj = JS_NewObject(ctx) ;
+            JS_SetPropertyStr(ctx, apobj, "bssid", JS_NewString(ctx, (char*)list[i].bssid)) ;
+            JS_SetPropertyStr(ctx, apobj, "ssid", JS_NewString(ctx, (char*)list[i].ssid)) ;
+            JS_SetPropertyStr(ctx, apobj, "channel", JS_NewInt32(ctx, list[i].primary)) ;
+            JS_SetPropertyStr(ctx, apobj, "rssi", JS_NewInt32(ctx, list[i].rssi)) ;
+            JS_SetPropertyStr(ctx, apobj, "authmode", JS_NewInt32(ctx, list[i].authmode)) ;
+            JS_SetPropertyUint32(ctx, array, i, apobj) ;
+        }
+
+        free(list) ;
+
+        return array ;
+    }
+
+    /**
+     * 返回 WiFi STA 模式是否启动
+     * 
+     * @beapi wifi.staStarted
+     * @return bool
+     */
     JSValue WiFiModule::staStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        if(!wifi_inited)
+            return JS_FALSE;
+        return JS_NewBool(ctx, _sta_started) ;
     }
+    /**
+     * 返回 WiFi STA 是否已经连接
+     * 
+     * @beapi wifi.staConnected
+     * @return bool
+     */
     JSValue WiFiModule::staConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        if(!wifi_inited)
+            return JS_FALSE;
+        return JS_NewBool(ctx, _sta_connected) ;
     }
+    /**
+     * 返回 WiFi AP 模式是否启用
+     * 
+     * @beapi wifi.apStarted
+     * @return bool
+     */
     JSValue WiFiModule::apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSTHROW("not implements")
-        return JS_UNDEFINED ;
+        if(!wifi_inited)
+            return JS_FALSE;
+        return JS_NewBool(ctx, _ap_started) ;
     }
 
 }

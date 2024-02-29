@@ -86,9 +86,9 @@ namespace be {
 
     void BeShell::setup() {
 
-#ifdef ESP_PLATFORM   
-        ESP_ERROR_CHECK(esp_event_loop_create_default());
-#endif
+// #ifdef ESP_PLATFORM
+//         ESP_ERROR_CHECK(esp_event_loop_create_default());
+// #endif
 
         telnet->setup() ;
 

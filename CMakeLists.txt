@@ -51,6 +51,24 @@ else ()
     set(requires esp_adc)
 endif ()
 
+
+# function(embed_js_src varname jspath hpath)
+#     file(WRITE ${hpath} "#@pragma once\n\n")
+#     file(APPEND ${hpath} "const char* ${varname} = R\"(")
+#     file(APPEND ${hpath} "${FILE_CONTENT}")
+#     file(APPEND ${hpath} ")\";\n")
+# endfunction()
+
+# # embed_js_src(jsSrcWifi "${CMAKE_CURRENT_LIST_DIR}/src/js/wifi.js", "${CMAKE_CURRENT_LIST_DIR}/src/js/wifi.js.h")
+
+
+# file(READ ${CMAKE_CURRENT_LIST_DIR}/src/js/wifi.js WIFI_SRC)
+# set(HEADER_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/src/js/wifi.js.tpl.h)
+# set(HEADER_FILE ${CMAKE_CURRENT_LIST_DIR}/src/js/wifi.js.h)
+
+# configure_file(${HEADER_TEMPLATE} ${HEADER_FILE} @ONLY)
+
+
 idf_component_register(
         SRCS
             ${src_beshell}
@@ -75,7 +93,7 @@ idf_component_register(
             esp_ringbuf
             esp_lcd
             ${requires}
-        #EMBED_FILES fs-root.img
+        # EMBED_FILES src/js/wifi.js
 )
 
 # for lvgl
