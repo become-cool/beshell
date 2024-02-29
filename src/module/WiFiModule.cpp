@@ -11,8 +11,8 @@
 
 using namespace be ;
 
-extern const uint8_t src_js_wifi_js_start[] asm("_binary_src_js_wifi_js_start");
-extern const uint8_t src_js_wifi_js_end[] asm("_binary_src_js_wifi_js_end");
+// extern const uint8_t src_js_wifi_js_start[] asm("_binary_src_js_wifi_js_start");
+// extern const uint8_t src_js_wifi_js_end[] asm("_binary_src_js_wifi_js_end");
 
 
 #define DEFAULT_SCAN_LIST_SIZE 16
@@ -215,9 +215,9 @@ namespace be {
 
     void WiFiModule::use(be::BeShell & beshell) {
 
-        dp(src_js_wifi_js_start)
-        size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
-        dn(size)
+        // dp(src_js_wifi_js_start)
+        // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
+        // dn(size)
 
         beshell.addModule<WiFiModule>("wifi") ;
         
