@@ -54,6 +54,8 @@ namespace be {
 
         static JSValue getClass(JSContext * ctx, const JSClassID & classID) ;
 
+        static JSValue newObject(JSContext * ctx, JSValue constructor) ;
+
         template <typename N>
         inline static bool instanceOf(JSContext * ctx, JSValue jsobj) {
             JSValue proto = JS_GetClassProto(ctx, N::classID);

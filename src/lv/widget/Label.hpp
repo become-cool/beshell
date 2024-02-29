@@ -10,9 +10,10 @@ namespace be::lv {
     private:
         static std::vector<JSCFunctionListEntry> methods ;
 
+    protected:
+        Label(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         Label(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        Label(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue getFont(JSContext *ctx, JSValueConst this_val) ;
@@ -39,6 +40,7 @@ namespace be::lv {
         static JSValue insText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue cutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
+    friend class Obj ;
     } ;
 
 }

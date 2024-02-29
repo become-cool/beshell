@@ -18,13 +18,17 @@ namespace be::lv {
     Spinner::Spinner(JSContext * ctx, lv_obj_t * parent)
         : Spinner(ctx, JS_NULL, lv_spinner_create(parent))
     {}
-        
-    JSValue Spinner::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Spinner::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Spinner * widget = new Spinner(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Spinner * widget = new Spinner(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

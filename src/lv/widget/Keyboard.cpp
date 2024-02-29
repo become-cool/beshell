@@ -22,13 +22,17 @@ namespace be::lv {
     Keyboard::Keyboard(JSContext * ctx, lv_obj_t * parent)
         : Keyboard(ctx, JS_NULL, lv_keyboard_create(parent))
     {}
-        
-    JSValue Keyboard::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Keyboard::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Keyboard * widget = new Keyboard(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Keyboard * widget = new Keyboard(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

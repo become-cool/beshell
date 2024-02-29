@@ -9,10 +9,11 @@ namespace be::lv {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-
+    
+    protected:
+        Span(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         Span(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        Span(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 
@@ -39,6 +40,8 @@ namespace be::lv {
         static JSValue getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue refrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
+
+    friend class Obj ;
     } ;
 
 }

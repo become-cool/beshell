@@ -9,10 +9,11 @@ namespace be::lv {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-
+    
+    protected:
+        MsgBox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         MsgBox(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        MsgBox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 
@@ -32,6 +33,8 @@ namespace be::lv {
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue closeAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
+
+    friend class Obj ;
     } ;
 
 }

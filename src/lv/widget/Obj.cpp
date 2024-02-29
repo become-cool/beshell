@@ -307,16 +307,9 @@ namespace be::lv {
             JSTHROW("not create display")
         }
 
-        JSValue obj = JS_NULL ;
-
-        // 派生子类
-        JSValue proto = JS_GetPropertyStr(ctx,ctor,"prototype") ;
-        JS_FreeValue(ctx,proto) ;
-
-        JSClassID classId = 0 ;
-        if(!JS_GetClassIDFromProto(ctx,proto,&classId)){
-            obj = JS_NewObject(ctx) ;
-            JS_SetPropertyStr(ctx,obj,"__proto__",JS_DupValue(ctx,proto)) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
         }
 
         lv_obj_t * lvparent = nullptr ;

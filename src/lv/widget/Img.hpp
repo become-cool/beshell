@@ -10,9 +10,10 @@ namespace be::lv {
     private:
         static std::vector<JSCFunctionListEntry> methods ;
 
+    protected:
+        Img(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         Img(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        Img(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue getSrc(JSContext *ctx, JSValueConst this_val) ;
@@ -60,6 +61,7 @@ namespace be::lv {
         static JSValue setPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
+    friend class Obj ;
     } ;
 
 }

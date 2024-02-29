@@ -26,13 +26,17 @@ namespace be::lv {
     Canvas::Canvas(JSContext * ctx, lv_obj_t * parent)
         : Canvas(ctx, JS_NULL, lv_canvas_create(parent))
     {}
-        
-    JSValue Canvas::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Canvas::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Canvas * widget = new Canvas(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Canvas * widget = new Canvas(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

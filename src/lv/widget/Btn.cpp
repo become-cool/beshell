@@ -19,13 +19,17 @@ namespace be::lv {
     Btn::Btn(JSContext * ctx, lv_obj_t * parent)
         : Btn(ctx, JS_NULL, lv_button_create(parent))
     {}
-        
-    JSValue Btn::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Btn::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Btn * widget = new Btn(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Btn * widget = new Btn(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

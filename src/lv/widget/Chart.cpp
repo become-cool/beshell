@@ -44,13 +44,17 @@ namespace be::lv {
     Chart::Chart(JSContext * ctx, lv_obj_t * parent)
         : Chart(ctx, JS_NULL, lv_chart_create(parent))
     {}
-        
-    JSValue Chart::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Chart::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Chart * widget = new Chart(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Chart * widget = new Chart(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

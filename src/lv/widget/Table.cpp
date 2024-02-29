@@ -30,13 +30,17 @@ namespace be::lv {
     Table::Table(JSContext * ctx, lv_obj_t * parent)
         : Table(ctx, JS_NULL, lv_table_create(parent))
     {}
-        
-    JSValue Table::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Table::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Table * widget = new Table(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Table * widget = new Table(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

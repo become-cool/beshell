@@ -34,13 +34,17 @@ namespace be::lv {
     Menu::Menu(JSContext * ctx, lv_obj_t * parent)
         : Menu(ctx, JS_NULL, lv_menu_create(parent))
     {}
-        
-    JSValue Menu::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Menu::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Menu * widget = new Menu(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Menu * widget = new Menu(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

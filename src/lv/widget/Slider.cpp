@@ -1,7 +1,7 @@
 #include "Slider.hpp"
 
 namespace be::lv {
-    DEFINE_NCLASS_META(Slider, Bar)
+    DEFINE_NCLASS_META(Slider, Obj)
     std::vector<JSCFunctionListEntry> Slider::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
@@ -14,19 +14,23 @@ namespace be::lv {
     } ;
 
     Slider::Slider(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Bar(ctx, Slider::build(ctx,jsobj), lvobj)
+        : Obj(ctx, Slider::build(ctx,jsobj), lvobj)
     {}
 
     Slider::Slider(JSContext * ctx, lv_obj_t * parent)
         : Slider(ctx, JS_NULL, lv_slider_create(parent))
     {}
-        
-    JSValue Slider::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Slider::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Slider * widget = new Slider(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Slider * widget = new Slider(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

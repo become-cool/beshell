@@ -30,13 +30,17 @@ namespace be::lv {
     Arc::Arc(JSContext * ctx, lv_obj_t * parent)
         : Arc(ctx, JS_NULL, lv_arc_create(parent))
     {}
-        
-    JSValue Arc::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Arc::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Arc * widget = new Arc(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Arc * widget = new Arc(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

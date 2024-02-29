@@ -1,18 +1,19 @@
 #pragma once
 
-#include "Bar.hpp"
+#include "Obj.hpp"
 #include "lvgl.h"
 
 namespace be::lv {
 
-    class Slider: public Bar {
+    class Slider: public Obj {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-
+    
+    protected:
+        Slider(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         Slider(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        Slider(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 
@@ -23,6 +24,8 @@ namespace be::lv {
         static JSValue bindValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isDragged(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 // AUTO GENERATE CODE END [METHODS] --------
+
+    friend class Obj ;
     } ;
 
 }

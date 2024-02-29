@@ -31,16 +31,20 @@ namespace be::lv {
         : Label(ctx, JS_NULL, lv_label_create(parent))
     {}
         
-    JSValue Label::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Label::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
+        }
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
         }
         char * text = nullptr ;
         if(argc>1) {
             text = (char *)JS_ToCString(ctx, argv[1]) ;
         }
-        Label * widget = new Label(ctx,lvparent) ;
+        Label * widget = new Label(ctx, obj, lv_obj_create(lvparent)) ;
         if(text) {
             lv_label_set_text(widget->lvobj(),text) ;
             JS_FreeCString(ctx,text) ;

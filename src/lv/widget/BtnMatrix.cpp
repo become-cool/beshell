@@ -27,13 +27,17 @@ namespace be::lv {
     BtnMatrix::BtnMatrix(JSContext * ctx, lv_obj_t * parent)
         : BtnMatrix(ctx, JS_NULL, lv_buttonmatrix_create(parent))
     {}
-        
-    JSValue BtnMatrix::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue BtnMatrix::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        BtnMatrix * widget = new BtnMatrix(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        BtnMatrix * widget = new BtnMatrix(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

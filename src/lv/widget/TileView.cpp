@@ -20,13 +20,17 @@ namespace be::lv {
     TileView::TileView(JSContext * ctx, lv_obj_t * parent)
         : TileView(ctx, JS_NULL, lv_tileview_create(parent))
     {}
-        
-    JSValue TileView::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue TileView::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        TileView * widget = new TileView(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        TileView * widget = new TileView(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

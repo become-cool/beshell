@@ -9,10 +9,11 @@ namespace be::lv {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-
+    
+    protected:
+        Checkbox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
     public:
         Checkbox(JSContext * ctx, lv_obj_t * parent=nullptr) ;
-        Checkbox(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 
@@ -24,6 +25,8 @@ namespace be::lv {
 // AUTO GENERATE CODE START [METHODS] --------
 
 // AUTO GENERATE CODE END [METHODS] --------
+
+    friend class Obj ;
     } ;
 
 }

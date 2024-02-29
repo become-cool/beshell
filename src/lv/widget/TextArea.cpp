@@ -41,13 +41,17 @@ namespace be::lv {
     TextArea::TextArea(JSContext * ctx, lv_obj_t * parent)
         : TextArea(ctx, JS_NULL, lv_textarea_create(parent))
     {}
-        
-    JSValue TextArea::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue TextArea::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        TextArea * widget = new TextArea(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        TextArea * widget = new TextArea(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

@@ -32,13 +32,17 @@ namespace be::lv {
     Scale::Scale(JSContext * ctx, lv_obj_t * parent)
         : Scale(ctx, JS_NULL, lv_scale_create(parent))
     {}
-        
-    JSValue Scale::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Scale::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Scale * widget = new Scale(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Scale * widget = new Scale(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

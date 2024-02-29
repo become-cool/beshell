@@ -28,13 +28,17 @@ namespace be::lv {
     MsgBox::MsgBox(JSContext * ctx, lv_obj_t * parent)
         : MsgBox(ctx, JS_NULL, lv_msgbox_create(parent))
     {}
-        
-    JSValue MsgBox::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue MsgBox::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        MsgBox * widget = new MsgBox(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        MsgBox * widget = new MsgBox(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

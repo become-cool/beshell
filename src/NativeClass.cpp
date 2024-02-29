@@ -117,4 +117,21 @@ namespace be {
         }
         return self ;
     }
+
+    JSValue NativeClass::newObject(JSContext * ctx, JSValue constructor) {
+        JSValue proto = JS_GetPropertyStr(ctx,constructor,"prototype") ;
+        if( !JS_IsObject(proto) ){
+            JSTHROW("arg is not a JS class constructor")
+        }
+        JS_FreeValue(ctx,proto) ;
+
+        JSClassID classId = 0 ;
+        if(!JS_GetClassIDFromProto(ctx,proto,&classId)){
+            JSValue obj = JS_NewObject(ctx) ;
+            JS_SetPropertyStr(ctx,obj,"__proto__",JS_DupValue(ctx,proto)) ;
+            return obj ;
+        } else {
+            return JS_NewObjectClass(ctx, classId) ;
+        }
+    }
 }

@@ -22,13 +22,17 @@ namespace be::lv {
     List::List(JSContext * ctx, lv_obj_t * parent)
         : List(ctx, JS_NULL, lv_list_create(parent))
     {}
-        
-    JSValue List::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue List::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        List * widget = new List(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        List * widget = new List(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 

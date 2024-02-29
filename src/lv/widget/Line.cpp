@@ -19,13 +19,17 @@ namespace be::lv {
     Line::Line(JSContext * ctx, lv_obj_t * parent)
         : Line(ctx, JS_NULL, lv_line_create(parent))
     {}
-        
-    JSValue Line::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue Line::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Line * widget = new Line(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Line * widget = new Line(ctx, obj, lv_obj_create(lvparent)) ;
         return widget->jsobj ;
     }
 
