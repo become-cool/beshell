@@ -6,6 +6,7 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("rowCount",Table::getRowCount,Table::setRowCount) ,
         JS_CGETSET_DEF("columnCount",Table::getColumnCount,Table::setColumnCount) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setCellValue", 3, Table::setCellValue),
@@ -20,6 +21,7 @@ namespace be::lv {
         // const char * lv_table_get_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col)
         // void lv_table_get_selected_cell(lv_obj_t * obj, uint32_t * row, uint32_t * col)
         // void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -40,7 +42,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Table * widget = new Table(ctx, obj, lv_obj_create(lvparent)) ;
+        Table * widget = new Table(ctx, obj, lv_table_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -83,6 +85,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -228,6 +231,7 @@ namespace be::lv {
 
         // Unsupported return type: void *
         // void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

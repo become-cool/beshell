@@ -12,6 +12,7 @@ namespace be::lv {
         JS_CGETSET_DEF("selectedHighlight",Dropdown::getSelectedHighlight,Dropdown::setSelectedHighlight) ,
         JS_CGETSET_DEF("list",Dropdown::getList,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("optionCount",Dropdown::getOptionCount,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addOption", 2, Dropdown::addOption),
@@ -23,6 +24,7 @@ namespace be::lv {
         JS_CFUNC_DEF("isOpen", 0, Dropdown::isOpen),
         // Unsupported arg type:
         // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -43,7 +45,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Dropdown * widget = new Dropdown(ctx, obj, lv_obj_create(lvparent)) ;
+        Dropdown * widget = new Dropdown(ctx, obj, lv_dropdown_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -162,6 +164,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -240,6 +243,7 @@ namespace be::lv {
         return jsretval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -1,20 +1,22 @@
 #include "Slider.hpp"
 
 namespace be::lv {
-    DEFINE_NCLASS_META(Slider, Obj)
+    DEFINE_NCLASS_META(Slider, Bar)
     std::vector<JSCFunctionListEntry> Slider::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
+
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("isDragged", 0, Slider::isDragged),
         // Unsupported arg type:
         // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
     Slider::Slider(JSContext * ctx, JSValue jsobj, lv_obj_t * lvobj)
-        : Obj(ctx, Slider::build(ctx,jsobj), lvobj)
+        : Bar(ctx, Slider::build(ctx,jsobj), lvobj)
     {}
 
     Slider::Slider(JSContext * ctx, lv_obj_t * parent)
@@ -30,11 +32,12 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Slider * widget = new Slider(ctx, obj, lv_obj_create(lvparent)) ;
+        Slider * widget = new Slider(ctx, obj, lv_slider_create(lvparent)) ;
         return widget->jsobj ;
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 
 // AUTO GENERATE CODE END [GETSETS] --------
 
@@ -50,6 +53,7 @@ namespace be::lv {
         return jsretval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

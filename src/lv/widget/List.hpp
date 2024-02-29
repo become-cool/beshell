@@ -18,6 +18,7 @@ namespace be::lv {
 
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -25,6 +26,7 @@ namespace be::lv {
         static JSValue addButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

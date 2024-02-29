@@ -7,6 +7,7 @@ namespace be::lv {
         JS_CGETSET_DEF("visibleRowCount",be::lv::Obj::invalidGetter,Roller::setVisibleRowCount) ,
         JS_CGETSET_DEF("selected",Roller::getSelected,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("optionCount",Roller::getOptionCount,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setOptions", 2, Roller::setOptions),
@@ -14,6 +15,7 @@ namespace be::lv {
         JS_CFUNC_DEF("getSelectedStr", 2, Roller::getSelectedStr),
         // Unsupported arg type:
         // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -34,7 +36,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Roller * widget = new Roller(ctx, obj, lv_obj_create(lvparent)) ;
+        Roller * widget = new Roller(ctx, obj, lv_roller_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -69,6 +71,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -129,6 +132,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

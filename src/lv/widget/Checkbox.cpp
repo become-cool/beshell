@@ -6,8 +6,10 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("text",be::lv::Obj::invalidGetter,Checkbox::setText) ,
         JS_CGETSET_DEF("textStatic",be::lv::Obj::invalidGetter,Checkbox::setTextStatic) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -29,7 +31,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Checkbox * widget = new Checkbox(ctx, obj, lv_obj_create(lvparent)) ;
+        Checkbox * widget = new Checkbox(ctx, obj, lv_checkbox_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -55,9 +57,11 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
 

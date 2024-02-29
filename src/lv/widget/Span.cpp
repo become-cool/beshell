@@ -11,6 +11,7 @@ namespace be::lv {
         JS_CGETSET_DEF("maxLines",Span::getMaxLines,Span::setMaxLines) ,
         JS_CGETSET_DEF("spanCount",Span::getSpanCount,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxLineHeight",Span::getMaxLineHeight,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("newSpan", 0, Span::newSpan),
@@ -20,6 +21,7 @@ namespace be::lv {
         JS_CFUNC_DEF("refrMode", 0, Span::refrMode),
         // Unsupported arg type:
         // void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -40,7 +42,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Span * widget = new Span(ctx, obj, lv_obj_create(lvparent)) ;
+        Span * widget = new Span(ctx, obj, lv_spangroup_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -171,6 +173,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -235,6 +238,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

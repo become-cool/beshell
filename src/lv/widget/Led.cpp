@@ -6,11 +6,13 @@ namespace be::lv {
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("color",be::lv::Obj::invalidGetter,Led::setColor) ,
         JS_CGETSET_DEF("brightness",Led::getBrightness,Led::setBrightness) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("on", 0, Led::on),
         JS_CFUNC_DEF("off", 0, Led::off),
         JS_CFUNC_DEF("toggle", 0, Led::toggle),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -31,7 +33,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Led * widget = new Led(ctx, obj, lv_obj_create(lvparent)) ;
+        Led * widget = new Led(ctx, obj, lv_led_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -66,6 +68,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -92,6 +95,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

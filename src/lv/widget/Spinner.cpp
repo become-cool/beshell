@@ -5,9 +5,11 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Spinner::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setAnimParams", 2, Spinner::setAnimParams),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -28,11 +30,12 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Spinner * widget = new Spinner(ctx, obj, lv_obj_create(lvparent)) ;
+        Spinner * widget = new Spinner(ctx, obj, lv_spinner_create(lvparent)) ;
         return widget->jsobj ;
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+
 
 // AUTO GENERATE CODE END [GETSETS] --------
 
@@ -53,6 +56,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

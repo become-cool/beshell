@@ -5,8 +5,10 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Switch::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+
 
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
@@ -28,15 +30,17 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Switch * widget = new Switch(ctx, obj, lv_obj_create(lvparent)) ;
+        Switch * widget = new Switch(ctx, obj, lv_switch_create(lvparent)) ;
         return widget->jsobj ;
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
 
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
+
 
 // AUTO GENERATE CODE END [METHODS] --------
 

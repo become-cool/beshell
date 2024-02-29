@@ -10,9 +10,7 @@ namespace be {
 
         // void import(JSContext *ctx) ;
 
-        inline static void use(be::BeShell & beshell) {
-            beshell.addModule<WiFiModule>("wifi") ;
-        }
+        static void use(be::BeShell & beshell) ;
 
         static JSValue start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -19,6 +19,7 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getBtnmatrix(JSContext *ctx, JSValueConst this_val) ;
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -29,6 +30,7 @@ namespace be::lv {
         static JSValue headerArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue headerDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue headerDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

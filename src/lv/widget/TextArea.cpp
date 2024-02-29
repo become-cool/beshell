@@ -19,6 +19,7 @@ namespace be::lv {
         JS_CGETSET_DEF("align",be::lv::Obj::invalidGetter,TextArea::setAlign) ,
         JS_CGETSET_DEF("label",TextArea::getLabel,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("currentChar",TextArea::getCurrentChar,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addChar", 1, TextArea::addChar),
@@ -31,6 +32,7 @@ namespace be::lv {
         JS_CFUNC_DEF("cursorLeft", 0, TextArea::cursorLeft),
         JS_CFUNC_DEF("cursorDown", 0, TextArea::cursorDown),
         JS_CFUNC_DEF("cursorUp", 0, TextArea::cursorUp),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -51,7 +53,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        TextArea * widget = new TextArea(ctx, obj, lv_obj_create(lvparent)) ;
+        TextArea * widget = new TextArea(ctx, obj, lv_textarea_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -266,6 +268,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -356,6 +359,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -9,12 +9,14 @@ namespace be::lv {
         JS_CGETSET_DEF("startValue",Bar::getStartValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("minValue",Bar::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Bar::getMaxValue,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setValue", 2, Bar::setValue),
         JS_CFUNC_DEF("setStartValue", 2, Bar::setStartValue),
         JS_CFUNC_DEF("setRange", 2, Bar::setRange),
         JS_CFUNC_DEF("isSymmetrical", 0, Bar::isSymmetrical),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -35,7 +37,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        Bar * widget = new Bar(ctx, obj, lv_obj_create(lvparent)) ;
+        Bar * widget = new Bar(ctx, obj, lv_bar_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -96,6 +98,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -168,6 +171,7 @@ namespace be::lv {
         return jsretval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

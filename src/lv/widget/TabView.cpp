@@ -10,11 +10,13 @@ namespace be::lv {
         JS_CGETSET_DEF("tabActive",TabView::getTabActive,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("content",TabView::getContent,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("tabBar",TabView::getTabBar,be::lv::Obj::invalidSetter) ,
+
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("addTab", 1, TabView::addTab),
         JS_CFUNC_DEF("renameTab", 2, TabView::renameTab),
         JS_CFUNC_DEF("setActive", 2, TabView::setActive),
+
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -35,7 +37,7 @@ namespace be::lv {
         if( JS_IsException(obj) ) {
             return obj ;
         }
-        TabView * widget = new TabView(ctx, obj, lv_obj_create(lvparent)) ;
+        TabView * widget = new TabView(ctx, obj, lv_tabview_create(lvparent)) ;
         return widget->jsobj ;
     }
 
@@ -99,6 +101,7 @@ namespace be::lv {
         return retval ;
     }
     #endif
+
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -149,6 +152,7 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

@@ -181,20 +181,20 @@ extern "C" {
     JS_FreeValue(ctx, ret) ;                                                        \
     }
 #define MALLOC_ARGV1(argv, arg1)                                                    \
-    argv = malloc(sizeof(JSValue)) ;                                                \
+    argv = (JSValue*)malloc(sizeof(JSValue)) ;                                      \
     argv[0] = arg1 ;
 #define MAKE_ARGV1(argv, arg1)                                                      \
     JSValueConst * MALLOC_ARGV1(argv, arg1)
 
 #define MALLOC_ARGV2(argv, arg1, arg2)                                              \
-    argv = malloc(sizeof(JSValue)*2) ;                                              \
+    argv = (JSValue*)malloc(sizeof(JSValue)*2) ;                                    \
     argv[0] = arg1 ;                                                                \
     argv[1] = arg2 ;
 #define MAKE_ARGV2(argv, arg1, arg2)                                                \
     JSValueConst * MALLOC_ARGV2(argv, arg1, arg2)
 
 #define MALLOC_ARGV3(argv, arg1, arg2, arg3)                                        \
-    argv = malloc(sizeof(JSValue)*3) ;                                              \
+    argv = (JSValue*)malloc(sizeof(JSValue)*3) ;                                    \
     argv[0] = arg1 ;                                                                \
     argv[1] = arg2 ;                                                                \
     argv[2] = arg3 ;
@@ -202,7 +202,7 @@ extern "C" {
     JSValueConst * MALLOC_ARGV3(argv, arg1, arg2, arg3)
 
 #define MALLOC_ARGV4(argv, arg1, arg2, arg3, arg4)                                  \
-    argv = malloc(sizeof(JSValue)*4) ;                                              \
+    argv = (JSValue*)malloc(sizeof(JSValue)*4) ;                                    \
     argv[0] = arg1 ;                                                                \
     argv[1] = arg2 ;                                                                \
     argv[2] = arg3 ;                                                                \
