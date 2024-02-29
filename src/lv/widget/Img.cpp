@@ -52,12 +52,16 @@ namespace be::lv {
         : Img(ctx, JS_NULL, lv_image_create(parent))
     {}
         
-    JSValue Img::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Img::constructor(JSContext *ctx, JSValueConst ctor, int argc, JSValueConst *argv) {
         lv_obj_t * lvparent = nullptr ;
         if(argc>0) {
             JSVALUE_TO_LVOBJ_VAR(argv[0], lvparent)
         }
-        Img * widget = new Img(ctx,lvparent) ;
+        JSValue obj = newObject(ctx, ctor) ;
+        if( JS_IsException(obj) ) {
+            return obj ;
+        }
+        Img * widget = new Img(ctx, obj, lv_image_create(lvparent)) ;
         return widget->jsobj ;
     }
 

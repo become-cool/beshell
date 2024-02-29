@@ -44,7 +44,7 @@ namespace be::lv {
         if(argc>1) {
             text = (char *)JS_ToCString(ctx, argv[1]) ;
         }
-        Label * widget = new Label(ctx, obj, lv_obj_create(lvparent)) ;
+        Label * widget = new Label(ctx, obj, lv_label_create(lvparent)) ;
         if(text) {
             lv_label_set_text(widget->lvobj(),text) ;
             JS_FreeCString(ctx,text) ;
