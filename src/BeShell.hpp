@@ -1,6 +1,6 @@
 #pragma once
 
-#include <queue>
+#include <vector>
 #include "debug.h"
 #include "JSEngine.hpp"
 #include "repl/REPL.hpp"
@@ -25,6 +25,9 @@
 
 
 namespace be {
+    
+    class BeShell ;
+	typedef void (*LoopFunction)(const BeShell &) ;
 
     class BeShell {
 
@@ -33,6 +36,8 @@ namespace be {
         uint8_t boot_level = 5 ;
         bool requst_reset = false ;
         bool nowifi = false ;
+
+        std::vector<LoopFunction> loopFunctions ;
 
     public:
         FS * fs = nullptr ;
@@ -56,6 +61,8 @@ namespace be {
         void addModule(const char * name) {
             engine->mloader.add<M>(name) ;
         }
+
+        void addLoopFunction(LoopFunction func) ;
 
         void useBasic() ;
         void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;

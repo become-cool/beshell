@@ -32,7 +32,8 @@ list(APPEND include_dirs deps/lvgl/src)
 # list(APPEND include_dirs deps/TinyUntar/tinyuntar)
 # list(APPEND src_dirs deps/TinyUntar/tinyuntar)
 
-# # mongoose
+# mongoose
+file(GLOB_RECURSE src_mg deps/mongoose/*.c)
 # list(APPEND include_dirs deps/mongoose)
 # list(APPEND src_dirs deps/mongoose)
 
@@ -75,6 +76,7 @@ idf_component_register(
             ${src_quickjs}
             ${src_littlefs}
             ${src_lvgl}
+            ${src_mg}
         # SRC_DIRS
         #     ${src_dirs}
         INCLUDE_DIRS
@@ -102,6 +104,7 @@ add_definitions(-DLV_CONF_INCLUDE_SIMPLE)
 
 # # for mongoose tls/ssl
 add_definitions(-DMG_ENABLE_MBEDTLS)
+add_definitions(-DMG_ARCH_ESP32)
 # add_definitions(-DMG_ENABLE_OPENSSL)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)

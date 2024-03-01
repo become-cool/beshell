@@ -84,6 +84,11 @@ namespace be {
     }
 #endif
 
+
+    void BeShell::addLoopFunction(LoopFunction func) {
+        loopFunctions.push_back(func) ;
+    }
+
     void BeShell::setup() {
 
 // #ifdef ESP_PLATFORM
@@ -99,6 +104,10 @@ namespace be {
             lv->setup(*this) ;
         }
 #endif
+
+        for(auto func:loopFunctions) {
+            func(*this) ;
+        }
     }
 
     void BeShell::loop() {
