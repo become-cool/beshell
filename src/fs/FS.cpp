@@ -1,4 +1,6 @@
 #include "FS.hpp"
+#include <BeShell.hpp>
+#include <JSEngine.hpp>
 #include <cstring>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -124,6 +126,17 @@ namespace be {
         }
         return path ;
     }
+    
+    std::string FS::toVFSPath(JSContext * ctx, const char * path) {
+        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
+        if(!engine) {
+            return std::string(path) ;
+        }
+        assert(engine->beshell) ;
+        assert(engine->beshell->fs) ;
+        return engine->beshell->fs->toVFSPath(path) ;
+    }
+
     std::string FS::trimVFSPath(const std::string & path) {
         if (path.substr(0, prefix.size())==prefix) {
             if(path.size()==prefix.size() || path[prefix.size()]=='/') {

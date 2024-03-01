@@ -4,17 +4,23 @@
 #include "mongoose/mongoose.h"
 
 namespace be::mg {
-    class Response: public be::NativeClass {
+    class Response: public ::be::NativeClass {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
+        struct mg_connection * conn = nullptr ;
 
     public:
-        Response(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
+        Response(JSContext * ctx, struct mg_connection * conn) ;
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
+        static JSValue wsSend(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue httpUpgrade(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue serveDir(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue redirect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue reply(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
     } ;
 }

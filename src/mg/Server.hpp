@@ -16,9 +16,12 @@ namespace be::mg {
         void * ssl_cert_path;
         void * ssl_key_path;
 
+        static void eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) ;
+
     public:
-        Server(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
+        Server(JSContext * ctx, struct mg_connection * conn, JSValue callback=JS_NULL) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        ~Server() ;
         
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue startTelweb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

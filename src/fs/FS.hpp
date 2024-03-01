@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <quickjs/quickjs.h>
 
 
 #include "FSPartition.hpp"
@@ -29,6 +30,7 @@ namespace be {
         void setPrefix(const char * path) ;
         std::string toVFSPath(const char * path) ;
         std::string & toVFSPath(std::string & path) ;
+        static std::string toVFSPath(JSContext * ctx, const char * path) ;
         std::string trimVFSPath(const std::string & path) ;
 
         void mount(const char * mountPoint, FSPartition * partition) ;

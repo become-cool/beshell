@@ -4,13 +4,16 @@
 namespace be::mg {
 
     struct mg_mgr MgModule::mgr ;
+    std::string MgModule::ca_path ;
+    std::string MgModule::cert_path ;
+    std::string MgModule::certkey_path ;
 
     MgModule::MgModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
         exportClass<Server>() ;
         exportClass<Client>() ;
-        exportClass<Request>() ;
+        exportClass<HTTPRequest>() ;
         exportClass<Response>() ;
 
         // exportFunction("isListening",isListening,0) ;
@@ -22,6 +25,7 @@ namespace be::mg {
         exportFunction("setLog",setLog,0) ;
 
         exportFunction("listenHttp",Server::listenHttp,0) ;
+        exportFunction("connect",Client::connect,0) ;
     }
 
     // void MgModule::import(JSContext *ctx) {

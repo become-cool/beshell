@@ -22,14 +22,22 @@ namespace be::mg {
         JS_CFUNC_DEF("setHandler", 0, Server::setHandler),
     } ;
     
-    Server::Server(JSContext * ctx, JSValue _jsobj)
-        : NativeClass(ctx,build(ctx,_jsobj))
+    Server::Server(JSContext * ctx, struct mg_connection * conn, JSValue callback)
+        : NativeClass(ctx,build(ctx))
+        , conn(conn)
+        , callback(JS_DupValue(ctx,callback))
     {
+        if(conn) {
+            conn->fn_data = this ;
+        }
     }
 
-    JSValue Server::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        auto obj = new Server(ctx) ;
-        return obj->jsobj ;
+    Server::~Server() {
+        if(conn && conn->fn_data==nullptr) {
+            conn->is_closing = true ;
+            conn->fn_data = nullptr ;
+        }
+        JS_FreeValue(ctx, callback) ;
     }
 
     JSValue Server::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -61,14 +69,6 @@ namespace be::mg {
     }
 
 
-    static response_t * response_new(JSContext *ctx, struct mg_connection * conn) {
-        response_t * rspn = malloc(sizeof(response_t)) ;
-        rspn->conn = conn ;
-        rspn->jsrspn = JS_NewObjectClass(ctx, js_mg_http_rspn_class_id) ;
-        JS_SetOpaque(rspn->jsrspn, rspn) ;
-        return rspn ;
-    }
-
     // enum {
     //   MG_EV_ERROR,       // Error                         char *error_message
     //   MG_EV_OPEN,        // Client created           NULL
@@ -91,21 +91,21 @@ namespace be::mg {
     //   MG_EV_USER,        // Starting ID for user events
     // };
 
-    static void Server::eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) {
+    void Server::eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) {
 
         if(ev== MG_EV_POLL || !fn_data) {
             return ;
         }
-            
-        #define SERVER ((be_http_server_t *)fn_data)
+
+        #define SERVER ((Server *)fn_data)
         // be_http_server_t * server = (be_http_server_t *)fn_data ;
         // printf("\nevent:%s, conn:%p, server:%p, server->conn:%p, \n", mg_event_const_to_name(ev), conn, server, server->conn) ;
         // printf("%s %s \n", ((server->conn==NULL || server->conn==conn)?"server":"client"), mg_event_const_to_name(ev)) ;
 
         if(ev==MG_EV_ACCEPT && SERVER->ssl) {
             struct mg_tls_opts opts = {
-                .cert = vfspath_to_fs("/var/cert.pem"),    // Certificate file
-                .certkey = vfspath_to_fs("/var/key.pem"),  // Private key file
+                .cert = MgModule::cert_path.c_str(),    // Certificate file
+                .certkey = MgModule::certkey_path.c_str(),  // Private key file
             };
             mg_tls_init(conn, &opts);
             printf("mg_tls_init()\n") ;
@@ -113,19 +113,21 @@ namespace be::mg {
         }
 
 
-        if(SERVER->telweb) {
-            if( telnet_ws_response(conn, ev, ev_data, fn_data) ) {
-                return ;
-            }
-            // c telweb 函数没有处理的请求, 由 js 函数接着处理
-            // 这种情况下 open 事件是在 c 函数内处理的，
-            // 需要在此创建 response_t 
-            if(!conn->userdata){
-                conn->userdata = response_new(SERVER->ctx, conn) ;
-            }
-        }
+        // @todo 未实现
+        // if(SERVER->telweb) {
+        //     if( telnet_ws_response(conn, ev, ev_data, fn_data) ) {
+        //         return ;
+        //     }
+        //     // c telweb 函数没有处理的请求, 由 js 函数接着处理
+        //     // 这种情况下 open 事件是在 c 函数内处理的，
+        //     // 需要在此创建 Response 
+        //     if(!conn->userdata){
+        //         conn->userdata = new Response(SERVER->ctx, conn) ;
+        //     }
+        // }
+
         if(!JS_IsFunction(SERVER->ctx, SERVER->callback)) {
-            printf("callback is not a function, event:%s\n", mg_event_const_to_name(ev)) ;
+            printf("callback is not a function, event:%s\n", MgModule::eventName(ev)) ;
             return ;
         }
 
@@ -143,23 +145,23 @@ namespace be::mg {
         else {
             switch(ev) {
                 case MG_EV_OPEN: {
-                    conn->userdata = response_new(SERVER->ctx, conn) ; 
+                    conn->userdata = new Response(SERVER->ctx, conn) ; 
                     return ;
                 }
                 case MG_EV_CLOSE:
                     if(conn->userdata) {
-                        response_t * rspn = (response_t *)conn->userdata ;
+                        Response * rspn = (Response *)conn->userdata ;
 
-                        JSValueConst * MALLOC_ARGV3(cbargv, JS_NewString(SERVER->ctx, "close"), JS_NULL, rspn->jsrspn)
+                        JSValueConst * MALLOC_ARGV3(cbargv, JS_NewString(SERVER->ctx, "close"), JS_NULL, rspn->jsobj)
                         JSValue ret = JS_Call(SERVER->ctx, SERVER->callback, JS_UNDEFINED, 3, cbargv) ;
                         free(cbargv) ;
                         if(JS_IsException(ret)) {
                             js_std_dump_error(SERVER->ctx) ;
                         }
 
-                        JS_SetOpaque(rspn->jsrspn, NULL) ;
-                        JS_FreeValue(SERVER->ctx, rspn->jsrspn) ;
-                        free(rspn) ;
+                        JS_SetOpaque(rspn->jsobj, NULL) ;
+                        JS_FreeValue(SERVER->ctx, rspn->jsobj) ;
+                        delete rspn ;
                         conn->userdata = NULL ;
                     }
                     return ;
@@ -170,16 +172,13 @@ namespace be::mg {
                         printf("conn->userdata == NULL ??") ;
                         return ;
                     }
-                    response_t * rspn = (response_t *)conn->userdata ;
+                    Response * rspn = (Response *)conn->userdata ;
+                    HTTPRequest * req = new HTTPRequest(SERVER->ctx,(struct mg_http_message *)ev_data);
 
-                    JSValue jsreq = JS_NewObjectClass(SERVER->ctx, js_mg_http_message_class_id) ;
-                    JS_SetOpaque(jsreq, ev_data) ;
-
-                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, mg_event_const_to_name(ev)), jsreq, rspn->jsrspn)
+                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, MgModule::eventName(ev)), req->jsobj, rspn->jsobj)
                     JSValue ret = JS_Call(SERVER->ctx, SERVER->callback, JS_UNDEFINED, 3, cbargv) ;
 
-                    JS_SetOpaque(jsreq, NULL) ;  // mg 事件函数结束后 mg_http_message 对象销毁
-                    JS_FreeValue(SERVER->ctx, jsreq) ;
+                    delete req ;
                     free(cbargv) ;
 
                     if(JS_IsException(ret)) {
@@ -198,7 +197,7 @@ namespace be::mg {
                         printf("conn->userdata == NULL ??") ;
                         return ;
                     }
-                    response_t * rspn = (response_t *)conn->userdata ;
+                    Response * rspn = (Response *)conn->userdata ;
 
                     struct mg_ws_message * msg = (struct mg_ws_message *)ev_data ;
 
@@ -210,10 +209,10 @@ namespace be::mg {
                         JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewStringLen(SERVER->ctx, msg->data.ptr, msg->data.len)) ;
                     }
                     else if(op == WEBSOCKET_OP_BINARY) {
-                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewArrayBuffer(SERVER->ctx,msg->data.ptr, msg->data.len,NULL,NULL,false)) ;
+                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewArrayBuffer(SERVER->ctx,(uint8_t*)msg->data.ptr, msg->data.len,NULL,NULL,false)) ;
                     }
 
-                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, mg_event_const_to_name(ev)), jsmsg, rspn->jsrspn)
+                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, MgModule::eventName(ev)), jsmsg, rspn->jsobj)
                     JSValue ret = JS_Call(SERVER->ctx, SERVER->callback, JS_UNDEFINED, 3, cbargv) ;
 
                     if( JS_IsException(ret) ){
@@ -247,68 +246,57 @@ namespace be::mg {
         CHECK_ARGC(1)
 
         char * addr = NULL ;
-
-        Server * server = new Server(ctx, JS_NULL) ;
+        JSValue callback = JS_NULL ;
+        bool ssl = false ;
+        bool telweb = false ;
 
         // options
         if( JS_IsObject(argv[0]) ){
+
+            ASSIGN_PROP(argv[0], "callback", callback)
+            if( !JS_IsFunction(ctx, callback) ) {
+                JSTHROW("arg callback must be a function") ;
+            }
+
             ASSIGN_STR_PROP_C(argv[0], "addr", addr, {
-                JSTHROW_GOTO(failed,"missing option addr")
+                JSTHROW("missing option addr") ;
             })
 
-            ASSIGN_PROP(argv[0], "callback", server->callback)
-            if( !JS_IsFunction(ctx, server->callback) ) {
-                JSTHROW_GOTO(failed,"arg callback must be a function")
-            }
-            JS_DupValue(ctx, server->callback) ;
-
-            ASSIGN_BOOL_PROP(argv[0], "ssl", server->ssl)
-            ASSIGN_BOOL_PROP(argv[0], "telweb", server->telweb)
+            ASSIGN_BOOL_PROP(argv[0], "ssl", ssl)
+            ASSIGN_BOOL_PROP(argv[0], "telweb", telweb)
         }
 
         // addr + callback
         else {
             CHECK_ARGC(2)
 
-            ARGV_AS_CSTRING_C(0, addr, {
-                JSTHROW_GOTO(failed,"arg addr must be a string")
-            }) ;
-
             if( !JS_IsFunction(ctx, argv[1]) ) {
-                JSTHROW_GOTO(failed, "arg callback must be a function")
+                JSTHROW("arg callback must be a function") ;
             }
-            server->callback = JS_DupValue(ctx,argv[1]) ;
-            server->telweb = false ;
-            server->ssl = false ;
+
+            ARGV_AS_CSTRING_C(0, addr, {
+                JSTHROW("arg addr must be a string") ;
+            }) ;
+            
+            callback = argv[1] ;
         }
 
         if(!MgModule::isListening(addr)) {
-            JSTHROW_GOTO(failed, "addr %s has listened", addr) ;
+            JS_FreeCString(ctx, addr) ;
+            JSTHROW("addr %s has listened", addr)
         }
 
-        struct mg_connection * conn = mg_http_listen(MgModule::mgr, addr, http_server_event_handler, NULL) ;
+        struct mg_connection * conn = mg_http_listen(&MgModule::mgr, addr, eventHandler, NULL) ;
         if(conn==NULL) {
-            JSTHROW_GOTO(failed, "could not listen addr: %s", addr)
+            JS_FreeCString(ctx, addr) ;
+            JSTHROW("could not listen addr: %s", addr) ;
         }
         JS_FreeCString(ctx, addr) ;
-        server->conn = conn ;
-        conn->fn_data = server ;
 
-        // 这个引用在监听结束后 free
-        JS_DupValue(ctx, server->jsobj) ;
-        
+        Server * server = new Server(ctx, conn, callback) ;
+        server->ssl = ssl ;
+        server->telweb = telweb ;
+
         return server->jsobj ;
-
-    failed:
-        if(addr) {
-            JS_FreeCString(ctx, addr) ;
-            addr = NULL ;
-        }
-        if(server) {
-            JS_FreeValue(ctx, server->callback) ;
-            free(server) ;
-            server = NULL ;
-        }
-        return JS_EXCEPTION ;
     }
 }

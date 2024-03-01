@@ -4,7 +4,7 @@
 #include "NativeModule.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
-#include "Request.hpp"
+#include "HTTPRequest.hpp"
 #include "Response.hpp"
 #include "mongoose/mongoose.h"
 
@@ -16,13 +16,19 @@ namespace be::mg {
     public:
         MgModule(JSContext * ctx, const char * name) ;
 
-        // void import(JSContext *ctx) ;
+        static std::string ca_path ;
+        static std::string cert_path ;
+        static std::string certkey_path ;
 
         static void loop(const BeShell & beshell) ;
 
         inline static void use(be::BeShell & beshell) {
             beshell.addModule<MgModule>("mg") ;
             beshell.addLoopFunction(loop) ;
+
+            ca_path = beshell.fs->toVFSPath("/var/ca.pem") ;
+            cert_path = beshell.fs->toVFSPath("/var/cert.pem") ;
+            certkey_path = beshell.fs->toVFSPath("/var/key.pem") ;
         }
 
         static const char * eventName(int ev) ;
@@ -30,7 +36,7 @@ namespace be::mg {
 
         static bool isListening(const char * url) ;
 
-        static JSValue sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sntpHTTPRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -38,5 +44,6 @@ namespace be::mg {
         static JSValue setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     friend class Server ;
+    friend class Client ;
     } ;
 }
