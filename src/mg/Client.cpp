@@ -35,7 +35,7 @@ namespace be::mg {
         CHECK_ARGC(1)
         THIS_NCLASS(Client,client)
 
-        ARGV_TO_STRING_LEN_E(0, data, len, "arg data must be a string")
+        ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
         bool res = mg_send(client->conn, data, len) ;
         JS_FreeCString(ctx, data) ;
 

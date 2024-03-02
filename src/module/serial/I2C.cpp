@@ -12,13 +12,18 @@ namespace be {
 
     std::vector<JSCFunctionListEntry> I2C::methods = {
         JS_CFUNC_DEF("setup", 1, I2C::setup),
+        JS_CFUNC_DEF("unsetup", 1, I2C::unsetup),
         JS_CFUNC_DEF("ping", 1, I2C::ping),
         JS_CFUNC_DEF("scan", 1, I2C::scan),
         JS_CFUNC_DEF("send", 2, I2C::send),
-        JS_CFUNC_DEF("write8", 2, I2C::write8),
-        JS_CFUNC_DEF("write16", 2, I2C::write16),
-        JS_CFUNC_DEF("write32", 2, I2C::write32),
+        JS_CFUNC_DEF("writeInt8", 2, I2C::write8),
+        JS_CFUNC_DEF("writeInt16", 2, I2C::write16),
+        JS_CFUNC_DEF("writeInt32", 2, I2C::write32),
+        JS_CFUNC_DEF("writeUint8", 2, I2C::write8),
+        JS_CFUNC_DEF("writeUint16", 2, I2C::write16),
+        JS_CFUNC_DEF("writeUint32", 2, I2C::write32),
         JS_CFUNC_DEF("recv", 2, I2C::recv),
+        JS_CFUNC_DEF("recvUint8", 2, I2C::recvUint8),
         JS_CFUNC_DEF("readR8", 2, I2C::readR8),
         JS_CFUNC_DEF("readR16", 2, I2C::readR16),
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
@@ -88,7 +93,6 @@ namespace be {
         if(i2c_param_config(thisobj->busnum, &i2c_config)!=ESP_OK) {
             return JS_FALSE ;
         }
-        i2c_driver_delete(thisobj->busnum) ;
         esp_err_t res = i2c_driver_install(thisobj->busnum, I2C_MODE_MASTER, 0, 0, 0) ;
         if(res!=ESP_OK) {
             return JS_FALSE ;
@@ -97,6 +101,11 @@ namespace be {
 	    // i2c_set_timeout(thisobj->busnum, timeout) ;
 
         return JS_TRUE ;
+    }
+
+    JSValue I2C::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2C, thisobj)
+        return i2c_driver_delete(thisobj->busnum)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
 
     bool I2C::ping(uint8_t addr) {
@@ -213,7 +222,7 @@ namespace be {
         return JS_NewArrayBuffer(ctx, buffer, len, freeArrayBuffer, NULL, false) ;
     }
 
-    JSValue I2C::recv8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue I2C::recvUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_UINT8(0, addr)
         THIS_NCLASS(I2C, thisobj)

@@ -132,7 +132,7 @@ namespace be::mg {
         MUST_BE_WS_FUNC("mg.HttpResponse.wsSend")
 
         if( JS_IsString(argv[0]) ){
-            ARGV_TO_STRING_LEN(0, str, len)
+            ARGV_TO_CSTRING_LEN(0, str, len)
             mg_ws_send(rspn->conn, str, len, WEBSOCKET_OP_TEXT) ;
             JS_FreeCString(ctx, str) ;
         }

@@ -83,6 +83,7 @@ namespace be {
         }
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -90,7 +91,7 @@ namespace be {
         static JSValue write16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue recv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue recv8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue recvUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <NativeClass.hpp>
+#include "driver/uart.h"
 
 namespace be{
     class UART: public be::NativeClass {
@@ -9,11 +10,18 @@ namespace be{
         static std::vector<JSCFunctionListEntry> methods ;
         // static std::vector<JSCFunctionListEntry> staticMethods ;
 
+        uart_port_t m_uartNum ;
+        
     public:
-        UART(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
-
+        UART(JSContext * ctx, uart_port_t port) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        uart_port_t uartNum() const ;
+
+        static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
     } ;
 }

@@ -118,14 +118,14 @@ extern "C" {
 #define ARGV_TO_DOUBLE_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, double, JS_ToFloat64, def)
 
 
-#define ARGV_TO_STRING_LEN(i, var, len)                     \
+#define ARGV_TO_CSTRING_LEN(i, var, len)                     \
     size_t len = 0 ;                                        \
     const char * var = JS_ToCStringLen(ctx, &len, argv[i]) ;
-#define ARGV_TO_STRING_LEN_E(i, var, len, msg)              \
+#define ARGV_TO_CSTRING_LEN_E(i, var, len, msg)              \
     if(!JS_IsString(argv[i])) {                             \
         JSTHROW(msg)                                        \
     }                                                       \
-    ARGV_TO_STRING_LEN(i, var, len)
+    ARGV_TO_CSTRING_LEN(i, var, len)
 
 
 #define ARGV_TO_STRING(i, var)                              \
