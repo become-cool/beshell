@@ -11,7 +11,7 @@ char *strdupf( const char *fmt, ... );
 char *vstrdupf( const char *fmt, va_list args );
 int strlenf( const char *fmt, ... );
 int vstrlenf( const char *fmt, va_list args );
-char * mallocf(char * fmt, ...) ;
+char * mallocf(const char * fmt, ...) ;
 
 #ifdef __cplusplus
 }

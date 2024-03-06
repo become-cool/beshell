@@ -137,6 +137,15 @@ extern "C" {
     }
 
 
+#define ARGV_TO_PATH(i, var)                                \
+    std::string var ;                                       \
+    {                                                       \
+        const char * cstr = JS_ToCString(ctx, argv[i]) ;    \
+        var = FS::toVFSPath(ctx, cstr) ;                    \
+        JS_FreeCString(ctx, cstr) ;                         \
+    }
+
+
 #define ARGV_TO_CSTRING(i, var)                             \
     const char * var = JS_ToCString(ctx, argv[i]) ;
 

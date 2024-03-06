@@ -45,6 +45,13 @@ file(GLOB_RECURSE src_mg deps/mongoose/*.c)
 # list(APPEND include_dirs deps/esp32-perfmon/include)
 # list(APPEND src_dirs deps/esp32-perfmon)
 
+# sqlite3
+file(GLOB_RECURSE src_sqlite3
+    deps/sqlite3/*.c
+    deps/sqlite3/*.cpp
+)
+
+
 
 if (IDF_VERSION_MAJOR LESS 5)
     set(requires esp_adc_cal)
@@ -77,6 +84,7 @@ idf_component_register(
             ${src_littlefs}
             ${src_lvgl}
             ${src_mg}
+            ${src_sqlite3}
         # SRC_DIRS
         #     ${src_dirs}
         INCLUDE_DIRS
@@ -109,6 +117,10 @@ add_definitions(-DMG_ARCH_ESP32)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
 
+# for sqlite3
+# add_definitions(-DSQLITE_COVERAGE_TEST)
+# add_definitions(-DSQLITE_DEBUG)
+
 add_definitions(-DGNUBOY_NO_MINIZIP)
 add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)
@@ -122,12 +134,15 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-conversion")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
+target_compile_options(${COMPONENT_LIB} PRIVATE -fno-stack-protector -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -mlongcalls -nostdlib -Wpointer-arith -Wno-error=unused-value -Wno-error=unused-label -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-error=char-subscripts -Wno-error=maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-error=misleading-indentation)
+
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-permissive")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-brace")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-enum-enum-conversion")
 
 if (COMMAND component_compile_options)
     # both c and c++
