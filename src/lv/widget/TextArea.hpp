@@ -40,7 +40,6 @@ namespace be::lv {
         static JSValue setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getLabel(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getCurrentChar(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -54,7 +53,6 @@ namespace be::lv {
         static JSValue cursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue cursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue cursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

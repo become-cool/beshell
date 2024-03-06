@@ -26,7 +26,6 @@ namespace be::lv {
         static JSValue setStep(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue setCursorPos(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue setDigitStepDirection(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -36,7 +35,6 @@ namespace be::lv {
         static JSValue stepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue increment(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue decrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

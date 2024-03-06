@@ -129,7 +129,7 @@ namespace be::driver::display {
         panel_config.data_gpio_nums[15] = GPIO_LCD_R4 ;
 
             // .timings = {
-        panel_config.timings.pclk_hz = 14 * 1000 * 1000;
+        panel_config.timings.pclk_hz = 20 * 1000 * 1000;
         panel_config.timings.h_res = _width;
         panel_config.timings.v_res = _height;
         
@@ -204,6 +204,7 @@ namespace be::driver::display {
     }
     JSValue RGB565::init(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(RGB565,that)
+        esp_lcd_panel_reset(that->handle) ;
         return esp_lcd_panel_init(that->handle) == ESP_OK? JS_TRUE: JS_FALSE ;
     }
 
