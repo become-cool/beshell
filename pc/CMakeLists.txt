@@ -77,9 +77,25 @@ include_directories(../deps)
 include_directories(../deps/littlefs/src/littlefs)
 
 
-
-
 add_definitions(-ldl)
+
+
+function(embed_js_src varname jspath hpath)
+
+    execute_process(COMMAND stat -c %Y ${FILE1_PATH} OUTPUT_VARIABLE FILE1_TIMESTAMP)
+
+    if(js_time STRGREATER h_time)
+        message("===================")
+    endif()
+
+    # file(WRITE ${hpath} "#@pragma once\n\n")
+    # file(APPEND ${hpath} "const char* ${varname} = R\"(")
+    # file(APPEND ${hpath} "${FILE_CONTENT}")
+    # file(APPEND ${hpath} ")\";\n")
+endfunction()
+
+embed_js_src(jsSrcWifi "${CMAKE_CURRENT_LIST_DIR}/../src/js/wifi.js", "${CMAKE_CURRENT_LIST_DIR}/../src/js/wifi.js.h")
+
 
 
 # 添加可执行文件

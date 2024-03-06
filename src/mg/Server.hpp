@@ -20,7 +20,6 @@ namespace be::mg {
 
     public:
         Server(JSContext * ctx, struct mg_connection * conn, JSValue callback=JS_NULL) ;
-        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         ~Server() ;
         
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
