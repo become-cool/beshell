@@ -22,6 +22,7 @@ namespace be::lv {
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
         JS_CFUNC_DEF("center", 2, Obj::center),
         JS_CFUNC_DEF("enableEvent", 1, Obj::enableEvent),
+        JS_CFUNC_DEF("allStyleProps", 1, Obj::allStyleProps),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
