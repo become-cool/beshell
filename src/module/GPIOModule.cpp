@@ -121,7 +121,7 @@ namespace be {
         return gpio_set_level((gpio_num_t)pin, value)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
     JSValue GPIOModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        CHECK_ARGC(1)
         ARGV_TO_UINT8(0, pin)
         gpio_get_level((gpio_num_t)pin);
         return JS_NewUint32(ctx, gpio_get_level((gpio_num_t)pin)) ;
