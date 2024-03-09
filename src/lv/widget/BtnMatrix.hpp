@@ -24,7 +24,6 @@ namespace be::lv {
         static JSValue getOneChecked(JSContext *ctx, JSValueConst this_val) ;
         static JSValue setOneChecked(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getPopovers(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -34,7 +33,6 @@ namespace be::lv {
         static JSValue setButtonWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue hasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

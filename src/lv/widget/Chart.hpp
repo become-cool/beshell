@@ -25,7 +25,6 @@ namespace be::lv {
         static JSValue setUpdateMode(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getPressedPoint(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getFirstPointCenterOffset(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -51,7 +50,6 @@ namespace be::lv {
         static JSValue setExtXArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getYArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getXArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

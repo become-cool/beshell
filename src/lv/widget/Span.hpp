@@ -30,7 +30,6 @@ namespace be::lv {
         static JSValue setMaxLines(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getSpanCount(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMaxLineHeight(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -40,7 +39,6 @@ namespace be::lv {
         static JSValue getExpandWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue refrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

@@ -22,6 +22,7 @@ namespace be::lv {
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
         JS_CFUNC_DEF("center", 2, Obj::center),
         JS_CFUNC_DEF("enableEvent", 1, Obj::enableEvent),
+        JS_CFUNC_DEF("allStyleProps", 1, Obj::allStyleProps),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
@@ -377,6 +378,7 @@ namespace be::lv {
         else CREATE_WIDGET(spangroup, Span)
         else CREATE_WIDGET(switch, Switch)
         else CREATE_WIDGET(textarea, TextArea)
+        else CREATE_WIDGET(gif, Gif)
 // AUTO GENERATE CODE END [WRAP WIDGETS] --------
         else {
             return nullptr ;

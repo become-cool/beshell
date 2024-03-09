@@ -5,13 +5,11 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Slider::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("isDragged", 0, Slider::isDragged),
         // Unsupported arg type:
         // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -38,7 +36,6 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [GETSETS] --------
 
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -53,7 +50,6 @@ namespace be::lv {
         return jsretval ;
     }
     #endif
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

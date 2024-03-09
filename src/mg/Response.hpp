@@ -12,8 +12,6 @@ namespace be::mg {
 
     public:
         Response(JSContext * ctx, struct mg_connection * conn) ;
-
-        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
         static JSValue wsSend(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue httpUpgrade(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

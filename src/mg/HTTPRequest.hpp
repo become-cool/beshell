@@ -13,7 +13,6 @@ namespace be::mg {
 
     public:
         HTTPRequest(JSContext * ctx, struct mg_http_message * mg_msg) ;
-        static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         struct mg_http_message * opaque() ;
     

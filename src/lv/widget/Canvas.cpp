@@ -5,7 +5,6 @@ namespace be::lv {
     std::vector<JSCFunctionListEntry> Canvas::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("setPx", 4, Canvas::setPx),
@@ -17,7 +16,6 @@ namespace be::lv {
         // void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf, const lv_area_t * dest_area)
         // void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
         // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -55,7 +53,6 @@ namespace be::lv {
     // unspported type: const void *
     // JSValue Canvas::getBuf(JSContext *ctx, JSValueConst this_val){}
     // const void * lv_canvas_get_buf(lv_obj_t * canvas)
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -128,7 +125,6 @@ namespace be::lv {
 
     // Unsupported arg type: lv_layer_t *
     // void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

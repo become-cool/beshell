@@ -744,7 +744,7 @@ namespace be {
     //     WIFI_AUTH_OWE,              /**< authenticate mode : OWE */
     //     WIFI_AUTH_MAX
     // } wifi_auth_mode_t;
-    static char * authmode_names(wifi_auth_mode_t auto_mode) {
+    static const char * authmode_names(wifi_auth_mode_t auto_mode) {
         switch(auto_mode) {
             case WIFI_AUTH_OPEN: return "OPEN" ;
             case WIFI_AUTH_WEP: return "WEP" ;

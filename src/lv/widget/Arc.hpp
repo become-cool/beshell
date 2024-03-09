@@ -29,7 +29,6 @@ namespace be::lv {
         static JSValue setKnobOffset(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getMinValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getMaxValue(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -39,7 +38,6 @@ namespace be::lv {
         static JSValue setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue alignObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue rotateObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

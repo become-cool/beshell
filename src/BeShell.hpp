@@ -58,7 +58,7 @@ namespace be {
 
 
         template <typename M>
-        void addModule(const char * name) {
+        void addModule(const char * name=nullptr) {
             engine->mloader.add<M>(name) ;
         }
 

@@ -17,6 +17,7 @@ namespace be::driver::display {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
+        bool playing = true ;
 
     protected:
         esp_lcd_panel_handle_t handle = nullptr;
@@ -27,8 +28,13 @@ namespace be::driver::display {
         
         bool createBuff() ;
         void drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) ;
-    
-        static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        
+        static JSValue init(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue off(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue on(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
 }

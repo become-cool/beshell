@@ -81,7 +81,7 @@ int vstrlenf( const char *fmt, va_list args )
   return vsnprintf( &buf, 0, fmt, args );
 }
 
-char * mallocf(char * fmt, ...) {
+char * mallocf(const char * fmt, ...) {
 	char *result;
 	va_list args;
 
