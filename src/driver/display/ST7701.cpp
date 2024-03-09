@@ -11,9 +11,9 @@ namespace be::driver::display {
 
         
     #define GPIO_LCD_RST    (GPIO_NUM_NC)
-    #define GPIO_LCD_CS     (GPIO_NUM_20)
-    #define GPIO_LCD_SDA    (GPIO_NUM_45)
-    #define GPIO_LCD_SCK    (GPIO_NUM_21)
+    #define GPIO_LCD_CS     (GPIO_NUM_0)
+    #define GPIO_LCD_SDA    (GPIO_NUM_12)
+    #define GPIO_LCD_SCK    (GPIO_NUM_14)
 
     #define LCD_CS_Clr()    gpio_set_level(GPIO_LCD_CS, 0)
     #define LCD_CS_Set()    gpio_set_level(GPIO_LCD_CS, 1)
