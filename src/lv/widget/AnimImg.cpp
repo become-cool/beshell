@@ -7,13 +7,11 @@ namespace be::lv {
         JS_CGETSET_DEF("duration",AnimImg::getDuration,AnimImg::setDuration) ,
         JS_CGETSET_DEF("repeatCount",AnimImg::getRepeatCount,AnimImg::setRepeatCount) ,
         JS_CGETSET_DEF("srcCount",AnimImg::getSrcCount,be::lv::Obj::invalidSetter) ,
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("start", 0, AnimImg::start),
         // Unsupported arg type:
         // void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num)
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -88,7 +86,6 @@ namespace be::lv {
         return retval ;
     }
     #endif
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -102,7 +99,6 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

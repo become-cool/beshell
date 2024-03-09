@@ -105,6 +105,32 @@ namespace be::lv {
         }
     }
 
+    JSValue Obj::allStyleProps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        JSVALUE_TO_LVOBJ(this_val,lvobj)
+
+        JSTHROW("not implements")
+        // JSValue jsProps = JS_NewObject(ctx) ;
+        // for(int i = 0; i < lvobj->style_cnt; i++) {
+
+        //     const lv_style_t * style = lvobj->styles[i].style ;
+
+        //     lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
+        //     uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+        //     uint16_t * props = (uint16_t *)tmp;
+
+        //     for(int j=0;j<style->prop_cnt;j++) {
+        //         const char * propName = lv_style_prop_const_to_str(props[j]) ;
+        //         JSValue jsval = lv_style_value_to_js(ctx, props[j], values[j]) ;
+        //         JS_SetPropertyStr(ctx, jsProps, propName, jsval) ;
+        //         // JS_FreeValue(ctx,jsval) ;
+        //     }
+
+        // }
+
+        // return jsProps ;
+
+    }
+
     JSValue Obj::center(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         JSVALUE_TO_LVOBJ(this_val,lvobj)
         lv_obj_align(lvobj, LV_ALIGN_CENTER, 0, 0);
@@ -129,21 +155,21 @@ namespace be::lv {
         return success ;
     }
     JSValue Obj::setWidth(JSContext *ctx, JSValueConst this_val, JSValueConst val){
-        THIS_NCLASS(Obj,thisobj)
+        THIS_NCLASS(Obj,lvobj)
         int32_t value ;
         if(!sizeValue(ctx,val,value)) {
             JSTHROW("arg %s of method %s.%s() must be a %s","width","Obj","setWidth","number")
         }
-        lv_obj_set_width(thisobj->lvobj(), value) ;
+        lv_obj_set_width(lvobj->lvobj(), value) ;
         return JS_UNDEFINED ;
     }
     JSValue Obj::setHeight(JSContext *ctx, JSValueConst this_val, JSValueConst val){
-        THIS_NCLASS(Obj,thisobj)
+        THIS_NCLASS(Obj,lvobj)
         int32_t value ;
         if(!sizeValue(ctx,val,value)) {
             JSTHROW("arg %s of method %s.%s() must be a %s","height","Obj","setHeight","number")
         }
-        lv_obj_set_height(thisobj->lvobj(), value) ;
+        lv_obj_set_height(lvobj->lvobj(), value) ;
         return JS_UNDEFINED ;
     }
 }

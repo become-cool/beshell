@@ -659,15 +659,15 @@
 #define LV_USE_LIBJPEG_TURBO 0
 
 /*GIF decoder library*/
-#define LV_USE_GIF 0
+#define LV_USE_GIF 1
 #if LV_USE_GIF
 /*GIF decoder accelerate*/
-#define LV_GIF_CACHE_DECODE_DATA 0
+#define LV_GIF_CACHE_DECODE_DATA 1
 #endif
 
 
 /*Decode bin images to RAM*/
-#define LV_BIN_DECODER_RAM_LOAD 0
+#define LV_BIN_DECODER_RAM_LOAD 1
 
 /*RLE decompress library*/
 #define LV_USE_RLE 0

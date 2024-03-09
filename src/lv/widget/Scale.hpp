@@ -32,7 +32,6 @@ namespace be::lv {
         static JSValue setPostDraw(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
         static JSValue getRangeMinValue(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getRangeMaxValue(JSContext *ctx, JSValueConst this_val) ;
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -42,7 +41,6 @@ namespace be::lv {
         static JSValue addSection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sectionSetRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sectionSetStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;
