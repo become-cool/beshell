@@ -89,6 +89,22 @@ namespace be::lv {
         }
         THIS_NCLASS(Img,thisobj)
         const char * src = (char *)JS_ToCString(ctx, value) ;
+        
+        if( strncmp(src,"res:",4)==0 ) {
+
+            const char * res = src+4 ;
+
+            if(LV::embededImages.count(res)<1) {
+                JS_ThrowReferenceError(ctx, "unknow res name: %s",res) ;
+                JS_FreeCString(ctx, src) ;
+                return JS_EXCEPTION ;
+            }
+            
+            lv_image_set_src(thisobj->lvobj(), LV::embededImages[res]) ;
+            JS_FreeCString(ctx, src) ;
+
+            return JS_UNDEFINED ;
+        }
 
         string path = string("C:") + engine->beshell->fs->toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
