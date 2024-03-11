@@ -8,6 +8,8 @@ using namespace std;
 
 namespace be::lv {
 
+    std::map<const char *, const lv_image_dsc_t  *> LV::preloadedImageDsc ;
+
     LV::LV() {}
 
     static void lv_tick_inc_cb(void *data) {
@@ -142,6 +144,10 @@ namespace be::lv {
     }
     void LV::loop() {
         lv_task_handler() ;
+    }
+
+    void preloadImage(const char * name, const lv_image_dsc_t  * imgDsc) {
+        LV::addImageDsc[name] = imgDsc ;
     }
 
 }
