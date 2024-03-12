@@ -7,5 +7,6 @@ namespace be {
         ProcessModule(JSContext * ctx, const char * name,uint8_t flagGlobal=1) ;
         
         static JSValue reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

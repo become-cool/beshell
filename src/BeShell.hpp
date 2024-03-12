@@ -37,7 +37,9 @@ namespace be {
         bool requst_reset = false ;
         bool nowifi = false ;
 
-        std::vector<LoopFunction> loopFunctions ;
+        std::vector<LoopFunction> loopFunctions ; 
+
+        const char * deviceJsonPath = nullptr ;
 
     public:
         FS * fs = nullptr ;
@@ -72,6 +74,7 @@ namespace be {
 #ifdef MODULE_LV
         void useLV() ;
 #endif
+        void useDeviceJSON(const char * path) ;
     } ;
 
 }

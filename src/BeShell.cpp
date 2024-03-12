@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
+// #include "js/device.h"
 
 
 #ifdef ESP_PLATFORM
@@ -108,6 +109,18 @@ namespace be {
         for(auto func:loopFunctions) {
             func(*this) ;
         }
+
+        if( deviceJsonPath ) {
+            if(!fs) {
+                cout << "could not setup device from json, call useFS() first" << endl ;
+            } else {
+                // engine->eval(embeded_js_src_device, sizeof(embeded_js_src_device), "device.js", JS_EVAL_TYPE_MODULE) ;
+            }
+        }
+    }
+
+    void BeShell::useDeviceJSON(const char * path) {
+        deviceJsonPath = path ;
     }
 
     void BeShell::loop() {

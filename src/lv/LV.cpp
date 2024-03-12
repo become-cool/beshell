@@ -8,7 +8,7 @@ using namespace std;
 
 namespace be::lv {
 
-    std::map<const char *, const lv_image_dsc_t  *> LV::preloadedImageDsc ;
+    std::map<const char *, const lv_image_dsc_t  *> LV::embededImageDsc ;
 
     LV::LV() {}
 
@@ -147,7 +147,7 @@ namespace be::lv {
     }
 
     void preloadImage(const char * name, const lv_image_dsc_t  * imgDsc) {
-        LV::addImageDsc[name] = imgDsc ;
+        LV::embededImageDsc[name] = imgDsc ;
     }
 
 }

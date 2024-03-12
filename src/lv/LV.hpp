@@ -24,7 +24,7 @@ namespace lv {
         void setup(const be::BeShell & beshell) ;
         void loop() ;
         
-        static std::map<const char *, const lv_image_dsc_t  *> preloadedImageDsc ;
+        static std::map<const char *, const lv_image_dsc_t  *> embededImageDsc ;
     } ;
 
     void addImageDsc(const char * name, const lv_image_dsc_t  *) ;
