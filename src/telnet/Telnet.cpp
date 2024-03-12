@@ -159,7 +159,7 @@ namespace be {
         if(pkg->body()) {
             // 分段数据包
             if(pkg->chunk_len && pkg->body_len>0xFF) {
-                echo_time("write file",{
+                necho_time("write file",{
                     fwrite(pkg->body(),1,pkg->chunk_len,ch->openedFile) ;
                 })
             }
