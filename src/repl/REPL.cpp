@@ -12,6 +12,8 @@
 #include <sstream>
 #include <utime.h>
 #ifdef ESP_PLATFORM
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_system.h"
 #endif
 
@@ -240,8 +242,68 @@ namespace be {
         registerCommand("free", 
             "Usage: free"
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
-            ch->send("command not implements.") ;
+
+            int heap_total = 0 ;
+            int heap_used = 0 ;
+            int heap_free = 0 ;
+            int psram_total = 0 ;
+            int psram_used = 0 ;
+            int psram_free = 0 ;
+            int dma_total = 0 ;
+            int dma_used = 0 ;
+            int dma_free = 0 ;
+
+#ifdef ESP32_PLATFORM
+            multi_heap_info_t info;
+
+            heap_caps_get_info(&info, MALLOC_CAP_DMA);
+            dma_total = info.total_free_bytes + info.total_allocated_bytes;
+            dma_used = info.total_allocated_bytes;
+            dma_free = info.total_free_bytes;
+
+            heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
+            heap_total = info.total_free_bytes + info.total_allocated_bytes;
+            heap_used = info.total_allocated_bytes;
+            heap_free = info.total_free_bytes;
+
+            heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+            psram_total = info.total_free_bytes + info.total_allocated_bytes;
+            psram_used = info.total_allocated_bytes;
+            psram_free = info.total_free_bytes;
+#endif
+            string buff = "heap: total=" + to_string(heap_total) + " used=" + to_string(heap_used) + " free=" + to_string(heap_free) + "\n" ;
+            buff+= "psram: total=" + to_string(psram_total) + " used=" + to_string(psram_used) + " free=" + to_string(psram_free) + "\n" ;
+            buff+= "dma: total=" + to_string(dma_total) + " used=" + to_string(dma_used) + " free=" + to_string(dma_free) + "\n" ;
+            ch->send(buff) ;
         }) ;
+
+        
+        registerCommand("top", 
+            "Usage: top"
+        , [](BeShell * beshell, TelnetChannel * ch, Options & args){
+
+            string buff ;
+#ifdef ESP_PLATFORM
+            uint8_t CPU_RunInfo[400];
+            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+    
+            vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
+
+            buff = "----------------------------------------------------\r\n";
+            buff+= "task_name     task_status     priority stack task_id\r\n";
+            buff+= (char *)CPU_RunInfo;
+            buff+= "----------------------------------------------------\r\n";
+
+            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+
+            vTaskGetRunTimeStats((char *)&CPU_RunInfo);
+
+            buff+= "task_name      run_cnt                 usage_rate   \r\n";
+            buff+= (char *)CPU_RunInfo;
+            buff+= "----------------------------------------------------\r\n";
+#endif
+            ch->send(buff) ;
+        });
 
 
         registerCommand("help", 
