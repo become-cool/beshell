@@ -3,6 +3,7 @@
 #include "lvgl.h"
 #include "esp_timer.h"
 #include <map>
+#include <string>
 
 namespace be {
     class BeShell ;
@@ -24,7 +25,7 @@ namespace lv {
         void setup(const be::BeShell & beshell) ;
         void loop() ;
         
-        static std::map<const char *, const lv_image_dsc_t  *> embededImageDsc ;
+        static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
     } ;
 
     void addImageDsc(const char * name, const lv_image_dsc_t  *) ;
