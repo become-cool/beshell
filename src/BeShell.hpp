@@ -39,8 +39,6 @@ namespace be {
 
         std::vector<LoopFunction> loopFunctions ; 
 
-        const char * deviceJsonPath = nullptr ;
-
     public:
         FS * fs = nullptr ;
         Telnet * telnet = nullptr ;

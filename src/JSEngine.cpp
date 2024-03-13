@@ -201,7 +201,7 @@ namespace be {
         if(code_len<0) {
             code_len = strlen(code) ;
         }
-        return JS_Eval(ctx, code, code_len, filename, JS_EVAL_TYPE_GLOBAL) ;   // JS_EVAL_FLAG_STRIP
+        return JS_Eval(ctx, code, code_len, filename, flags) ;   // JS_EVAL_FLAG_STRIP
     }
 
     JSValue JSEngine::evalScript(const char * filepath, int flags) {
