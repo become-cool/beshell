@@ -3,6 +3,7 @@
 #include "BeShell.hpp"
 #include "telnet/Telnet.hpp"
 #include "debug.h"
+#include "mallocf.h"
 #include <cassert>
 #include <iomanip>
 #include <sys/stat.h>
@@ -304,6 +305,24 @@ namespace be {
 #endif
             ch->send(buff) ;
         });
+
+
+        registerCommand("import", 
+            "Usage: import <module>"
+        , [](BeShell * beshell, TelnetChannel * ch, Options & args){
+            if(args.length()<1) {
+                ch->send("missing module name") ;
+            }
+            const char * moduleName = args[0].c_str() ;
+            const char * varName = moduleName ;
+            char * code = (char *)mallocf("import * as %s from \"%s\";\n global.%s = %s;", varName, moduleName, varName, varName) ;
+            JSValue ret = beshell->engine->eval(code, -1, "repl.import" , JS_EVAL_TYPE_MODULE) ;
+            free(code) ;
+            if(JS_IsException(ret)) {
+                beshell->engine->dumpError(-1,ch) ;
+            }
+            JS_FreeValue(beshell->engine->ctx,ret) ;
+        }) ;
 
 
         registerCommand("help", 
