@@ -253,7 +253,7 @@ namespace be {
             int dma_used = 0 ;
             int dma_free = 0 ;
 
-#ifdef ESP32_PLATFORM
+#ifdef ESP_PLATFORM
             multi_heap_info_t info;
 
             heap_caps_get_info(&info, MALLOC_CAP_DMA);
