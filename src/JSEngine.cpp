@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include "debug.h"
+#include "js/json.c"
 #include "ModuleLoader.hpp"
 #include "EventEmitter.hpp"
 #include "module/ProcessModule.hpp"
@@ -104,29 +105,23 @@ namespace be {
         // global 对象
         JSValue global = JS_GetGlobalObject(ctx);
         JS_SetPropertyStr(ctx, global, "global", global);
-
-        // base 函数
-        // eval_rc_script(ctx, "/lib/base/base.js") ;
-        // eval_rc_script(ctx, "/lib/base/console.js") ;
-        // eval_rc_script(ctx, "/lib/base/events.js") ;
-        // eval_rc_script(ctx, "/lib/base/require.js") ;
-
         
         JSValue ArrayBufferProto = js_get_prop(ctx, global, 2, "ArrayBuffer", "prototype") ;
         JS_SetPropertyStr(ctx, ArrayBufferProto, "asString", JS_NewCFunction(ctx, js_ArrayBuffer_asString, "asString", 0));
         JS_SetPropertyStr(ctx, ArrayBufferProto, "toArray", JS_NewCFunction(ctx, js_ArrayBuffer_toArray, "toArray", 0));
 	    JS_FreeValue(ctx, ArrayBufferProto);
 
-
         JSEngine * engine = JSEngine::fromJSRuntime(rt) ;
-
         assert(engine) ;
+
         engine->timer.setup(ctx) ;
         engine->mloader.setup(ctx) ;
 
         engine->console = new Console(ctx) ;
         setGlobalValue(ctx, "console", engine->console->jsobj) ;
 
+        JSEngineEvalEmbeded(ctx, json)
+        
         EventEmitter::defineClass(ctx) ;
         setGlobalValue(ctx, "EventEmitter", JS_DupValue(ctx,NativeClass::getClass(ctx,EventEmitter::classID)) ) ;
 

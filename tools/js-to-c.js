@@ -29,7 +29,7 @@ files.forEach(file => {
             cArray += `${utf8Bytes}, `;
         }
 
-        cArray += '0x00\n};';
+        cArray += "\n0x" + "\n".charCodeAt(0).toString(16) + ', 0x00\n};';
 
         fs.writeFileSync(cFilePath, cArray, 'utf8');
         console.log(`File ${cFilePath} has been generated`);
