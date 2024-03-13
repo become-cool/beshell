@@ -7,7 +7,7 @@ using namespace std ;
 
 namespace be::lv {
     
-    static map<const char *, lv_font_t *> loadedFonts ;
+    static map<string, lv_font_t *> loadedFonts ;
     
     JSValue LVModule::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(2) 
