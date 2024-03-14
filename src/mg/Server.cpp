@@ -253,17 +253,17 @@ namespace be::mg {
         // options
         if( JS_IsObject(argv[0]) ){
 
-            ASSIGN_PROP(argv[0], "callback", callback)
+            GET_PROP(argv[0], "callback", callback)
             if( !JS_IsFunction(ctx, callback) ) {
                 JSTHROW("arg callback must be a function") ;
             }
 
-            ASSIGN_STR_PROP_C(argv[0], "addr", addr, {
+            GET_STR_PROP_C(argv[0], "addr", addr, {
                 JSTHROW("missing option addr") ;
             })
 
-            ASSIGN_BOOL_PROP(argv[0], "ssl", ssl)
-            ASSIGN_BOOL_PROP(argv[0], "telweb", telweb)
+            GET_BOOL_PROP(argv[0], "ssl", ssl)
+            GET_BOOL_PROP(argv[0], "telweb", telweb)
         }
 
         // addr + callback

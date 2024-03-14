@@ -92,6 +92,7 @@ function() {
 
         JS_SetPropertyStr(ctx, jsobj, "stringify", jsStringify) ;
         JS_SetPropertyStr(ctx, jsobj, "log", jsLog) ;
+        JS_SetPropertyStr(ctx, jsobj, "error", jsLog) ;
         JS_SetPropertyStr(ctx, jsobj, "emit", jsEmit) ;
     }
 

@@ -97,14 +97,14 @@ namespace be {
 
         telnet->setup() ;
 
-        engine->setup() ;
-
 #ifdef MODULE_LV
         if(lv) {
             lv->setup(*this) ;
         }
 #endif
 
+        engine->setup() ;
+        
         for(auto func:loopFunctions) {
             func(*this) ;
         }

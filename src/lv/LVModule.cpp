@@ -17,7 +17,6 @@ namespace be::lv {
         exportFunction("registerDisplay",registerDisplay,0) ;
         exportFunction("registerInputDevice",registerInputDevice,0) ;
         exportFunction("loadFont",loadFont,2) ;
-        exportFunction("test",test,0) ;
 
         exportClass<Style>() ;
         exportClass<Row>() ;
@@ -93,6 +92,7 @@ namespace be::lv {
 
     JSValue LVModule::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
+        dd
         return JS_UNDEFINED ;
     }
 
@@ -121,6 +121,7 @@ namespace be::lv {
 
     JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
+        dd
         JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
 
         // @todo
@@ -132,6 +133,7 @@ namespace be::lv {
         data->ptr = static_pointer_cast<be::driver::InDevPointer>(indev->shared());
 
         lv_indev_t * lvindev = lv_indev_create();
+        dp(lvindev)
         lv_indev_set_user_data(lvindev, (void *)data) ;
         lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(lvindev, pointer_read);
@@ -139,14 +141,5 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
-    JSValue LVModule::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        lv_obj_t * parent = lv_screen_active() ;
-        dp(parent)
-        dn(lv_obj_get_child_count(parent))
-
-        lv_obj_t * btn = lv_button_create(parent) ;
-
-        return JS_UNDEFINED ;
-    }
 
 }
