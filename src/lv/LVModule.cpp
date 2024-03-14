@@ -121,7 +121,6 @@ namespace be::lv {
 
     JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
-        dd
         JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
 
         // @todo
@@ -133,7 +132,6 @@ namespace be::lv {
         data->ptr = static_pointer_cast<be::driver::InDevPointer>(indev->shared());
 
         lv_indev_t * lvindev = lv_indev_create();
-        dp(lvindev)
         lv_indev_set_user_data(lvindev, (void *)data) ;
         lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(lvindev, pointer_read);

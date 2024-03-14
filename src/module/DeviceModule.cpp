@@ -6,7 +6,7 @@ namespace be{
     const char * DeviceModule::deviceJsonPath = nullptr ;
 
     DeviceModule::DeviceModule(JSContext * ctx, const char * name)
-        : NativeModule(ctx, name, 1)
+        : NativeModule(ctx, name, 0)
     {
         exportName("deviceJsonPath") ;
         exportName("device") ;
