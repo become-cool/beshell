@@ -7,22 +7,23 @@ using namespace std ;
 
 namespace be::lv {
     
-    static map<const char *, lv_font_t *> loadedFonts ;
+    static map<string, lv_font_t *> loadedFonts ;
     
     JSValue LVModule::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(2) 
         ARGV_TO_CSTRING(0, name) 
-        ARGV_TO_CSTRING(1, path)
+        ARGV_TO_CSTRING(1, cpath)
 
-        lv_font_t * font = lv_binfont_create(path);
+        string path = string("C:") + FS::toVFSPath(ctx, cpath) ;
+        JS_FreeCString(ctx, cpath) ;
+
+        lv_font_t * font = lv_binfont_create(path.c_str());
         if(font) {
             loadedFonts[name] = font ;
             JS_FreeCString(ctx, name) ;
-            JS_FreeCString(ctx, path) ;
             return JS_UNDEFINED ;
         } else {
             JS_FreeCString(ctx, name) ;
-            JS_FreeCString(ctx, path) ;
             return JSTHROW("load font failed") ;
         }
     }

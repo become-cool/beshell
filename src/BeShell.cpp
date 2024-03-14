@@ -1,9 +1,11 @@
 #include "BeShell.hpp"
 #include "fs/FSModule.hpp"
 #include "module/NVSModule.hpp"
+#include "module/DeviceModule.hpp"
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
+#include "js/device.c"
 
 
 #ifdef ESP_PLATFORM
@@ -108,6 +110,16 @@ namespace be {
         for(auto func:loopFunctions) {
             func(*this) ;
         }
+
+        if(bUseDeviceJSON) {
+            JSEngineEvalEmbeded(engine->ctx, device)
+        }
+    }
+
+    void BeShell::useDeviceJSON(const char * path) {
+        DeviceModule::use(*this) ;
+        DeviceModule::setDeviceJsonPath(path) ;
+        bUseDeviceJSON = true ;
     }
 
     void BeShell::loop() {

@@ -36,8 +36,9 @@ namespace be {
         uint8_t boot_level = 5 ;
         bool requst_reset = false ;
         bool nowifi = false ;
+        bool bUseDeviceJSON = false ;
 
-        std::vector<LoopFunction> loopFunctions ;
+        std::vector<LoopFunction> loopFunctions ; 
 
     public:
         FS * fs = nullptr ;
@@ -72,6 +73,7 @@ namespace be {
 #ifdef MODULE_LV
         void useLV() ;
 #endif
+        void useDeviceJSON(const char * path="/config/device.json") ;
     } ;
 
 }
