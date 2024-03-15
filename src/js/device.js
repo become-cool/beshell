@@ -1,31 +1,9 @@
-import {deviceJsonPath} from 'device'
+import {deviceJsonPath, device} from 'device'
 import * as serial from 'serial'
+import * as driver from 'driver'
+import * as lv from 'lv'
 
-function createDevFromDriver(devConf) {
-    try{
-        // console.log("besdk/driver/"+devConf.driver+'.js')
-        var driver = require("besdk/driver/"+devConf.driver+'.js')
-    }catch(e){
-        console.error(e)
-        console.error("unknow driver", devConf.driver)
-    }
-    try {
-        let dev = new driver
-        if(dev.setup(devConf.setup)==false) {
-            console.error(devConf.driver,'device setup failed.')
-            return
-        }
-        if(dev.begin(devConf.begin)==false) {
-            console.error(devConf.driver,'device begin failed.')
-            return
-        }
-        dev.register(devConf.varname)
-        return dev
-    }catch(e) {
-        console.error(e)
-    }
-}
-(function(){
+(async function(){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
         console.log(deviceJsonPath, "not exists or invalid.") ;
@@ -55,13 +33,37 @@ function createDevFromDriver(devConf) {
     
     // dev
     for(let devConf of deviceConf.dev||[]){
+        if(devConf.disable) {
+            continue
+        }
+        let driverClass = driver[devConf.driver]
+        if(!driverClass) {
+            console.error("unknow driver", devConf.driver)
+            continue ;
+        }
         try {
-            if(devConf.disable) {
+            let dev = new driverClass
+            if(dev.setup && dev.setup(devConf.setup)==false) {
+                console.error(devConf.driver,'device setup failed.')
                 continue
             }
-            createDevFromDriver(devConf)
-        }catch(e){
-            console.log(e)
+            if(dev.begin && dev.begin(devConf.begin)==false) {
+                console.error(devConf.driver,'device begin failed.')
+                continue
+            }
+            if(devConf.lv) {
+                if(devConf.lv.type=='input') {
+                    lv.registerInputDevice(dev, devConf.lv.option)
+                } else if (devConf.lv.type=='display') {
+                    lv.registerInputDisplay(dev, devConf.lv.option)
+                } else {
+                    console.error("unknown lv type", devConf.lv.type)
+                }
+            }
+            let varname = devConf.name || driverClass.name
+            device[varname] = dev
+        }catch(e) {
+            console.error(e)
         }
     }
 })()

@@ -1,6 +1,7 @@
 #include "Obj.hpp"
 #include "../const.hpp"
 #include "../Style.hpp"
+#include "fs/FS.hpp"
 
 using namespace std ;
 
@@ -47,6 +48,7 @@ namespace be::lv {
             lv_obj_set_local_style_prop(lvobj, LV_STYLE_PAD_LEFT, jsStyleValue, selector) ;
             lv_obj_set_local_style_prop(lvobj, LV_STYLE_PAD_RIGHT, jsStyleValue, selector) ;
         }
+
         else {
             lv_style_prop_t prop ;
             if(!lv_style_prop_str_to_const(jsStyleName, &prop)) {
@@ -54,6 +56,22 @@ namespace be::lv {
                 JS_FreeCString(ctx, jsStyleName) ;
                 return JS_EXCEPTION ;
             }
+
+            // 路径
+            if( prop==LV_STYLE_BG_IMAGE_SRC || prop==LV_STYLE_ARC_IMAGE_SRC ) {
+
+                const char * cpath = JS_ToCString(ctx, value) ;
+                string path = FS::toVFSPath(ctx, cpath) ;
+                char * cvfspath = (char *) malloc(path.length()) ;
+                strcpy(cvfspath, path.c_str()) ;
+
+                jsStyleValue.ptr = "/fs/4.jpg" ;
+                lv_obj_set_local_style_prop(lvobj, prop, jsStyleValue, selector) ;
+                
+                JS_FreeCString(ctx, cpath) ;
+                return JS_UNDEFINED ;
+            }
+
             if(!Style::propToValue(ctx, prop, value, &jsStyleValue)){
                 JSTHROW("style value invalid")
             }
@@ -79,7 +97,6 @@ namespace be::lv {
                 JSAtom prop = e.atom;
                 const char * propName = JS_AtomToCString(ctx, prop) ;
                 JSValue val = JS_GetProperty(ctx, argv[0], prop);
-                ds(propName)
                 JSValue ret = set_style(ctx, lvobj, propName, val, selector) ;
 
                 JS_FreeCString(ctx, propName);

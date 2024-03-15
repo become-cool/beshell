@@ -19,7 +19,5 @@ namespace be{
         }
 
         static void setDeviceJsonPath(const char * path) ;
-
-        static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

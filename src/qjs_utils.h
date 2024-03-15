@@ -268,8 +268,8 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define HMALLOC(var, size) var = malloc(size);
 #endif
 
-#define GET_INT_PROP(obj, propName, cvar, excp)                                     \
-    int32_t cvar = 0 ;                                                              \
+#define GET_INT_PROP(obj, propName, cvar, ctype, getter, excp)                      \
+    cvar ;                                                                          \
     {                                                                               \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                     \
         if( JS_IsUndefined(jsvar) ) {                                               \
@@ -281,93 +281,47 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
             JS_ThrowReferenceError(ctx, "property %s is not a number", propName) ;  \
             excp ;                                                                  \
         }                                                                           \
-        JS_ToInt32(ctx, &cvar, jsvar) ;                                             \
+        getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
     }
 
-#define GET_INT_PROP_DEFAULT(obj, propName, cvar, default)                              \
-    int32_t cvar = 0 ;                                                                  \
+#define GET_INT32_PROP(obj, propName, cvar, excp)   GET_INT_PROP(obj, propName, cvar, int32_t, JS_ToInt32, excp)
+#define GET_UINT32_PROP(obj, propName, cvar, excp)  GET_INT_PROP(obj, propName, cvar, uint32_t, JS_ToUint32, excp)
+
+#define GET_INT_PROP_OPT(obj, propName, cvar, ctype, getter, default)                   \
+    cvar ;                                                                              \
     {                                                                                   \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( JS_IsUndefined(jsvar) ) {                                                     \
+        if( JS_IsUndefined(jsvar) ) {                                                   \
             cvar = default ;                                                            \
         }                                                                               \
         else {                                                                          \
             if( !JS_IsNumber(jsvar) ) {                                                 \
                 JS_FreeValue(ctx, jsvar) ;                                              \
-                JSTHROW(ctx, "property %s is not a number", propName) ;         \
+                JSTHROW("property %s is not a number", propName) ;                      \
             }                                                                           \
-            JS_ToInt32(ctx, &cvar, jsvar) ;                                             \
+            getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
         }                                                                               \
     }
-
-#define GET_INT_PROP_NODEF(obj, propName, cvar)                                         \
-    {                                                                                   \
-        JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( !JS_IsUndefined(jsvar) ) {                                                     \
-            if( !JS_IsNumber(jsvar) ) {                                                 \
-                JS_FreeValue(ctx, jsvar) ;                                              \
-                JSTHROW(ctx, "property %s is not a number", propName) ;         \
-            }                                                                           \
-            JS_ToInt32(ctx, &cvar, jsvar) ;                                             \
-        }                                                                               \
-    }
-
-#define _ASSIGN_INT_PROP_DEFAULT(obj, propName, cvar, getter, default, tmptype)         \
-    if(obj==JS_UNDEFINED||obj==JS_NULL) {                                               \
-        cvar = default ;                                                                \
-    } else {                                                                            \
-        JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( jsvar==JS_UNDEFINED ) {                                                     \
-            cvar = default ;                                                            \
-        }                                                                               \
-        else {                                                                          \
-            if( !JS_IsNumber(jsvar) ) {                                                 \
-                JS_FreeValue(ctx, jsvar) ;                                              \
-                JSTHROW(ctx, "property %s is not a number", propName) ;         \
-            }                                                                           \
-            tmptype tmp = 0 ;                                                           \
-            getter(ctx, &tmp, jsvar) ;                                                  \
-            cvar = tmp ;                                                                \
-        }                                                                               \
-    }
-#define ASSIGN_INT_PROP_DEFAULT(obj, propName, cvar, default) \
-        _ASSIGN_INT_PROP_DEFAULT(obj, propName, cvar, JS_ToInt32, default, int32_t)
-
-#define ASSIGN_UINT_PROP_DEFAULT(obj, propName, cvar, default) \
-        _ASSIGN_INT_PROP_DEFAULT(obj, propName, cvar, JS_ToUint32, default, uint32_t)
-
-#define _ASSIGN_INT_PROP(obj, propName, ctype, cvar, getter)                            \
-    {                                                                                   \
-        JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( !JS_IsNumber(jsvar) ) {                                                     \
-            JS_FreeValue(ctx, jsvar) ;                                                  \
-            JSTHROW(ctx, "property %s is not a number", propName) ;             \
-        }                                                                               \
-        getter(ctx, (ctype *) &cvar, jsvar) ;                                           \
-    }
-
-#define ASSIGN_INT_PROP(obj, propName, cvar) \
-        _ASSIGN_INT_PROP(obj, propName, int, cvar, JS_ToInt32)
-
-#define ASSIGN_UINT_PROP(obj, propName, cvar) \
-        _ASSIGN_INT_PROP(obj, propName, uint, cvar, JS_ToUint32)
+    
+#define GET_INT32_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t, JS_ToInt32, default)
+#define GET_UINT32_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
 
 
-#define ASSIGN_PROP(obj, propName, jsvar)                                               \
+#define GET_PROP(obj, propName, jsvar)                                                  \
     jsvar = JS_UNDEFINED ;                                                              \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                                 \
     }                                                                                   \
 
-#define ASSIGN_PROP_P(obj, propName, jsvar, not_exist_code)                             \
-    ASSIGN_PROP(obj, propName, jsvar)                                                   \
+#define GET_PROP_P(obj, propName, jsvar, not_exist_code)                                \
+    GET_PROP(obj, propName, jsvar)                                                      \
     if(jsvar==JS_UNDEFINED||jsvar==JS_NULL) {                                           \
         not_exist_code                                                                  \
     }
 
 // 对象属性值 -> cvar
 // 需要要手动 JS_FreeCString(ctx, cvar)
-#define ASSIGN_STR_PROP(obj, propName, cvar)                                            \
+#define GET_STR_PROP(obj, propName, cvar)                                               \
     cvar = NULL ;                                                                       \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
@@ -375,7 +329,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
             cvar = JS_ToCString(ctx, jsvar) ;                                           \
         }                                                                               \
     }
-#define ASSIGN_STR_PROP_C(obj, propName, cvar, err_code)                                \
+#define GET_STR_PROP_C(obj, propName, cvar, err_code)                                   \
     cvar = NULL ;                                                                       \
     if((!JS_IsUndefined(obj))&&(!JS_IsNull(obj))) {                                     \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
@@ -387,11 +341,11 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         err_code                                                                        \
     }
 
-#define ASSIGN_STR_PROP_E(obj, propName, cvar, err_msg)                                 \
-    ASSIGN_STR_PROP_C( obj, propName, cvar, JSTHROW(err_msg))
+#define GET_STR_PROP_E(obj, propName, cvar, err_msg)                                 \
+    GET_STR_PROP_C( obj, propName, cvar, JSTHROW(err_msg))
 
 
-#define ASSIGN_BOOL_PROP(obj, propName, cvar)                                           \
+#define GET_BOOL_PROP(obj, propName, cvar)                                           \
     cvar = false ;                                                                      \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \

@@ -16,6 +16,7 @@ using namespace std ;
 #define GT_TP4_REG 		(0x8168)   
 #define GT_TP5_REG 		(0x8170)   
 
+
 namespace be::driver {
 
     DEFINE_NCLASS_META(GT911, InDevPointer)
@@ -24,19 +25,21 @@ namespace be::driver {
         JS_CFUNC_DEF("setup", 0, GT911::setup),
     } ;
 
-    GT911::GT911(JSContext * ctx, be::I2C * _i2c, uint8_t _addr)
+    GT911::GT911(JSContext * ctx, be::I2C * i2c, uint8_t addr)
         : InDevPointer(ctx,build(ctx))
-        , addr(_addr)
-        , i2c(_i2c)
+        , addr(addr)
+        , i2c(i2c)
     {}
 
     JSValue GT911::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
-        ARGV_TO_UINT8(0, busnum)
+        ARGV_TO_UINT8_OPT(0, busnum, 255)
         ARGV_TO_UINT8_OPT(1, addr, 0x5D)
-        I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;
-        if(!i2c) {
-            JSTHROW("invalid i2c port number:%d", busnum)
+        I2C * i2c = nullptr ;
+        if(busnum<255) {
+            i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;
+            if(!i2c) {
+                JSTHROW("invalid i2c port number:%d", busnum)
+            }
         }
         auto obj = new GT911(ctx,i2c,addr) ;
         obj->self = std::shared_ptr<GT911> (obj) ;
@@ -44,20 +47,26 @@ namespace be::driver {
     }
 
     bool GT911::reset() {
-        assert(i2c) ;
+        if(!i2c) {
+            return false ;
+        }
         uint8_t data = 0X02 ;
         return i2c->write<uint16_t, uint8_t>(addr, GT_CTRL_REG, 0X02) ;
     }
 
     uint8_t GT911::readConfigVersion() {
-        assert(i2c) ;
+        if(!i2c) {
+            return 0 ;
+        }
         uint8_t data = 0 ;
         i2c->read<uint16_t, uint8_t>(addr, GT_CFGS_REG, data) ;
         return data ;
     }
     
     bool GT911::dataReady() {
-        assert(i2c) ;
+        if(!i2c) {
+            return false ;
+        }
         uint8_t data = 0;
         if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
             return false ;
@@ -66,7 +75,9 @@ namespace be::driver {
     }
 
     bool GT911::readPos(uint8_t i, uint16_t &x, uint16_t &y) {
-        assert(i2c) ;
+        if(!i2c) {
+            return false ;
+        }
         if(!this->dataReady()) {
             return false ;
         }
@@ -92,7 +103,9 @@ namespace be::driver {
     }
 
     uint8_t GT911::readPointCount() {
-        assert(i2c) ;
+        if(!i2c) {
+            return 0 ;
+        }
         uint8_t data = 0;
         if(!i2c->read<uint16_t,uint8_t>(addr,GT_GSTID_REG,data)){
             return 0 ;
@@ -112,6 +125,15 @@ namespace be::driver {
 
     JSValue GT911::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(GT911, thisobj)
+        CHECK_ARGC(1)
+
+        int GET_INT32_PROP_OPT(argv[0], "i2c", i2cnum, 0)
+        GET_UINT32_PROP_OPT(argv[1], "addr", thisobj->addr, 0x5D)
+        thisobj->i2c = be::I2C::flyweight(ctx, (i2c_port_t)i2cnum) ;
+        if(!thisobj->i2c) {
+            JSTHROW("invalid i2c port number:%d", i2cnum)
+        }
+
         thisobj->reset() ;
         return JS_UNDEFINED ;
     }

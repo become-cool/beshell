@@ -106,12 +106,13 @@ namespace be::driver::display {
 
         lv_display = lv_display_create(_width, _height) ;
 
+        lv_display_set_antialiasing(lv_display, true) ;
+
         if(!createBuff()) {
             return false ;
         }
 
         lv_display_set_flush_cb(lv_display, disp_flush_cb);
-
         
         // @todo
         // unregister 时销毁这个 shared_ptr 指针

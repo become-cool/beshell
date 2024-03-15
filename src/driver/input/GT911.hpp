@@ -15,7 +15,7 @@ namespace be::driver {
         be::I2C * i2c = nullptr ;
 
     public:
-        GT911(JSContext * ctx, be::I2C * i2c, uint8_t addr=0x5D) ;
+        GT911(JSContext * ctx, be::I2C * i2c=nullptr, uint8_t addr=0x5D) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         bool reset() ;

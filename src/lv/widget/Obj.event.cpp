@@ -33,9 +33,12 @@ namespace be::lv {
 
         JS_FreeValue(ctx,jsname) ;
 
-        // @todo 引用
+        // @todo 线程安全
         if(e->code==LV_EVENT_DELETE){
+            JS_SetOpaque(obj->jsobj, nullptr) ;
             JS_FreeValue(ctx, obj->jsobj) ; // js  counter -1
+            obj->jsobj = JS_NULL ;
+            obj->_lvobj = nullptr ;
             obj->self = nullptr ;           // c++ counter -1
         }
     }
