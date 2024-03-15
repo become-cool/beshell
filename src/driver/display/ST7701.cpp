@@ -10,23 +10,23 @@ namespace be::driver::display {
     DEFINE_NCLASS_META(ST7701, RGB565)
 
         
-    #define GPIO_LCD_RST    (GPIO_NUM_NC)
-    #define GPIO_LCD_CS     (GPIO_NUM_0)
-    #define GPIO_LCD_SDA    (GPIO_NUM_12)
-    #define GPIO_LCD_SCK    (GPIO_NUM_14)
+    // #define GPIO_LCD_RST    (GPIO_NUM_NC)
+    // #define GPIO_LCD_CS     (GPIO_NUM_0)
+    // #define GPIO_LCD_SDA    (GPIO_NUM_12)
+    // #define GPIO_LCD_SCK    (GPIO_NUM_14)
 
-    #define LCD_CS_Clr()    gpio_set_level(GPIO_LCD_CS, 0)
-    #define LCD_CS_Set()    gpio_set_level(GPIO_LCD_CS, 1)
-    #define LCD_SCK_Clr()   gpio_set_level(GPIO_LCD_SCK, 0)
-    #define LCD_SCK_Set()   gpio_set_level(GPIO_LCD_SCK, 1)
-    #define LCD_SDA_Clr()   gpio_set_level(GPIO_LCD_SDA, 0)
-    #define LCD_SDA_Set()   gpio_set_level(GPIO_LCD_SDA, 1)
+    #define LCD_CS_Clr()    gpio_set_level(pin_cs, 0)
+    #define LCD_CS_Set()    gpio_set_level(pin_cs, 1)
+    #define LCD_SCK_Clr()   gpio_set_level(pin_sck, 0)
+    #define LCD_SCK_Set()   gpio_set_level(pin_sck, 1)
+    #define LCD_SDA_Clr()   gpio_set_level(pin_sda, 0)
+    #define LCD_SDA_Set()   gpio_set_level(pin_sda, 1)
 
     ST7701::ST7701(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : RGB565(ctx, build(ctx, _jsobj), width, height)
     {
-        initGPIO() ;
-        initReg() ;
+        //initGPIO() ;
+        //initReg() ;
     }
 
     JSValue ST7701::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -36,6 +36,7 @@ namespace be::driver::display {
     }
 
     std::vector<JSCFunctionListEntry> ST7701::methods = {
+        JS_CFUNC_DEF("setup", 0, ST7701::setup),
     } ;
 
     void ST7701::initGPIO() {
@@ -46,32 +47,67 @@ namespace be::driver::display {
         // gpio_config(&io_conf0);
         // gpio_set_level(GPIO_SWITCH, 0);
 
-        gpio_config_t io_conf1 = {
-            .pin_bit_mask = 1ULL << GPIO_LCD_CS, 
-            .mode = GPIO_MODE_OUTPUT,
-        };
-        gpio_config(&io_conf1);
-        gpio_set_level(GPIO_LCD_CS, 1);
+        // gpio_config_t io_conf1 = {
+        //     .pin_bit_mask = 1ULL << GPIO_LCD_CS, 
+        //     .mode = GPIO_MODE_OUTPUT,
+        // };
+        // gpio_config(&io_conf1);
+        // gpio_set_level(GPIO_LCD_CS, 1);
 
-        gpio_config_t io_conf2 = {
-            .pin_bit_mask = 1ULL << GPIO_LCD_SCK, 
-            .mode = GPIO_MODE_OUTPUT,
-        };
-        gpio_config(&io_conf2);
-        gpio_set_level(GPIO_LCD_SCK, 1);
+        // gpio_config_t io_conf2 = {
+        //     .pin_bit_mask = 1ULL << GPIO_LCD_SCK, 
+        //     .mode = GPIO_MODE_OUTPUT,
+        // };
+        // gpio_config(&io_conf2);
+        // gpio_set_level(GPIO_LCD_SCK, 1);
 
-        gpio_config_t io_conf3 = {
-            .pin_bit_mask = 1ULL << GPIO_LCD_SDA,
-            .mode = GPIO_MODE_OUTPUT,
-        };
-        gpio_config(&io_conf3);
-        gpio_set_level(GPIO_LCD_SDA, 1);
+        // gpio_config_t io_conf3 = {
+        //     .pin_bit_mask = 1ULL << GPIO_LCD_SDA,
+        //     .mode = GPIO_MODE_OUTPUT,
+        // };
+        // gpio_config(&io_conf3);
+        // gpio_set_level(GPIO_LCD_SDA, 1);
     }
 
+    JSValue ST7701::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(ST7701,that)
+        CHECK_ARGC(1)
+        JSValue pin = JS_GetPropertyStr(ctx, argv[0], "pin");
+        if(!JS_IsObject(pin)){
+            JSTHROW("missing pin property")
+        }
+
+        GET_INT32_PROP(pin, "sda", that->pin_sda, )
+        GET_INT32_PROP(pin, "sck", that->pin_sck, )
+        GET_INT32_PROP(pin, "cs", that->pin_cs, )
+        GET_INT32_PROP_OPT(pin, "rst", that->pin_rst, GPIO_NUM_NC)
+
+        // dn4(that->pin_sda,that->pin_sck,that->pin_cs,that->pin_rst)
+        
+        gpio_config_t io_conf = {
+            .pin_bit_mask = 1ULL << that->pin_sda, 
+            .mode = GPIO_MODE_OUTPUT,
+        };
+        gpio_config(&io_conf);
+        gpio_set_level(that->pin_sda, 1);
+
+        io_conf.pin_bit_mask = 1ULL << that->pin_sck;
+        gpio_config(&io_conf);
+        gpio_set_level(that->pin_sck, 1);
+
+        io_conf.pin_bit_mask = 1ULL << that->pin_cs;
+        gpio_config(&io_conf);
+        gpio_set_level(that->pin_cs, 1);
+
+        that->initReg() ;
+
+        return RGB565::setup(ctx, this_val, argc, argv) ;
+    }
 
 
     void ST7701::write9b(uint16_t data)
     {
+        return ;
         uint8_t i;
         LCD_CS_Clr();
         for(i = 0; i < 9; i++)

@@ -275,11 +275,13 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         if( JS_IsUndefined(jsvar) ) {                                               \
             JS_ThrowReferenceError(ctx, "property %s not exists", propName) ;       \
             excp ;                                                                  \
+            return JS_EXCEPTION ;                                                   \
         }                                                                           \
         if( !JS_IsNumber(jsvar) ) {                                                 \
             JS_FreeValue(ctx, jsvar) ;                                              \
             JS_ThrowReferenceError(ctx, "property %s is not a number", propName) ;  \
             excp ;                                                                  \
+            return JS_EXCEPTION ;                                                   \
         }                                                                           \
         getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
     }

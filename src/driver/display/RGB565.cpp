@@ -173,6 +173,43 @@ namespace be::driver::display {
         // xTaskCreatePinnedToCore(lv_tick_task, "lv_tick_task", 1024 * 5, NULL, 5, &lvgl_task_handle, 1);
     }
 
+    JSValue RGB565::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(RGB565,that)
+        CHECK_ARGC(1)
+
+        JSValue pin = JS_GetPropertyStr(ctx, argv[0], "pin");
+        if(!JS_IsObject(pin)){
+            JSTHROW("missing pin property")
+        }
+
+        GET_INT32_PROP(pin, "de", pin_de) ;
+
+        gpio_num_t GET_INT32_PROP(pin, "de", pin_de) ;
+        gpio_num_t GET_INT32_PROP(pin, "vsync", pin_vsync) ;
+        gpio_num_t GET_INT32_PROP(pin, "hsync", pin_hsync) ;
+        gpio_num_t GET_INT32_PROP(pin, "pclk", pin_pclk) ;
+
+        gpio_num_t GET_INT32_PROP(pin, "r0", pin_r0) ;
+        gpio_num_t GET_INT32_PROP(pin, "r1", pin_r1) ;
+        gpio_num_t GET_INT32_PROP(pin, "r2", pin_r2) ;
+        gpio_num_t GET_INT32_PROP(pin, "r3", pin_r3) ;
+        gpio_num_t GET_INT32_PROP(pin, "r4", pin_r4) ;
+
+        gpio_num_t GET_INT32_PROP(pin, "g0", pin_g0) ;
+        gpio_num_t GET_INT32_PROP(pin, "g1", pin_g1) ;
+        gpio_num_t GET_INT32_PROP(pin, "g2", pin_g2) ;
+        gpio_num_t GET_INT32_PROP(pin, "g3", pin_g3) ;
+        gpio_num_t GET_INT32_PROP(pin, "g4", pin_g4) ;
+        gpio_num_t GET_INT32_PROP(pin, "g5", pin_g5) ;
+        
+        gpio_num_t GET_INT32_PROP(pin, "b0", pin_b0) ;
+        gpio_num_t GET_INT32_PROP(pin, "b1", pin_b1) ;
+        gpio_num_t GET_INT32_PROP(pin, "b2", pin_b2) ;
+        gpio_num_t GET_INT32_PROP(pin, "b3", pin_b3) ;
+        gpio_num_t GET_INT32_PROP(pin, "b4", pin_b4) ;
+
+        return JS_UNDEFINED ;
+    }
 
     void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
         if(!playing) {
@@ -188,10 +225,6 @@ namespace be::driver::display {
         ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &buff1, &buff2));
         lv_display_set_buffers(lv_display, buff1, buff2, _width*_height*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_FULL);
         return true ;
-    }
-
-    JSValue RGB565::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
     }
     JSValue RGB565::reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(RGB565,that)
