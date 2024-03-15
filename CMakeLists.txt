@@ -102,6 +102,7 @@ idf_component_register(
             esp_netif
             esp_ringbuf
             esp_lcd
+            bt
             ${requires}
         # EMBED_FILES src/js/wifi.js
 )
