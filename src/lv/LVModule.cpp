@@ -3,6 +3,7 @@
 #include <cassert>
 #include "Style.hpp"
 #include "driver/input/InDevPointer.hpp"
+#include "driver/display/Display.hpp"
 
 using namespace std ;
 
@@ -90,10 +91,11 @@ namespace be::lv {
         return JS_NewUint32(ctx,LV_PCT(val)) ;
     }
 
+
     JSValue LVModule::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
-        dd
-        return JS_UNDEFINED ;
+        JSVALUE_TO_NCLASS(be::driver::display::Display, argv[0], display)
+        return JS_NewBool(ctx, display->registerToLV()) ;
     }
 
     typedef struct {

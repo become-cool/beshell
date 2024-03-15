@@ -37,7 +37,6 @@ namespace be::driver::display {
 #ifdef MODULE_LV
         virtual bool createBuff() ;
         virtual bool registerToLV() ;
-        static JSValue jsRegisterToLV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 #endif
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -11,7 +11,6 @@ namespace be::driver::display {
     DEFINE_NCLASS_META(Display, NativeClass)
     std::vector<JSCFunctionListEntry> Display::methods = {
         JS_CFUNC_DEF("drawRect", 0, Display::jsDrawRect),
-        JS_CFUNC_DEF("registerToLV", 0, Display::jsRegisterToLV),
     } ;
 
     Display::Display(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
@@ -99,18 +98,17 @@ namespace be::driver::display {
     }
 
     bool Display::registerToLV() {
-return true ;
+
         if(lv_display) {
             return true ;
         }
 
         lv_display = lv_display_create(_width, _height) ;
-
-        lv_display_set_antialiasing(lv_display, true) ;
-
         if(!createBuff()) {
             return false ;
         }
+
+        lv_display_set_antialiasing(lv_display, true) ;
 
         lv_display_set_flush_cb(lv_display, disp_flush_cb);
         
@@ -122,14 +120,6 @@ return true ;
         lv_display_set_driver_data(lv_display,opa) ;
 
         return true ;
-    }
-
-    JSValue Display::jsRegisterToLV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(Display,thisobj)
-        if(!thisobj->registerToLV()){
-            JSTHROW("out of memory?")
-        }
-        return JS_UNDEFINED ;
     }
 
 #endif

@@ -11,7 +11,6 @@ namespace be::driver::display {
         // static std::vector<JSCFunctionListEntry> staticMethods ;
 
     private:
-        void initGPIO() ;
         void initReg() ;
         
         void writeData(uint8_t data) ;

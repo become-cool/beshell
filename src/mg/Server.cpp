@@ -262,8 +262,8 @@ namespace be::mg {
                 JSTHROW("missing option addr") ;
             })
 
-            GET_BOOL_PROP(argv[0], "ssl", ssl)
-            GET_BOOL_PROP(argv[0], "telweb", telweb)
+            GET_BOOL_PROP_OPT(argv[0], "ssl", ssl, false)
+            GET_BOOL_PROP_OPT(argv[0], "telweb", telweb, false)
         }
 
         // addr + callback

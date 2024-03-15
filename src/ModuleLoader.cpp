@@ -9,6 +9,7 @@
 #include <cassert>
 #include <stdlib.h>
 #include "path.hpp"
+#include "mallocf.h"
 #include "qjs_utils.h"
 #include "quickjs_private.h"
 
@@ -25,6 +26,19 @@ namespace be {
         {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
+            exportFunction("importSync",importSync) ;
+        }
+        
+        static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            CHECK_ARGC(1)
+            
+            const char * modulename = JS_ToCString(ctx, argv[0]) ;
+
+            JSModuleDef * mdef = JS_RunModule(ctx, nullptr, modulename) ;
+            JSValue mi = js_get_module_ns(ctx, mdef ) ;
+
+            JS_FreeCString(ctx, modulename) ;
+            return mi ;
         }
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

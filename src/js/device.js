@@ -2,8 +2,9 @@ import {deviceJsonPath, device} from 'device'
 import * as serial from 'serial'
 import * as driver from 'driver'
 import * as lv from 'lv'
+import {importSync} from 'loader'
 
-(async function(){
+(async function (){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
         console.log(deviceJsonPath, "not exists or invalid.") ;
@@ -30,13 +31,19 @@ import * as lv from 'lv'
             console.log(`setup I2C ${num}, sda:${conf.sda}, scl:${conf.scl}`)
         }
     }
+
+    let lvdevs = []
     
     // dev
     for(let devConf of deviceConf.dev||[]){
         if(devConf.disable) {
             continue
         }
-        let driverClass = driver[devConf.driver]
+        let module = driver
+        if(devConf.module) {
+            module = importSync(devConf.module)
+        }
+        let driverClass = module[devConf.driver]
         if(!driverClass) {
             console.error("unknow driver", devConf.driver)
             continue ;
@@ -52,10 +59,13 @@ import * as lv from 'lv'
                 continue
             }
             if(devConf.lv) {
+                if(typeof devConf.lv=='string') {
+                    devConf.lv = {type:devConf.lv}
+                }
                 if(devConf.lv.type=='input') {
-                    lv.registerInputDevice(dev, devConf.lv.option)
+                    lvdevs.push([dev,devConf])
                 } else if (devConf.lv.type=='display') {
-                    lv.registerInputDisplay(dev, devConf.lv.option)
+                    lvdevs.unshift([dev,devConf])
                 } else {
                     console.error("unknown lv type", devConf.lv.type)
                 }
@@ -63,7 +73,23 @@ import * as lv from 'lv'
             let varname = devConf.name || driverClass.name
             device[varname] = dev
         }catch(e) {
+            console.error(devConf.driver,'device init failed.')
             console.error(e)
         }
     }
-})()
+
+    // lv
+    for(let [dev,devConf] of lvdevs) {
+        try {
+            if(devConf.lv.type=='input') {
+                lv.registerInputDevice(dev, devConf.lv.option)
+            } else if (devConf.lv.type=='display') {
+                lv.registerDisplay(dev, devConf.lv.option)
+            } else {
+                console.error("unknown lv type", devConf.lv.type)
+            }
+        }catch(e){
+            console.error(e)
+        }
+    }
+}) ()

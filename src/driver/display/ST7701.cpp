@@ -24,10 +24,7 @@ namespace be::driver::display {
 
     ST7701::ST7701(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : RGB565(ctx, build(ctx, _jsobj), width, height)
-    {
-        //initGPIO() ;
-        //initReg() ;
-    }
+    {}
 
     JSValue ST7701::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new ST7701(ctx) ;
@@ -39,39 +36,14 @@ namespace be::driver::display {
         JS_CFUNC_DEF("setup", 0, ST7701::setup),
     } ;
 
-    void ST7701::initGPIO() {
-        // gpio_config_t io_conf0 = {
-        //     .mode = GPIO_MODE_OUTPUT,
-        //     .pin_bit_mask = 1ULL << GPIO_SWITCH, 
-        // };
-        // gpio_config(&io_conf0);
-        // gpio_set_level(GPIO_SWITCH, 0);
-
-        // gpio_config_t io_conf1 = {
-        //     .pin_bit_mask = 1ULL << GPIO_LCD_CS, 
-        //     .mode = GPIO_MODE_OUTPUT,
-        // };
-        // gpio_config(&io_conf1);
-        // gpio_set_level(GPIO_LCD_CS, 1);
-
-        // gpio_config_t io_conf2 = {
-        //     .pin_bit_mask = 1ULL << GPIO_LCD_SCK, 
-        //     .mode = GPIO_MODE_OUTPUT,
-        // };
-        // gpio_config(&io_conf2);
-        // gpio_set_level(GPIO_LCD_SCK, 1);
-
-        // gpio_config_t io_conf3 = {
-        //     .pin_bit_mask = 1ULL << GPIO_LCD_SDA,
-        //     .mode = GPIO_MODE_OUTPUT,
-        // };
-        // gpio_config(&io_conf3);
-        // gpio_set_level(GPIO_LCD_SDA, 1);
-    }
-
     JSValue ST7701::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(ST7701,that)
         CHECK_ARGC(1)
+
+        if( JS_IsException(RGB565::setup(ctx, this_val, argc, argv)) ) {
+            return JS_EXCEPTION ;
+        }
+
         JSValue pin = JS_GetPropertyStr(ctx, argv[0], "pin");
         if(!JS_IsObject(pin)){
             JSTHROW("missing pin property")
@@ -101,7 +73,7 @@ namespace be::driver::display {
 
         that->initReg() ;
 
-        return RGB565::setup(ctx, this_val, argc, argv) ;
+        return JS_UNDEFINED ;
     }
 
 

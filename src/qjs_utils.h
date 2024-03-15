@@ -343,12 +343,12 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         err_code                                                                        \
     }
 
-#define GET_STR_PROP_E(obj, propName, cvar, err_msg)                                 \
+#define GET_STR_PROP_E(obj, propName, cvar, err_msg)                                    \
     GET_STR_PROP_C( obj, propName, cvar, JSTHROW(err_msg))
 
 
-#define GET_BOOL_PROP(obj, propName, cvar)                                           \
-    cvar = false ;                                                                      \
+#define GET_BOOL_PROP_OPT(obj, propName, cvar, default)                                 \
+    cvar = default ;                                                                    \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
         cvar = JS_ToBool(ctx, jsvar) ;                                                  \
