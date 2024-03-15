@@ -99,7 +99,7 @@ namespace be::driver::display {
     }
 
     bool Display::registerToLV() {
-
+return true ;
         if(lv_display) {
             return true ;
         }
