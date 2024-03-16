@@ -79,7 +79,6 @@ namespace be::lv {
                 JSAtom prop = e.atom;
                 const char * propName = JS_AtomToCString(ctx, prop) ;
                 JSValue val = JS_GetProperty(ctx, argv[0], prop);
-                ds(propName)
                 JSValue ret = set_style(ctx, lvobj, propName, val, selector) ;
 
                 JS_FreeCString(ctx, propName);
