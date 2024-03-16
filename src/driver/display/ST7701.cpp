@@ -79,7 +79,6 @@ namespace be::driver::display {
 
     void ST7701::write9b(uint16_t data)
     {
-        return ;
         uint8_t i;
         LCD_CS_Clr();
         for(i = 0; i < 9; i++)
