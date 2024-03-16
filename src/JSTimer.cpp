@@ -30,10 +30,10 @@ namespace be {
                 for(int i=0;i<argc; i++) {
                     JS_FreeValue(ctx, argv[i]) ;
                 }
+                delete[] argv ;
+                argv = nullptr ;
+                argc = 0 ;
             }
-            delete argv ;
-            argv = nullptr ;
-            argc = 0 ;
         }
         
         friend class JSTimer ;
@@ -145,8 +145,6 @@ namespace be {
 
         event->func = JS_DupValue(ctx, func) ;
         event->thisobj = JS_DupValue(ctx, thisobj) ;
-        event->argc = argc ;
-        event->argv = argv ;
         event->interval = interval ;
         event->repeat = repeat ;
         event->requestAnimationFrame = false ;
@@ -161,8 +159,10 @@ namespace be {
         event->id = lastTimerId ;
 
         if(argc>0 && argv) {
+            event->argc = argc ;
+            event->argv = new JSValue[argc] ;
             for(int i=0;i<argc; i++) {
-                JS_DupValue(ctx, argv[i]) ;
+                event->argv[i] = JS_DupValue(ctx, argv[i]) ;
             }
         }
 
