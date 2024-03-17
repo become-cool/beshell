@@ -16,6 +16,7 @@ namespace be {
         exportFunction("reboot", reboot);
         exportFunction("top", top);
         exportFunction("usage", usage);
+        exportFunction("setTime", setTime);
 
         exportName("versions") ;
         exportName("platform") ;
@@ -131,4 +132,20 @@ namespace be {
         return JS_UNDEFINED ;
     }
 
+    JSValue ProcessModule::setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, ms)
+        
+        struct timeval tv;
+        tv.tv_sec = ms/1000;  // epoch time (seconds)
+        tv.tv_usec = (ms%1000)*1000;    // microseconds
+
+        printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
+
+#ifndef WASM_PLATFORM
+        settimeofday(&tv, NULL);
+#endif
+
+        return JS_UNDEFINED ;
+    }
 }
