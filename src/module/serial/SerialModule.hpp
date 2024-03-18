@@ -2,7 +2,7 @@
 
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
-// #include "UART.hpp"
+#include "UART.hpp"
 #include "I2C.hpp"
 #include "SPI.hpp"
 // #include "I2S.hpp"
@@ -12,6 +12,11 @@ namespace be {
     protected:
         void import(JSContext *ctx) ;
     public:
+
+        UART * uart0 = nullptr ;
+        UART * uart1 = nullptr ;
+        UART * uart2 = nullptr ;
+
         I2C * i2c0 = nullptr ;
         I2C * i2c1 = nullptr ;
 
