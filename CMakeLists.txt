@@ -32,14 +32,18 @@ list(APPEND include_dirs deps/lvgl/src)
 # list(APPEND include_dirs deps/TinyUntar/tinyuntar)
 # list(APPEND src_dirs deps/TinyUntar/tinyuntar)
 
+# TinySoundFont
+list(APPEND include_dirs deps/TinySoundFont)
+list(APPEND src_dirs deps/TinySoundFont)
+
 # mongoose
 file(GLOB_RECURSE src_mg deps/mongoose/*.c)
 # list(APPEND include_dirs deps/mongoose)
 # list(APPEND src_dirs deps/mongoose)
 
-# # helix
-# list(APPEND include_dirs deps/helix/include)
-# list(APPEND src_dirs deps/helix/src)
+# helix
+list(APPEND include_dirs deps/helix/include)
+list(APPEND src_dirs deps/helix/src)
 
 # # esp32-perfmon
 # list(APPEND include_dirs deps/esp32-perfmon/include)

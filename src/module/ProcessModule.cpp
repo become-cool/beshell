@@ -28,7 +28,7 @@ namespace be {
 
         JSValue versions = JS_NewObject(ctx) ;
         JS_SetPropertyStr(ctx, versions, "beshell", JS_NewString(ctx, BESHELL_VERSION));
-    #ifdef PLATFORM_ESP32
+    #ifdef ESP_PLATFORM
             JS_SetPropertyStr(ctx, versions, "esp-idf", JS_NewString(ctx, ESPIDF_VERSION));
     #endif
         JS_SetPropertyStr(ctx, versions, "quickjs", JS_NewString(ctx, QUICKJS_VERSION));
