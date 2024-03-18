@@ -45,8 +45,8 @@ namespace be {
         exportValue("uart1", JS_DupValue(ctx,uart1->jsobj)) ;
         exportValue("uart2", JS_DupValue(ctx,uart2->jsobj)) ;
         
-        i2c0 = new I2C(ctx, I2C_NUM_0) ;
-        i2c1 = new I2C(ctx, I2C_NUM_1) ;
+        i2c0 = I2C::flyweight(ctx, I2C_NUM_0) ;
+        i2c1 = I2C::flyweight(ctx, I2C_NUM_1) ;
         exportValue("i2c0", JS_DupValue(ctx,i2c0->jsobj)) ;
         exportValue("i2c1", JS_DupValue(ctx,i2c1->jsobj)) ;
         

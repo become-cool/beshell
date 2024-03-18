@@ -5,6 +5,11 @@ using namespace std ;
 #define RX_BUF_SIZE 1024
 
 namespace be{
+    
+    UART * UART::uart0 = nullptr ;
+    UART * UART::uart1 = nullptr ;
+    UART * UART::uart2 = nullptr ;
+    
     DEFINE_NCLASS_META(UART, NativeClass)
     std::vector<JSCFunctionListEntry> UART::methods = {
         JS_CFUNC_DEF("setup", 0, UART::setup),
@@ -17,6 +22,20 @@ namespace be{
         : NativeClass(ctx,build(ctx))
         , m_uartNum(uartNum)
     {}
+    
+    #define DEFINE_BUS(busconst, var)           \
+        if(bus==busconst) {                     \
+            if(!var) {                          \
+                var = new UART(ctx, busconst) ; \
+            }                                   \
+            return var ;                        \
+        }
+    UART * UART::flyweight(JSContext * ctx, uart_port_t bus) {
+        DEFINE_BUS(UART_NUM_0, uart0)
+        else DEFINE_BUS(UART_NUM_1, uart1)
+        else DEFINE_BUS(UART_NUM_2, uart2)
+        return nullptr ;
+    }
 
     uart_port_t UART::uartNum() const {
         return m_uartNum ;
