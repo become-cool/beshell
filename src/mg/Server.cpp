@@ -1,10 +1,11 @@
 #include "Server.hpp"
 #include "MgModule.hpp"
+#include "module/WiFiModule.hpp"
 
 
-#ifdef PLATFORM_ESP32
+#ifdef ESP_PLATFORM
 #define CHECK_WIFI_INITED           \
-    if(!wifi_has_inited()) {        \
+    if(!WiFiModule::hasInited()) {        \
         JSTHROW("wifi not init")    \
     }
 #else

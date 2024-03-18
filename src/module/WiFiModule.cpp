@@ -39,6 +39,10 @@ static esp_event_handler_instance_t instance_any_id;
 static esp_event_handler_instance_t instance_got_ip;
 
 static bool wifi_inited = false ;
+bool WiFiModule::hasInited() {
+    return wifi_inited ;
+}
+
 
 #define CHECK_WIFI_INITED                                       \
     if(!wifi_inited) {                                          \
