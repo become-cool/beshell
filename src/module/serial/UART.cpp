@@ -8,6 +8,9 @@ namespace be{
     DEFINE_NCLASS_META(UART, NativeClass)
     std::vector<JSCFunctionListEntry> UART::methods = {
         JS_CFUNC_DEF("setup", 0, UART::setup),
+        JS_CFUNC_DEF("read", 0, UART::read),
+        JS_CFUNC_DEF("write", 0, UART::write),
+        JS_CFUNC_DEF("listen", 0, UART::listen),
     } ;
 
     UART::UART(JSContext * ctx, uart_port_t uartNum)
@@ -57,6 +60,10 @@ namespace be{
         return JS_UNDEFINED ;
     }
 
+    /**
+     * length
+     * timeout=20ms
+     */
     JSValue UART::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
         CHECK_ARGC(1)
@@ -75,23 +82,26 @@ namespace be{
         THIS_NCLASS(UART, uart)
         CHECK_ARGC(1)
 
-        // if pass ArrayBuffer
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
 
-        // as string
+        // if string
         if(!buff || !length) {
             ARGV_TO_CSTRING_LEN(0, buff, length)
             const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
             JS_FreeCString(ctx, (const char *)buff) ;
             return JS_NewInt32(ctx, txBytes) ;
         }
-        // as ArrayBuffer
+        // if ArrayBuffer
         else {
             const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
             return JS_NewInt32(ctx, txBytes) ;
         }
 
+    }
+
+    JSValue UART::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
     }
 
     JSValue UART::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
