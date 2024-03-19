@@ -2,10 +2,6 @@
 
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
-#include "UART.hpp"
-#include "I2C.hpp"
-#include "SPI.hpp"
-// #include "I2S.hpp"
 
 namespace be {
     class SerialModule: public NativeModule {

@@ -29,9 +29,9 @@ namespace be {
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
     } ;
 
-    I2C::I2C(JSContext * ctx, i2c_port_t _busnum)
+    I2C::I2C(JSContext * ctx, i2c_port_t busnum)
         : NativeClass(ctx, build(ctx))
-        , busnum(_busnum)
+        , busnum(busnum)
         , sema(xSemaphoreCreateMutex())
     {}
     

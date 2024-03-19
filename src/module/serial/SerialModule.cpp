@@ -1,4 +1,8 @@
 #include "SerialModule.hpp"
+#include "UART.hpp"
+#include "I2C.hpp"
+#include "SPI.hpp"
+#include "I2S.hpp"
 
 using namespace std ;
 
@@ -16,6 +20,7 @@ namespace be {
         exportName("spi1") ;
         exportName("spi2") ;
         exportName("spi3") ;
+        exportName("i2s") ;
     }
     
     SerialModule::~SerialModule() {
@@ -43,6 +48,9 @@ namespace be {
         exportValue("spi0", spi0->jsobj) ;
         exportValue("spi1", spi1->jsobj) ;
         exportValue("spi2", spi2->jsobj) ;
+        
+        I2S * i2s0 = I2S::flyweight(ctx, I2S_NUM_0) ;
+        exportValue("i2s0", JS_DupValue(ctx,i2s0->jsobj)) ;
     }
     
 }
