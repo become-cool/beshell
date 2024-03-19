@@ -72,12 +72,12 @@ inline void audio_pipe_emit_js(audio_pipe_t * pipe, const char * event, JSValue 
     JSValue eventName = JS_NewString(pipe->ctx, event) ;
 
     if(JS_IsUndefined(param) ) {
-        MAKE_ARGV1(argv, eventName)
-        eventloop_push_with_argv(pipe->ctx, emit, pipe->jsobj, 1, argv) ;
+        // MAKE_ARGV1(argv, eventName)
+        // eventloop_push_with_argv(pipe->ctx, emit, pipe->jsobj, 1, argv) ;
     }
     else {
-        MAKE_ARGV2(argv, eventName, param)
-        eventloop_push_with_argv(pipe->ctx, emit, pipe->jsobj, 2, argv) ;
+        //MAKE_ARGV2(argv, eventName, param)
+        //eventloop_push_with_argv(pipe->ctx, emit, pipe->jsobj, 2, argv) ;
     }
 
     JS_FreeValue(pipe->ctx, eventName) ;

@@ -1,6 +1,11 @@
 #ifndef ONCE_H_AUDIO_STREAM
 #define ONCE_H_AUDIO_STREAM
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -50,7 +55,7 @@ typedef struct _audio_el_t{
 
 
 #define ELEMENT_CREATE(_pipe, type, var, func,stack,prio,core,ringsize) \
-    var = mallocDMA(sizeof(type)) ;                                     \
+    var = malloc(sizeof(type)) ;                                        \
     memset(var, 0, sizeof(type)) ;                                      \
     var->base.pipe = _pipe ;                                            \
     audio_el_init(var, func, #func, stack, prio, core, ringsize ) ;
@@ -208,13 +213,13 @@ void audio_el_stop_when_req(audio_el_t * el) ;
 
 // source file reader
 void audio_el_src_delete(audio_el_src_t * el) ;
-audio_el_t *  audio_el_src_create(audio_pipe_t * pipe, uint8_t core) ;
+audio_el_src_t *  audio_el_src_create(audio_pipe_t * pipe, uint8_t core) ;
 void task_src(audio_el_src_t * el) ;
 bool audio_el_src_strip_pcm(audio_el_src_t * el) ;
 bool audio_el_src_strip_mp3(audio_el_src_t * el) ;
 
 // mp3 decoder
-audio_el_t * audio_el_mp3_create(audio_pipe_t * pipe, uint8_t core) ;
+audio_el_mp3_t * audio_el_mp3_create(audio_pipe_t * pipe, uint8_t core) ;
 void audio_el_mp3_delete(audio_el_mp3_t * el) ;
 void audio_el_mp3_reset(audio_el_mp3_t * el) ;
 
@@ -254,5 +259,9 @@ audio_player_midi_t * audio_player_midi_create(audio_player_midi_conf_t * config
 void audio_player_midi_delete(audio_player_midi_t * player) ;
 
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

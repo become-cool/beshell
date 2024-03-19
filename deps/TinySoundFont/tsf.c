@@ -597,7 +597,6 @@ static int tsf_load_samples(float** fontSamples, unsigned int* fontSampleCount, 
 	// Read sample data into float format buffer.
 	float* out; unsigned int samplesLeft, samplesToRead, samplesToConvert;
 	samplesLeft = *fontSampleCount = chunkSmpl->size / sizeof(short);
-	dn(samplesLeft * sizeof(float))
 	// 
 	// out = *fontSamples = (float*)TSF_MALLOC(samplesLeft * sizeof(float));
 	out = *fontSamples = (float*)mallocDMA(samplesLeft * sizeof(float));

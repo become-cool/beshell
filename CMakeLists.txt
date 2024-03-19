@@ -29,25 +29,19 @@ list(APPEND include_dirs deps/lvgl)
 list(APPEND include_dirs deps/lvgl/src)
 
 # # TinyUntar
-# list(APPEND include_dirs deps/TinyUntar/tinyuntar)
-# list(APPEND src_dirs deps/TinyUntar/tinyuntar)
+list(APPEND include_dirs deps/TinyUntar/tinyuntar)
+list(APPEND src_untar deps/TinyUntar/tinyuntar)
 
 # TinySoundFont
 list(APPEND include_dirs deps/TinySoundFont)
-list(APPEND src_dirs deps/TinySoundFont)
+file(GLOB_RECURSE src_tsf deps/TinySoundFont/*.c)
 
 # mongoose
 file(GLOB_RECURSE src_mg deps/mongoose/*.c)
-# list(APPEND include_dirs deps/mongoose)
-# list(APPEND src_dirs deps/mongoose)
 
 # helix
 list(APPEND include_dirs deps/helix/include)
-list(APPEND src_dirs deps/helix/src)
-
-# # esp32-perfmon
-# list(APPEND include_dirs deps/esp32-perfmon/include)
-# list(APPEND src_dirs deps/esp32-perfmon)
+file(GLOB_RECURSE src_helix deps/helix/src/*.c)
 
 # sqlite3
 file(GLOB_RECURSE src_sqlite3
@@ -88,6 +82,9 @@ idf_component_register(
             ${src_littlefs}
             ${src_lvgl}
             ${src_mg}
+            ${src_helix}
+            ${src_tsf}
+            ${src_untar}
             ${src_sqlite3}
         # SRC_DIRS
         #     ${src_dirs}

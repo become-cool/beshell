@@ -1,7 +1,7 @@
 #include "audio_stream.h"
 
 
-audio_el_t *  audio_el_src_create(audio_pipe_t * pipe, uint8_t core) {
+audio_el_src_t *  audio_el_src_create(audio_pipe_t * pipe, uint8_t core) {
     audio_el_src_t * el ;
     ELEMENT_CREATE(pipe, audio_el_src_t, el, task_src, 1024*3, 5, core, 1024*2)
     return el ;
