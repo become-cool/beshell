@@ -22,7 +22,7 @@ namespace be {
         std::map<gpio_num_t, spi_device_handle_t> devices ;
 
     public:
-        SPI(JSContext * ctx, JSValue jsobj=JS_NULL, spi_host_device_t busnum=1) ;
+        SPI(JSContext * ctx, JSValue jsobj=JS_NULL, spi_host_device_t busnum=SPI1_HOST) ;
 
         static SPI * flyweight(JSContext *, spi_host_device_t) ;
 
