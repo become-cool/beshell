@@ -21,6 +21,19 @@ namespace be {
         exportFunction("readPWM",readPWM,0) ;
         exportFunction("watch",watch,0) ;
         exportFunction("unwatch",unwatch,0) ;
+        exportName("blink") ;
+    }
+
+    void GPIOModule::import(JSContext *ctx) {
+        JSValue DEF_JS_FUNC(jsBlink, R"(
+function (gpio,time) {
+    this.setMode(gpio,"output")
+    return setInterval(() => {
+        this.write(gpio,this.read(gpio)?0:1)
+    }, time||1000)
+}
+    )", "gpio.js", )
+        exportValue("blink", jsBlink) ;
     }
 
     JSValue GPIOModule::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

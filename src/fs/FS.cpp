@@ -136,6 +136,19 @@ namespace be {
         assert(engine->beshell->fs) ;
         return engine->beshell->fs->toVFSPath(path) ;
     }
+    
+    std::string FS::toVFSPath(JSContext * ctx, JSValue path) {
+        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
+        const char * cpath = JS_ToCString(ctx, path) ;
+        std::string cstrpath(cpath) ;
+        JS_FreeCString(ctx, cpath) ;
+        if(!engine) {
+            return cstrpath ;
+        }
+        assert(engine->beshell) ;
+        assert(engine->beshell->fs) ;
+        return engine->beshell->fs->toVFSPath(cstrpath) ;
+    }
 
     std::string FS::trimVFSPath(const std::string & path) {
         if (path.substr(0, prefix.size())==prefix) {

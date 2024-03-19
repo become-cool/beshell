@@ -9,9 +9,9 @@ namespace be {
     std::vector<JSCFunctionListEntry> NativeClass::methods ;
     std::vector<JSCFunctionListEntry> NativeClass::staticMethods ;
 
-    NativeClass::NativeClass(JSContext * _ctx, JSValue _jsobj)
+    NativeClass::NativeClass(JSContext * _ctx, JSValue jsobj)
         : ctx(_ctx)
-        , jsobj(_jsobj)
+        , jsobj(jsobj)
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;

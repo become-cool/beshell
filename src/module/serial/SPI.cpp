@@ -4,13 +4,14 @@ using namespace std ;
 
 namespace be {
     
+    SPI * SPI::spi0 = nullptr ;
     SPI * SPI::spi1 = nullptr ;
     SPI * SPI::spi2 = nullptr ;
-    SPI * SPI::spi3 = nullptr ;
 
     DEFINE_NCLASS_META(SPI, NativeClass)
     std::vector<JSCFunctionListEntry> SPI::methods = {
         JS_CFUNC_DEF("setup", 0, SPI::setup),
+        JS_CFUNC_DEF("spiNum", 0, SPI::spiNum),
         // JS_CFUNC_DEF("addDevice", 0, SPI::addDevice),
         // JS_CFUNC_DEF("removeDevice", 0, SPI::removeDevice),
         // JS_CFUNC_DEF("send", 0, SPI::send),
@@ -26,11 +27,12 @@ namespace be {
     } ;
     
 
-    SPI::SPI(JSContext * ctx, JSValue _jsobj, spi_host_device_t busnum)
-        : NativeClass(ctx, build(ctx, _jsobj))
+    SPI::SPI(JSContext * ctx, spi_host_device_t busnum)
+        : NativeClass(ctx, build(ctx))
         , busnum(busnum)
     {
     }
+
 
     #define DEFINE_BUS(busconst, var)           \
         if(bus==busconst) {                     \
@@ -40,12 +42,20 @@ namespace be {
             return var ;                        \
         }
     SPI * SPI::flyweight(JSContext * ctx, spi_host_device_t bus) {
-        DEFINE_BUS(SPI1_HOST, spi1)
-        else DEFINE_BUS(SPI2_HOST, spi2)
-        else DEFINE_BUS(SPI3_HOST, spi3)
+        DEFINE_BUS(SPI1_HOST, spi0)
+        else DEFINE_BUS(SPI2_HOST, spi1)
+        else DEFINE_BUS(SPI3_HOST, spi2)
         return nullptr ;
     }
 
+
+    spi_host_device_t SPI::spiNum() const {
+        return busnum ;
+    }
+    JSValue SPI::spiNum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        THIS_NCLASS(SPI, that)
+        return JS_NewInt32(ctx, that->busnum) ;
+    }
 
     /**
      * miso
@@ -53,7 +63,7 @@ namespace be {
      * clk
      */
     JSValue SPI::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-
+        THIS_NCLASS(SPI, that)
         CHECK_ARGC(3)
         ARGV_TO_UINT8(2, clkpin)
         
@@ -74,20 +84,20 @@ namespace be {
         ARGV_TO_UINT8(0, misopin)
 
 
-        printf("spi[%d] miso=%d, mosi=%d, clk=%d\n", busnum, misopin, mosipin, clkpin);
+        printf("spi[%d] miso=%d, mosi=%d, clk=%d\n", that->busnum, misopin, mosipin, clkpin);
         // dn(busnum)
 
         spi_bus_config_t buscfg = {
-            .miso_io_num=misopin,
             .mosi_io_num=mosipin,
+            .miso_io_num=misopin,
             .sclk_io_num=clkpin,
             .quadwp_io_num=-1,
             .quadhd_io_num=-1,
             .max_transfer_sz=20480
         } ;
 
-        esp_err_t ret = spi_bus_initialize(busnum, &buscfg, SPI_DMA_CH_AUTO);
-        if(ret==ESP_OK) {
+        esp_err_t ret = spi_bus_initialize(that->busnum, &buscfg, SPI_DMA_CH_AUTO);
+        if(ret!=ESP_OK) {
             printf("spi_bus_initialize() failed with err: %d\n", ret) ;
         }
 
@@ -121,14 +131,14 @@ namespace be {
 
     //     return JS_NewInt32(ctx, ret!=0? -1: spiidx) ;
     // }
-
-    // #define ARGV_TO_SPI_HANDLE(i, handle)                           \
-    //     ARGV_TO_UINT8(i, spiidx)                                    \
-    //     spi_device_handle_t handle = spi_handle_with_id(spiidx) ;   \
-    //     if(handle==NULL) {                                          \
-    //         JSTHROW("unknow spi device id:%d",spiidx)               \
-    //     }
-
+/*
+    #define ARGV_TO_SPI_HANDLE(i, handle)                           \
+        ARGV_TO_UINT8(i, spiidx)                                    \
+        spi_device_handle_t handle = spi_handle_with_id(spiidx) ;   \
+        if(handle==NULL) {                                          \
+            JSTHROW("unknow spi device id:%d",spiidx)               \
+        }
+*/
     // /**
     //  * 
     //  * bus (1-3)
@@ -186,14 +196,15 @@ namespace be {
     //     return JS_NewInt32(ctx, ret) ;
     // }
 
-
-    // #define ARGV_TO_SPI_OUT_NUMBER(i, type, var)            \
-    //     type var = 0 ;                                      \
-    //     if( !JS_IsUndefined(var) && !JS_IsUndefined(var) ) {\
-    //         if(JS_ToUint32(ctx, &out, argv[i])!=0) {        \
-    //             JSTHROW("arg must be a number")     \
-    //         }                                               \
-    //     }
+/*
+    #define ARGV_TO_SPI_OUT_NUMBER(i, type, var)            \
+        type var = 0 ;                                      \
+        if( !JS_IsUndefined(var) && !JS_IsUndefined(var) ) {\
+            if(JS_ToUint32(ctx, &out, argv[i])!=0) {        \
+                JSTHROW("arg must be a number")     \
+            }                                               \
+        }
+        */
 
     // inline esp_err_t spi_trans_int(spi_device_handle_t handle, uint8_t * rx_buff, uint8_t * tx_buff, size_t bit_length) {
     //     spi_transaction_t t;
@@ -269,30 +280,30 @@ namespace be {
     //     esp_err_t ret = spi_device_transmit(handle, &t) ;
     //     return JS_NewInt32(ctx, ret) ;
     // }
+/*
+    // 双工收发, 或 接受
+    #define SPI_TRANS(h, in, out, bit_length)                       \
+            esp_err_t ret = spi_trans_int(h, in, out, bit_length) ; \
+            if(ret!=ESP_OK) {                                       \
+                JSTHROW("spi bus transmit failed:%d", ret)  \
+            }                                                       \
+            return JS_NewInt32(ctx, in) ;
 
-    // // 双工收发, 或 接受
-    // #define SPI_TRANS(h, in, out, bit_length)                       \
-    //         esp_err_t ret = spi_trans_int(h, in, out, bit_length) ; \
-    //         if(ret!=ESP_OK) {                                       \
-    //             JSTHROW("spi bus transmit failed:%d", ret)  \
-    //         }                                                       \
-    //         return JS_NewInt32(ctx, in) ;
-
-    // #define SPI_TRANS_FUNC(type, bit_length) \
-    //     CHECK_ARGC(1) \
-    //     ARGV_TO_SPI_HANDLE(0, handle) \
-    //     type in_var = 0 ; \
-    //     if( argc>1 && !JS_IsUndefined(argv[1]) && !JS_IsUndefined(argv[1]) ) { \
-    //         type out_var ; \
-    //         if(JS_ToUint32(ctx, &out_var, argv[1])!=0) { \
-    //             JSTHROW("arg must be a number") \
-    //         } \
-    //         SPI_TRANS(handle, in_var, (uint8_t*)&out_var, bit_length) \
-    //     } \ 
-    //     else { \
-    //         SPI_TRANS(handle, in_var, NULL, bit_length) \
-    //     }
-
+    #define SPI_TRANS_FUNC(type, bit_length) \
+        CHECK_ARGC(1) \
+        ARGV_TO_SPI_HANDLE(0, handle) \
+        type in_var = 0 ; \
+        if( argc>1 && !JS_IsUndefined(argv[1]) && !JS_IsUndefined(argv[1]) ) { \
+            type out_var ; \
+            if(JS_ToUint32(ctx, &out_var, argv[1])!=0) { \
+                JSTHROW("arg must be a number") \
+            } \
+            SPI_TRANS(handle, in_var, (uint8_t*)&out_var, bit_length) \
+        } \ 
+        else { \
+            SPI_TRANS(handle, in_var, NULL, bit_length) \
+        }
+*/
 
     // JSValue SPI::transU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
     //     SPI_TRANS_FUNC(uint8_t, 8)
@@ -304,12 +315,13 @@ namespace be {
     //     SPI_TRANS_FUNC(uint32_t, 32)
     // }
 
-
-    // #define SPI_RECV_FUNC(type, bit_length)         \
-    //     CHECK_ARGC(1)                               \
-    //     ARGV_TO_SPI_HANDLE(0, handle)               \
-    //     type in_var = 0 ;                           \
-    //     SPI_TRANS(handle, in_var, NULL, bit_length)
+/*
+    #define SPI_RECV_FUNC(type, bit_length)         \
+        CHECK_ARGC(1)                               \
+        ARGV_TO_SPI_HANDLE(0, handle)               \
+        type in_var = 0 ;                           \
+        SPI_TRANS(handle, in_var, NULL, bit_length)
+        */
 
     // JSValue SPI::recvU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
     //     SPI_RECV_FUNC(uint8_t, 8)

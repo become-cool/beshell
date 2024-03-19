@@ -20,7 +20,7 @@ namespace be::driver {
         }
     public:
         DriverModule(JSContext * ctx, const char * name) ;
-        
+
         template <typename D>
         static void use() {
             providers.push_back(provider<D>);

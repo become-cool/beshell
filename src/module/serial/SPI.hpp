@@ -15,18 +15,21 @@ namespace be {
     private:
         spi_host_device_t busnum ;
 
+        static SPI * spi0 ;
         static SPI * spi1 ;
         static SPI * spi2 ;
-        static SPI * spi3 ;
 
         std::map<gpio_num_t, spi_device_handle_t> devices ;
 
     public:
-        SPI(JSContext * ctx, JSValue jsobj=JS_NULL, spi_host_device_t busnum=SPI1_HOST) ;
+        SPI(JSContext * ctx, spi_host_device_t busnum=SPI1_HOST) ;
+
+        spi_host_device_t spiNum() const ;
 
         static SPI * flyweight(JSContext *, spi_host_device_t) ;
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue spiNum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

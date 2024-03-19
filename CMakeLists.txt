@@ -149,11 +149,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-value")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-brace")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-enum-enum-conversion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=comment")
 
 if (COMMAND component_compile_options)
     # both c and c++
     component_compile_options(-Wno-missing-braces)
-    component_compile_options(-Wno-error=format=)
+    component_compile_options(-Wno-error=format)
     component_compile_options(-Wno-format)
     component_compile_options(-Wno-unused-function)
     component_compile_options(-Wno-unused-variable)

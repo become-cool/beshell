@@ -10,7 +10,7 @@ namespace be {
     public:
         GPIOModule(JSContext * ctx, const char * name) ;
 
-        // void import(JSContext *ctx) ;
+        void import(JSContext *ctx) ;
 
         inline static void use(be::BeShell & beshell) {
             beshell.addModule<GPIOModule>("gpio") ;

@@ -31,6 +31,7 @@ namespace be {
         std::string toVFSPath(const char * path) ;
         std::string & toVFSPath(std::string & path) ;
         static std::string toVFSPath(JSContext * ctx, const char * path) ;
+        static std::string toVFSPath(JSContext * ctx, JSValue path) ;
         std::string trimVFSPath(const std::string & path) ;
 
         void mount(const char * mountPoint, FSPartition * partition) ;

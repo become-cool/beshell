@@ -13,17 +13,6 @@ namespace be {
         void import(JSContext *ctx) ;
     public:
 
-        UART * uart0 = nullptr ;
-        UART * uart1 = nullptr ;
-        UART * uart2 = nullptr ;
-
-        I2C * i2c0 = nullptr ;
-        I2C * i2c1 = nullptr ;
-
-        SPI * spi1 = nullptr ;
-        SPI * spi2 = nullptr ;
-        SPI * spi3 = nullptr ;
-
         SerialModule(JSContext * ctx, const char * name) ;
         ~SerialModule() ;
 
