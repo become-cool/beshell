@@ -51,7 +51,7 @@ namespace be::sqlite{
             JSTHROW("db not open")
         }
         CHECK_ARGC(1)
-        ARGV_TO_STRING(0, sql)
+        string ARGV_TO_STRING(0, sql)
         
         sql_exec_opaque_t opa ;
         opa.rows = JS_NewArray(ctx) ;

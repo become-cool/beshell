@@ -21,6 +21,7 @@ namespace be {
     JSValue I2S::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         THIS_NCLASS(I2S, that)
+        CHECK_ARGC(1)
 
         i2s_config_t i2s_config = {
             .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX),
@@ -38,35 +39,35 @@ namespace be {
 
 
         i2s_pin_config_t pin_config = {
-            .bck_io_num = 26,
-            .ws_io_num = 33,
-            .data_out_num = 4,
+            .bck_io_num = -1,
+            .ws_io_num = -1,
+            .data_out_num = -1,
             .data_in_num = -1
         };
 
-        if(argc>1) {
 
-            if(!JS_IsObject(argv[1])) {
-                JSTHROW("arg %s must be an object", "opts");
-            }
-
-            GET_INT32_PROP_OPT(argv[1], "mode", i2s_config.mode, (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX))
-            GET_UINT32_PROP_OPT(argv[1], "sample_rate", i2s_config.sample_rate, 8000)
-            GET_INT32_PROP_OPT(argv[1], "bits_per_sample", i2s_config.bits_per_sample, I2S_BITS_PER_SAMPLE_16BIT)
-            GET_INT32_PROP_OPT(argv[1], "channel_format", i2s_config.channel_format, I2S_CHANNEL_FMT_RIGHT_LEFT)
-            GET_INT32_PROP_OPT(argv[1], "communication_format", i2s_config.communication_format, I2S_COMM_FORMAT_STAND_I2S)
-            GET_INT32_PROP_OPT(argv[1], "intr_alloc_flags", i2s_config.intr_alloc_flags, ESP_INTR_FLAG_LEVEL2 | ESP_INTR_FLAG_IRAM)
-            GET_INT32_PROP_OPT(argv[1], "dma_buf_count", i2s_config.dma_buf_count, 2)
-            GET_INT32_PROP_OPT(argv[1], "dma_buf_len", i2s_config.dma_buf_len, 256)
-            GET_INT32_PROP_OPT(argv[1], "use_apll", i2s_config.use_apll, 1)
-            
-            GET_UINT32_PROP(argv[1], "lrclk", pin_config.ws_io_num, )
-            GET_UINT32_PROP(argv[1], "sclk", pin_config.bck_io_num, )
-            GET_INT32_PROP_OPT(argv[1], "sout", pin_config.data_out_num, -1)
-            GET_INT32_PROP_OPT(argv[1], "sin", pin_config.data_in_num, -1)
+        if(!JS_IsObject(argv[0])) {
+            JSTHROW("arg %s must be an object", "opts");
         }
 
+        GET_INT32_PROP_OPT(argv[0], "mode", i2s_config.mode, (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX))
+        GET_UINT32_PROP_OPT(argv[0], "sample_rate", i2s_config.sample_rate, 8000)
+        GET_INT32_PROP_OPT(argv[0], "bits_per_sample", i2s_config.bits_per_sample, I2S_BITS_PER_SAMPLE_16BIT)
+        GET_INT32_PROP_OPT(argv[0], "channel_format", i2s_config.channel_format, I2S_CHANNEL_FMT_RIGHT_LEFT)
+        GET_INT32_PROP_OPT(argv[0], "communication_format", i2s_config.communication_format, I2S_COMM_FORMAT_STAND_I2S)
+        GET_INT32_PROP_OPT(argv[0], "intr_alloc_flags", i2s_config.intr_alloc_flags, ESP_INTR_FLAG_LEVEL2 | ESP_INTR_FLAG_IRAM)
+        GET_INT32_PROP_OPT(argv[0], "dma_buf_count", i2s_config.dma_buf_count, 2)
+        GET_INT32_PROP_OPT(argv[0], "dma_buf_len", i2s_config.dma_buf_len, 256)
+        GET_INT32_PROP_OPT(argv[0], "use_apll", i2s_config.use_apll, 1)
+        
+        GET_UINT32_PROP(argv[0], "lrclk", pin_config.ws_io_num, )
+        GET_UINT32_PROP(argv[0], "sclk", pin_config.bck_io_num, )
+        GET_INT32_PROP_OPT(argv[0], "sout", pin_config.data_out_num, -1)
+        GET_INT32_PROP_OPT(argv[0], "sin", pin_config.data_in_num, -1)
+
         i2s_config.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT ;
+
+        printf("I2S %d, lrclk:%d, sclk:d%, sout:%d\n", pin_config.ws_io_num, pin_config.bck_io_num, pin_config.data_out_num) ;
         dn(i2s_config.channel_format)
         dn(i2s_config.sample_rate)
         dn(i2s_config.bits_per_sample)
@@ -75,7 +76,10 @@ namespace be {
         if(res!=ESP_OK){
             JSTHROW("i2s_driver_install() faild with error: %d", res)
         }
-        i2s_set_pin(that->busnum, &pin_config);
+        res = i2s_set_pin(that->busnum, &pin_config);
+        if(res!=ESP_OK){
+            JSTHROW("i2s_set_pin() faild with error: %d", res)
+        }
 
         return JS_UNDEFINED ;
     }

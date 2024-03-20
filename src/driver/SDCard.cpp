@@ -29,17 +29,23 @@ namespace be::driver {
     }
 
     /**
-     * 
-     * @param spi num 
-     * @param cs 
-     * @param path 
-     * @param khz = 20000 
+     * {
+     *   spi 
+     *   cs 
+     *   mount 
+     *   khz=20000
+     * } 
      */
     JSValue SDCard::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(3)
-        ARGV_TO_UINT8(0, spi)
-        ARGV_TO_UINT8(1, cs)
-        std::string mntPath = FS::toVFSPath(ctx,argv[2]) ;
+        CHECK_ARGC(1)
+
+        spi_host_device_t GET_INT32_PROP(argv[0], "spi", spi, )
+        gpio_num_t GET_INT32_PROP(argv[0], "cs", cs, )
+        int GET_INT32_PROP_OPT(argv[0], "khz", khz, 20000)
+        string GET_STR_PROP(argv[0], "mount", mount, )
+        mount = FS::toVFSPath(ctx,mount.c_str()) ;
+
+        dstr(mount)
 
         esp_err_t ret;
         esp_vfs_fat_sdmmc_mount_config_t mount_config = {
@@ -57,22 +63,15 @@ namespace be::driver {
         sdmmc_card_t* card;
         sdmmc_host_t host = SDSPI_HOST_DEFAULT();
         host.slot = spi ;
+        host.max_freq_khz = khz ;
 
-        if(argc>3 && !JS_IsUndefined(argv[3])){
-            ARGV_TO_UINT32(3, khz)
-            host.max_freq_khz = khz ;
-        }
-
-        dn2(spi, cs)
-
-        ret = esp_vfs_fat_sdspi_mount(mntPath.c_str(), &host, &slot_config, &mount_config, &card);
+        ret = esp_vfs_fat_sdspi_mount(mount.c_str(), &host, &slot_config, &mount_config, &card);
 
         if (ret == ESP_OK) {
-            dn(card->max_freq_khz)
+            // dn(card->max_freq_khz)
             sdmmc_card_print_info(stdout, card);
         }
         else {
-            dn(ret)
             if (ret == ESP_FAIL) {
                 JSTHROW("Failed to mount the card .\n")
             } else {

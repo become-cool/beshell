@@ -72,28 +72,56 @@ namespace be {
         return nullptr ;
     }
     
+    /**
+     * options: {
+     *   sda
+     *   scl
+     *   mode=0
+     *   rx_buffer_len = 0
+     *   tx_buffer_len = 0
+     *   freq=400000
+     *   addr_10bit_en=0
+     *   slave_addr
+     *   timeout=1000
+     * }
+     */
     JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, thisobj)
-        CHECK_ARGC(2)
-        ARGV_TO_UINT8(0, sda) ;
-        ARGV_TO_UINT8(1, scl) ;
-        ARGV_TO_UINT32_OPT(2, freq, 400000) ;
-        ARGV_TO_UINT32_OPT(3, timeout, 1000) ;
+        CHECK_ARGC(1)
+
+        gpio_num_t GET_INT32_PROP(argv[0], "sda", sda, )
+        gpio_num_t GET_INT32_PROP(argv[0], "scl", scl, )
+        i2c_mode_t GET_UINT32_PROP_OPT(argv[0], "mode", mode, I2C_MODE_MASTER)
+        int GET_INT32_PROP_OPT(argv[0], "timeout", timeout, 1000)
+
+        size_t GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
+        size_t GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
+
 
         i2c_config_t i2c_config = {
-            .mode = I2C_MODE_MASTER,
+            .mode = mode,
             .sda_io_num = sda,
             .scl_io_num = scl,
             .sda_pullup_en = GPIO_PULLUP_ENABLE,
             .scl_pullup_en = GPIO_PULLUP_ENABLE,
             .clk_flags = 0
         };
-        i2c_config.master.clk_speed = freq;
+
+        if(mode==I2C_MODE_MASTER) {
+            GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 400000)
+        } else if(mode==I2C_MODE_SLAVE) {
+            GET_INT32_PROP_OPT(argv[0], "addr_10bit_en", i2c_config.slave.addr_10bit_en, 0)
+            GET_INT32_PROP(argv[0], "addr_10bit_en", i2c_config.slave.slave_addr, )
+            dn(i2c_config.slave.slave_addr)
+        }
+        else {
+            JSTHROW("invalid mode")
+        }
 
         if(i2c_param_config(thisobj->busnum, &i2c_config)!=ESP_OK) {
             return JS_FALSE ;
         }
-        esp_err_t res = i2c_driver_install(thisobj->busnum, I2C_MODE_MASTER, 0, 0, 0) ;
+        esp_err_t res = i2c_driver_install(thisobj->busnum, mode, rx_buffer_len, tx_buffer_len, 0) ;
         if(res!=ESP_OK) {
             return JS_FALSE ;
         }

@@ -246,7 +246,7 @@ namespace be::mg {
         CHECK_WIFI_INITED
         CHECK_ARGC(1)
 
-        char * addr = NULL ;
+        string addr ;
         JSValue callback = JS_NULL ;
         bool ssl = false ;
         bool telweb = false ;
@@ -259,9 +259,7 @@ namespace be::mg {
                 JSTHROW("arg callback must be a function") ;
             }
 
-            GET_STR_PROP_C(argv[0], "addr", addr, {
-                JSTHROW("missing option addr") ;
-            })
+            GET_STR_PROP(argv[0], "addr", addr, )
 
             GET_BOOL_PROP_OPT(argv[0], "ssl", ssl, false)
             GET_BOOL_PROP_OPT(argv[0], "telweb", telweb, false)
@@ -275,24 +273,19 @@ namespace be::mg {
                 JSTHROW("arg callback must be a function") ;
             }
 
-            ARGV_AS_CSTRING_C(0, addr, {
-                JSTHROW("arg addr must be a string") ;
-            }) ;
+            ARGV_TO_STRING(0, addr)
             
             callback = argv[1] ;
         }
 
-        if(!MgModule::isListening(addr)) {
-            JS_FreeCString(ctx, addr) ;
+        if(!MgModule::isListening(addr.c_str())) {
             JSTHROW("addr %s has listened", addr)
         }
 
-        struct mg_connection * conn = mg_http_listen(&MgModule::mgr, addr, eventHandler, NULL) ;
+        struct mg_connection * conn = mg_http_listen(&MgModule::mgr, addr.c_str(), eventHandler, NULL) ;
         if(conn==NULL) {
-            JS_FreeCString(ctx, addr) ;
             JSTHROW("could not listen addr: %s", addr) ;
         }
-        JS_FreeCString(ctx, addr) ;
 
         Server * server = new Server(ctx, conn, callback) ;
         server->ssl = ssl ;

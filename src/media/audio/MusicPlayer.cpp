@@ -47,9 +47,7 @@ namespace be::media {
 
     
     void MusicPlayer::build_el_src(int core) {
-        dd
         if(!src) {
-            dd
             src = audio_el_src_create(&pipe, core) ;
         }
     }

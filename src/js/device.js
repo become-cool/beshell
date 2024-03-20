@@ -1,34 +1,32 @@
 import {deviceJsonPath, device} from 'device'
 import * as serial from 'serial'
 import * as driver from 'driver'
-import * as lv from 'lv'
 import {importSync} from 'loader'
+
+function setupSerialBus(type, num, conf) {
+    let varname = type+num
+    if(!serial[varname]) {
+        console.log("unknown",type,"bus:",varname)
+    } else {
+        try {
+            serial[varname].setup(conf)
+        } catch(e) {
+            console.error("setup",varname,"failed.")
+            console.error(e)
+        }
+    }
+}
 
 (async function (){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
-        console.log(deviceJsonPath, "not exists or invalid.") ;
+        console.log(deviceJsonPath, "not exists or invalid.")
         return ;
     }
-    // serial bus
-    for(let num in deviceConf.spi||{}){
-        let bus = 'spi'+num
-        let conf = deviceConf.i2c[num]
-        if(!serial[bus]) {
-            console.log("unknown spi bus",num)
-        } else {
-            serial[bus].setup(conf.miso, conf.mosi, conf.sck)
-            console.log(`setup SPI ${num}, miso:${conf.miso}, mosi:${conf.mosi}, sck:${conf.sck}`)
-        }
-    }
-    for(let num in deviceConf.i2c||{}){
-        let bus = 'i2c'+num
-        let conf = deviceConf.i2c[num]
-        if(!serial[bus]) {
-            console.log("unknown i2c bus",num)
-        } else {
-            serial[bus].setup(conf.sda, conf.scl, conf.freq||100000)
-            console.log(`setup I2C ${num}, sda:${conf.sda}, scl:${conf.scl}`)
+    console.log("load device config from:", deviceJsonPath)
+    for(let prepheral of ['spi','i2c','uart','i2s']) {
+        for(let num in deviceConf[prepheral]||{}){
+            setupSerialBus(prepheral,num,deviceConf[prepheral][num])
         }
     }
 
@@ -79,17 +77,22 @@ import {importSync} from 'loader'
     }
 
     // lv
-    for(let [dev,devConf] of lvdevs) {
-        try {
-            if(devConf.lv.type=='input') {
-                lv.registerInputDevice(dev, devConf.lv.option)
-            } else if (devConf.lv.type=='display') {
-                lv.registerDisplay(dev, devConf.lv.option)
-            } else {
-                console.error("unknown lv type", devConf.lv.type)
+    try{
+        var lv = await import('lv')
+    }catch(e){}
+    if(lv) {
+        for(let [dev,devConf] of lvdevs) {
+            try {
+                if(devConf.lv.type=='input') {
+                    lv.registerInputDevice(dev, devConf.lv.option)
+                } else if (devConf.lv.type=='display') {
+                    lv.registerDisplay(dev, devConf.lv.option)
+                } else {
+                    console.error("unknown lv type", devConf.lv.type)
+                }
+            }catch(e){
+                console.error(e)
             }
-        }catch(e){
-            console.error(e)
         }
     }
 }) ()

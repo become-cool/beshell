@@ -118,10 +118,10 @@ extern "C" {
 #define ARGV_TO_DOUBLE_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, double, JS_ToFloat64, def)
 
 
-#define ARGV_TO_CSTRING_LEN(i, var, len)                     \
+#define ARGV_TO_CSTRING_LEN(i, var, len)                    \
     size_t len = 0 ;                                        \
     const char * var = JS_ToCStringLen(ctx, &len, argv[i]) ;
-#define ARGV_TO_CSTRING_LEN_E(i, var, len, msg)              \
+#define ARGV_TO_CSTRING_LEN_E(i, var, len, msg)             \
     if(!JS_IsString(argv[i])) {                             \
         JSTHROW(msg)                                        \
     }                                                       \
@@ -129,7 +129,7 @@ extern "C" {
 
 
 #define ARGV_TO_STRING(i, var)                              \
-    std::string var ;                                       \
+    var ;                                                   \
     {                                                       \
         const char * cstr = JS_ToCString(ctx, argv[i]) ;    \
         var = cstr ;                                        \
@@ -138,7 +138,7 @@ extern "C" {
 
 
 #define ARGV_TO_PATH(i, var)                                \
-    std::string var ;                                       \
+    var ;                                                   \
     {                                                       \
         const char * cstr = JS_ToCString(ctx, argv[i]) ;    \
         var = FS::toVFSPath(ctx, cstr) ;                    \
@@ -321,30 +321,22 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
         not_exist_code                                                                  \
     }
 
-// 对象属性值 -> cvar
-// 需要要手动 JS_FreeCString(ctx, cvar)
-#define GET_STR_PROP(obj, propName, cvar)                                               \
-    cvar = NULL ;                                                                       \
+#define GET_STR_PROP(obj, propName, var, excp)                                          \
+    var ;                                                                               \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( !JS_IsUndefined(jsvar) && !JS_IsNull(jsvar)) {                              \
-            cvar = JS_ToCString(ctx, jsvar) ;                                           \
+        if( !JS_IsUndefined(jsvar) ) {                                                  \
+            const char * cvar = JS_ToCString(ctx, jsvar) ;                              \
+            var = cvar ;                                                                \
+            JS_FreeCString(ctx, cvar) ;                                                 \
+        } else {                                                                        \
+            excp                                                                        \
+            JSTHROW("property %s not exists", propName) ;                               \
         }                                                                               \
+    } else {                                                                            \
+        excp                                                                            \
+        JSTHROW("invalid options object") ;                                             \
     }
-#define GET_STR_PROP_C(obj, propName, cvar, err_code)                                   \
-    cvar = NULL ;                                                                       \
-    if((!JS_IsUndefined(obj))&&(!JS_IsNull(obj))) {                                     \
-        JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
-        if( !JS_IsUndefined(jsvar) && !JS_IsNull(jsvar)) {                              \
-            cvar = (char *)JS_ToCString(ctx, jsvar) ;                                   \
-        }                                                                               \
-    }                                                                                   \
-    if(!cvar) {                                                                         \
-        err_code                                                                        \
-    }
-
-#define GET_STR_PROP_E(obj, propName, cvar, err_msg)                                    \
-    GET_STR_PROP_C( obj, propName, cvar, JSTHROW(err_msg))
 
 
 #define GET_BOOL_PROP_OPT(obj, propName, cvar, default)                                 \

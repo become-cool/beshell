@@ -58,42 +58,36 @@ namespace be {
     }
 
     /**
-     * miso
-     * mosi
-     * clk
+     * options: {
+     *   miso=-1
+     *   mosi=-1
+     *   sck
+     *   quadwp_io_num=-1
+     *   quadhd_io_num=-1
+     *   max_transfer_sz=20480
+     * }
      */
     JSValue SPI::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         THIS_NCLASS(SPI, that)
-        CHECK_ARGC(3)
-        ARGV_TO_UINT8(2, clkpin)
-        
-        // int8_t misopin = -1 ;
-        // int8_t mosipin = -1 ;
-        // if(!JS_IsUndefined(argv[2]) && !JS_IsNull(argv[2])) {
-        //     if( JS_ToUint32(ctx, &mosipin, argv[2])!=0 ){
-        //         JSTHROW("MOSI pin invalid.")
-        //     }
-        // }
-        // if(!JS_IsUndefined(argv[1]) && !JS_IsNull(argv[1])) {
-        //     if( JS_ToUint32(ctx, &misopin, argv[1])!=0 ){
-        //         JSTHROW("MISO pin invalid.")
-        //     }
-        // }
-        
-        ARGV_TO_UINT8(1, mosipin)
-        ARGV_TO_UINT8(0, misopin)
+        CHECK_ARGC(1)
 
-
-        printf("spi[%d] miso=%d, mosi=%d, clk=%d\n", that->busnum, misopin, mosipin, clkpin);
+        gpio_num_t GET_INT32_PROP_OPT(argv[0], "miso", misopin, GPIO_NUM_NC)
+        gpio_num_t GET_INT32_PROP_OPT(argv[0], "mosi", mosipin, GPIO_NUM_NC)
+        gpio_num_t GET_INT32_PROP(argv[0], "sck", sckpin, )
+        int GET_INT32_PROP_OPT(argv[0], "quadwp_io_num", quadwp_io_num, -1)
+        int GET_INT32_PROP_OPT(argv[0], "quadhd_io_num", quadhd_io_num, -1)
+        int GET_INT32_PROP_OPT(argv[0], "max_transfer_sz", max_transfer_sz, 20480)
+        
+        printf("spi[%d] miso=%d, mosi=%d, clk=%d\n", that->busnum, misopin, mosipin, sckpin);
         // dn(busnum)
 
         spi_bus_config_t buscfg = {
             .mosi_io_num=mosipin,
             .miso_io_num=misopin,
-            .sclk_io_num=clkpin,
-            .quadwp_io_num=-1,
-            .quadhd_io_num=-1,
-            .max_transfer_sz=20480
+            .sclk_io_num=sckpin,
+            .quadwp_io_num=quadwp_io_num,
+            .quadhd_io_num=quadhd_io_num,
+            .max_transfer_sz=max_transfer_sz
         } ;
 
         esp_err_t ret = spi_bus_initialize(that->busnum, &buscfg, SPI_DMA_CH_AUTO);

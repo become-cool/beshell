@@ -20,7 +20,7 @@ namespace be {
         exportName("spi1") ;
         exportName("spi2") ;
         exportName("spi3") ;
-        exportName("i2s") ;
+        exportName("i2s0") ;
     }
     
     SerialModule::~SerialModule() {

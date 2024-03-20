@@ -182,6 +182,7 @@ namespace be {
             JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack");
             if (!JS_IsUndefined(val)) {
                 cstr = JS_ToCString(ctx, val) ;
+                str+= "\n";
                 str+= cstr;
                 JS_FreeCString(ctx,cstr) ;
             }

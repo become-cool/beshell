@@ -102,7 +102,7 @@ function() {
             return JS_UNDEFINED ;
         }
 
-        ARGV_TO_STRING(0,str)
+        string ARGV_TO_STRING(0,str)
         
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
