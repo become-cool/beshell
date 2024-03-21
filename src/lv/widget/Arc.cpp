@@ -4,22 +4,30 @@ namespace be::lv {
     DEFINE_NCLASS_META(Arc, Obj)
     std::vector<JSCFunctionListEntry> Arc::methods = {
 // AUTO GENERATE CODE START [GETSET LIST] --------
+        JS_CGETSET_DEF("startAngle",be::lv::Obj::invalidGetter,Arc::setStartAngle) ,
+        JS_CGETSET_DEF("endAngle",be::lv::Obj::invalidGetter,Arc::setEndAngle) ,
+        JS_CGETSET_DEF("bgStartAngle",be::lv::Obj::invalidGetter,Arc::setBgStartAngle) ,
+        JS_CGETSET_DEF("bgEndAngle",be::lv::Obj::invalidGetter,Arc::setBgEndAngle) ,
         JS_CGETSET_DEF("rotation",Arc::getRotation,Arc::setRotation) ,
         JS_CGETSET_DEF("mode",Arc::getMode,Arc::setMode) ,
         JS_CGETSET_DEF("value",Arc::getValue,Arc::setValue) ,
         JS_CGETSET_DEF("changeRate",be::lv::Obj::invalidGetter,Arc::setChangeRate) ,
         JS_CGETSET_DEF("knobOffset",Arc::getKnobOffset,Arc::setKnobOffset) ,
+        JS_CGETSET_DEF("angleStart",Arc::getAngleStart,be::lv::Obj::invalidSetter) ,
+        JS_CGETSET_DEF("angleEnd",Arc::getAngleEnd,be::lv::Obj::invalidSetter) ,
+        JS_CGETSET_DEF("bgAngleStart",Arc::getBgAngleStart,be::lv::Obj::invalidSetter) ,
+        JS_CGETSET_DEF("bgAngleEnd",Arc::getBgAngleEnd,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("minValue",Arc::getMinValue,be::lv::Obj::invalidSetter) ,
         JS_CGETSET_DEF("maxValue",Arc::getMaxValue,be::lv::Obj::invalidSetter) ,
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
+        JS_CFUNC_DEF("setAngles", 2, Arc::setAngles),
+        JS_CFUNC_DEF("setBgAngles", 2, Arc::setBgAngles),
         JS_CFUNC_DEF("setRange", 2, Arc::setRange),
         JS_CFUNC_DEF("alignObjToAngle", 2, Arc::alignObjToAngle),
         JS_CFUNC_DEF("rotateObjToAngle", 2, Arc::rotateObjToAngle),
         // Unsupported arg type:
         // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
-        // void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
-        // void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -45,18 +53,50 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::setStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
-    // void lv_arc_set_start_angle(lv_obj_t * obj, lv_value_precise_t start)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::setEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
-    // void lv_arc_set_end_angle(lv_obj_t * obj, lv_value_precise_t end)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::setBgStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
-    // void lv_arc_set_bg_start_angle(lv_obj_t * obj, lv_value_precise_t start)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::setBgEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
-    // void lv_arc_set_bg_end_angle(lv_obj_t * obj, lv_value_precise_t end)
+    #ifndef SETTER_Arc_StartAngle
+    JSValue Arc::setStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
+        THIS_NCLASS(Arc,thisobj)
+        int32_t startAngle ;
+        if(JS_ToInt32(ctx, (int32_t *) &startAngle, val)!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","startAngle","Arc","setStartAngle","number")
+        }
+        lv_arc_set_start_angle(thisobj->lvobj(), startAngle) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
+    #ifndef SETTER_Arc_EndAngle
+    JSValue Arc::setEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
+        THIS_NCLASS(Arc,thisobj)
+        int32_t endAngle ;
+        if(JS_ToInt32(ctx, (int32_t *) &endAngle, val)!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","endAngle","Arc","setEndAngle","number")
+        }
+        lv_arc_set_end_angle(thisobj->lvobj(), endAngle) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
+    #ifndef SETTER_Arc_BgStartAngle
+    JSValue Arc::setBgStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
+        THIS_NCLASS(Arc,thisobj)
+        int32_t bgStartAngle ;
+        if(JS_ToInt32(ctx, (int32_t *) &bgStartAngle, val)!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","bgStartAngle","Arc","setBgStartAngle","number")
+        }
+        lv_arc_set_bg_start_angle(thisobj->lvobj(), bgStartAngle) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
+    #ifndef SETTER_Arc_BgEndAngle
+    JSValue Arc::setBgEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
+        THIS_NCLASS(Arc,thisobj)
+        int32_t bgEndAngle ;
+        if(JS_ToInt32(ctx, (int32_t *) &bgEndAngle, val)!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","bgEndAngle","Arc","setBgEndAngle","number")
+        }
+        lv_arc_set_bg_end_angle(thisobj->lvobj(), bgEndAngle) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
     #ifndef GETTER_Arc_Rotation
     JSValue Arc::getRotation(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -149,18 +189,38 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::getAngleStart(JSContext *ctx, JSValueConst this_val){}
-    // lv_value_precise_t lv_arc_get_angle_start(lv_obj_t * obj)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::getAngleEnd(JSContext *ctx, JSValueConst this_val){}
-    // lv_value_precise_t lv_arc_get_angle_end(lv_obj_t * obj)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::getBgAngleStart(JSContext *ctx, JSValueConst this_val){}
-    // lv_value_precise_t lv_arc_get_bg_angle_start(lv_obj_t * obj)
-    // unspported type: lv_value_precise_t
-    // JSValue Arc::getBgAngleEnd(JSContext *ctx, JSValueConst this_val){}
-    // lv_value_precise_t lv_arc_get_bg_angle_end(lv_obj_t * obj)
+    #ifndef GETTER_Arc_AngleStart
+    JSValue Arc::getAngleStart(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Arc,thisobj)
+        lv_value_precise_t value = lv_arc_get_angle_start(thisobj->lvobj()) ;
+        JSValue retval = JS_NewInt32(ctx, value) ;
+        return retval ;
+    }
+    #endif
+    #ifndef GETTER_Arc_AngleEnd
+    JSValue Arc::getAngleEnd(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Arc,thisobj)
+        lv_value_precise_t value = lv_arc_get_angle_end(thisobj->lvobj()) ;
+        JSValue retval = JS_NewInt32(ctx, value) ;
+        return retval ;
+    }
+    #endif
+    #ifndef GETTER_Arc_BgAngleStart
+    JSValue Arc::getBgAngleStart(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Arc,thisobj)
+        lv_value_precise_t value = lv_arc_get_bg_angle_start(thisobj->lvobj()) ;
+        JSValue retval = JS_NewInt32(ctx, value) ;
+        return retval ;
+    }
+    #endif
+    #ifndef GETTER_Arc_BgAngleEnd
+    JSValue Arc::getBgAngleEnd(JSContext *ctx, JSValueConst this_val){
+        THIS_NCLASS(Arc,thisobj)
+        lv_value_precise_t value = lv_arc_get_bg_angle_end(thisobj->lvobj()) ;
+        JSValue retval = JS_NewInt32(ctx, value) ;
+        return retval ;
+    }
+    #endif
     #ifndef GETTER_Arc_MinValue
     JSValue Arc::getMinValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -183,11 +243,39 @@ namespace be::lv {
     // Unsupported arg type: lv_subject_t *
     // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
-    // Unsupported arg type: lv_value_precise_t
-    // void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
+    #ifndef METHOD_Arc_setAngles
+    JSValue Arc::setAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t start ;
+        if(JS_ToInt32(ctx, (int32_t *) &start, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","start","Arc","setAngles","number")
+        }
+        int32_t end ;
+        if(JS_ToInt32(ctx, (int32_t *) &end, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","end","Arc","setAngles","number")
+        }
+        lv_arc_set_angles( thisobj->lvobj(), start, end ) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
 
-    // Unsupported arg type: lv_value_precise_t
-    // void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end)
+    #ifndef METHOD_Arc_setBgAngles
+    JSValue Arc::setBgAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        CHECK_ARGC(2)
+        int32_t start ;
+        if(JS_ToInt32(ctx, (int32_t *) &start, argv[0])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","start","Arc","setBgAngles","number")
+        }
+        int32_t end ;
+        if(JS_ToInt32(ctx, (int32_t *) &end, argv[1])!=0){
+            JSTHROW("arg %s of method %s.%s() must be a %s","end","Arc","setBgAngles","number")
+        }
+        lv_arc_set_bg_angles( thisobj->lvobj(), start, end ) ;
+        return JS_UNDEFINED ;
+    }
+    #endif
 
     #ifndef METHOD_Arc_setRange
     JSValue Arc::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

@@ -1434,16 +1434,16 @@ bool lv_style_prop_str_to_const(const char * name, lv_style_prop_t * out) {
     else if(strcmp(name,"grid-cell-y-align")==0) {
         (*out) = LV_STYLE_GRID_CELL_Y_ALIGN ;
     }
-    else if(strcmp(name,"last-built-in-prop")==0) {
+    else if(strcmp(name,"e-last-built-in-prop")==0) {
         (*out) = _LV_STYLE_LAST_BUILT_IN_PROP ;
     }
-    else if(strcmp(name,"num-built-in-props")==0) {
+    else if(strcmp(name,"e-num-built-in-props")==0) {
         (*out) = _LV_STYLE_NUM_BUILT_IN_PROPS ;
     }
     else if(strcmp(name,"prop-any")==0) {
         (*out) = LV_STYLE_PROP_ANY ;
     }
-    else if(strcmp(name,"prop-const")==0) {
+    else if(strcmp(name,"e-prop-const")==0) {
         (*out) = _LV_STYLE_PROP_CONST ;
     }
 
@@ -1570,8 +1570,8 @@ const char * lv_style_prop_const_to_str(lv_style_prop_t code) {
         case LV_STYLE_GRID_CELL_ROW_POS: return "grid-cell-row-pos";
         case LV_STYLE_GRID_CELL_ROW_SPAN: return "grid-cell-row-span";
         case LV_STYLE_GRID_CELL_Y_ALIGN: return "grid-cell-y-align";
-        case _LV_STYLE_LAST_BUILT_IN_PROP: return "last-built-in-prop";
-        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "num-built-in-props";
+        case _LV_STYLE_LAST_BUILT_IN_PROP: return "e-last-built-in-prop";
+        case _LV_STYLE_NUM_BUILT_IN_PROPS: return "e-num-built-in-props";
         case LV_STYLE_PROP_ANY: return "prop-any";
 
         default:

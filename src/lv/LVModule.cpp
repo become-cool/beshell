@@ -57,7 +57,6 @@ namespace be::lv {
         exportClass<Span>() ;
         exportClass<Switch>() ;
         exportClass<TextArea>() ;
-        exportClass<Gif>() ;
 // AUTO GENERATE CODE END [EXPORT WIDGETS] --------
     }
 
