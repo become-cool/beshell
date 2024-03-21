@@ -3,6 +3,16 @@
 
 using namespace std ;
 
+#define JSCHECK_MASTER                              \
+    if(that->mode!=I2C_MODE_MASTER) {               \
+        JSTHROW("I2C is not in %s mode", "master") ;\
+    }
+#define JSCHECK_SLAVE                              \
+    if(that->mode!=I2C_MODE_SLAVE) {               \
+        JSTHROW("I2C is not in %s mode", "slave") ;\
+    }
+
+
 namespace be {
     
     DEFINE_NCLASS_META(I2C, NativeClass)
@@ -27,6 +37,7 @@ namespace be {
         JS_CFUNC_DEF("readR8", 2, I2C::readR8),
         JS_CFUNC_DEF("readR16", 2, I2C::readR16),
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
+        JS_CFUNC_DEF("listen", 2, I2C::listen),
     } ;
 
     I2C::I2C(JSContext * ctx, i2c_port_t busnum)
@@ -86,7 +97,7 @@ namespace be {
      * }
      */
     JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
         CHECK_ARGC(1)
 
         gpio_num_t GET_INT32_PROP(argv[0], "sda", sda, )
@@ -96,7 +107,6 @@ namespace be {
 
         size_t GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
         size_t GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
-
 
         i2c_config_t i2c_config = {
             .mode = mode,
@@ -111,38 +121,45 @@ namespace be {
             GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 400000)
         } else if(mode==I2C_MODE_SLAVE) {
             GET_INT32_PROP_OPT(argv[0], "addr_10bit_en", i2c_config.slave.addr_10bit_en, 0)
-            GET_INT32_PROP(argv[0], "addr_10bit_en", i2c_config.slave.slave_addr, )
-            dn(i2c_config.slave.slave_addr)
+            GET_INT32_PROP(argv[0], "slave_addr", i2c_config.slave.slave_addr, )
         }
         else {
             JSTHROW("invalid mode")
         }
 
-        if(i2c_param_config(thisobj->busnum, &i2c_config)!=ESP_OK) {
+        that->mode = mode ;
+
+        if(i2c_param_config(that->busnum, &i2c_config)!=ESP_OK) {
             return JS_FALSE ;
         }
-        esp_err_t res = i2c_driver_install(thisobj->busnum, mode, rx_buffer_len, tx_buffer_len, 0) ;
+        esp_err_t res = i2c_driver_install(that->busnum, mode, rx_buffer_len, tx_buffer_len, 0) ;
         if(res!=ESP_OK) {
             return JS_FALSE ;
         }
         
-	    // i2c_set_timeout(thisobj->busnum, timeout) ;
+	    // i2c_set_timeout(that->busnum, timeout) ;
 
         return JS_TRUE ;
     }
 
     JSValue I2C::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, thisobj)
-        return i2c_driver_delete(thisobj->busnum)==ESP_OK? JS_TRUE: JS_FALSE ;
+        THIS_NCLASS(I2C, that)
+        return i2c_driver_delete(that->busnum)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
 
     bool I2C::ping(uint8_t addr) {
+        if(mode!=I2C_MODE_MASTER) {
+            return false ;
+        }
         I2C_BEGIN_WRITE(addr)
         I2C_COMMIT(busnum)
         return res==ESP_OK;
     }
 
     void I2C::scan(uint8_t from, uint8_t to) {
+        if(mode!=I2C_MODE_MASTER) {
+            return ;
+        }
         for(uint8_t addr=from; addr<=to; addr++) {
             if( ping(addr) ){
                 printf("found device: 0x%02x\n", addr) ;
@@ -161,22 +178,25 @@ namespace be {
 
     JSValue I2C::ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
+        JSCHECK_MASTER
         ARGV_TO_UINT8(0, addr)
-        return thisobj->ping(addr)? JS_TRUE: JS_FALSE ;
+        return that->ping(addr)? JS_TRUE: JS_FALSE ;
     }
     
     JSValue I2C::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
+        JSCHECK_MASTER
         ARGV_TO_UINT8_OPT(0, from, 0)
         ARGV_TO_UINT8_OPT(1, to, 127)
-        thisobj->scan(from,to) ;
+        that->scan(from,to) ;
         return JS_UNDEFINED ;
     }
     
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(2)
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
+        JSCHECK_MASTER
         ARGV_TO_UINT8(0, addr)
         if(!JS_IsArray(ctx, argv[1])) {
             JSTHROW("arg must be a array")
@@ -199,7 +219,7 @@ namespace be {
                 JS_FreeValue(ctx, val) ;
             }
         }
-        bool res = thisobj->send(addr,data,len) ;
+        bool res = that->send(addr,data,len) ;
         if(data) {
             free(data) ;
         }
@@ -215,11 +235,12 @@ namespace be {
 
     #define I2C_WRITE(type, ARGV_CONVERT)   \
         CHECK_ARGC(3)                       \
-        THIS_NCLASS(I2C, thisobj)           \
+        THIS_NCLASS(I2C, that)              \
+        JSCHECK_MASTER                      \
         ARGV_TO_UINT8(0, addr)              \
         ARGV_TO_UINT8(1, reg)               \
         ARGV_CONVERT(2, byte)               \
-        return  thisobj->write<uint8_t, type>(addr, reg, byte)? JS_TRUE: JS_FALSE ;
+        return  that->write<uint8_t, type>(addr, reg, byte)? JS_TRUE: JS_FALSE ;
 
     JSValue I2C::write8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         I2C_WRITE(uint8_t,ARGV_TO_UINT8)
@@ -235,7 +256,8 @@ namespace be {
         CHECK_ARGC(2)
         ARGV_TO_UINT8(0, addr)
         ARGV_TO_UINT8(1, len)
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
+        JSCHECK_MASTER
         if(len<1) {
             JSTHROW("invalid recv length")
         }
@@ -243,7 +265,7 @@ namespace be {
         if(!buffer) {
             JSTHROW("out of memory?") ;
         }
-        if(!thisobj->recv(addr,buffer,len)){
+        if(!that->recv(addr,buffer,len)){
             free(buffer) ;
             return JS_NULL;
         }
@@ -253,16 +275,18 @@ namespace be {
     JSValue I2C::recvUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_UINT8(0, addr)
-        THIS_NCLASS(I2C, thisobj)
+        THIS_NCLASS(I2C, that)
+        JSCHECK_MASTER
         uint8_t byte ;
-        if(!thisobj->recv(addr,&byte,1)){
+        if(!that->recv(addr,&byte,1)){
             JSTHROW("i2c recv failed")
         }
         return JS_NewUint32(ctx,byte) ;
     }
 
     #define READ_REG(bits)                                      \
-        THIS_NCLASS(I2C, thisobj)                               \
+        THIS_NCLASS(I2C, that)                                  \
+        JSCHECK_MASTER                                          \
         CHECK_ARGC(3)                                           \
         ARGV_TO_UINT8(0, addr)                                  \
         ARGV_TO_UINT##bits(1, reg)                              \
@@ -271,7 +295,7 @@ namespace be {
         if(!buffer) {                                           \
             JSTHROW("out of memory?") ;                         \
         }                                                       \
-        if(!thisobj->read<uint##bits##_t>(addr,reg,buffer,len)){\
+        if(!that->read<uint##bits##_t>(addr,reg,buffer,len)){\
             free(buffer) ;                                      \
             return JS_NULL;                                     \
         }                                                       \
@@ -286,5 +310,34 @@ namespace be {
     }
     JSValue I2C::readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         READ_REG(32)
+    }
+
+    // for slave 
+    void I2C::task_i2c_slave(void *arg) {
+        I2C * that = (I2C*)arg ;
+
+        uint8_t data;
+        while (1) {
+            int ret = i2c_slave_read_buffer(that->busnum, &data, 1, portMAX_DELAY);
+            if (ret == 1) {
+                printf("Received data: %c\n", data);
+                // 处理收到的数据
+            }
+        }
+    }
+    
+    JSValue I2C::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        if( !JS_IsFunction(ctx, argv[0]) ){
+            JSTHROW("arg callback must be a function")
+        }
+        THIS_NCLASS(I2C, that)
+        JSCHECK_SLAVE
+        if(that->slaveTask) {
+            JSTHROW("slave listener already exists")
+        }
+        that->slaveListener = JS_DupValue(ctx, argv[0]) ;
+        xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024, that, 10, &that->slaveTask, 1);
+        return JS_UNDEFINED ;
     }
 }

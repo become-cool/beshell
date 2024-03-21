@@ -35,6 +35,9 @@ namespace be {
             const char * modulename = JS_ToCString(ctx, argv[0]) ;
 
             JSModuleDef * mdef = JS_RunModule(ctx, nullptr, modulename) ;
+            if(!mdef) {
+                JSTHROW("Cannot find module: %s", modulename) ;
+            }
             JSValue mi = js_get_module_ns(ctx, mdef ) ;
 
             JS_FreeCString(ctx, modulename) ;
@@ -193,14 +196,18 @@ namespace be {
     }
 
     char * ModuleLoader::normalize(JSContext *ctx, const char *module_base_name, const char *module_name, void *opaque) {
-        assert(opaque) ;
+
+        if(!opaque) {
+            printf("invalid opaque in ModuleLoader::normalize()\n") ;
+            return nullptr ;
+        }
+        
         ModuleLoader * mloader = (ModuleLoader *)opaque ;
 
         if(mloader->modules.count(ctx)<1) {
             printf("invalid ctx in ModuleLoader::normalize()\n") ;
             return nullptr ;
         }
-
         // 内置模块 
         // -------------
         for (const auto & pair : mloader->modules[ctx]) {
@@ -213,7 +220,7 @@ namespace be {
         // -------------
         JSEngine * engine= JSEngine::fromJSContext(ctx) ;
         assert(engine) ;
-        
+    
         std::string fullpath ;
         // 绝对路
         if(module_name[0]=='/') {

@@ -45,8 +45,6 @@ namespace be::driver {
         string GET_STR_PROP(argv[0], "mount", mount, )
         mount = FS::toVFSPath(ctx,mount.c_str()) ;
 
-        dstr(mount)
-
         esp_err_t ret;
         esp_vfs_fat_sdmmc_mount_config_t mount_config = {
             .format_if_mount_failed = false,

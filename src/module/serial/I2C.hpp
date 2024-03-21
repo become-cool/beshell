@@ -2,6 +2,8 @@
 
 #include <NativeClass.hpp>
 #include "driver/i2c.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 namespace be {
 
@@ -28,8 +30,15 @@ namespace be {
         i2c_port_t busnum ;
         SemaphoreHandle_t sema ;
 
+        i2c_mode_t mode = I2C_MODE_MASTER ;
+
+        TaskHandle_t slaveTask = nullptr ;
+        JSValue slaveListener = JS_NULL ;
+        static void task_i2c_slave(void *arg) ;
+
         static I2C * i2c0 ;
         static I2C * i2c1 ;
+
 
     public:
         I2C(JSContext * ctx, i2c_port_t busnum) ;
@@ -95,6 +104,7 @@ namespace be {
         static JSValue readR8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
 }
