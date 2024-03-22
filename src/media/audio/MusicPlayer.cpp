@@ -83,7 +83,7 @@ namespace be::media {
             JSTHROW("path is too long")
         }
         strcpy(player->src->src_path, path.c_str()) ;
-    #ifdef ESP_PLATFORM
+
         if(!audio_el_src_strip_mp3(player->src)) {
             JSTHROW("file not exists") ;
         }
@@ -109,12 +109,8 @@ namespace be::media {
 
         if(sync) {
             xEventGroupWaitBits(player->playback->base.stats, STAT_STOPPED, false, false, portMAX_DELAY);
-            printf("stopped") ;
         }
 
-    #else
-        printf("not implements") ;
-    #endif
         return JS_UNDEFINED ;
     }
     JSValue MusicPlayer::playPCM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

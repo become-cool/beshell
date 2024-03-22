@@ -1,7 +1,7 @@
 #include "audio_stream.h"
 
-#define BUFF_SRC_SIZE   MAINBUF_SIZE/2
-#define BUFF_SRC_MEMTYPE   MALLOC_CAP_DMA
+#define BUFF_SRC_SIZE       MAINBUF_SIZE/2
+#define BUFF_SRC_MEMTYPE    MALLOC_CAP_DMA
 
 
 static void mp3dec_output(audio_el_mp3_t * el, uint8_t * data, size_t size) {
@@ -29,7 +29,6 @@ static void mp3dec_output(audio_el_mp3_t * el, uint8_t * data, size_t size) {
         el->channels = el->decoder->nChans ;
     }
 
-#ifdef ESP_PLATFORM
     // if(pdTRUE != xRingbufferSend(el->base.ring, buff_pcm, el->info.outputSamps * 2, portMAX_DELAY)) {
     if(pdTRUE != xRingbufferSend(el->base.ring, data, size, portMAX_DELAY)) {
         printf("task mp3 decode xRingbufferSend() wrong ?????\n") ;
@@ -38,10 +37,6 @@ static void mp3dec_output(audio_el_mp3_t * el, uint8_t * data, size_t size) {
         xEventGroupClearBits(el->base.stats, STAT_DRAIN) ;
     }
 
-#else
-    // fwrite(buff_pcm,1,el->info.outputSamps * el->info.nChans,el->fout) ;
-    fwrite(data,1,size,el->fout) ;
-#endif
 }
 
 // 解码任务线程
@@ -81,7 +76,6 @@ static void task_mp3_decoder(audio_el_mp3_t * el) {
             memmove(el->undecode_buff, psrc, decode_left);
         }
 
-#ifdef ESP_PLATFORM
         data_size = 0 ;
         psrc = xRingbufferReceiveUpTo(el->base.upstream->ring, &data_size, 20, BUFF_SRC_SIZE-decode_left);
         if(psrc) {
@@ -104,13 +98,6 @@ static void task_mp3_decoder(audio_el_mp3_t * el) {
             }
             continue ;
         }
-
-#else
-        data_size = fread(el->undecode_buff+decode_left, 1, BUFF_SRC_SIZE-decode_left, el->fin) ;
-        if(!data_size) {
-            break ;
-        }
-#endif
 
         decode_left = decode_left + data_size;
         psrc = el->undecode_buff;
