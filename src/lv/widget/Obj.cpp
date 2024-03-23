@@ -388,10 +388,10 @@ namespace be::lv {
     }
 
     JSValue Obj::invalidGetter(JSContext *ctx, JSValueConst this_val) {
-        return JS_UNDEFINED ;
+        JSTHROW("not support get property") ;
     }
     JSValue Obj::invalidSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
-        return JS_UNDEFINED ;
+        JSTHROW("not support set property") ;
     }
 
     #define SETTER_Obj_Width
