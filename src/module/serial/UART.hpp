@@ -2,6 +2,8 @@
 
 #include <NativeClass.hpp>
 #include "driver/uart.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 namespace be{
     class UART: public be::NativeClass {
@@ -15,6 +17,10 @@ namespace be{
         static UART * uart0 ;
         static UART * uart1 ;
         static UART * uart2 ;
+
+        TaskHandle_t taskListenerHandle = nullptr ;
+        JSValue listener = JS_NULL ;
+        static void task_listen(void * arg) ;
 
     public:
         UART(JSContext * ctx, uart_port_t port) ;

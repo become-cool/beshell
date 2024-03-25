@@ -25,6 +25,7 @@ namespace be {
         // JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, std::initializer_list<JSValue> argv={}) ;
 
         JSTimerEvent * setImmediate(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
+        JSTimerEvent * setImmediateAsync(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
         
         void removeTimer(JSContext *ctx, JSTimerEvent *) ;
         void removeTimer(JSContext *ctx, uint32_t id) ;

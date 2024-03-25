@@ -93,6 +93,7 @@ namespace be{
         if(!buff) {
             JSTHROW("out of memory?")
         }
+        dn2(len, timeout)
         int readlen = uart_read_bytes(uart->m_uartNum, buff, len, timeout / portTICK_PERIOD_MS);
         return JS_NewArrayBuffer(ctx, buff, readlen, freeArrayBuffer, NULL, false) ;
     }
@@ -119,7 +120,41 @@ namespace be{
 
     }
 
+    void UART::task_listen(void * arg) {
+        uart_event_t event;
+        UART * uart = (UART *) arg ;
+        uint8_t data [32];
+        while(1) {
+            bzero(data, sizeof(data));
+            int len = uart_read_bytes(uart->uartNum(), data, sizeof(data), 1);
+            if(len) {
+                printf("Read %d bytes: ", len);
+                for(int i = 0; i < len; i++) {
+                    printf("%c", data[i]);
+                }
+                printf("\n");
+            }
+
+            vTaskDelay(1);
+        }
+    }
+
     JSValue UART::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(UART, uart)
+        CHECK_ARGC(1)
+        if( !JS_IsFunction(ctx, argv[0]) ){
+            JSTHROW("arg callback must be a function")
+        }
+
+        if(JS_IsNull(uart->listener)) {
+            JS_FreeValue(ctx, uart->listener) ;
+        }
+        uart->listener = JS_DupValue(ctx, argv[0]) ;
+
+        if(uart->taskListenerHandle == nullptr) {
+            xTaskCreatePinnedToCore(task_listen, "task-listen", 2048, uart, 5, &uart->taskListenerHandle, 1);
+        }
+
         return JS_UNDEFINED ;
     }
 
