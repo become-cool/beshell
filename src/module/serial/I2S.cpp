@@ -65,10 +65,14 @@ namespace be {
         GET_INT32_PROP_OPT(argv[0], "sout", pin_config.data_out_num, -1)
         GET_INT32_PROP_OPT(argv[0], "sin", pin_config.data_in_num, -1)
 
-        i2s_config.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT ;
+        // i2s_config.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT ;
+        // i2s_config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT ;
+        dn(I2S_CHANNEL_FMT_RIGHT_LEFT)
+        dn(I2S_CHANNEL_FMT_ONLY_LEFT)
 
         printf("I2S %d, lrclk:%d, sclk:d%, sout:%d\n", pin_config.ws_io_num, pin_config.bck_io_num, pin_config.data_out_num) ;
         dn(i2s_config.channel_format)
+        dn(i2s_config.communication_format)
         dn(i2s_config.sample_rate)
         dn(i2s_config.bits_per_sample)
 

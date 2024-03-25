@@ -109,7 +109,8 @@ namespace be {
     }
     
     JSValue ProcessModule::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-#ifdef ESP_PLATFORM
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+#ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
         uint8_t CPU_RunInfo[400];
         memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
  
@@ -127,6 +128,7 @@ namespace be {
         printf("task_name      run_cnt                 usage_rate   \r\n");
         printf("%s", CPU_RunInfo);
         printf("----------------------------------------------------\r\n");
+#endif
 #endif
 
         return JS_UNDEFINED ;

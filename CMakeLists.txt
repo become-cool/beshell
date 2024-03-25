@@ -128,6 +128,11 @@ add_definitions(-DGNUBOY_NO_SCREENSHOT)
 add_definitions(-DIS_LITTLE_ENDIAN)
 set(CMAKE_CXX_STANDARD 11)
 
+
+add_definitions(-DCONFIG_FREERTOS_USE_TRACE_FACILITY)
+add_definitions(-DCONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS)
+
+
 # for c
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types")

@@ -25,7 +25,7 @@ function setupSerialBus(type, num, conf) {
     }
     console.log("load device config from:", deviceJsonPath)
     for(let prepheral of ['spi','i2c','uart','i2s']) {
-        for(let num in deviceConf[prepheral]||{}){
+        for(let num in deviceConf[prepheral]||{}) {
             setupSerialBus(prepheral,num,deviceConf[prepheral][num])
         }
     }
