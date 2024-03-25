@@ -17,7 +17,7 @@ function setupSerialBus(type, num, conf) {
     }
 }
 
-(async function (){
+(function (){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
         console.log(deviceJsonPath, "not exists or invalid.")
@@ -78,7 +78,7 @@ function setupSerialBus(type, num, conf) {
 
     // lv
     try{
-        var lv = await import('lv')
+        var lv = importSync('lv')
     }catch(e){}
     if(lv) {
         for(let [dev,devConf] of lvdevs) {
