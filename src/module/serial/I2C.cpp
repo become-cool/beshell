@@ -7,9 +7,9 @@ using namespace std ;
     if(that->mode!=I2C_MODE_MASTER) {               \
         JSTHROW("I2C is not in %s mode", "master") ;\
     }
-#define JSCHECK_SLAVE                              \
-    if(that->mode!=I2C_MODE_SLAVE) {               \
-        JSTHROW("I2C is not in %s mode", "slave") ;\
+#define JSCHECK_SLAVE                               \
+    if(that->mode!=I2C_MODE_SLAVE) {                \
+        JSTHROW("I2C is not in %s mode", "slave") ; \
     }
 
 

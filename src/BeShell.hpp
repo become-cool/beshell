@@ -27,7 +27,7 @@
 namespace be {
     
     class BeShell ;
-	typedef void (*LoopFunction)(const BeShell &) ;
+	typedef void (*LoopFunction)(const BeShell &, void *) ;
 
     class BeShell {
 
@@ -38,7 +38,7 @@ namespace be {
         bool nowifi = false ;
         bool bUseDeviceJSON = false ;
 
-        std::vector<LoopFunction> loopFunctions ; 
+        std::vector<std::pair<LoopFunction,void *>> loopFunctions ; 
 
     public:
         FS * fs = nullptr ;
@@ -63,7 +63,7 @@ namespace be {
             engine->mloader.add<M>(name) ;
         }
 
-        void addLoopFunction(LoopFunction func) ;
+        void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
 
         void useBasic() ;
         void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;

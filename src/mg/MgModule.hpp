@@ -20,11 +20,11 @@ namespace be::mg {
         static std::string cert_path ;
         static std::string certkey_path ;
 
-        static void loop(const BeShell & beshell) ;
+        static void loop(const BeShell & beshell, void * data) ;
 
         inline static void use(be::BeShell & beshell) {
             beshell.addModule<MgModule>("mg") ;
-            beshell.addLoopFunction(loop) ;
+            beshell.addLoopFunction(loop, nullptr) ;
 
             ca_path = beshell.fs->toVFSPath("/var/ca.pem") ;
             cert_path = beshell.fs->toVFSPath("/var/cert.pem") ;

@@ -4,6 +4,12 @@
 #include <vector>
 #include <initializer_list>
 
+#if defined(ESP_PLATFORM)
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#endif
+
 namespace be {
     class JSTimerEvent ;
 
@@ -11,6 +17,10 @@ namespace be {
     private:
         std::vector<JSTimerEvent*> events ;
         uint32_t lastTimerId = 0 ;
+
+#if defined(ESP_PLATFORM)
+        QueueHandle_t timer_queue = nullptr ;
+#endif
 
     public:
         void setup(JSContext * ctx) ;
@@ -25,7 +35,10 @@ namespace be {
         // JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, std::initializer_list<JSValue> argv={}) ;
 
         JSTimerEvent * setImmediate(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
+        
+#if defined(ESP_PLATFORM)
         JSTimerEvent * setImmediateAsync(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
+#endif
         
         void removeTimer(JSContext *ctx, JSTimerEvent *) ;
         void removeTimer(JSContext *ctx, uint32_t id) ;

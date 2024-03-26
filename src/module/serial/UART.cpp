@@ -1,4 +1,5 @@
 #include "UART.hpp"
+#include <JSEngine.hpp>
 
 using namespace std ;
 
@@ -117,28 +118,45 @@ namespace be{
             const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
             return JS_NewInt32(ctx, txBytes) ;
         }
-
     }
+
+    typedef struct {
+        uint8_t * data ;
+        int len ;
+    } uart_chunk_t ;
 
     void UART::task_listen(void * arg) {
         uart_event_t event;
         UART * uart = (UART *) arg ;
-        uint8_t data [32];
+        uint8_t buff [32];
+        uart_chunk_t chunk ;
         while(1) {
-            bzero(data, sizeof(data));
-            int len = uart_read_bytes(uart->uartNum(), data, sizeof(data), 1);
-            if(len) {
-                printf("Read %d bytes: ", len);
-                for(int i = 0; i < len; i++) {
-                    printf("%c", data[i]);
+            chunk.len = uart_read_bytes(uart->uartNum(), buff, sizeof(buff), 1);
+            if(chunk.len) {
+                chunk.data = (uint8_t *)malloc(chunk.len) ;
+                memcpy(chunk.data, buff, chunk.len) ;
+                if( xQueueSend(uart->data_queue, &chunk, 0)!=pdPASS ){
+                    free(chunk.data) ;
                 }
-                printf("\n");
             }
 
             vTaskDelay(1);
         }
     }
 
+    void UART::loop(JSContext * ctx, void * opaque) {
+        UART * uart = (UART *) opaque ;
+        uart_chunk_t chunk ;
+        if(xQueueReceive(uart->data_queue, &chunk, 0)) {
+            if(chunk.data) {
+                JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
+                JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
+                JS_FreeValue(ctx, ab) ;
+            }
+        }
+    }
+
+    #define DATA_QUEUE_LEN 10
     JSValue UART::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
         CHECK_ARGC(1)
@@ -154,6 +172,12 @@ namespace be{
         if(uart->taskListenerHandle == nullptr) {
             xTaskCreatePinnedToCore(task_listen, "task-listen", 2048, uart, 5, &uart->taskListenerHandle, 1);
         }
+        
+        if(uart->data_queue==nullptr){
+            uart->data_queue = xQueueCreate(DATA_QUEUE_LEN, sizeof(uart_chunk_t));
+        }
+
+        JSEngine::fromJSContext(ctx)->addLoopFunction(UART::loop, (void *)uart) ;
 
         return JS_UNDEFINED ;
     }

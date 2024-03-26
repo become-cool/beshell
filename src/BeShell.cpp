@@ -87,8 +87,15 @@ namespace be {
 #endif
 
 
-    void BeShell::addLoopFunction(LoopFunction func) {
-        loopFunctions.push_back(func) ;
+    void BeShell::addLoopFunction(LoopFunction func, void * opaque, bool ignoreRepeat) {
+        if(ignoreRepeat) {
+            for(auto pair:loopFunctions) {
+                if(func==pair.first) {
+                    return ;
+                }
+            }
+        }
+        loopFunctions.push_back( pair(func,opaque) ) ;
     }
 
     void BeShell::setup() {
@@ -107,10 +114,6 @@ namespace be {
 
         engine->setup() ;
         
-        for(auto func:loopFunctions) {
-            func(*this) ;
-        }
-
         if(bUseDeviceJSON) {
             JSEngineEvalEmbeded(engine->ctx, device)
         }
@@ -133,6 +136,10 @@ namespace be {
             lv->loop() ;
         }
 #endif
+
+        for(auto pair:loopFunctions) {
+            pair.first(*this, pair.second) ;
+        }
     }
 
     void BeShell::run() {

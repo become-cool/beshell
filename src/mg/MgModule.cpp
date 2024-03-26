@@ -99,7 +99,7 @@ namespace be::mg {
         else { return -1 ;}
     }
 
-    void MgModule::loop(const BeShell & beshell) {
+    void MgModule::loop(const BeShell & beshell, void * data) {
         mg_mgr_poll(&mgr, 0);
     }
 

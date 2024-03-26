@@ -131,6 +131,10 @@ namespace be {
     void JSEngine::loop() {
         timer.loop(ctx) ;
         js_std_loop(ctx) ;
+
+        for(auto pair:loopFunctions) {
+            pair.first(ctx, pair.second) ;
+        }
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -223,4 +227,14 @@ namespace be {
         JS_FreeValue(ctx,global) ;
     }
 
+    void JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat) {
+        if(ignoreRepeat) {
+            for(auto pair:loopFunctions) {
+                if(func==pair.first) {
+                    return ;
+                }
+            }
+        }
+        loopFunctions.push_back( pair(func,opaque) ) ;
+    }
 }

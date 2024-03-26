@@ -9,10 +9,13 @@
 
 namespace be {
     class BeShell ;
+	typedef void (*EngineLoopFunction)(JSContext *, void *) ;
+
     class JSEngine {
     private:
 
         Console * console = nullptr ;
+        std::vector<std::pair<EngineLoopFunction,void *>> loopFunctions ; 
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 
@@ -42,6 +45,8 @@ namespace be {
 
         static JSEngine * fromJSContext(JSContext *) ;
         static JSEngine * fromJSRuntime(JSRuntime *) ;
+        
+        void addLoopFunction(EngineLoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
     } ;
 }
 

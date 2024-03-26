@@ -4,13 +4,13 @@
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
 namespace be{
     class UART: public be::NativeClass {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
 
         uart_port_t m_uartNum ;
         
@@ -21,6 +21,7 @@ namespace be{
         TaskHandle_t taskListenerHandle = nullptr ;
         JSValue listener = JS_NULL ;
         static void task_listen(void * arg) ;
+        QueueHandle_t data_queue = nullptr ;
 
     public:
         UART(JSContext * ctx, uart_port_t port) ;
@@ -35,5 +36,6 @@ namespace be{
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
+        static void loop(JSContext * ctx, void * opaque) ;
     } ;
 }

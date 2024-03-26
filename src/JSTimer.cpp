@@ -196,4 +196,16 @@ namespace be {
         }
         return nullptr ;
     }
+
+    
+#if defined(ESP_PLATFORM)
+    #define TIMER_QUEUE_LEN 10
+    JSTimerEvent * JSTimer::setImmediateAsync(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) {
+        if(timer_queue==nullptr) {
+            // timer_queue = xQueueCreate(TIMER_QUEUE_LEN, sizeof(JSTimerEvent *));
+        }
+        // @todo
+        return nullptr ;
+    }
+#endif
 }
