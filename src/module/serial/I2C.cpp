@@ -105,9 +105,6 @@ namespace be {
         i2c_mode_t GET_UINT32_PROP_OPT(argv[0], "mode", mode, I2C_MODE_MASTER)
         int GET_INT32_PROP_OPT(argv[0], "timeout", timeout, 1000)
 
-        size_t GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
-        size_t GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
-
         i2c_config_t i2c_config = {
             .mode = mode,
             .sda_io_num = sda,
@@ -117,9 +114,17 @@ namespace be {
             .clk_flags = 0
         };
 
+        size_t rx_buffer_len = 0 ;
+        size_t tx_buffer_len = 0 ;
+
         if(mode==I2C_MODE_MASTER) {
             GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 400000)
+            GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
+            GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
+
         } else if(mode==I2C_MODE_SLAVE) {
+            GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 1024 )
+            GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 1024 )
             GET_INT32_PROP_OPT(argv[0], "addr_10bit_en", i2c_config.slave.addr_10bit_en, 0)
             GET_INT32_PROP(argv[0], "slave_addr", i2c_config.slave.slave_addr, )
         }
@@ -316,13 +321,17 @@ namespace be {
     void I2C::task_i2c_slave(void *arg) {
         I2C * that = (I2C*)arg ;
 
-        uint8_t data;
+        uint8_t data[32];
         while (1) {
-            int ret = i2c_slave_read_buffer(that->busnum, &data, 1, portMAX_DELAY);
-            if (ret == 1) {
-                printf("Received data: %c\n", data);
-                // 处理收到的数据
+            int len = i2c_slave_read_buffer(that->busnum, data, sizeof(data), 1/portTICK_PERIOD_MS);
+            if (len > 0 ) {
+                printf("Received data: %d: ", len);
+                for (int i = 0; i < len; i++) {
+                    printf("0x%02x ", data[i]);
+                }
+                printf("\n");
             }
+            vTaskDelay(1/portTICK_PERIOD_MS);
         }
     }
     
@@ -337,7 +346,7 @@ namespace be {
             JSTHROW("slave listener already exists")
         }
         that->slaveListener = JS_DupValue(ctx, argv[0]) ;
-        xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024, that, 10, &that->slaveTask, 1);
+        xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024*2, that, 10, &that->slaveTask, 1);
         return JS_UNDEFINED ;
     }
 }
