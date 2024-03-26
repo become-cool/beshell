@@ -170,7 +170,7 @@ namespace be{
         uart->listener = JS_DupValue(ctx, argv[0]) ;
 
         if(uart->taskListenerHandle == nullptr) {
-            xTaskCreatePinnedToCore(task_listen, "task-listen", 2048, uart, 5, &uart->taskListenerHandle, 1);
+            xTaskCreatePinnedToCore(task_listen, "task-listen", 1024, uart, 5, &uart->taskListenerHandle, 1);
         }
         
         if(uart->data_queue==nullptr){
