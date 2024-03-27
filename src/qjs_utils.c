@@ -102,3 +102,28 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) {
     JS_FreeValue(ctx,cotr) ;
 	return res ;
 }
+
+
+uint8_t * JS_ArrayToBufferUint8(JSContext *ctx, JSValue array, int * len) {
+	if(!JS_IsArray(ctx, array)) {
+		return NULL ;
+	}
+	if(JS_ToUint32(ctx, len, JS_GetPropertyStr(ctx, array, "length"))!=0) {
+		return NULL ;
+	}
+	uint8_t * data = NULL ;
+	if(*len) {
+		data = (uint8_t*)malloc(*len) ;
+		if(!data) {
+			return NULL ;
+		}
+		for(uint32_t i=0;i<*len;i++) {
+			JSValue val = JS_GetPropertyUint32(ctx, array, i) ;
+			uint32_t nval = 0 ;
+			JS_ToUint32(ctx, &nval, val) ;
+			data[i] = (int8_t)nval ;
+			JS_FreeValue(ctx, val) ;
+		}
+	}
+	return data ;
+}

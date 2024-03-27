@@ -20,8 +20,9 @@ namespace be{
 
         TaskHandle_t taskListenerHandle = nullptr ;
         JSValue listener = JS_NULL ;
-        static void task_listen(void * arg) ;
         QueueHandle_t data_queue = nullptr ;
+        static void task_listen(void * arg) ;
+        static void loop(JSContext * ctx, void * opaque) ;
 
     public:
         UART(JSContext * ctx, uart_port_t port) ;
@@ -36,6 +37,5 @@ namespace be{
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
-        static void loop(JSContext * ctx, void * opaque) ;
     } ;
 }

@@ -1,5 +1,6 @@
 #include "I2C.hpp"
 #include "qjs_utils.h"
+#include <JSEngine.hpp>
 
 using namespace std ;
 
@@ -38,6 +39,7 @@ namespace be {
         JS_CFUNC_DEF("readR16", 2, I2C::readR16),
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
         JS_CFUNC_DEF("listen", 2, I2C::listen),
+        JS_CFUNC_DEF("slaveWrite", 2, I2C::slaveWrite),
     } ;
 
     I2C::I2C(JSContext * ctx, i2c_port_t busnum)
@@ -206,29 +208,17 @@ namespace be {
         if(!JS_IsArray(ctx, argv[1])) {
             JSTHROW("arg must be a array")
         }
-        uint32_t len = 0 ;
-        if(JS_ToUint32(ctx, &len, JS_GetPropertyStr(ctx, argv[1], "length"))!=0) {
+        int len ;
+        uint8_t * data = JS_ArrayToBufferUint8(ctx, argv[1], &len) ;
+        if(data) {
+            bool res = that->send(addr,data,len) ;
+            if(data) {
+                free(data) ;
+            }
+            return res? JS_TRUE: JS_FALSE ;
+        } else {
             return JS_FALSE ;
         }
-        uint8_t * data = NULL ;
-        if(len) {
-            data = (uint8_t*)malloc(len) ;
-            if(!data) {
-                JSTHROW("out of memory?")
-            }
-            for(uint32_t i=0;i<len;i++) {
-                JSValue val = JS_GetPropertyUint32(ctx, argv[1], i) ;
-                uint32_t nval = 0 ;
-                JS_ToUint32(ctx, &nval, val) ;
-                data[i] = nval ;
-                JS_FreeValue(ctx, val) ;
-            }
-        }
-        bool res = that->send(addr,data,len) ;
-        if(data) {
-            free(data) ;
-        }
-        return res? JS_TRUE: JS_FALSE ;
     }
     
     bool I2C::recv(uint8_t addr, uint8_t * buff, size_t buffsize) {
@@ -324,28 +314,29 @@ namespace be {
     } i2c_chunk_t ;
     void I2C::task_i2c_slave(void *arg) {
         I2C * that = (I2C*)arg ;
-
-        uint8_t data[32];
+        i2c_chunk_t chunk;
+        uint8_t buff[32] ;
         while (1) {
-            int len = i2c_slave_read_buffer(that->busnum, data, sizeof(data), 1/portTICK_PERIOD_MS);
-            if (len > 0 ) {
-                printf("Received data: %d: ", len);
-                for (int i = 0; i < len; i++) {
-                    printf("0x%02x ", data[i]);
+            chunk.len = i2c_slave_read_buffer(that->busnum, buff, sizeof(buff), 1/portTICK_PERIOD_MS);
+            if (chunk.len > 0 ) {
+                chunk.data = (uint8_t *)malloc(chunk.len) ;
+                memcpy(chunk.data, buff, chunk.len) ;
+                if( xQueueSend(that->data_queue, &chunk, 0)!=pdPASS ){
+                    free(chunk.data) ;
                 }
-                printf("\n");
             }
             vTaskDelay(1/portTICK_PERIOD_MS);
         }
     }
 
+    #define DATA_QUEUE_LEN 10
     void I2C::loop(JSContext * ctx, void * opaque) {
         I2C * i2c = (I2C *) opaque ;
         i2c_chunk_t chunk ;
         if(xQueueReceive(i2c->data_queue, &chunk, 0)) {
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
-                JS_Call(ctx, i2c->listener, JS_UNDEFINED, 1, &ab);
+                JS_Call(ctx, i2c->slaveListener, JS_UNDEFINED, 1, &ab);
                 JS_FreeValue(ctx, ab) ;
             }
         }
@@ -368,7 +359,28 @@ namespace be {
         if(that->slaveListener!=JS_NULL){
             JS_FreeValue(ctx, that->slaveListener) ;
         }
+        
+        JSEngine::fromJSContext(ctx)->addLoopFunction(I2C::loop, (void *)that) ;
+
         that->slaveListener = JS_DupValue(ctx, argv[0]) ;
         return JS_UNDEFINED ;
     }
+
+    JSValue I2C::slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        THIS_NCLASS(I2C, that)
+        if(!JS_IsArray(ctx, argv[0])) {
+            JSTHROW("arg must be a array")
+        }
+        int len ;
+        uint8_t * data = JS_ArrayToBufferUint8(ctx, argv[0], &len) ;
+        if(data) {
+            esp_err_t res = i2c_slave_write_buffer(that->busnum, data, len, 10/portTICK_PERIOD_MS) ;
+            return res == ESP_OK? JS_TRUE: JS_FALSE ;
+            free(data) ;
+        } else {
+            return JS_FALSE ;
+        }
+    }
+
 }

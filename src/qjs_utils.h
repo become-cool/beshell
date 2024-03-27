@@ -368,11 +368,11 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
             JS_ToUint32(ctx, &len, jslen) ; \
             for(int i=0;i<len;i++){         \
                 JSValue item = JS_GetPropertyUint32(ctx, jsobj, i) ; \
-                code \
-                JS_FreeValue(ctx,item) ; \
-            } \
-            JS_FreeValue(ctx,jslen) ; \
-        }\
+                code                        \
+                JS_FreeValue(ctx,item) ;    \
+            }                               \ 
+            JS_FreeValue(ctx,jslen) ;       \
+        }                                   \
     }
 
 
@@ -385,6 +385,8 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 #define JS_IsNone(jsval) (JS_IsUndefined(jsval)||JS_IsNull(jsval))
 
+
+uint8_t * JS_ArrayToBufferUint8(JSContext *ctx, JSValue array, int * len) ;
     
 #ifdef __cplusplus
 }
