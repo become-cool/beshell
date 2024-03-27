@@ -4,6 +4,7 @@
 #include "driver/i2c.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
 namespace be {
 
@@ -35,6 +36,7 @@ namespace be {
         TaskHandle_t slaveTask = nullptr ;
         JSValue slaveListener = JS_NULL ;
         static void task_i2c_slave(void *arg) ;
+        QueueHandle_t data_queue = nullptr ;
 
         static I2C * i2c0 ;
         static I2C * i2c1 ;

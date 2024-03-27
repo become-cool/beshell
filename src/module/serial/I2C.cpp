@@ -313,15 +313,30 @@ namespace be {
     }
 
     // for slave 
+    typedef struct {
+        uint8_t * data ;
+        int len ;
+    } i2c_chunk_t ;
     void I2C::task_i2c_slave(void *arg) {
-        I2C * that = (I2C*)arg ;
-
+        I2C * i2c = (I2C*)arg ;
         uint8_t data;
         while (1) {
-            int ret = i2c_slave_read_buffer(that->busnum, &data, 1, portMAX_DELAY);
+            int ret = i2c_slave_read_buffer(i2c->busnum, &data, 1, portMAX_DELAY);
             if (ret == 1) {
-                printf("Received data: %c\n", data);
+                // printf("Received data: %c\n", data);
                 // 处理收到的数据
+            }
+        }
+    }
+
+    void I2C::loop(JSContext * ctx, void * opaque) {
+        I2C * i2c = (I2C *) opaque ;
+        i2c_chunk_t chunk ;
+        if(xQueueReceive(i2c->data_queue, &chunk, 0)) {
+            if(chunk.data) {
+                JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
+                JS_Call(ctx, i2c->listener, JS_UNDEFINED, 1, &ab);
+                JS_FreeValue(ctx, ab) ;
             }
         }
     }
@@ -333,11 +348,18 @@ namespace be {
         }
         THIS_NCLASS(I2C, that)
         JSCHECK_SLAVE
-        if(that->slaveTask) {
-            JSTHROW("slave listener already exists")
+        
+        if(that->data_queue==nullptr){
+            that->data_queue = xQueueCreate(DATA_QUEUE_LEN, sizeof(i2c_chunk_t));
+        }
+        if(that->slaveTask == nullptr) {
+            xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024, that, 10, &that->slaveTask, 1);
+        }
+        if(that->slaveListener!=JS_NULL){
+            JS_FreeValue(ctx, that->slaveListener) ;
         }
         that->slaveListener = JS_DupValue(ctx, argv[0]) ;
-        xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024, that, 10, &that->slaveTask, 1);
+
         return JS_UNDEFINED ;
     }
 }
