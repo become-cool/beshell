@@ -42,6 +42,7 @@ namespace be {
         static I2C * i2c0 ;
         static I2C * i2c1 ;
 
+        std::map<int, std::pair<int, void *>> slaveRegisters ;
 
     public:
         I2C(JSContext * ctx, i2c_port_t busnum) ;
@@ -96,6 +97,8 @@ namespace be {
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        // for master mode
         static JSValue ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -107,8 +110,11 @@ namespace be {
         static JSValue readR8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        // for slave mode
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
     } ;
 
 }

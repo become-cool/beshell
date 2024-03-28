@@ -120,7 +120,7 @@ namespace be {
         size_t tx_buffer_len = 0 ;
 
         if(mode==I2C_MODE_MASTER) {
-            GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 400000)
+            GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 100000)
             GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
             GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
 
@@ -369,18 +369,26 @@ namespace be {
     JSValue I2C::slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         THIS_NCLASS(I2C, that)
-        if(!JS_IsArray(ctx, argv[0])) {
-            JSTHROW("arg must be a array")
-        }
+
         int len ;
-        uint8_t * data = JS_ArrayToBufferUint8(ctx, argv[0], &len) ;
+        bool needfree = false ;
+        uint8_t * data = (uint8_t *)JS_GetArrayBuffer(ctx, (size_t*)&len, argv[0]) ;
+        if(!data) {
+            if(!JS_IsArray(ctx, argv[0])) {
+                JSTHROW("arg must be a array or ArrayBuffer")
+            } else {
+                data = JS_ArrayToBufferUint8(ctx, argv[0], &len) ;
+                needfree = true ;
+            }
+        }
         if(data) {
             esp_err_t res = i2c_slave_write_buffer(that->busnum, data, len, 10/portTICK_PERIOD_MS) ;
+            if(needfree) {
+                free(data) ;
+            }
             return res == ESP_OK? JS_TRUE: JS_FALSE ;
-            free(data) ;
         } else {
             return JS_FALSE ;
         }
     }
-
 }
