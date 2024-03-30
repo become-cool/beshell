@@ -378,6 +378,7 @@ namespace be::lv {
         else CREATE_WIDGET(spangroup, Span)
         else CREATE_WIDGET(switch, Switch)
         else CREATE_WIDGET(textarea, TextArea)
+        else CREATE_WIDGET(gif, Gif)
 // AUTO GENERATE CODE END [WRAP WIDGETS] --------
         else {
             return nullptr ;

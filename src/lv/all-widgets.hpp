@@ -33,6 +33,7 @@
 #include "widget/Span.hpp"
 #include "widget/Switch.hpp"
 #include "widget/TextArea.hpp"
+#include "widget/Gif.hpp"
 // AUTO GENERATE CODE END [WIDGETS] --------
 
 #include "ext/Row.hpp"
