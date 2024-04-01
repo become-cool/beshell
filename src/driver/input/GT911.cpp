@@ -128,10 +128,26 @@ namespace be::driver {
         CHECK_ARGC(1)
 
         int GET_INT32_PROP_OPT(argv[0], "i2c", i2cnum, 0)
-        GET_UINT32_PROP_OPT(argv[1], "addr", thisobj->addr, 0x5D)
+        GET_INT32_PROP_OPT(argv[1], "addr", thisobj->addr, -1)
+
         thisobj->i2c = be::I2C::flyweight(ctx, (i2c_port_t)i2cnum) ;
         if(!thisobj->i2c) {
             JSTHROW("invalid i2c port number:%d", i2cnum)
+        }
+
+        if(thisobj->addr<0) {
+            if( thisobj->i2c->ping(0x5D) ){
+                thisobj->addr = 0x5D ;
+            }
+            else if( thisobj->i2c->ping(0x14) ){
+                thisobj->addr = 0x14 ;
+            }
+            else {
+                JSTHROW("GT911 not found (address 0x5D or 0x14)")
+            }
+        }
+        else if(thisobj->addr!= 0x5D && thisobj->addr!= 0x14) {
+            JSTHROW("invalid GT911 address:0x%02X (must be 0x5D or 0x14)", thisobj->addr)
         }
 
         thisobj->reset() ;
