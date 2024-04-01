@@ -10,16 +10,17 @@ namespace be {
     private:
         static std::vector<JSCFunctionListEntry> methods ;
 
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
-
     public:
         EventEmitter(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
 
-        void emit(JSContext * ctx, const JSValue & eventName, std::initializer_list<JSValue> args) ;
+        virtual void eventAdded(const char * eventName) ;
+        virtual void eventRemoved(const char * eventName) ;
+
+        void emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) ;
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsMethod(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
+        static JSValue eventAdded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue eventRemoved(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
 }

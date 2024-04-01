@@ -1,26 +1,29 @@
 #include "InDevPointer.hpp"
+#include "qjs_utils.h"
 
 using namespace std ;
 
     namespace be::driver {
 
-    DEFINE_NCLASS_META(InDevPointer, NativeClass)
+    DEFINE_NCLASS_META(InDevPointer, EventEmitter)
     
     std::vector<JSCFunctionListEntry> InDevPointer::methods = {
         JS_CFUNC_DEF("readPos", 0, InDevPointer::readPos),
         JS_CFUNC_DEF("readPointCount", 0, InDevPointer::readPointCount),
+        JS_CFUNC_DEF("lastX", 0, InDevPointer::lastX),
+        JS_CFUNC_DEF("lastY", 0, InDevPointer::lastY),
     } ;
 
     InDevPointer::InDevPointer(JSContext * ctx, JSValue jsobj)
-        : NativeClass(ctx,jsobj)
+        : EventEmitter(ctx,jsobj)
     {}
 
         
     JSValue InDevPointer::readPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(InDevPointer, thisobj)
+        THIS_NCLASS(InDevPointer, that)
         ARGV_TO_UINT8_OPT(0, idx, 0)
         uint16_t x=0, y=0 ;
-        if( !thisobj->readPos(idx,x,y) ) {
+        if( !that->readPos(idx,x,y) ) {
             return JS_NULL ;
         }
         JSValue arr = JS_NewArray(ctx) ;
@@ -30,9 +33,57 @@ using namespace std ;
     }
 
     JSValue InDevPointer::readPointCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(InDevPointer, thisobj)
-        uint8_t points = thisobj->readPointCount();
+        THIS_NCLASS(InDevPointer, that)
+        uint8_t points = that->readPointCount();
         return JS_NewUint32(ctx,points) ;
     }
+    JSValue InDevPointer::lastX(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(InDevPointer, that)
+        return JS_NewInt32(ctx,that->lastX0) ;
+    }
+    JSValue InDevPointer::lastY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(InDevPointer, that)
+        return JS_NewInt32(ctx,that->lastY0) ;
+    }
 
+    void InDevPointer::read() {
+        int pcnt = readPointCount() ;
+        if( pcnt>0 ) {
+            readPos(0, lastX0, lastY0);
+        }
+        if(enabledEvents>0 && pcnt!=_pointCount) {
+            if( pcnt>0 && enabledEvents&PRESSED ) {
+                JSValue jsname = JS_NewString(ctx,"pressed") ;
+                emitSync(jsname,{}) ;
+                JS_FreeValue(ctx,jsname) ;
+            }
+            else if( pcnt==0 && enabledEvents&RELEASED ) {
+                JSValue jsname = JS_NewString(ctx,"released") ;
+                emitSync(jsname,{}) ;
+                JS_FreeValue(ctx,jsname) ;
+            }
+        }
+        _pointCount = pcnt ;
+    }
+
+    
+    void InDevPointer::eventAdded(const char * eventName) {
+        if(strcmp(eventName,"released")==0){
+            enabledEvents|= RELEASED ;
+        } else if(strcmp(eventName,"pressed")==0){
+            enabledEvents|= PRESSED ;
+        } else if(strcmp(eventName,"moved")==0){
+            enabledEvents|= MOVED ;
+        }
+    }
+
+    void InDevPointer::eventRemoved(const char * eventName) {
+        if(strcmp(eventName,"released")==0){
+            enabledEvents&= ~RELEASED ;
+        } else if(strcmp(eventName,"pressed")==0){
+            enabledEvents&= ~PRESSED ;
+        } else if(strcmp(eventName,"moved")==0){
+            enabledEvents&= ~MOVED ;
+        }
+    }
 }

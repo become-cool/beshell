@@ -109,16 +109,21 @@ namespace be::lv {
         indev_pointer_data_t * indev_opa = (indev_pointer_data_t*)lv_indev_get_user_data(indev) ;
         assert(indev_opa) ;
 
-        if( indev_opa->ptr->readPointCount()>0 ) {
-            indev_opa->ptr->readPos(0, indev_opa->x, indev_opa->y);
-            // dn2(indev_opa->x, indev_opa->y)
-            data->state = LV_INDEV_STATE_PR;
-        } else {
-            data->state = LV_INDEV_STATE_REL;
-        }
+        indev_opa->ptr->read() ;
+        indev_opa->x = indev_opa->ptr->lastX() ;
+        indev_opa->y = indev_opa->ptr->lastY() ;
+
+        // if( indev_opa->ptr->readPointCount()>0 ) {
+        //     indev_opa->ptr->readPos(0, indev_opa->x, indev_opa->y);
+        //     dn2(indev_opa->x, indev_opa->y)
+        //     data->state = LV_INDEV_STATE_PR;
+        // } else {
+        //     data->state = LV_INDEV_STATE_REL;
+        // }
 
         data->point.x = (lv_coord_t)indev_opa->x;
         data->point.y = (lv_coord_t)indev_opa->y;
+        data->state = indev_opa->ptr->pointCount()==0? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR ;
     }
 
     JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

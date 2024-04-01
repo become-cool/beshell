@@ -21,10 +21,15 @@ namespace be::driver {
     public:
         DriverModule(JSContext * ctx, const char * name) ;
 
+        void import(JSContext *ctx) ;
+
         template <typename D>
         static void use() {
             providers.push_back(provider<D>);
         }
+
+        static JSValue loadeDeviceFromJson(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
     } ;
 
 }
