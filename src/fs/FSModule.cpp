@@ -17,19 +17,19 @@ namespace be {
     FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
-        exportFunction("mkdirSync", jsMkdirSync) ;
-        exportFunction("rmdirSync", jsRmdirSync) ;
-        exportFunction("unlinkSync", jsUnlinkSync) ;
-        exportFunction("readFileSync", jsReadFileSync) ;
-        exportFunction("writeFileSync", jsWriteFileSync) ;
-        exportFunction("listDirSync", jsListDirSync) ;
-        exportFunction("rmSync", jsRmSync) ;
-        exportFunction("renameSync", jsRenameSync) ;
-        exportFunction("info", jsInfo) ;
-        exportFunction("statSync", jsStatSync) ;
-        exportFunction("exsitsSync", jsExistsSync) ;
-        exportFunction("isFileSync", jsIsFileSync) ;
-        exportFunction("isDirSync", jsIsDirSync) ;
+        exportFunction("mkdirSync",  mkdirSync) ;
+        exportFunction("rmdirSync",  rmdirSync) ;
+        exportFunction("unlinkSync",  unlinkSync) ;
+        exportFunction("readFileSync",  readFileSync) ;
+        exportFunction("writeFileSync",  writeFileSync) ;
+        exportFunction("listDirSync",  listDirSync) ;
+        exportFunction("rmSync",  rmSync) ;
+        exportFunction("renameSync",  renameSync) ;
+        exportFunction("info",  info) ;
+        exportFunction("statSync",  statSync) ;
+        exportFunction("exsitsSync",  exsitsSync) ;
+        exportFunction("isFileSync",  isFileSync) ;
+        exportFunction("isDirSync", isDirSync) ;
     }
 
     #define FETCH_FS                                                \
@@ -67,7 +67,7 @@ namespace be {
      * @param recursive:bool=false 路径
      * @return bool
      */
-    JSValue FSModule::jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -86,7 +86,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -104,7 +104,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsUnlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -126,7 +126,7 @@ namespace be {
      * @param offset:number=0 开始位置
      * @return ArrayBuffer
      */
-    JSValue FSModule::jsReadFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         CHECK_ARGC(1)
         FETCH_FS
@@ -183,7 +183,7 @@ namespace be {
      * @param append:bool=false 是否追加写入
      * @return number
      */
-    JSValue FSModule::jsWriteFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         CHECK_ARGC(2)
         FETCH_FS
@@ -252,7 +252,7 @@ namespace be {
      * @param detail:bool=false 是否范围详细信息
      * @return string[]|{name:string, type:"file"|"dir"|"unknown", size:number}[]
      */
-    JSValue FSModule::jsListDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         CHECK_ARGC(1)
         FETCH_FS
@@ -336,7 +336,7 @@ namespace be {
      * @param path {string} 路径
      * @return bool
      */
-    JSValue FSModule::jsRmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -360,7 +360,7 @@ namespace be {
      * @param name {string} 名称
      * @return number
      */
-    JSValue FSModule::jsRenameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         CHECK_ARGC(1)
         FETCH_FS
@@ -381,7 +381,7 @@ namespace be {
      * @param path:string 文件路径
      * @return null|{dev:number,ino:number,mode:number,size:number,isDir:bool,atime:number,mtime:number,ctime:number}
      */
-    JSValue FSModule::jsStatSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -417,7 +417,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsExistsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: exsitsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -432,7 +432,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsIsFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -447,7 +447,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsIsDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -461,7 +461,7 @@ namespace be {
      * @param path {string} 分区路径
      * @return {total:number, used:number}
      */
-    JSValue FSModule::jsInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FSModule:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         CHECK_ARGC(1)
         ARGV_TO_CSTRING(0, jslabel)

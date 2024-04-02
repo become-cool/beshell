@@ -8,18 +8,18 @@ namespace be {
     public:
         FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal=1);
         
-        static JSValue jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsUnlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsListDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsRmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsRenameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsStatSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsExistsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsIsFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsIsDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
