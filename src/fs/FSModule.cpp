@@ -17,25 +17,25 @@ namespace be {
     FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
-        exportFunction("mkdirSync",  mkdirSync) ;
-        exportFunction("rmdirSync",  rmdirSync) ;
-        exportFunction("unlinkSync",  unlinkSync) ;
-        exportFunction("readFileSync",  readFileSync) ;
-        exportFunction("writeFileSync",  writeFileSync) ;
-        exportFunction("listDirSync",  listDirSync) ;
-        exportFunction("rmSync",  rmSync) ;
-        exportFunction("renameSync",  renameSync) ;
-        exportFunction("info",  info) ;
-        exportFunction("statSync",  statSync) ;
-        exportFunction("exsitsSync",  exsitsSync) ;
-        exportFunction("isFileSync",  isFileSync) ;
+        exportFunction("mkdirSync", mkdirSync) ;
+        exportFunction("rmdirSync", rmdirSync) ;
+        exportFunction("unlinkSync", unlinkSync) ;
+        exportFunction("readFileSync", readFileSync) ;
+        exportFunction("writeFileSync", writeFileSync) ;
+        exportFunction("listDirSync", listDirSync) ;
+        exportFunction("rmSync", rmSync) ;
+        exportFunction("renameSync", renameSync) ;
+        exportFunction("info", info) ;
+        exportFunction("statSync", statSync) ;
+        exportFunction("existsSync", existsSync) ;
+        exportFunction("isFileSync", isFileSync) ;
         exportFunction("isDirSync", isDirSync) ;
     }
 
     #define FETCH_FS                                                \
             FS * fs = JSEngine::fromJSContext(ctx)->beshell->fs ;   \
             if(!fs) {                                               \
-                JSTHROW("call BeShell::USE_FS() first")     \
+                JSTHROW("call BeShell::USE_FS() first")             \
             }
     #define ARGV_PATH(var, i)                                       \
             string var ;                                            \
@@ -417,7 +417,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule:: exsitsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
