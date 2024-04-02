@@ -73,7 +73,9 @@ namespace be {
 #ifdef MODULE_LV
         void useLV() ;
 #endif
+#ifdef ESP_PLATFORM
         void useDeviceJSON(const char * path="/config/device.json") ;
+#endif
     } ;
 
 }

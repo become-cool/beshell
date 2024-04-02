@@ -29,11 +29,12 @@ namespace be {
         }
         return JS_NewStringLen(ctx, buff, size) ;
     }
-    static JSValue js_ArrayBuffer_toArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {        size_t size ;
+    static JSValue js_ArrayBuffer_toArray(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        size_t size ;
         char * buff = (char *)JS_GetArrayBuffer(ctx, &size, this_val) ;
         JSValue array = JS_NewArray(ctx) ;
         if(buff) {
-            for(int i=0;i<size;i++) {
+            for(int i=0;i<(int)size;i++) {
                 JS_SetPropertyUint32(ctx, array, i, JS_NewUint32(ctx, buff[i])) ;
             }
         }
