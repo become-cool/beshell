@@ -136,6 +136,18 @@ extern "C" {
         JS_FreeCString(ctx, cstr) ;                         \
     }
 
+#define ARGV_TO_STRING_OPT(i, var, defval)                  \
+    var ;                                                   \
+    {                                                       \
+        if(argc>i) {                                        \
+            const char * cstr = JS_ToCString(ctx, argv[i]) ;\
+            var = cstr ;                                    \
+            JS_FreeCString(ctx, cstr) ;                     \
+        } else {                                            \
+            var = defval ;                                  \
+        }                                                   \
+    }
+
 
 #define ARGV_TO_PATH(i, var)                                \
     var ;                                                   \

@@ -8,6 +8,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <cassert>
+#include <cstdio>
 
 using namespace std ;
 
@@ -17,19 +18,25 @@ namespace be {
     FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
-        exportFunction("mkdirSync", mkdirSync) ;
-        exportFunction("rmdirSync", rmdirSync) ;
-        exportFunction("unlinkSync", unlinkSync) ;
-        exportFunction("readFileSync", readFileSync) ;
-        exportFunction("writeFileSync", writeFileSync) ;
-        exportFunction("listDirSync", listDirSync) ;
-        exportFunction("rmSync", rmSync) ;
-        exportFunction("renameSync", renameSync) ;
-        exportFunction("info", info) ;
-        exportFunction("statSync", statSync) ;
-        exportFunction("existsSync", existsSync) ;
-        exportFunction("isFileSync", isFileSync) ;
-        exportFunction("isDirSync", isDirSync) ;
+        EXPORT_FUNCTION(mkdirSync) ;
+        EXPORT_FUNCTION(rmdirSync) ;
+        EXPORT_FUNCTION(unlinkSync) ;
+        EXPORT_FUNCTION(readFileSync) ;
+        EXPORT_FUNCTION(writeFileSync) ;
+        EXPORT_FUNCTION(listDirSync) ;
+        EXPORT_FUNCTION(rmSync) ;
+        EXPORT_FUNCTION(renameSync) ;
+        EXPORT_FUNCTION(info) ;
+        EXPORT_FUNCTION(statSync) ;
+        EXPORT_FUNCTION(existsSync) ;
+        EXPORT_FUNCTION(isFileSync) ;
+        EXPORT_FUNCTION(isDirSync) ;
+        EXPORT_FUNCTION(open) ;
+        EXPORT_FUNCTION(read) ;
+        EXPORT_FUNCTION(write) ;
+        EXPORT_FUNCTION(seek) ;
+        EXPORT_FUNCTION(flush) ;
+        EXPORT_FUNCTION(close) ;
     }
 
     #define FETCH_FS                                                \
@@ -524,4 +531,69 @@ namespace be {
         return obj ;
     }
 
+    
+    JSValue FSModule::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        string ARGV_TO_PATH(0, path)
+        string ARGV_TO_STRING_OPT(1, mode, "rw")
+
+        FILE * handle = fopen(path.c_str(), mode.c_str()) ;
+        if(!handle) {
+            JSTHROW("Failed to open file %s", path.c_str()) ;
+        }
+
+        return JS_NewInt64(ctx, (int64_t)handle) ;
+    }
+    JSValue FSModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+        ARGV_TO_UINT32(1, length)
+
+        void * buff = malloc(length) ;
+        if(!buff){
+            JSTHROW("Failed to malloc %d bytes", length) ;
+        }
+        int readed = fread(buff, 1, length, (FILE*)handle) ;
+        return JS_NewArrayBuffer(ctx, (uint8_t*)buff, readed, freeArrayBuffer, NULL, false) ;
+    }
+    JSValue FSModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+
+        
+        size_t length = 0 ;
+        uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[1]) ;
+
+        // if ArrayBuffer
+        if(buff && length) {
+            const int wrote = fwrite(buff, 1, length, (FILE*)handle) ;
+            return JS_NewInt32(ctx, wrote) ;
+        }
+        // as string
+        else {
+            ARGV_TO_CSTRING_LEN(1, buff, length)
+            const int wrote = fwrite(buff, 1, length, (FILE*)handle) ;
+            JS_FreeCString(ctx, (const char *)buff) ;
+            return JS_NewInt32(ctx, wrote) ;
+        }
+    }
+
+    JSValue FSModule::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+        ARGV_TO_UINT32(1, offset)
+        ARGV_TO_INT32_OPT(2, whence, SEEK_SET)
+        return JS_NewInt32(ctx, fseek((FILE*)handle, offset, whence)) ;
+    }
+    JSValue FSModule::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
+    }
+
+    JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        return JS_NewInt32(ctx, fclose((FILE*)handle)) ;
+    }
 }

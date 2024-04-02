@@ -21,5 +21,12 @@ namespace be {
         static JSValue isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static JSValue open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
