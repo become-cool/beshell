@@ -8,13 +8,11 @@ namespace be::lv {
         JS_CGETSET_DEF("src",Img::getSrc,Gif::setSrc) ,
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
-
 // AUTO GENERATE CODE END [GETSET LIST] --------
 // AUTO GENERATE CODE START [METHOD LIST] --------
         JS_CFUNC_DEF("restart", 0, Gif::restart),
         JS_CFUNC_DEF("pause", 0, Gif::pause),
         JS_CFUNC_DEF("resume", 0, Gif::resume),
-
 // AUTO GENERATE CODE END [METHOD LIST] --------
     } ;
 
@@ -58,7 +56,6 @@ namespace be::lv {
     // unspported type: const void *
     // JSValue Gif::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_gif_set_src(lv_obj_t * obj, const void * src)
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
@@ -85,7 +82,6 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
-
 // AUTO GENERATE CODE END [METHODS] --------
 
 }

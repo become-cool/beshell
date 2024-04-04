@@ -9,6 +9,8 @@
 #include <map>
 #include <cassert>
 
+#define EXPORT_FUNCTION(funcname)   exportFunction(#funcname, funcname, 0) ;
+
 namespace be {
 
 	typedef void (*NativeClassFactoryFunc)(JSContext * ctx, JSModuleDef * m) ;

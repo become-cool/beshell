@@ -8,6 +8,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <cassert>
+#include <cstdio>
 
 using namespace std ;
 
@@ -17,25 +18,31 @@ namespace be {
     FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
-        exportFunction("mkdirSync", jsMkdirSync) ;
-        exportFunction("rmdirSync", jsRmdirSync) ;
-        exportFunction("unlinkSync", jsUnlinkSync) ;
-        exportFunction("readFileSync", jsReadFileSync) ;
-        exportFunction("writeFileSync", jsWriteFileSync) ;
-        exportFunction("listDirSync", jsListDirSync) ;
-        exportFunction("rmSync", jsRmSync) ;
-        exportFunction("renameSync", jsRenameSync) ;
-        exportFunction("info", jsInfo) ;
-        exportFunction("statSync", jsStatSync) ;
-        exportFunction("exsitsSync", jsExistsSync) ;
-        exportFunction("isFileSync", jsIsFileSync) ;
-        exportFunction("isDirSync", jsIsDirSync) ;
+        EXPORT_FUNCTION(mkdirSync) ;
+        EXPORT_FUNCTION(rmdirSync) ;
+        EXPORT_FUNCTION(unlinkSync) ;
+        EXPORT_FUNCTION(readFileSync) ;
+        EXPORT_FUNCTION(writeFileSync) ;
+        EXPORT_FUNCTION(listDirSync) ;
+        EXPORT_FUNCTION(rmSync) ;
+        EXPORT_FUNCTION(renameSync) ;
+        EXPORT_FUNCTION(info) ;
+        EXPORT_FUNCTION(statSync) ;
+        EXPORT_FUNCTION(existsSync) ;
+        EXPORT_FUNCTION(isFileSync) ;
+        EXPORT_FUNCTION(isDirSync) ;
+        EXPORT_FUNCTION(open) ;
+        EXPORT_FUNCTION(read) ;
+        EXPORT_FUNCTION(write) ;
+        EXPORT_FUNCTION(seek) ;
+        EXPORT_FUNCTION(flush) ;
+        EXPORT_FUNCTION(close) ;
     }
 
     #define FETCH_FS                                                \
             FS * fs = JSEngine::fromJSContext(ctx)->beshell->fs ;   \
             if(!fs) {                                               \
-                JSTHROW("call BeShell::USE_FS() first")     \
+                JSTHROW("call BeShell::USE_FS() first")             \
             }
     #define ARGV_PATH(var, i)                                       \
             string var ;                                            \
@@ -67,7 +74,7 @@ namespace be {
      * @param recursive:bool=false 路径
      * @return bool
      */
-    JSValue FSModule::jsMkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -86,7 +93,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsRmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -104,7 +111,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsUnlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -126,7 +133,7 @@ namespace be {
      * @param offset:number=0 开始位置
      * @return ArrayBuffer
      */
-    JSValue FSModule::jsReadFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         CHECK_ARGC(1)
         FETCH_FS
@@ -183,7 +190,7 @@ namespace be {
      * @param append:bool=false 是否追加写入
      * @return number
      */
-    JSValue FSModule::jsWriteFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         CHECK_ARGC(2)
         FETCH_FS
@@ -252,7 +259,7 @@ namespace be {
      * @param detail:bool=false 是否范围详细信息
      * @return string[]|{name:string, type:"file"|"dir"|"unknown", size:number}[]
      */
-    JSValue FSModule::jsListDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         CHECK_ARGC(1)
         FETCH_FS
@@ -336,7 +343,7 @@ namespace be {
      * @param path {string} 路径
      * @return bool
      */
-    JSValue FSModule::jsRmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -360,7 +367,7 @@ namespace be {
      * @param name {string} 名称
      * @return number
      */
-    JSValue FSModule::jsRenameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         CHECK_ARGC(1)
         FETCH_FS
@@ -381,7 +388,7 @@ namespace be {
      * @param path:string 文件路径
      * @return null|{dev:number,ino:number,mode:number,size:number,isDir:bool,atime:number,mtime:number,ctime:number}
      */
-    JSValue FSModule::jsStatSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -417,7 +424,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsExistsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -432,7 +439,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsIsFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -447,7 +454,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::jsIsDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FSModule::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
@@ -461,7 +468,7 @@ namespace be {
      * @param path {string} 分区路径
      * @return {total:number, used:number}
      */
-    JSValue FSModule::jsInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FSModule:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         CHECK_ARGC(1)
         ARGV_TO_CSTRING(0, jslabel)
@@ -524,4 +531,69 @@ namespace be {
         return obj ;
     }
 
+    
+    JSValue FSModule::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        string ARGV_TO_PATH(0, path)
+        string ARGV_TO_STRING_OPT(1, mode, "rw")
+
+        FILE * handle = fopen(path.c_str(), mode.c_str()) ;
+        if(!handle) {
+            JSTHROW("Failed to open file %s", path.c_str()) ;
+        }
+
+        return JS_NewInt64(ctx, (int64_t)handle) ;
+    }
+    JSValue FSModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+        ARGV_TO_UINT32(1, length)
+
+        void * buff = malloc(length) ;
+        if(!buff){
+            JSTHROW("Failed to malloc %d bytes", length) ;
+        }
+        int readed = fread(buff, 1, length, (FILE*)handle) ;
+        return JS_NewArrayBuffer(ctx, (uint8_t*)buff, readed, freeArrayBuffer, NULL, false) ;
+    }
+    JSValue FSModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+
+        
+        size_t length = 0 ;
+        uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[1]) ;
+
+        // if ArrayBuffer
+        if(buff && length) {
+            const int wrote = fwrite(buff, 1, length, (FILE*)handle) ;
+            return JS_NewInt32(ctx, wrote) ;
+        }
+        // as string
+        else {
+            ARGV_TO_CSTRING_LEN(1, buff, length)
+            const int wrote = fwrite(buff, 1, length, (FILE*)handle) ;
+            JS_FreeCString(ctx, (const char *)buff) ;
+            return JS_NewInt32(ctx, wrote) ;
+        }
+    }
+
+    JSValue FSModule::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_INT64(0, handle)
+        ARGV_TO_UINT32(1, offset)
+        ARGV_TO_INT32_OPT(2, whence, SEEK_SET)
+        return JS_NewInt32(ctx, fseek((FILE*)handle, offset, whence)) ;
+    }
+    JSValue FSModule::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
+    }
+
+    JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        return JS_NewInt32(ctx, fclose((FILE*)handle)) ;
+    }
 }

@@ -8,6 +8,8 @@ namespace be {
     DEFINE_NCLASS_META_BUILD(EventEmitter)
 
     std::vector<JSCFunctionListEntry> EventEmitter::methods = {
+        JS_CFUNC_DEF("eventAdded", 1, EventEmitter::eventAdded),
+        JS_CFUNC_DEF("eventRemoved", 1, EventEmitter::eventRemoved),
     } ;
 
     EventEmitter::EventEmitter(JSContext * ctx, JSValue _jsobj)
@@ -41,8 +43,10 @@ namespace be {
     if(typeof(event)=="string") {
         if(!this._handlers[event]){
             this._handlers[event] = []
-            if(event!="#EVENT.ADD#"&&event!="#EVENT.CLEAR#")
+            if(event!="#EVENT.ADD#"&&event!="#EVENT.REMOVE#") {
                 this.emit("#EVENT.ADD#",event)
+                this.eventAdded(event)
+            }
         }
         if(!norepeat || !this.isListening(event, handle)) {
             this._handlers[event].push(handle)
@@ -95,8 +99,10 @@ namespace be {
     }
     if(!this._handlers[eventName].length) {
         delete this._handlers[eventName]
-        if(eventName!="#EVENT.ADD#"&&eventName!="#EVENT.CLEAR#")
-            this.emit("#EVENT.CLEAR#",eventName)
+        if(eventName!="#EVENT.ADD#"&&eventName!="#EVENT.REMOVE#") {
+            this.emit("#EVENT.REMOVE#",eventName)
+            this.eventRemoved(eventName)
+        }
     }
     return this
 })", "off()", {})
@@ -155,8 +161,9 @@ namespace be {
         return jscotr ;
     }
 
-    void EventEmitter::emit(JSContext * ctx, const JSValue & eventName, std::initializer_list<JSValue> args) {
-        JSValue * jsargv = new JSValue[args.size()+1] ;
+    void EventEmitter::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
+        int arglen = args.size() + 1;
+        JSValue * jsargv = new JSValue[arglen] ;
         jsargv[0] = eventName ;
         int i = 0 ;
         for(auto arg : args) {
@@ -164,7 +171,7 @@ namespace be {
             ++ i ;
         }
         JSValue func_emit = js_get_prop(ctx, jsobj, 1, "emit") ;
-        JSValue ret = JS_Call(ctx, func_emit, jsobj, 4, jsargv) ;
+        JSValue ret = JS_Call(ctx, func_emit, jsobj, arglen, jsargv) ;
         if(JS_IsException(ret)) {
             js_std_dump_error(ctx) ;
         }
@@ -172,5 +179,24 @@ namespace be {
         JS_FreeValue(ctx, func_emit) ;
 
         delete[] jsargv ;
+    }
+
+    void EventEmitter::eventAdded(const char * eventName) {}
+    void EventEmitter::eventRemoved(const char * eventName) {}
+    
+    JSValue EventEmitter::eventAdded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(EventEmitter, that)
+        const char * event_name = JS_ToCString(ctx, argv[0]) ;
+        that->eventAdded(event_name) ;
+        JS_FreeCString(ctx, event_name) ;
+        return JS_NULL ;
+    }
+
+    JSValue EventEmitter::eventRemoved(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(EventEmitter, that)
+        const char * event_name = JS_ToCString(ctx, argv[0]) ;
+        that->eventRemoved(event_name) ;
+        JS_FreeCString(ctx, event_name) ;
+        return JS_NULL ;
     }
 }

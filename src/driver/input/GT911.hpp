@@ -11,7 +11,7 @@ namespace be::driver {
     private:
         static std::vector<JSCFunctionListEntry> methods ;
         
-        uint8_t addr = 0x5D ;
+        int8_t addr = 0x5D ;
         be::I2C * i2c = nullptr ;
 
     public:

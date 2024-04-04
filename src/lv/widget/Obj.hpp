@@ -43,6 +43,7 @@ namespace be::lv {
         static JSValue invalidGetter(JSContext *ctx, JSValueConst this_val) ;
         static JSValue invalidSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
 
+        static JSValue animation(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue style(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue center(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

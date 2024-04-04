@@ -29,12 +29,12 @@ namespace be {
         JSValue versions = JS_NewObject(ctx) ;
         JS_SetPropertyStr(ctx, versions, "beshell", JS_NewString(ctx, BESHELL_VERSION));
     #ifdef ESP_PLATFORM
-            JS_SetPropertyStr(ctx, versions, "esp-idf", JS_NewString(ctx, ESPIDF_VERSION));
-    #endif
-        JS_SetPropertyStr(ctx, versions, "quickjs", JS_NewString(ctx, QUICKJS_VERSION));
+        JS_SetPropertyStr(ctx, versions, "esp-idf", JS_NewString(ctx, ESPIDF_VERSION));
         char lvgl_ver[16] ;
         sprintf(lvgl_ver, "%d.%d.%d", LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH) ;
         JS_SetPropertyStr(ctx, versions, "lvgl", JS_NewString(ctx, lvgl_ver));
+    #endif
+        JS_SetPropertyStr(ctx, versions, "quickjs", JS_NewString(ctx, QUICKJS_VERSION));
         exportValue("versions", versions) ;
 
 #ifdef ESP_PLATFORM
@@ -144,7 +144,7 @@ namespace be {
 
         printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
 
-#ifndef WASM_PLATFORM
+#ifdef ESP_PLATFORM
         settimeofday(&tv, NULL);
 #endif
 

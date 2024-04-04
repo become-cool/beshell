@@ -19,14 +19,12 @@ namespace be::lv {
         static JSValue setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
 
 // AUTO GENERATE CODE START [GETSETS] --------
-
 // AUTO GENERATE CODE END [GETSETS] --------
 
 // AUTO GENERATE CODE START [METHODS] --------
         static JSValue restart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
 // AUTO GENERATE CODE END [METHODS] --------
 
     friend class Obj ;

@@ -29,7 +29,7 @@ namespace be::lv {
             param = lv_dir_const_to_jsstr(ctx, dir) ;
         }
 
-        obj->emit(ctx, jsname, {jsname, obj->jsobj, param}) ;
+        obj->emitSync(jsname, {jsname, obj->jsobj, param}) ;
 
         JS_FreeValue(ctx,jsname) ;
 
