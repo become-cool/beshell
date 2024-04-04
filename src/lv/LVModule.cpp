@@ -1,4 +1,5 @@
 #include "LVModule.hpp"
+#include "Animation.hpp"
 #include "all-widgets.hpp"
 #include <cassert>
 #include "Style.hpp"
@@ -18,7 +19,8 @@ namespace be::lv {
         exportFunction("registerDisplay",registerDisplay,0) ;
         exportFunction("registerInputDevice",registerInputDevice,0) ;
         exportFunction("loadFont",loadFont,2) ;
-
+        
+        exportClass<Animation>() ;
         exportClass<Style>() ;
         exportClass<Row>() ;
         exportClass<Column>() ;

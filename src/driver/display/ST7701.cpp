@@ -59,17 +59,21 @@ namespace be::driver::display {
         gpio_config_t io_conf = {
             .pin_bit_mask = 1ULL << that->pin_sda, 
             .mode = GPIO_MODE_OUTPUT,
+            .pull_up_en = GPIO_PULLUP_ENABLE
         };
         gpio_config(&io_conf);
         gpio_set_level(that->pin_sda, 1);
+        gpio_set_pull_mode(that->pin_sda, GPIO_PULLUP_ONLY);
 
         io_conf.pin_bit_mask = 1ULL << that->pin_sck;
         gpio_config(&io_conf);
         gpio_set_level(that->pin_sck, 1);
+        gpio_set_pull_mode(that->pin_sck, GPIO_PULLUP_ONLY);
 
         io_conf.pin_bit_mask = 1ULL << that->pin_cs;
         gpio_config(&io_conf);
         gpio_set_level(that->pin_cs, 1);
+        gpio_set_pull_mode(that->pin_sck, GPIO_PULLUP_ONLY);
 
         that->initReg() ;
 

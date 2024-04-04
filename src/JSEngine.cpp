@@ -136,6 +136,10 @@ namespace be {
         for(auto pair:loopFunctions) {
             pair.first(ctx, pair.second) ;
         }
+
+        for(auto obj:loopables) {
+            obj->loop(ctx) ;
+        }
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -238,4 +242,23 @@ namespace be {
         }
         loopFunctions.push_back( pair(func,opaque) ) ;
     }
+
+    void JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat) {
+        if(ignoreRepeat) {
+            auto it = std::find(loopables.begin(), loopables.end(), obj);
+            if(it != loopables.end()) {
+                return ;
+            }
+        }
+        loopables.push_back(obj) ;
+    }
+
+    
+    void JSEngine::removeLoopObject(ILoopable* obj) {
+        auto it = std::find(loopables.begin(), loopables.end(), obj);
+        if(it != loopables.end()) {
+            loopables.erase(it) ;
+        }
+    }
+
 }

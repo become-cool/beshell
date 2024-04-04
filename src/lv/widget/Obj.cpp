@@ -2,6 +2,7 @@
 #include "../const.hpp"
 #include "../Style.hpp"
 #include "../all-widgets.hpp"
+#include "../Animation.hpp"
 #include <stdlib.h>
 
 using namespace std ;
@@ -19,6 +20,7 @@ namespace be::lv {
         JS_CFUNC_DEF("dbginfo", 0, dbginfo),
         JS_CFUNC_DEF("child", 1, Obj::getChild),
         JS_CFUNC_DEF("style", 1, Obj::style),
+        JS_CFUNC_DEF("animation", 0, Obj::animation),
         JS_CFUNC_DEF("setStyle", 2, Obj::setStyle),
         JS_CFUNC_DEF("center", 2, Obj::center),
         JS_CFUNC_DEF("enableEvent", 1, Obj::enableEvent),
@@ -330,6 +332,47 @@ namespace be::lv {
 
     lv_obj_t * Obj::lvobj() const {
         return _lvobj ;
+    }
+
+    /**
+     * 
+     */
+    JSValue Obj::animation(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,that)
+
+        CHECK_ARGC(4)
+        string ARGV_TO_STRING(0, propName)
+        ARGV_TO_INT32(1, valueFrom)
+        ARGV_TO_INT32(2, valueTo)
+        ARGV_TO_INT32(3, duration)
+        string ARGV_TO_STRING_OPT(4, ease, "linear")
+        be::misc::EaseFunc easeFunc = be::misc::Ease::map_name_to_func(ease.c_str()) ;
+        if(!easeFunc) {
+            JSTHROW("not support ease function: %s", ease.c_str())
+        }
+
+        #define ANIM_PROP_SETTER(prop)          \
+            if(propName==#prop) {               \
+                setter = (lv_anim_prop_setter)lv_obj_set_##prop ;    \
+            }
+        lv_anim_prop_setter setter ;
+        ANIM_PROP_SETTER(x)
+        else ANIM_PROP_SETTER(y)
+        else ANIM_PROP_SETTER(width)
+        else ANIM_PROP_SETTER(height)
+        else {
+            JSTHROW("not support property: %s", propName.c_str())
+        }
+
+        auto anim = new Animation(ctx, that) ;
+        anim->duration = (float)duration ;
+        anim->startValue = (float)valueFrom ;
+        anim->change = (float)(valueTo - valueFrom) ;
+        anim->easeFunc = easeFunc ;
+        anim->propSetter = setter ;
+
+        anim->shared() ;
+        return anim->jsobj ;
     }
     
     #define CREATE_WIDGET(typename, classname)                                      \

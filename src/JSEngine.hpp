@@ -11,11 +11,17 @@ namespace be {
     class BeShell ;
 	typedef void (*EngineLoopFunction)(JSContext *, void *) ;
 
+    class ILoopable {
+    public:
+        virtual void loop(JSContext *) = 0 ;
+    } ;
+
     class JSEngine {
     private:
 
         Console * console = nullptr ;
         std::vector<std::pair<EngineLoopFunction,void *>> loopFunctions ; 
+        std::vector<ILoopable*> loopables ; 
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 
@@ -47,6 +53,8 @@ namespace be {
         static JSEngine * fromJSRuntime(JSRuntime *) ;
         
         void addLoopFunction(EngineLoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
+        void addLoopObject(ILoopable* obj, bool ignoreRepeat=true) ;
+        void removeLoopObject(ILoopable* obj) ;
     } ;
 }
 
