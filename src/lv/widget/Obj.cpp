@@ -335,7 +335,12 @@ namespace be::lv {
     }
 
     /**
-     * 
+     * @param propName
+     * @param valueFrom
+     * @param valueTo
+     * @param duration (ms)
+     * @param easeFunctionName="Linear"
+     * @return lv.Animation object
      */
     JSValue Obj::animation(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,that)
@@ -345,15 +350,15 @@ namespace be::lv {
         ARGV_TO_INT32(1, valueFrom)
         ARGV_TO_INT32(2, valueTo)
         ARGV_TO_INT32(3, duration)
-        string ARGV_TO_STRING_OPT(4, ease, "linear")
+        string ARGV_TO_STRING_OPT(4, ease, "Linear")
         be::misc::EaseFunc easeFunc = be::misc::Ease::map_name_to_func(ease.c_str()) ;
         if(!easeFunc) {
             JSTHROW("not support ease function: %s", ease.c_str())
         }
 
-        #define ANIM_PROP_SETTER(prop)          \
-            if(propName==#prop) {               \
-                setter = (lv_anim_prop_setter)lv_obj_set_##prop ;    \
+        #define ANIM_PROP_SETTER(prop)                              \
+            if(propName==#prop) {                                   \
+                setter = (lv_anim_prop_setter)lv_obj_set_##prop ;   \
             }
         lv_anim_prop_setter setter ;
         ANIM_PROP_SETTER(x)
