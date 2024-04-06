@@ -93,13 +93,13 @@ namespace be::driver {
     JSValue AHT20::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         THIS_NCLASS(AHT20, thisobj)
         float temperature, humidity ;
-        int ret = thisobj->read(&temperature,&humidity) ;
+        int ret = thisobj->read(&humidity,&temperature) ;
         if( ret!=0 ) {
             JSTHROW("%s.%s() failed, error: %d", "AHT20", "read", ret)
         }
         JSValue value = JS_NewArray(ctx) ;
-        JS_SetPropertyUint32(ctx,value,0,JS_NewFloat64(ctx,temperature));
-        JS_SetPropertyUint32(ctx,value,1,JS_NewFloat64(ctx,humidity));
+        JS_SetPropertyUint32(ctx,value,0,JS_NewFloat64(ctx,humidity));
+        JS_SetPropertyUint32(ctx,value,1,JS_NewFloat64(ctx,temperature));
         return value ;
     }
 }

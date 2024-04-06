@@ -17,11 +17,13 @@ namespace lv {
         static void use(be::BeShell & beshell) ;
 
         static JSValue screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue loadScreen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     } ;
 

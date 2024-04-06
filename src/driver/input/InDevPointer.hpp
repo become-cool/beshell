@@ -22,6 +22,7 @@ namespace be::driver {
             MOVED=4,
         };
         int enabledEvents = 0 ;
+        bool _usedForLVGL = false ;
 
     public:
         InDevPointer(JSContext * ctx, JSValue jsobj) ;

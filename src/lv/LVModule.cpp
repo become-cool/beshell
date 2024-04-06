@@ -13,12 +13,14 @@ namespace be::lv {
     LVModule::LVModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
-        exportFunction("screen",screen,0) ;
-        exportFunction("load",loadScreen,0) ;
-        exportFunction("pct",pct,0) ;
-        exportFunction("registerDisplay",registerDisplay,0) ;
-        exportFunction("registerInputDevice",registerInputDevice,0) ;
-        exportFunction("loadFont",loadFont,2) ;
+        EXPORT_FUNCTION(screen) ;
+        EXPORT_FUNCTION(load) ;
+        EXPORT_FUNCTION(pct) ;
+        EXPORT_FUNCTION(registerDisplay) ;
+        EXPORT_FUNCTION(registerInputDevice) ;
+        EXPORT_FUNCTION(loadFont) ;
+        EXPORT_FUNCTION(disableAllInDev) ;
+        EXPORT_FUNCTION(enableAllInDev) ;
         
         exportClass<Animation>() ;
         exportClass<Style>() ;
@@ -80,7 +82,7 @@ namespace be::lv {
         }
         return JS_DupValue(ctx,Obj::wrap(ctx,lvobj)->jsobj) ;
     }
-    JSValue LVModule::loadScreen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue LVModule::load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         JSVALUE_TO_NCLASS(Obj, argv[0], obj)
         lv_screen_load(obj->lvobj()) ;
@@ -104,6 +106,7 @@ namespace be::lv {
         shared_ptr<be::driver::InDevPointer> ptr ;
         uint16_t x;
         uint16_t y;
+        bool enabled;
     } indev_pointer_data_t ;
 
     static void pointer_read(lv_indev_t * indev, lv_indev_data_t * data) {
@@ -112,6 +115,10 @@ namespace be::lv {
         assert(indev_opa) ;
 
         indev_opa->ptr->read() ;
+        if(!indev_opa->enabled) {
+            return ;
+        }
+
         indev_opa->x = indev_opa->ptr->lastX() ;
         indev_opa->y = indev_opa->ptr->lastY() ;
 
@@ -137,6 +144,7 @@ namespace be::lv {
         auto data = new indev_pointer_data_t() ;
         data->x = 0 ;
         data->y = 0 ;
+        data->enabled = true ;
 
         data->ptr = static_pointer_cast<be::driver::InDevPointer>(indev->shared());
 
@@ -148,5 +156,34 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+    JSValue LVModule::disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        lv_indev_t * indev = NULL;
+        for(;;) {
+            indev = lv_indev_get_next(indev);
+            if(!indev) {
+                break;
+            }
+            indev_pointer_data_t * indev_opa = (indev_pointer_data_t*)lv_indev_get_user_data(indev) ;
+            if(indev_opa) {
+                indev_opa->enabled = false ;
+            }
+        }
+        return JS_UNDEFINED ;
+    }
+    
+    JSValue LVModule::enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        lv_indev_t * indev = NULL;
+        for(;;) {
+            indev = lv_indev_get_next(indev);
+            if(!indev) {
+                break;
+            }
+            indev_pointer_data_t * indev_opa = (indev_pointer_data_t*)lv_indev_get_user_data(indev) ;
+            if(indev_opa) {
+                indev_opa->enabled = true ;
+            }
+        }
+        return JS_UNDEFINED ;
+    }
 
 }
