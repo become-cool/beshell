@@ -9,6 +9,9 @@
 #include <dirent.h>
 #include <cassert>
 #include <cstdio>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 using namespace std ;
 
@@ -35,6 +38,7 @@ namespace be {
         EXPORT_FUNCTION(read) ;
         EXPORT_FUNCTION(write) ;
         EXPORT_FUNCTION(seek) ;
+        EXPORT_FUNCTION(sync) ;
         EXPORT_FUNCTION(flush) ;
         EXPORT_FUNCTION(close) ;
     }
@@ -589,6 +593,12 @@ namespace be {
         CHECK_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
+    }
+    JSValue FSModule::sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        int fd = fileno((FILE*)handle);
+        return JS_NewInt32(ctx, fsync(fd)) ;
     }
 
     JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
