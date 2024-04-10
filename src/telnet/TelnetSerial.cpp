@@ -60,66 +60,6 @@ namespace be {
         vTaskDelete(NULL);
     }
 
-    void TelnetSerial::task(void * argv) {
-
-        // forwarding received package to telnet
-        Parser parser([argv](std::unique_ptr<Package> pkg){
-            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-            Package * ptr = pkg.release() ;
-            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &ptr, 0) ;
-        }) ;
-
-        uart_event_t event;
-        size_t buffered_size;
-        uint8_t* dtmp = (uint8_t*) malloc(RD_BUF_SIZE);
-        size_t chunklen = 0 ;
-
-        for(;;) {
-            //Waiting for UART event.
-            if(xQueueReceive(((TelnetSerial*)argv)->uart_queue, (void * )&event, (TickType_t)portMAX_DELAY)) {
-                bzero(dtmp, RD_BUF_SIZE);
-                switch(event.type) {
-                    case UART_DATA: {
-                        uint64_t t = gettime() ;
-                        chunklen = uart_read_bytes(UART_NUM, dtmp, event.size, 100/portTICK_PERIOD_MS);
-                        parser.parse(dtmp, chunklen) ;
-                        dn64(gettime()-t) ;
-                        break;
-                    }
-                    //Event of HW FIFO overflow detected
-                    case UART_FIFO_OVF:
-                    //Event of UART ring buffer full
-                    case UART_BUFFER_FULL:
-                        uart_flush_input(UART_NUM);
-                        xQueueReset(((TelnetSerial*)argv)->uart_queue);
-                        break;
-                    //Event of UART RX break detected
-
-                    //UART_PATTERN_DET
-                    case UART_PATTERN_DET:
-                        uart_get_buffered_data_len(UART_NUM, &buffered_size);
-                        int pos = uart_pattern_pop_pos(UART_NUM);
-                        // ESP_LOGI(TAG, "[UART PATTERN DETECTED] pos: %d, buffered size: %d", pos, buffered_size);
-                        if (pos == -1) {
-                            // There used to be a UART_PATTERN_DET event, but the pattern position queue is full so that it can not
-                            // record the position. We should set a larger queue size.
-                            // As an example, we directly flush the rx buffer here.
-                            uart_flush_input(UART_NUM);
-                        } else {
-                            uart_read_bytes(UART_NUM, dtmp, pos, 100 / portTICK_PERIOD_MS);
-                            uint8_t pat[PATTERN_CHR_NUM + 1];
-                            memset(pat, 0, sizeof(pat));
-                            uart_read_bytes(UART_NUM, pat, PATTERN_CHR_NUM, 100 / portTICK_PERIOD_MS);
-                        }
-                        break;
-                }
-            }
-        }
-        free(dtmp);
-        dtmp = NULL;
-        vTaskDelete(NULL);
-    }
-    
     void TelnetSerial::setup () {
 
         cout << flush ;
@@ -149,7 +89,7 @@ namespace be {
         uart_pattern_queue_reset(UART_NUM, 20);
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
-        xTaskCreatePinnedToCore(&TelnetSerial::task2, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;
+        xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;
     }
 
     void TelnetSerial::loop () {

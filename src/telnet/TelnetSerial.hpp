@@ -13,7 +13,6 @@ namespace be {
         QueueHandle_t pkg_queue;
 
         static void task(void * argv) ;
-        static void task2(void * argv) ;
 
     public:
         using TelnetChannel::TelnetChannel ;
