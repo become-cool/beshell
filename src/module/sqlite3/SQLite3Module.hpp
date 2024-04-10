@@ -11,7 +11,7 @@ namespace be::sqlite{
         // void import(JSContext *ctx) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<SQLite3Module>("sqlite3") ;
+            beshell.useModule<SQLite3Module>("sqlite3") ;
         }
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

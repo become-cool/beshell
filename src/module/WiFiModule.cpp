@@ -223,7 +223,7 @@ namespace be {
         // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
         // dn(size)
 
-        beshell.addModule<WiFiModule>("wifi") ;
+        beshell.useModule<WiFiModule>("wifi") ;
         
         esp_err_t res ;
         ESP_API(esp_event_loop_create_default())

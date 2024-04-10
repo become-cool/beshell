@@ -13,7 +13,7 @@ namespace be {
         void import(JSContext *ctx) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<GPIOModule>("gpio") ;
+            beshell.useModule<GPIOModule>("gpio") ;
         }
 
         static JSValue mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

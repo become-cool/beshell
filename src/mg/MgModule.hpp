@@ -23,7 +23,7 @@ namespace be::mg {
         static void loop(const BeShell & beshell, void * data) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<MgModule>("mg") ;
+            beshell.useModule<MgModule>("mg") ;
             beshell.addLoopFunction(loop, nullptr) ;
 
             ca_path = beshell.fs->toVFSPath("/var/ca.pem") ;

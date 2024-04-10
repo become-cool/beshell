@@ -12,7 +12,7 @@ namespace be {
         // void import(JSContext *ctx) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<BTModule>("bt") ;
+            beshell.useModule<BTModule>("bt") ;
         }
 
         static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

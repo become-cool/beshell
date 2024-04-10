@@ -15,7 +15,7 @@ namespace be{
         void import(JSContext *ctx) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<DeviceModule>("device") ;
+            beshell.useModule<DeviceModule>("device") ;
         }
 
         static void setDeviceJsonPath(const char * path) ;

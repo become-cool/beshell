@@ -72,7 +72,7 @@ namespace be::lv {
     
     void LVModule::use(be::BeShell & beshell) {
         driver::display::use(beshell) ;
-        beshell.addModule<LVModule>("lv") ;
+        beshell.useModule<LVModule>("lv") ;
     }
 
     JSValue LVModule::screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

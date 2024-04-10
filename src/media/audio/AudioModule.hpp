@@ -9,7 +9,7 @@ namespace be::media{
         AudioModule(JSContext * ctx, const char * name) ;
 
         inline static void use(be::BeShell & beshell) {
-            beshell.addModule<AudioModule>("audio") ;
+            beshell.useModule<AudioModule>("audio") ;
         }
     } ;
 }

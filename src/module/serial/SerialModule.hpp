@@ -13,7 +13,7 @@ namespace be {
         ~SerialModule() ;
 
         inline static void use(BeShell & beshell) {
-            beshell.addModule<SerialModule>("serial") ;
+            beshell.useModule<SerialModule>("serial") ;
         }
         
     } ;

@@ -6,6 +6,7 @@
 #include "repl/REPL.hpp"
 #include "fs/FS.hpp"
 #include "telnet/Telnet.hpp"
+#include "driver/DriverModule.hpp"
 
 #ifdef ESP_PLATFORM
 #include "lv/LV.hpp"
@@ -57,12 +58,6 @@ namespace be {
         void run() ;
         void main() ;
 
-
-        template <typename M>
-        void addModule(const char * name=nullptr) {
-            engine->mloader.add<M>(name) ;
-        }
-
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
 
         void useBasic() ;
@@ -76,6 +71,16 @@ namespace be {
 #ifdef ESP_PLATFORM
         void useDeviceJSON(const char * path="/config/device.json") ;
 #endif
+        
+        template <typename ModuleClass>
+        void useModule(const char * name=nullptr) {
+            engine->mloader.add<ModuleClass>(name) ;
+        }
+
+        template <typename DriverClass>
+        void useDriver() {
+            be::driver::DriverModule::use<DriverClass>() ;
+        }
     } ;
 
 }

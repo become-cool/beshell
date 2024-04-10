@@ -14,7 +14,7 @@ void DemoModule::import() {
 }
 
 void DemoModule::use(be::BeShell & beshell) {
-    beshell.addModule<DemoModule>("demo") ;
+    beshell.useModule<DemoModule>("demo") ;
 }
 
 JSValue DemoModule::jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

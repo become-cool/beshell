@@ -62,6 +62,6 @@ namespace be::driver::display {
     }
 
     void use(be::BeShell & beshell) {
-        beshell.addModule<DisplayModule>("driver/display") ;
+        beshell.useModule<DisplayModule>("driver/display") ;
     }
 }

@@ -109,7 +109,7 @@
             "    \/\/ void import() ;" ,
             "" ,
             "    inline static void use(be::BeShell & beshell) {",
-            "        beshell.addModule<${TM_FILENAME_BASE}>(\"${TM_FILENAME_BASE/(.+)/${1:/downcase}/g}\") ;",
+            "        beshell.useModule<${TM_FILENAME_BASE}>(\"${TM_FILENAME_BASE/(.+)/${1:/downcase}/g}\") ;",
             "    }" ,
             "" ,
             "    static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;" ,
