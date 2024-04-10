@@ -22,29 +22,29 @@ namespace be::driver::motion {
         esp_timer_handle_t timer = nullptr;
         esp_timer_handle_t timer_accel = nullptr;  // 用于实现加速度的计时器
 
-        bool is_running:1 ;
-        bool is_stopping:1 ;
-        bool level:1 ;          // io step 的脉冲电平
-        bool run_dir:1 ;
-        bool use_dest:1 ;
-        bool use_accel:1 ;      // 使用加速度
-        bool use_passing:1 ;    // "passing" 事件 (过点触发)
+        bool is_running:1 = false ;
+        bool is_stopping:1 = true ;
+        bool level:1 = false ;          // io step 的脉冲电平
+        bool run_dir:1 = false ;
+        bool use_dest:1 = false ;
+        bool use_accel:1 = false ;      // 使用加速度
+        bool use_passing:1 = false ;    // "passing" 事件 (过点触发)
         
 
-        uint16_t _freq ;             // 当前频率 (电机当前速度)
-        uint16_t _freq_target ;      // 目标频率 (电机目标速度)
-        // uint16_t _freq_hzms ;        // 频率的增减速度 (电机加速度), 每毫秒增加的赫兹数，例如 3hz/ms 表示从 0hz 到 3000hz 需要1秒
-        uint16_t _accel ;            // 电机加速度(单位hz/s), 是 freq 相对时间的变化化率，例如 1000hz/s 表示从 0hz 到 1000hz 需要1秒
+        uint16_t _freq = 0 ;             // 当前频率 (电机当前速度)
+        uint16_t _freq_target = 0 ;      // 目标频率 (电机目标速度)
+        // uint16_t _freq_hzms = 0 ;        // 频率的增减速度 (电机加速度), 每毫秒增加的赫兹数，例如 3hz/ms 表示从 0hz 到 3000hz 需要1秒
+        uint16_t _accel = 0 ;            // 电机加速度(单位hz/s), 是 freq 相对时间的变化化率，例如 1000hz/s 表示从 0hz 到 1000hz 需要1秒
         
-        int64_t _pos ;           // 当前位置
-        int64_t _dest ;          // 目标位置 
-        int64_t _passing ;    // 触发 "passing" 事件的位置（过点触发）
-        int64_t _pos_stopping ;  // 从该位置开始减速
+        int64_t _pos = 0 ;           // 当前位置
+        int64_t _dest = 0 ;          // 目标位置 
+        int64_t _passing = 0 ;    // 触发 "passing" 事件的位置（过点触发）
+        int64_t _pos_stopping = 0 ;  // 从该位置开始减速
 
-        uint64_t start_time ;
-        uint64_t stop_time ;
+        uint64_t start_time = 0 ;
+        uint64_t stop_time = 0 ;
 
-        uint32_t run_delay_us ;  // 延迟开始(微秒)
+        uint32_t run_delay_us = 0 ;  // 延迟开始(微秒)
 
         void emit_stop_event(bool sync) ;
         void emit_passing_event() ;

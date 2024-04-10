@@ -10,6 +10,7 @@ using namespace std ;
 namespace be::driver::motion {
     DEFINE_NCLASS_META(TimerStepper, EventEmitter)
     std::vector<JSCFunctionListEntry> TimerStepper::methods = {
+        JS_CFUNC_DEF("setup", 0, TimerStepper::setup),
         JS_CFUNC_DEF("run", 0, TimerStepper::run),
         JS_CFUNC_DEF("runSteps", 0, TimerStepper::runSteps),
         JS_CFUNC_DEF("runTo", 0, TimerStepper::runTo),
@@ -443,26 +444,29 @@ namespace be::driver::motion {
         
         return JS_UNDEFINED ;
     }
-    JSValue TimerStepper::runSteps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue TimerStepper::runTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         CHECK_ARGC(1)
         if(stepper->is_running) {
             JSTHROW("stepper is running already")
         }
         ARGV_TO_INT64(0, dest) ;
+        if(dest==stepper->_pos) {
+            return JS_UNDEFINED ;
+        }
 
         if(argc>1) {
             ARGV_TO_INT32(1, freq)
             SET_FREQ(freq)
         }
-        
-        SET_DEST(dest) ;
+
+        SET_DEST(dest)
         SET_ACCEL(2)
 
         return stepper->run() ;
 
     }
-    JSValue TimerStepper::runTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue TimerStepper::runSteps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         CHECK_ARGC(1)
         if(stepper->is_running) {
@@ -474,7 +478,7 @@ namespace be::driver::motion {
             ARGV_TO_INT32(1, freq)
             SET_FREQ(freq)
         }
-        SET_DEST(stepper->_pos + steps) ;
+        SET_DEST(stepper->_pos + steps)
         SET_ACCEL(2)
         return stepper->run() ;
     }
@@ -485,11 +489,10 @@ namespace be::driver::motion {
         if(argc>0) {
             force = JS_ToBool(ctx, argv[0]) ;
         }
-
         if(stepper->is_running) {
-
             // force==true 或 无加速度，直接停止
             if( force || !stepper->use_accel || stepper->_accel == 0 ) {
+                dd
                 stepper->is_running = false;
                 stepper->is_stopping = false;
                 stepper->_freq = 0;

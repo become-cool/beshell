@@ -23,7 +23,7 @@ using namespace std ;
 namespace be {
 
     
-    void TelnetSerial::task2(void * argv) {
+    void TelnetSerial::task(void * argv) {
         
         fd_set rfds;
         struct timeval tv;
