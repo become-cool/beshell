@@ -1,13 +1,14 @@
 #pragma once
 
 #include <EventEmitter.hpp>
+#include <JSEngine.hpp>
 #include <driver/gpio.h>
 #include <esp_system.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 namespace be::driver::motion {
-    class TimerStepper: public be::EventEmitter {
+    class TimerStepper: public be::EventEmitter, public be::ILoopable {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
@@ -31,8 +32,8 @@ namespace be::driver::motion {
         bool use_passing:1 = false ;    // "passing" 事件 (过点触发)
         
 
-        uint16_t _freq = 0 ;             // 当前频率 (电机当前速度)
-        uint16_t _freq_target = 0 ;      // 目标频率 (电机目标速度)
+        uint16_t _freq = 1000 ;             // 当前频率 (电机当前速度)
+        uint16_t _freq_target = 1000 ;      // 目标频率 (电机目标速度)
         // uint16_t _freq_hzms = 0 ;        // 频率的增减速度 (电机加速度), 每毫秒增加的赫兹数，例如 3hz/ms 表示从 0hz 到 3000hz 需要1秒
         uint16_t _accel = 0 ;            // 电机加速度(单位hz/s), 是 freq 相对时间的变化化率，例如 1000hz/s 表示从 0hz 到 1000hz 需要1秒
         
@@ -46,14 +47,19 @@ namespace be::driver::motion {
 
         uint32_t run_delay_us = 0 ;  // 延迟开始(微秒)
 
-        void emit_stop_event(bool sync) ;
-        void emit_passing_event() ;
         static void stepper_timer_callback(TimerStepper *arg) ;
-        
+
         bool calculate_step_time_freq(uint16_t v0, uint16_t a, float * time) ;
         int64_t calculate_accel(int64_t dest, float * out_time) ;
 
         JSValue run() ;
+
+        int eventsActived = 0 ;
+        int eventsListenered = 0 ;
+
+    protected: 
+        void eventAdded(const char * eventName) ;
+        void eventRemoved(const char * eventName) ;
 
     public:
         TimerStepper(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
@@ -86,5 +92,6 @@ namespace be::driver::motion {
         static JSValue setDelay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getDelay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
+        void loop(JSContext *) ;
     } ;
 }

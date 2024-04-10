@@ -161,6 +161,11 @@ namespace be {
         return jscotr ;
     }
 
+    void EventEmitter::emitSync(const char * eventName, std::initializer_list<JSValue> args) {
+        JSValue name = JS_NewString(ctx, eventName) ;
+        emitSync(name, args) ;
+        JS_FreeValue(ctx, name) ;
+    }
     void EventEmitter::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
         int arglen = args.size() + 1;
         JSValue * jsargv = new JSValue[arglen] ;

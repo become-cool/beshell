@@ -24,15 +24,16 @@ namespace be::driver {
         int enabledEvents = 0 ;
         bool _usedForLVGL = false ;
 
+    protected: 
+        void eventAdded(const char * eventName) ;
+        void eventRemoved(const char * eventName) ;
+
     public:
         InDevPointer(JSContext * ctx, JSValue jsobj) ;
 
         virtual bool dataReady() = 0 ;
         virtual bool readPos(uint8_t i, uint16_t &x, uint16_t &y) = 0 ;
         virtual uint8_t readPointCount() = 0 ;
-
-        void eventAdded(const char * eventName) ;
-        void eventRemoved(const char * eventName) ;
 
         void read() ;
         inline int pointCount() { return _pointCount ; } ;

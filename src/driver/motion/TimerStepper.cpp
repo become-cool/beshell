@@ -7,6 +7,9 @@
 
 using namespace std ;
 
+#define EVENT_STOP 1
+#define EVENT_PASSING 2
+
 namespace be::driver::motion {
     DEFINE_NCLASS_META(TimerStepper, EventEmitter)
     std::vector<JSCFunctionListEntry> TimerStepper::methods = {
@@ -44,7 +47,6 @@ namespace be::driver::motion {
     TimerStepper::~TimerStepper() {
         if(is_running) {
             is_running = false ;
-            emit_stop_event(true) ;
         }
 
         if(timer) {
@@ -121,7 +123,7 @@ namespace be::driver::motion {
             // passing 事件
             if(stepper->use_passing) {
                 if(stepper->_pos == stepper->_passing) {
-                    stepper->emit_passing_event() ;
+                    stepper->eventsActived|= EVENT_PASSING ;
                 }
             }
 
@@ -155,7 +157,7 @@ namespace be::driver::motion {
                     if(stepper->_freq==0) {
                         stepper->is_running = false ;
                         stepper->is_stopping = false ;
-                        stepper->emit_stop_event(false) ;
+                        stepper->eventsActived|= EVENT_STOP ;
                         
                         return ;
                     }
@@ -190,7 +192,7 @@ namespace be::driver::motion {
                 // 到达目的地
                 if(!stepper->is_running) {
                     esp_timer_stop(stepper->timer) ;
-                    stepper->emit_stop_event(false) ;
+                    stepper->eventsActived|= EVENT_STOP ;
                 }
             }
         }
@@ -231,33 +233,39 @@ namespace be::driver::motion {
                 JSTHROW("invalid arg accel, musb be uint or false") \
             }                                           \
         }
-        
-    void TimerStepper::emit_stop_event(bool sync) {
-        // stop_time = gettime_us() ;
-        // JSValue eventName = JS_NewString(ctx, "stop") ;
-        // MAKE_ARGV3( argv, eventName, JS_NewInt64(ctx, (int64_t)pos), JS_NewUint32(ctx, run_dir) ) ;
-        // JSValue emit = JS_GetPropertyStr(ctx, jsobj, "emit") ;
-        // if(sync) {
-        //     JS_Call(ctx, emit, jsobj, 3, argv) ;
-        //     JS_FreeValue(ctx, eventName) ;
-        //     free(argv) ;
-        // }
-        // else {
-        //     // eventloop_push_with_argv(ctx, emit, JS_DupValue(ctx, jsobj), 3, argv) ;
-        // }
-
-        // JS_FreeValue(ctx, emit) ;
+    void TimerStepper::eventAdded(const char * eventName) {
+        if(strcmp(eventName, "stop")==0) {
+            eventsListenered|= EVENT_STOP ;
+        }
+        else if(strcmp(eventName, "passing")==0) {
+            eventsListenered|= EVENT_PASSING ;
+        }
+        if(eventsListenered>0) {
+            JSEngine::fromJSContext(ctx)->addLoopObject(this, true) ;
+        }
     }
-
-    void TimerStepper::emit_passing_event() {
-
-        // JSValue eventName = JS_NewString(ctx, "passing") ;
-        // MAKE_ARGV2( argv, eventName, JS_NewInt64(ctx, (int64_t)_passing) ) ;
-
-        // JSValue emit = JS_GetPropertyStr(ctx, jsobj, "emit") ;
-        // eventloop_push_with_argv(ctx, emit, JS_DupValue(ctx, jsobj), 2, argv) ;
-
-        // JS_FreeValue(ctx, argv) ;
+    void TimerStepper::eventRemoved(const char * eventName) {
+        if(strcmp(eventName, "stop")==0) {
+            eventsListenered&= ~EVENT_STOP ;
+        }
+        else if(strcmp(eventName, "passing")==0) {
+            eventsListenered&= ~EVENT_PASSING ;
+        }
+        if(eventsListenered==0) {
+            JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
+        }
+    }
+    void TimerStepper::loop(JSContext *) {
+        if( eventsActived == 0 || eventsListenered == 0 ) {
+            return ;
+        }
+        if( eventsActived&EVENT_PASSING ) {
+            emitSync("passing", {}) ;
+        }
+        if( eventsActived&EVENT_STOP ) {
+            emitSync("stop", {}) ;
+        }
+        eventsActived = 0 ;
     }
 
     JSValue TimerStepper::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -498,7 +506,7 @@ namespace be::driver::motion {
                 stepper->_freq = 0;
 
                 esp_timer_stop(stepper->timer) ;
-                stepper->emit_stop_event(true) ;
+                stepper->eventsActived|= EVENT_STOP ;
             }
 
             else {
