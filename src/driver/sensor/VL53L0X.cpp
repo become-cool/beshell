@@ -54,7 +54,6 @@ namespace be::driver {
     }
 
     int VL53L0X::begin(be::I2C * i2c, uint8_t addr) {
-        dd
         int ret = I2CDevice::begin(i2c,addr) ;
         if( ret<0 ) {
             return ret ;

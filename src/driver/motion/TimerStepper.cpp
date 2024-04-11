@@ -227,7 +227,7 @@ namespace be::driver::motion {
                 if(accel<0) {                           \
                     JSTHROW("arg accel musb >= 0")      \
                 }                                       \
-                stepper->_accel = accel ;                \
+                stepper->_accel = accel ;               \
             }                                           \
             else {                                      \
                 JSTHROW("invalid arg accel, musb be uint or false") \
