@@ -5,6 +5,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
+#include "soc/soc.h"
+#include "esp_efuse.h"
 #endif
 
 using namespace std;
@@ -17,6 +19,7 @@ namespace be {
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
+        exportFunction("readEFUSE", readEFUSE);
 
         exportName("versions") ;
         exportName("platform") ;
@@ -50,6 +53,23 @@ namespace be {
         esp_restart();
 #endif
         return JS_NewBool(ctx, true);
+    }
+
+    JSValue ProcessModule::readEFUSE(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        CHECK_ARGC(1)
+        ARGV_TO_UINT8(0, field)
+        if(field>7) {
+            JSTHROW("metadata field must 0-7")
+        }
+        
+#ifdef ESP_PLATFORM
+        int value = esp_efuse_read_reg((esp_efuse_block_t)3, field) ;
+#else
+        int value = 0 ;
+#endif
+
+        return JS_NewInt32(ctx, value) ;
     }
 
     JSValue ProcessModule::usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
