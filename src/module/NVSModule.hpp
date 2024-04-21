@@ -38,25 +38,25 @@ namespace be {
         static bool readDouble(const char * key, double & value, const char * ns="beshell") ;
         static bool writeDouble(const char * key, double value, const char * ns="beshell") ;
 
-        static JSValue jsErase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue jsReadInt8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadInt16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadInt32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadInt64(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadUint16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsReadUint32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readInt8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readInt16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readInt32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readInt64(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readUint16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readUint32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue jsWriteInt8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteInt16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteInt32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteInt64(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteUint16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue jsWriteUint32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeInt8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeInt16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeInt32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeInt64(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeUint16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeUint32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
     } ;
 }
