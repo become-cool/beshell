@@ -8,6 +8,8 @@
 namespace be::driver {
     class I2CDevice: public be::NativeClass {
         DECLARE_NCLASS_META
+    private:
+        static std::vector<JSCFunctionListEntry> methods ;
     protected:
         be::I2C * i2c = nullptr ;
         uint8_t addr = 0 ;

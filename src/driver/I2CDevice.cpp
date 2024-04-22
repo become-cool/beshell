@@ -4,6 +4,10 @@ using namespace std ;
 
 namespace be::driver {
     DEFINE_NCLASS_META(I2CDevice, NativeClass)
+    std::vector<JSCFunctionListEntry> I2CDevice::methods = {
+        JS_CFUNC_DEF("setup", 2, I2CDevice::setup),
+        JS_CFUNC_DEF("begin", 2, I2CDevice::setup),
+    } ;
 
     I2CDevice::I2CDevice(JSContext * ctx, JSValue _jsobj)
         : NativeClass(ctx,build(ctx,_jsobj))

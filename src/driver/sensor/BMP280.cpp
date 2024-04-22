@@ -8,7 +8,6 @@ namespace be::driver::sensor {
 
     DEFINE_NCLASS_META(BMP280, I2CDevice)
     std::vector<JSCFunctionListEntry> BMP280::methods = {
-        JS_CFUNC_DEF("setup", 0, I2CDevice::setup),
         JS_CFUNC_DEF("readTemperature", 0, BMP280::readTemperature),
         JS_CFUNC_DEF("readPressure", 0, BMP280::readPressure),
         JS_CFUNC_DEF("readAltitude", 0, BMP280::readAltitude),

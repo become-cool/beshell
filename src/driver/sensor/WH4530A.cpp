@@ -29,7 +29,6 @@ namespace be::driver::sensor {
     DEFINE_NCLASS_META(WH4530A, I2CDevice)
 
     std::vector<JSCFunctionListEntry> WH4530A::methods = {
-            JS_CFUNC_DEF("setup", 0, I2CDevice::setup),
             JS_CFUNC_DEF("read", 0, WH4530A::read),
     };
 

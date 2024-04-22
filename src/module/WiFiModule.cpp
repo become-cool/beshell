@@ -217,19 +217,14 @@ namespace be {
                 printf("%s failed, return error code:%d\n", #code, res) ; \
             }
 
-    void WiFiModule::use(be::BeShell & beshell) {
+    void WiFiModule::init() {
 
-        // dp(src_js_wifi_js_start)
-        // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
-        // dn(size)
-
-        beshell.useModule<WiFiModule>("wifi") ;
+        if(wifi_inited) {
+            return ;
+        }
         
         esp_err_t res ;
         ESP_API(esp_event_loop_create_default())
-        ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id))
-        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip))
-
         ESP_API(esp_netif_init())
 
         netif_sta = esp_netif_create_default_wifi_sta();
@@ -241,8 +236,21 @@ namespace be {
         wifi_inited = true ;
     }
 
+    void WiFiModule::use(be::BeShell & beshell) {
+
+        // dp(src_js_wifi_js_start)
+        // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
+        // dn(size)
+
+        beshell.useModule<WiFiModule>("wifi") ;
+        
+        esp_err_t res ;
+        ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id))
+        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip))
+    }
+
     JSValue WiFiModule::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_WIFI_INITED
+        init() ;
         esp_err_t err = esp_wifi_start() ;
         _started = err == ESP_OK ;
         return JS_NewInt32(ctx, err);

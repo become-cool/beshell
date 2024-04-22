@@ -22,7 +22,7 @@ namespace be::driver::sensor {
         VL53L0X(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        virtual int setup(be::I2C *, uint8_t addr) ;
+        int setup(be::I2C *, uint8_t addr) ;
         bool setMode(ModeState mode, PrecisionState prec) ;
         bool start() ;
         bool stop() ;

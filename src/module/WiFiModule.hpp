@@ -13,6 +13,8 @@ namespace be {
 
         static void use(be::BeShell & beshell) ;
 
+        static void init() ;
+
         static JSValue start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setPS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
