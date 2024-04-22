@@ -9,7 +9,7 @@ namespace be::driver {
         : NativeClass(ctx,build(ctx,_jsobj))
     {}
 
-    int I2CDevice::begin(I2C * _i2c, uint8_t _addr) {
+    int I2CDevice::setup(I2C * _i2c, uint8_t _addr) {
         if(!_i2c) {
             return -1 ;
         }
@@ -18,7 +18,7 @@ namespace be::driver {
         return 0 ;
     }
 
-    JSValue I2CDevice::begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue I2CDevice::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2CDevice, thisobj)
         CHECK_ARGC(1)
         ARGV_TO_UINT8(0, busnum)
@@ -27,9 +27,9 @@ namespace be::driver {
         if(!i2c) {
             JSTHROW("invalid i2c port number:%d", busnum)
         }
-        int ret = thisobj->begin(i2c, addr) ;
+        int ret = thisobj->setup(i2c, addr) ;
         if( ret!=0 ){
-            JSTHROW("%s.%s() failed, error: %d", "I2CDevice", "begin", ret)
+            JSTHROW("%s.%s() failed, error: %d", "I2CDevice", "setup", ret)
         }
         return JS_UNDEFINED ;
     }

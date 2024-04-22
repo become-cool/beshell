@@ -36,10 +36,10 @@ using namespace std ;
             return false ;                                      \
         }
 
-namespace be::driver {
+namespace be::driver::sensor {
     DEFINE_NCLASS_META(VL53L0X, I2CDevice)
     std::vector<JSCFunctionListEntry> VL53L0X::methods = {
-        JS_CFUNC_DEF("begin", 2, I2CDevice::begin),
+        JS_CFUNC_DEF("setup", 2, I2CDevice::setup),
         JS_CFUNC_DEF("start", 0, VL53L0X::start),
         JS_CFUNC_DEF("stop", 0, VL53L0X::stop),
         JS_CFUNC_DEF("readDistance", 0, VL53L0X::readDistance),
@@ -53,8 +53,8 @@ namespace be::driver {
         return obj->jsobj ;
     }
 
-    int VL53L0X::begin(be::I2C * i2c, uint8_t addr) {
-        int ret = I2CDevice::begin(i2c,addr) ;
+    int VL53L0X::setup(be::I2C * i2c, uint8_t addr) {
+        int ret = I2CDevice::setup(i2c,addr) ;
         if( ret<0 ) {
             return ret ;
         }

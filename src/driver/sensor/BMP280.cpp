@@ -3,12 +3,12 @@
 using namespace std ;
 using namespace be ;
 
-namespace be::driver {
+namespace be::driver::sensor {
 
 
     DEFINE_NCLASS_META(BMP280, I2CDevice)
     std::vector<JSCFunctionListEntry> BMP280::methods = {
-        JS_CFUNC_DEF("begin", 0, I2CDevice::begin),
+        JS_CFUNC_DEF("setup", 0, I2CDevice::setup),
         JS_CFUNC_DEF("readTemperature", 0, BMP280::readTemperature),
         JS_CFUNC_DEF("readPressure", 0, BMP280::readPressure),
         JS_CFUNC_DEF("readAltitude", 0, BMP280::readAltitude),
@@ -35,8 +35,8 @@ namespace be::driver {
             return -7 ;                                         \
         }
 
-    int BMP280::begin(I2C * _i2c, uint8_t _addr) {
-        int ret = I2CDevice::begin(_i2c,_addr) ;
+    int BMP280::setup(I2C * _i2c, uint8_t _addr) {
+        int ret = I2CDevice::setup(_i2c,_addr) ;
         if( ret<0 ) {
             return ret ;
         }

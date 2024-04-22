@@ -14,7 +14,7 @@ namespace be::driver {
     DEFINE_NCLASS_META(PCA9557, NativeClass)
 
     std::vector<JSCFunctionListEntry> PCA9557::methods = {
-            JS_CFUNC_DEF("begin", 0, PCA9557::begin),
+            JS_CFUNC_DEF("setup", 0, PCA9557::setup),
             JS_CFUNC_DEF("read", 0, PCA9557::read),
             JS_CFUNC_DEF("write", 0, PCA9557::write),
             JS_CFUNC_DEF("getMode", 0, PCA9557::getMode),
@@ -32,7 +32,7 @@ namespace be::driver {
         return obj->jsobj;
     }
     
-    int PCA9557::begin(I2C * _i2c, uint8_t _addr) {
+    int PCA9557::setup(I2C * _i2c, uint8_t _addr) {
         if(!_i2c) {
             return -1 ;
         }
@@ -117,7 +117,7 @@ namespace be::driver {
         return i2c->write(addr, 3, regVal_Mode) ;
     }
     
-    JSValue PCA9557::begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue PCA9557::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(PCA9557, thisobj)
         CHECK_ARGC(1)
         ARGV_TO_UINT8(0, busnum)
@@ -126,9 +126,9 @@ namespace be::driver {
         if(!i2c) {
             JSTHROW("invalid i2c port number:%d", busnum)
         }
-        int ret = thisobj->begin(i2c, addr) ;
+        int ret = thisobj->setup(i2c, addr) ;
         if( ret!=0 ){
-            JSTHROW("%s.%s() failed, error: %d", "PCA9557", "begin", ret)
+            JSTHROW("%s.%s() failed, error: %d", "PCA9557", "setup", ret)
         }
         return JS_UNDEFINED ;
     }

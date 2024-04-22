@@ -2,7 +2,7 @@
 
 #include "driver/I2CDevice.hpp"
 
-namespace be::driver {
+namespace be::driver::sensor {
     class AHT20: public I2CDevice {
     DECLARE_NCLASS_META
     private:

@@ -22,7 +22,7 @@ namespace be::driver {
         PCA9557(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        int begin(be::I2C *, uint8_t addr) ;
+        int setup(be::I2C *, uint8_t addr) ;
         bool read(uint8_t pin, uint8_t & val);
         bool write(uint8_t pin, uint8_t val) ;
         bool getMode(uint8_t & mode);
@@ -30,7 +30,7 @@ namespace be::driver {
         bool getPinMode(uint8_t pin, Mode & mode);
         bool setPinMode(uint8_t pin, Mode mode);
 
-        static JSValue begin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

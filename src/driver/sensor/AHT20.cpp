@@ -10,11 +10,11 @@
 using namespace std;
 using namespace be;
 
-namespace be::driver {
+namespace be::driver::sensor {
     DEFINE_NCLASS_META(AHT20, I2CDevice)
 
     std::vector<JSCFunctionListEntry> AHT20::methods = {
-            JS_CFUNC_DEF("begin", 0, I2CDevice::begin),
+            JS_CFUNC_DEF("setup", 0, I2CDevice::setup),
             JS_CFUNC_DEF("read", 0, AHT20::read),
             JS_CFUNC_DEF("measure", 0, AHT20::measure),
     };
