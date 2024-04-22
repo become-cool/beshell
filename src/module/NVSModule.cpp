@@ -3,6 +3,7 @@
 #include "qjs_utils.h"
 #include <iostream>
 
+using namespace std ;
 
 #ifdef ESP_PLATFORM
 
@@ -10,12 +11,19 @@
 #include "nvs_flash.h"
 
 
-#define NVS_OPEN(ns, h, failed)                                 \
+#define NVS_OPEN(ns, h, failed)                             \
     nvs_handle_t h;                                         \
-    esp_err_t err = nvs_open(ns, NVS_READWRITE, &h); \
+    esp_err_t err = nvs_open(ns, NVS_READWRITE, &h);        \
     if(err!=ESP_OK) {                                       \
         failed                                              \
     }
+
+#define JS_NVS_OPEN(ns, h, failed)                          \
+    NVS_OPEN(ns, h, {                                       \
+        failed                                              \
+        JSTHROW("nvs_open(%s) failed: %d", ns, err) ;       \
+    })
+
 
 #define NVS_INT_GETTER(name,type,ctype)                             \
         bool NVSModule::read##name(const char * key, ctype & value, const char * ns) { \
@@ -53,7 +61,7 @@
 #endif
 
 #define NVS_INT_JS_GETTER(name,ctype,jstype)                        \
-    JSValue NVSModule::jsRead##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
+    JSValue NVSModule::read##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
         CHECK_ARGC(1)                           \
         ARGV_TO_CSTRING(0,key)                  \
         ctype value = 0 ;                       \
@@ -66,7 +74,7 @@
     }
 
 #define NVS_INT_JS_SETTER(name,ctype,jstype,apitype)               \
-    JSValue NVSModule::jsWrite##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
+    JSValue NVSModule::write##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
         CHECK_ARGC(2)                                                   \
         ARGV_TO_CSTRING(0,key)                                          \
         ctype value = 0 ;                                               \
@@ -93,26 +101,25 @@ namespace be {
     NVSModule::NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
-        
-        exportFunction("jsErase", jsErase) ;
-        // exportFunction("jsReadString", jsReadString) ;
-        // exportFunction("jsWriteString", jsWriteString) ;
+        exportFunction("erase", erase) ;
+        exportFunction("readString", readString) ;
+        exportFunction("writeString", writeString) ;
 
-        exportFunction("readInt8", jsReadInt8) ;
-        exportFunction("readInt16", jsReadInt16) ;
-        exportFunction("readInt32", jsReadInt32) ;
-        exportFunction("readInt64", jsReadInt64) ;
-        exportFunction("readUint8", jsReadUint8) ;
-        exportFunction("readUint16", jsReadUint16) ;
-        exportFunction("readUint32", jsReadUint32) ;
+        exportFunction("readInt8", readInt8) ;
+        exportFunction("readInt16", readInt16) ;
+        exportFunction("readInt32", readInt32) ;
+        exportFunction("readInt64", readInt64) ;
+        exportFunction("readUint8", readUint8) ;
+        exportFunction("readUint16", readUint16) ;
+        exportFunction("readUint32", readUint32) ;
         
-        exportFunction("writeInt8", jsWriteInt8) ;
-        exportFunction("writeInt16", jsWriteInt16) ;
-        exportFunction("writeInt32", jsWriteInt32) ;
-        exportFunction("writeInt64", jsWriteInt64) ;
-        exportFunction("writeUint8", jsWriteUint8) ;
-        exportFunction("writeUint16", jsWriteUint16) ;
-        exportFunction("writeUint32", jsWriteUint32) ;
+        exportFunction("writeInt8", writeInt8) ;
+        exportFunction("writeInt16", writeInt16) ;
+        exportFunction("writeInt32", writeInt32) ;
+        exportFunction("writeInt64", writeInt64) ;
+        exportFunction("writeUint8", writeUint8) ;
+        exportFunction("writeUint16", writeUint16) ;
+        exportFunction("writeUint32", writeUint32) ;
     }
     
     // c/c++ helper api
@@ -179,7 +186,7 @@ namespace be {
     NVS_INT_JS_SETTER(Uint16, uint16_t, Uint32, uint32_t)
     NVS_INT_JS_SETTER(Uint32, uint32_t, Uint32, uint32_t)
 
-    JSValue NVSModule::jsErase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue NVSModule::erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
 
 #ifdef ESP_PLATFORM
@@ -203,11 +210,68 @@ namespace be {
 
     }
 
+    JSValue NVSModule::readString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        string ARGV_TO_STRING(0,key)
+        ARGV_TO_UINT32_OPT(1,buff_size,128)
+
+        if(buff_size<1) {
+            JSTHROW("buff_size must be greater than 0") ;
+        }
+
+        JSValue strvalue = JS_NULL ;
+
+#ifdef ESP_PLATFORM
+
+        JS_NVS_OPEN("beshell", handle, )
+
+        // size_t buff_size = 0 ;
+        // esp_err_t res = nvs_get_blob(handle, key.c_str(), NULL, &buff_size) ;
+        // if(res!= ESP_OK) {
+        //     ds(key.c_str())
+        //     dn(buff_size)
+        //     JSTHROW("nvs_get_blob() failed: %d", res) ;
+        // }
+
+        char * value = (char *)malloc(buff_size) ;
+        if(!value) {
+            nvs_close(handle) ;
+            JSTHROW("malloc(%d) failed", buff_size) ;
+        }
+
+        esp_err_t res = nvs_get_str(handle, key.c_str(), value, (size_t*)&buff_size);
+        if(res!= ESP_OK) {
+            free(value) ;
+            nvs_close(handle) ;
+            JSTHROW("nvs_get_str() failed: %d", res) ;
+        }
+        strvalue = JS_NewString(ctx, value) ;
+
+        nvs_close(handle) ;
+        free(value) ;
+#endif
+
+        return strvalue ;
+    }
+
+    JSValue NVSModule::writeString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        string ARGV_TO_STRING(0,key)
+        string ARGV_TO_STRING(1,value)
+
+        JSValue ret = JS_FALSE ;
+#ifdef ESP_PLATFORM
+        JS_NVS_OPEN("beshell", handle, )
+        ret = nvs_set_str(handle, key.c_str(), value.c_str()) == ESP_OK ? JS_TRUE : JS_FALSE ;
+        nvs_close(handle) ;
+#endif
+
+        return ret ;
+    }
+
     void NVSModule::readOneTime(const char * key, uint8_t * value) const {
 #ifdef ESP_PLATFORM
-        NVS_OPEN("beshell", handle, {
-            return ;
-        })
+        NVS_OPEN("beshell", handle, {})
         if(nvs_get_u8(handle, key, value)==ESP_OK) {
             nvs_erase_key(handle, key) ;
         }

@@ -235,7 +235,7 @@ namespace be::lv {
         lv_indev_set_user_data(lvindev, (void *)data) ;
         lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(lvindev, pointer_read);
-        ((_lv_indev_t*)lvindev)->gesture_limit = 10 ;
+        ((_lv_indev_t*)lvindev)->gesture_limit = 30 ;
 
         return JS_UNDEFINED ;
     }

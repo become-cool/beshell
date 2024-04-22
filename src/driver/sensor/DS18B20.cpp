@@ -2,7 +2,7 @@
 #include <esp_system.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp32/rom/ets_sys.h"
+#include "esp_rom_sys.h"
 
 using namespace std ;
 
@@ -83,14 +83,14 @@ namespace be::driver::sensor {
         unsigned int init_state = 0;
         ESP_OUT_MODE;
         ESP_LOW;
-        ets_delay_us(480);
+        esp_rom_delay_us(480);
         ESP_HIGH;
     
         ESP_INPUT_MODE;//设置输入模式，就是高阻态，此时上拉电阻提供高电平
-        ets_delay_us(70);
+        esp_rom_delay_us(70);
         init_state = (gpio_get_level(pin) == 0);
     
-        ets_delay_us(410);
+        esp_rom_delay_us(410);
         return init_state;
     }
 
@@ -98,16 +98,16 @@ namespace be::driver::sensor {
         if (bit & 1) {
             ESP_OUT_MODE;
             ESP_LOW;
-            ets_delay_us(6);
+            esp_rom_delay_us(6);
             ESP_INPUT_MODE;//设置输入模式，就是高阻态，此时上拉电阻提供高电平
-            ets_delay_us(64);
+            esp_rom_delay_us(64);
         }
         else {
             ESP_OUT_MODE;
             ESP_LOW;
-            ets_delay_us(60);
+            esp_rom_delay_us(60);
             ESP_INPUT_MODE;//设置输入模式，就是高阻态，此时上拉电阻提供高电平
-            ets_delay_us(10);
+            esp_rom_delay_us(10);
         }
     }
 
@@ -116,11 +116,11 @@ namespace be::driver::sensor {
         ESP_OUT_MODE;
         
         ESP_LOW;
-        ets_delay_us(6);
+        esp_rom_delay_us(6);
         ESP_INPUT_MODE;//设置输入数据
-        ets_delay_us(9);
+        esp_rom_delay_us(9);
         bit = ESP_GET;
-        ets_delay_us(55);
+        esp_rom_delay_us(55);
     
         return bit;
     }
@@ -133,7 +133,7 @@ namespace be::driver::sensor {
             a_data &= 0x01;//与操作，只留刚刚右移的一位数据
             writeBit(a_data);//写入一位数据
         }
-        ets_delay_us(100);
+        esp_rom_delay_us(100);
     }
 
     unsigned char DS18B20::readByte(void) {
@@ -143,7 +143,7 @@ namespace be::driver::sensor {
         for (i = 0; i < 8; i++) {
             if (readBit())
                 data |= 0x01 << i;//读取到1就会向左移相应的位数
-            ets_delay_us(15);
+            esp_rom_delay_us(15);
         }
         return data;
     }

@@ -12,5 +12,6 @@ namespace be {
         static JSValue top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readEFUSE(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
