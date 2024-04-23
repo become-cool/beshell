@@ -2,6 +2,7 @@
 
 Added:
 * driver WH4530A
+* driver DS1307
 * nvs.readString() / nvs.writeString()
 * process.readEFUSE()
 
