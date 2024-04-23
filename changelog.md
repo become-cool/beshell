@@ -1,7 +1,9 @@
 ## master
 
 Added:
-* driver WH4530A 
+* driver WH4530A
+* nvs.readString() / nvs.writeString()
+* process.readEFUSE()
 
 Fixed:
 
