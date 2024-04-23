@@ -178,6 +178,9 @@ namespace be {
     }
     void JSTimer::give(bool fromISR) {
 #ifdef ESP_PLATFORM
+        if(!xMutex) {
+            return ;
+        }
         if(fromISR) {
             xSemaphoreGiveFromISR(xMutex, nullptr);
         } else {
