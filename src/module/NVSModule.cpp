@@ -88,6 +88,8 @@ using namespace std ;
 
 namespace be {
     
+    const char * NVSModule::name = "nvs" ;
+
     void NVSModule::use(BeShell * beshell) {
 #ifdef ESP_PLATFORM
         esp_err_t ret = nvs_flash_init();
@@ -95,7 +97,6 @@ namespace be {
             std::cout << "nvs_flash_init() failed: " << ret << std::endl ;
         }
 #endif
-        beshell->engine->mloader.add<NVSModule>("nvs") ;
     }
 
     NVSModule::NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)

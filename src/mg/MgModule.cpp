@@ -3,6 +3,8 @@
 
 namespace be::mg {
 
+    const char * MgModule::name = "mg" ;
+
     struct mg_mgr MgModule::mgr ;
     std::string MgModule::ca_path ;
     std::string MgModule::cert_path ;

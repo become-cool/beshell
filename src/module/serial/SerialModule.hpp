@@ -9,12 +9,10 @@ namespace be {
         void import(JSContext *ctx) ;
     public:
 
+        static const char *name ;
+
         SerialModule(JSContext * ctx, const char * name) ;
         ~SerialModule() ;
-
-        inline static void use(BeShell & beshell) {
-            beshell.useModule<SerialModule>("serial") ;
-        }
         
     } ;
 }

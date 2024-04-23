@@ -74,12 +74,12 @@ namespace be {
         
         template <typename ModuleClass>
         void useModule(const char * name=nullptr) {
-            engine->mloader.add<ModuleClass>(name) ;
+            engine->mloader.add<ModuleClass>(this, name) ;
         }
 
         template <typename DriverClass>
         void useDriver() {
-            be::driver::DriverModule::use<DriverClass>() ;
+            be::driver::DriverModule::useDriver<DriverClass>(this) ;
         }
     } ;
 

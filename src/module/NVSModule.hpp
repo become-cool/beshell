@@ -9,6 +9,7 @@ namespace be {
     private:
     protected:
     public:
+        static const char * name ;
         static void use(BeShell * beshell) ;
 
         NVSModule(JSContext * ctx, const char * name,uint8_t flagGlobal=0);

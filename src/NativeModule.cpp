@@ -8,7 +8,7 @@ using namespace std ;
 
 namespace be {
 
-    const char * NativeModule::name = "unname_module" ;
+    const char * NativeModule::name = nullptr ;
 
     NativeModule::NativeModule(JSContext * _ctx, const char * name, uint8_t _flagGlobal)
         : ctx(_ctx)
@@ -69,4 +69,5 @@ namespace be {
     
     void NativeModule::import(JSContext *ctx) {}
 
+    void NativeModule::use(BeShell * beshell) {}
 }

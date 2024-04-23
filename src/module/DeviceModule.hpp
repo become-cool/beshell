@@ -10,13 +10,10 @@ namespace be{
         static const char * deviceJsonPath ;
     
     public:
+        static const char * name ;
         DeviceModule(JSContext * ctx, const char * name) ;
 
         void import(JSContext *ctx) ;
-
-        inline static void use(be::BeShell & beshell) {
-            beshell.useModule<DeviceModule>("device") ;
-        }
 
         static void setDeviceJsonPath(const char * path) ;
     } ;

@@ -2,6 +2,8 @@
 
 namespace be {
 
+    const char * const BTModule::name = "bt" ;
+
     BTModule::BTModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
@@ -12,8 +14,5 @@ namespace be {
     // void BTModule::import(JSContext *ctx) {
     // }
 
-    JSValue BTModule::jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
     
 }

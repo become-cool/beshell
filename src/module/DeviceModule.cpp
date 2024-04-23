@@ -3,6 +3,8 @@
 
 namespace be{
 
+    const char * DeviceModule::name = "device" ;
+
     const char * DeviceModule::deviceJsonPath = nullptr ;
 
     DeviceModule::DeviceModule(JSContext * ctx, const char * name)

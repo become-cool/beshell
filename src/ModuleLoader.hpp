@@ -8,6 +8,7 @@
 #include "fs/FS.hpp"
 
 namespace be {
+    class BeShell ;
     class JSEngine ;
     class ModuleLoader ;
     
@@ -19,7 +20,7 @@ namespace be {
         std::map<JSContext*, std::map<std::string, NativeModule*>> modules ;
 
     public:
-        ModuleLoader() ;
+        ModuleLoader(BeShell * beshell) ;
         ~ModuleLoader() ;
 
         template <typename M>
@@ -27,10 +28,17 @@ namespace be {
             return new M(ctx, name) ;
         }
         template <typename M>
-        void add(const char * name=nullptr) {
-            factories[name? name: M::name] = factory<M> ;
+        void add(BeShell * beshell, const char * name=nullptr) {
+            if(!name) {
+                name = M::name ;
+            }
+            if(!name) {
+                printf("ModuleLoader::add(): name is null\n") ;
+                return ;
+            }
+            factories[name] = factory<M> ;
+            M::use(beshell) ;
         }
-        void add(const char * name, NativeModuleFactoryFunc factory) ;
         
         void setup(JSContext * ctx) ;
 

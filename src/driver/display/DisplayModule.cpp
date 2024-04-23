@@ -6,6 +6,8 @@ using namespace std ;
 
 namespace be::driver::display {
 
+    const char * DisplayModule::name = "driver/display" ;
+
     DisplayModule::DisplayModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
@@ -59,9 +61,5 @@ namespace be::driver::display {
     }
     JSValue DisplayModule::jsToRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
-    }
-
-    void use(be::BeShell & beshell) {
-        beshell.useModule<DisplayModule>("driver/display") ;
     }
 }

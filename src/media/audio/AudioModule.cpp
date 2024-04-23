@@ -3,6 +3,9 @@
 
 
 namespace be::media{
+
+    const char * const AudioModule::name = "audio" ;
+
     AudioModule::AudioModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {

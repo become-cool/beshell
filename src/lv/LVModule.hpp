@@ -10,11 +10,14 @@ namespace lv {
 
     class LVModule: public be::NativeModule {
     public:
+
+        static const char * const name ;
+        
         LVModule(JSContext * ctx, const char * name) ;
 
         // void import() ;
 
-        static void use(be::BeShell & beshell) ;
+        static void use(be::BeShell * beshell) ;
 
         static JSValue screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

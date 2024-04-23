@@ -42,8 +42,9 @@ namespace be {
     }
 
 
-    JSEngine::JSEngine(BeShell * _beshell)
-        : beshell(_beshell)
+    JSEngine::JSEngine(BeShell * beshell)
+        : beshell(beshell)
+        , mloader(beshell)
     {}
 
     void JSEngine::setup() {

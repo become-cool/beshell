@@ -94,12 +94,12 @@ namespace be {
         }
     } ;
 
-    ModuleLoader::ModuleLoader() {
-        add<JSLoader>("loader") ;
-        add<ProcessModule>("process") ;
+    ModuleLoader::ModuleLoader(BeShell * beshell) {
+        add<JSLoader>(beshell, "loader") ;
+        add<ProcessModule>(beshell, "process") ;
 #ifdef ESP_PLATFORM
-        add<driver::DriverModule>("driver") ;
-        add<GPIOModule>("gpio") ;
+        add<driver::DriverModule>(beshell, "driver") ;
+        add<GPIOModule>(beshell, "gpio") ;
 #endif
     }
     
@@ -146,10 +146,6 @@ namespace be {
                 }
             }
         }        
-    }
-
-    void ModuleLoader::add(const char * name, NativeModuleFactoryFunc factory) {
-        factories[name] = factory ;
     }
 
     std::string ModuleLoader::resovleFS(FS * fs, const char * module_name, const char * base_dir) {

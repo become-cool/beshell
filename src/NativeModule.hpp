@@ -15,6 +15,7 @@ namespace be {
 
 	typedef void (*NativeClassFactoryFunc)(JSContext * ctx, JSModuleDef * m) ;
 
+    class BeShell ;
     class NativeModule {
     private:
         std::vector<JSCFunctionListEntry> exportFuncs ;
@@ -39,6 +40,8 @@ namespace be {
         uint8_t flagGlobal = 0 ;
         
         NativeModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
+
+        static void use(BeShell * beshell) ;
 
         void exportName(const char * name) ;
 

@@ -183,6 +183,8 @@ static void esp32_wifi_eventHandler(void* arg, esp_event_base_t event_base, int3
 }
 
 namespace be {
+
+    const char * const WiFiModule::name = "wifi" ;
     
     WiFiModule::WiFiModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
@@ -241,8 +243,6 @@ namespace be {
         // dp(src_js_wifi_js_start)
         // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
         // dn(size)
-
-        beshell.useModule<WiFiModule>("wifi") ;
         
         esp_err_t res ;
         ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id))

@@ -7,6 +7,8 @@ namespace be::driver::display {
 
     class DisplayModule: public be::NativeModule {
     public:
+        static const char * name ;
+
         DisplayModule(JSContext * ctx, const char * name) ;
 
         static JSValue jsFromRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -14,8 +16,6 @@ namespace be::driver::display {
         static JSValue jsToRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsToRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
-
-    void use(be::BeShell & beshell) ;
 
     uint16_t fromRGB(uint8_t r,uint8_t g,uint8_t b) ;
     uint16_t fromRGB565(uint8_t r,uint8_t g,uint8_t b) ;

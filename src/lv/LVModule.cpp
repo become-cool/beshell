@@ -10,6 +10,8 @@ using namespace std ;
 
 namespace be::lv {
 
+    const char * const LVModule::name = "lv" ;
+
     LVModule::LVModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
@@ -70,9 +72,8 @@ namespace be::lv {
     // }
 
     
-    void LVModule::use(be::BeShell & beshell) {
-        driver::display::use(beshell) ;
-        beshell.useModule<LVModule>("lv") ;
+    void LVModule::use(be::BeShell * beshell) {
+        beshell->useModule<driver::display::DisplayModule>() ;
     }
 
     JSValue LVModule::screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

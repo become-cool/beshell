@@ -4,6 +4,9 @@
 #include <fs/FS.hpp>
 
 namespace be::sqlite{
+
+    const char * SQLite3Module::name = "sqlite3" ;
+
     SQLite3Module::SQLite3Module(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {

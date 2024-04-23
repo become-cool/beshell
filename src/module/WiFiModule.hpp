@@ -6,6 +6,8 @@
 namespace be {
     class WiFiModule: public be::NativeModule {
     public:
+        static const char * const name ;
+
         WiFiModule(JSContext * ctx, const char * name) ;
 
         static bool hasInited() ;

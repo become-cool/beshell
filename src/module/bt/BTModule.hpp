@@ -7,13 +7,8 @@ namespace be {
 
     class BTModule: public be::NativeModule {
     public:
+        static const char * const name ;
         BTModule(JSContext * ctx, const char * name) ;
-
-        // void import(JSContext *ctx) ;
-
-        inline static void use(be::BeShell & beshell) {
-            beshell.useModule<BTModule>("bt") ;
-        }
 
         static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;

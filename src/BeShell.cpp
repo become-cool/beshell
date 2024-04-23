@@ -50,13 +50,12 @@ namespace be {
     void BeShell::useBasic() {
         useFS() ;
         useREPL() ;
-        NVSModule::use(this) ;
     }
     
     void BeShell::useFS(const char * mountPath, FSPartition * partition) {
         if(!fs) {
             fs = new FS() ;
-            engine->mloader.add<FSModule>("fs") ;
+            useModule<FSModule>("fs") ;
         }
         if(mountPath && partition) {
             fs->mount(mountPath,partition) ;
@@ -72,7 +71,7 @@ namespace be {
     
     #ifdef MODULE_SERIAL
     void BeShell::useSerial() {
-        SerialModule::use(*this) ;
+        useModule<SerialModule>() ;
     }
     #endif
 
@@ -81,7 +80,7 @@ namespace be {
         if(lv) {
             return ;
         }
-        lv::LVModule::use(*this) ;
+        useModule<lv::LVModule>() ;
         lv = new lv::LV ;
     }
 #endif
@@ -123,7 +122,7 @@ namespace be {
 
 #ifdef ESP_PLATFORM
     void BeShell::useDeviceJSON(const char * path) {
-        DeviceModule::use(*this) ;
+        useModule<DeviceModule>() ;
         DeviceModule::setDeviceJsonPath(path) ;
         bUseDeviceJSON = true ;
     }

@@ -8,7 +8,8 @@ using namespace std ;
 
 namespace be {
 
-    
+    const char * SerialModule::name = "serial" ;
+
     SerialModule::SerialModule(JSContext * ctx, const char * name)
         : NativeModule(ctx,name,0)
     {

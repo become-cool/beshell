@@ -23,7 +23,7 @@ namespace be::driver {
         void import(JSContext *ctx) ;
 
         template <typename D>
-        static void use() {
+        static void useDriver(BeShell * beshell) {
             providers.push_back(provider<D>);
         }
 
