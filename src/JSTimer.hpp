@@ -8,6 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/semphr.h"
 #endif
 
 namespace be {
@@ -20,7 +21,10 @@ namespace be {
 
 #if defined(ESP_PLATFORM)
         QueueHandle_t timer_queue = nullptr ;
+        SemaphoreHandle_t xMutex = nullptr ;
 #endif
+        inline bool take(bool fromISR=false) ;
+        inline void give(bool fromISR=false) ;
 
     public:
         void setup(JSContext * ctx) ;
@@ -32,6 +36,7 @@ namespace be {
         static JSValue jsClearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, int argc=0, JSValueConst *argv=nullptr) ;
+        JSTimerEvent * setTimerAsync(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, int argc=0, JSValueConst *argv=nullptr, bool fromISR=false) ;
         // JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, std::initializer_list<JSValue> argv={}) ;
 
         JSTimerEvent * setImmediate(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;

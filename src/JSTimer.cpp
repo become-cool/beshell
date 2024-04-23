@@ -6,6 +6,18 @@
 
 using namespace std;
 
+#define _MUTEX(fromISR, critical)                      \
+    {                                                  \  
+        bool toke = take(fromISR) ;                    \
+        critical                                       \
+        if(toke) {                                     \
+            give(fromISR) ;                            \
+        }                                              \
+    }
+
+#define MUTEX(critical)        _MUTEX(false, critical)
+#define MUTEX_ISR(critical)    _MUTEX(true,  critical)
+
 
 namespace be {
 
@@ -53,7 +65,9 @@ namespace be {
     }
 
     void JSTimer::loop(JSContext * ctx) {
+        take(false) ;
         if(events.size()<1){
+            give(false) ;
             return ;
         }
         uint64_t now = gettime() ;
@@ -85,6 +99,7 @@ namespace be {
             }
         }
         
+        give(false) ;
     }
 
     #define CHECK_ENGINE                                     \
@@ -139,6 +154,38 @@ namespace be {
         return JS_UNDEFINED ;
     }
     
+    bool JSTimer::take(bool fromISR) {
+#ifdef ESP_PLATFORM
+        bool toke = false ; 
+        if(xMutex) {
+            xMutex = xSemaphoreCreateMutex();
+        }
+        if(xMutex) {
+            if(fromISR) {
+                if(xSemaphoreTakeFromISR(xMutex, 0) == pdTRUE) {
+                    toke = true ;
+                }
+            } else {
+                if(xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
+                    toke = true ;
+                }
+            }
+        }
+        return toke ;
+#else
+        return true ;
+#endif
+    }
+    void JSTimer::give(bool fromISR) {
+#ifdef ESP_PLATFORM
+        if(fromISR) {
+            xSemaphoreGiveFromISR(xMutex, nullptr);
+        } else {
+            xSemaphoreGive(xMutex);
+        }
+#endif
+    }
+    
     JSTimerEvent * JSTimer::setTimer(JSContext *ctx, JSValue func, int interval, bool repeat, JSValue thisobj, int argc, JSValueConst *argv) {
         JSTimerEvent * event = new JSTimerEvent ;
         memset(event,0,sizeof(JSTimerEvent)) ;
@@ -166,17 +213,30 @@ namespace be {
             }
         }
 
-        events.push_back(event) ;
+        MUTEX({
+            events.push_back(event) ;
+        })
 
+        return event ;
+    }
+
+    JSTimerEvent * JSTimer::setTimerAsync(JSContext *ctx, JSValue func, int interval, bool repeat, JSValue thisobj, int argc, JSValueConst *argv, bool fromISR) {
+        JSTimerEvent * event = nullptr ;
+        MUTEX_ISR({
+            event = setTimer(ctx, func, interval, repeat,  thisobj, argc, argv) ;
+        })
         return event ;
     }
     
     void JSTimer::removeTimer(JSContext *ctx, JSTimerEvent * event) {
-        auto it = std::find(events.begin(),events.end(),event) ;
-        if(it==events.end()) {
-            return ;
-        }
-        events.erase(it);
+        MUTEX({
+            auto it = std::find(events.begin(),events.end(),event) ;
+            if(it==events.end()) {
+                give(false) ;
+                return ;
+            }
+            events.erase(it);
+        })
         event->destroy(ctx) ;
         delete event ;
     }
@@ -189,11 +249,14 @@ namespace be {
     }
 
     JSTimerEvent * JSTimer::findWithId(uint32_t id) {
-        for(auto event: events) {
-            if(event->id == id) {
-                return event ;
+        MUTEX({
+            for(auto event: events) {
+                if(event->id == id) {
+                    give(false) ;
+                    return event ;
+                }
             }
-        }
+        })
         return nullptr ;
     }
 
