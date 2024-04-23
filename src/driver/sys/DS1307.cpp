@@ -63,14 +63,13 @@ namespace be::driver::sys {
         return (num / 10) << 4 | (num % 10);
     }
     
-    bool DS1307::read(int & sec, int & min, int & hour, int & day, int & date, int & mth, int & year) {
+    bool DS1307::readTime(int & year, int & mth, int & date, int & hour, int & min, int & sec) {
         if(!i2c) {
             return false ;
         }
         uint8_t _sec = 0 ;
         uint8_t _min = 0 ;
         uint8_t _hr = 0 ;
-        uint8_t _dow = 0 ;
         uint8_t _date = 0 ;
         uint8_t _mth = 0 ;
         uint8_t _yr = 0 ;
@@ -81,9 +80,6 @@ namespace be::driver::sys {
             return false ;
         }
         if(!i2c->read<uint8_t,uint8_t>(DS1307_I2C_ADDR, DS1307_HR_REG, _hr)){
-            return false ;
-        }
-        if(!i2c->read<uint8_t,uint8_t>(DS1307_I2C_ADDR, DS1307_DOW_REG, _dow)){
             return false ;
         }
         if(!i2c->read<uint8_t,uint8_t>(DS1307_I2C_ADDR, DS1307_DATE_REG, _date)){
@@ -99,7 +95,6 @@ namespace be::driver::sys {
         sec = tonumber(_sec);
         min = tonumber(_min);
         hour = tonumber(_hr);
-        day = tonumber(_dow);
         date = tonumber(_date);
         mth = tonumber(_mth);
         year = tonumber(_yr) + DS1307_BASE_YR;
@@ -111,25 +106,23 @@ namespace be::driver::sys {
         int sec = 0 ;
         int min = 0 ;
         int hr = 0 ;
-        int dow = 0 ;    
         int date = 0 ;
         int mth = 0 ;
         int yr = 0 ;
-        if( !thisobj->read(sec, min, hr, dow, date, mth, yr) ) {
+        if( !thisobj->readTime(yr, mth, date, hr, min, sec) ) {
             return JS_NULL ;
         }
         JSValue array = JS_NewArray(ctx);
-        JS_SetPropertyUint32(ctx, array, 0, JS_NewInt32(ctx, sec));
-        JS_SetPropertyUint32(ctx, array, 1, JS_NewInt32(ctx, min));
-        JS_SetPropertyUint32(ctx, array, 2, JS_NewInt32(ctx, hr));
-        JS_SetPropertyUint32(ctx, array, 3, JS_NewInt32(ctx, dow));
-        JS_SetPropertyUint32(ctx, array, 4, JS_NewInt32(ctx, date));
-        JS_SetPropertyUint32(ctx, array, 5, JS_NewInt32(ctx, mth));
-        JS_SetPropertyUint32(ctx, array, 6, JS_NewInt32(ctx, yr));
+        JS_SetPropertyUint32(ctx, array, 0, JS_NewInt32(ctx, yr));
+        JS_SetPropertyUint32(ctx, array, 1, JS_NewInt32(ctx, mth));
+        JS_SetPropertyUint32(ctx, array, 2, JS_NewInt32(ctx, date));
+        JS_SetPropertyUint32(ctx, array, 3, JS_NewInt32(ctx, hr));
+        JS_SetPropertyUint32(ctx, array, 4, JS_NewInt32(ctx, min));
+        JS_SetPropertyUint32(ctx, array, 5, JS_NewInt32(ctx, sec));
         return array ;
     }
 
-    bool DS1307::set(int sec, int min, int hour, int day, int date, int mth, int year) {
+    bool DS1307::setTime(int year, int mth, int date, int hour, int min, int sec) {
         if(!i2c) {
             return false ;
         }
@@ -145,11 +138,6 @@ namespace be::driver::sys {
         }
         if(hour>=0){
             if( !i2c->write<uint8_t,uint8_t>(DS1307_I2C_ADDR, DS1307_HR_REG, tobcd(hour)) ) {
-                return false ;
-            }
-        }
-        if(day>=0){
-            if( !i2c->write<uint8_t,uint8_t>(DS1307_I2C_ADDR, DS1307_DOW_REG, tobcd(day)) ) {
                 return false ;
             }
         }
@@ -174,13 +162,13 @@ namespace be::driver::sys {
     
     JSValue DS1307::set(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         THIS_NCLASS(DS1307, thisobj)
-        ARGV_TO_INT8_OPT(0, sec, -1)
-        ARGV_TO_INT8_OPT(1, min, -1)
-        ARGV_TO_INT8_OPT(2, hr, -1)
-        ARGV_TO_INT8_OPT(3, dow, -1)
-        ARGV_TO_INT8_OPT(4, date, -1)
-        ARGV_TO_INT8_OPT(5, mth, -1)
-        ARGV_TO_INT8_OPT(6, yr, -1)
-        return thisobj->set(sec, min, hr, dow, date, mth, yr) ? JS_TRUE : JS_FALSE ;
+        ARGV_TO_INT8_OPT(0, yr, -1)
+        ARGV_TO_INT8_OPT(1, mth, -1)
+        ARGV_TO_INT8_OPT(2, date, -1)
+        ARGV_TO_INT8_OPT(3, hr, -1)
+        ARGV_TO_INT8_OPT(4, min, -1)
+        ARGV_TO_INT8_OPT(5, sec, -1)
+        return thisobj->setTime(yr,mth,date,hr,min,sec) ? JS_TRUE : JS_FALSE ;
     }
+    
 }

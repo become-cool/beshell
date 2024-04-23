@@ -162,7 +162,7 @@ namespace be {
         tv.tv_sec = ms/1000;  // epoch time (seconds)
         tv.tv_usec = (ms%1000)*1000;    // microseconds
 
-        printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
+        //printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
 
 #ifdef ESP_PLATFORM
         settimeofday(&tv, NULL);

@@ -12,8 +12,10 @@ namespace be::driver::sys {
         DS1307(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        bool read(int & sec, int & min, int & hour, int & day, int & date, int & mth, int & year) ;
-        bool set(int sec, int min=-1, int hour=-1, int day=-1, int date=-1, int mth=-1, int year=-1) ;
+        bool readDayOfWeek(int & dow) ;
+        bool setDayOfWeek(int dow) ;
+        bool readTime(int & year, int & month, int & day, int & hour, int & minute, int & second) ;
+        bool setTime(int year, int month, int day, int hour, int minute, int second) ;
 
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue set(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
