@@ -31,12 +31,33 @@ namespace be {
         
         static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             CHECK_ARGC(1)
-            
             const char * modulename = JS_ToCString(ctx, argv[0]) ;
 
-            JSModuleDef * mdef = JS_RunModule(ctx, nullptr, modulename) ;
+            JSAtom atom = JS_GetScriptOrModuleName(ctx, 1) ;
+            JSValue val = JS_AtomToString(ctx, atom);
+
+            char * fullpath = (char *)JS_ToCString(ctx, val) ;
+            path_normalize(fullpath) ;
+
+            JS_FreeAtom(ctx,atom) ;
+            JS_FreeValue(ctx,val) ;
+
+            char * dir = (char *) malloc(strlen(fullpath)+1) ;
+            path_dirname(fullpath,dir) ;
+
+            JSModuleDef * mdef = JS_RunModule(ctx, fullpath, modulename) ;
+            
+            JS_FreeCString(ctx, fullpath) ;
+            free(dir) ;
+
             if(!mdef) {
-                JSTHROW("Cannot find module: %s", modulename) ;
+                JSValue excpt = JS_GetException(ctx) ;
+                if( JS_IsNull(excpt) ) {
+                    JSTHROW("Cannot find module: %s", modulename) ;
+                } else {
+                    JS_Throw(ctx, excpt) ;
+                    return JS_EXCEPTION ;
+                }
             }
             JSValue mi = js_get_module_ns(ctx, mdef ) ;
 
@@ -158,6 +179,7 @@ namespace be {
 
         // to vfs path
         fullpath = fs->toVFSPath(fullpath.c_str()) ;
+        path_normalize(fullpath) ;
 
         if(fs->isFile(fullpath.c_str())) {
             return fullpath ;
