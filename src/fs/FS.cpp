@@ -165,11 +165,9 @@ namespace be {
         return stat(_path.c_str(),&statbuf)>=0 ;
     }
     bool FS::isDir(const char * path) {
-        toVFSPath(path) ;
         return be::isDir(path) ;
     }
     bool FS::isFile(const char * path) {
-        toVFSPath(path) ;
         return be::isFile(path) ;
     }
 

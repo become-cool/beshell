@@ -45,6 +45,22 @@ using namespace std ;
 
 namespace be {
 
+
+    static void printFileSize(size_t size, ostringstream & output) {
+        if(size>1024*1024*1024) {
+            output << std::fixed << std::setprecision(1) << (double)size/(1024*1024*1024) << "G" ;
+        }
+        else if(size>1024*1024) {
+            output << std::fixed << std::setprecision(1) << (double)size/(1024*1024) << "M" ;
+        }
+        else if(size>1024) {
+            output << std::fixed << std::setprecision(1) << (double)size/1024 << "K" ;
+        }
+        else if(size>1024) {
+            output << size ;
+        }
+    }
+
     REPL::REPL(BeShell * _beshell)
         : beshell(_beshell)
     {
@@ -56,20 +72,40 @@ namespace be {
                 "  -(?|-help)                   print this message and exit\n"
             , [](BeShell * beshell, TelnetChannel * ch, Options & args){
                 CHECK_FS_USED
-                ARGS_TO_DIR(0, path)
+                
+                string path = beshell->fs->resolve(args[0]) ;
+                beshell->fs->toVFSPath(path) ;
+
+                if( !beshell->fs->exist(path.c_str()) ){
+                    ch->send("path is not a exists\n") ;
+                    return ;
+                }
+
                 bool bList = args.has("l") ;
                 bool bReadable = args.has("h") ;
+                
+                struct dirent *dirEnt ;
+                struct stat statbuf ;
+                bool fisrt = true ;
+
+                std::ostringstream dirsBuff, filesBuff;
+
+                if( beshell->fs->isFile(path.c_str()) ){
+                    stat(path.c_str(),&statbuf) ;
+                    if(bReadable) {
+                        printFileSize(statbuf.st_size, filesBuff) ;
+                    } else {
+                        filesBuff << statbuf.st_size ;
+                    }
+
+                    ch->send(filesBuff.str()) ;
+                    return ;
+                }
 
                 DIR* dir = opendir(path.c_str());
                 if(!dir) {
                     ch->send("Count not open dir") ;
                 }
-
-                std::ostringstream dirsBuff, filesBuff;
-                
-                struct dirent *dirEnt ;
-                struct stat statbuf ;
-                bool fisrt = true ;
 
                 while((dirEnt = readdir(dir))) {
                     if( strcmp(dirEnt->d_name,"..")==0 || strcmp(dirEnt->d_name,".")==0 ) {
@@ -81,18 +117,7 @@ namespace be {
                         if(stat(childpath.c_str(),&statbuf)==0 && !S_ISDIR(statbuf.st_mode)) {
                             filesBuff << std::setw(8) ;
                             if(bReadable) {
-                                if(statbuf.st_size>1024*1024*1024) {
-                                    filesBuff << std::fixed << std::setprecision(1) << (double)statbuf.st_size/(1024*1024*1024) << "G" ;
-                                }
-                                else if(statbuf.st_size>1024*1024) {
-                                    filesBuff << std::fixed << std::setprecision(1) << (double)statbuf.st_size/(1024*1024) << "M" ;
-                                }
-                                else if(statbuf.st_size>1024) {
-                                    filesBuff << std::fixed << std::setprecision(1) << (double)statbuf.st_size/1024 << "K" ;
-                                }
-                                else if(statbuf.st_size>1024) {
-                                    filesBuff << statbuf.st_size ;
-                                }
+                                printFileSize(statbuf.st_size, filesBuff) ;
                             } else {
                                 filesBuff << statbuf.st_size ;
                             }
