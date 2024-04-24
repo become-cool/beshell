@@ -23,7 +23,7 @@ namespace be {
         QueueHandle_t timer_queue = nullptr ;
         SemaphoreHandle_t xMutex = nullptr ;
 #endif
-        inline bool take(bool fromISR=false) ;
+        inline bool take(bool fromISR=false, bool createWhenFirst=false) ;
         inline void give(bool fromISR=false) ;
 
     public:

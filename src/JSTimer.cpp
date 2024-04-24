@@ -6,17 +6,17 @@
 
 using namespace std;
 
-#define _MUTEX(fromISR, critical)                      \
+#define _MUTEX(fromISR, createWhenFirst, critical)     \
     {                                                  \  
-        bool toke = take(fromISR) ;                    \
+        bool toke = take(fromISR, createWhenFirst) ;   \
         critical                                       \
         if(toke) {                                     \
             give(fromISR) ;                            \
         }                                              \
     }
 
-#define MUTEX(critical)        _MUTEX(false, critical)
-#define MUTEX_ISR(critical)    _MUTEX(true,  critical)
+#define MUTEX(critical)        _MUTEX(false, false, critical)
+#define MUTEX_ISR(critical)    _MUTEX(true, true,  critical)
 
 
 namespace be {
@@ -154,11 +154,15 @@ namespace be {
         return JS_UNDEFINED ;
     }
     
-    bool JSTimer::take(bool fromISR) {
+    bool JSTimer::take(bool fromISR, bool createWhenFirst) {
 #ifdef ESP_PLATFORM
         bool toke = false ; 
-        if(xMutex) {
-            xMutex = xSemaphoreCreateMutex();
+        if(!xMutex) {
+            if(createWhenFirst) {
+                xMutex = xSemaphoreCreateMutex();
+            }else{
+                return false ;
+            }
         }
         if(xMutex) {
             if(fromISR) {
