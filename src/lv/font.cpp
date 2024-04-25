@@ -10,7 +10,7 @@ namespace be::lv {
     static map<string, lv_font_t *> loadedFonts ;
     
     JSValue LVModule::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2) 
+        ASSERT_ARGC(2) 
         ARGV_TO_CSTRING(0, name) 
         ARGV_TO_CSTRING(1, cpath)
 

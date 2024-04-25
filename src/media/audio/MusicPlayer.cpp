@@ -68,7 +68,7 @@ namespace be::media {
         if(player->pipe.running) {
             JSTHROW("player is running")
         }
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         string path = be::FS::toVFSPath(ctx, argv[0]) ;
         player->build_el_src(1) ;
         player->build_el_mp3(1) ;

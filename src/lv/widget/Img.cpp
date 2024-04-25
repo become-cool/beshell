@@ -357,7 +357,7 @@ namespace be::lv {
     #ifndef METHOD_Img_setPivot
     JSValue Img::setPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Img","setPivot","number")

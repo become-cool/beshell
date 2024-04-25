@@ -24,7 +24,7 @@ namespace be::driver {
 
     JSValue I2CDevice::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2CDevice, thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, busnum)
         ARGV_TO_UINT8(1, addr)
         I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;

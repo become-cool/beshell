@@ -48,7 +48,7 @@ static JSValue js_camera_setup(JSContext *ctx, JSValueConst this_val, int argc, 
         JSTHROW("camera device has setuped.")
     }
 
-    CHECK_ARGC(1)
+    ASSERT_ARGC(1)
     if( !JS_IsObject(argv[0]) ) {
         JSTHROW("setup param must be a object")
     }
@@ -214,7 +214,7 @@ esp_err_t ws_rtc_camera_stream(httpd_req_t *req) {
 static httpd_handle_t stream_httpd = NULL;
 
 static JSValue js_camera_start_http_stream(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    CHECK_ARGC(1)
+    ASSERT_ARGC(1)
     ARGV_TO_INT32(0, port)
     
     if(!wifi_has_inited() || stream_httpd) {
@@ -334,7 +334,7 @@ static void task_camera_tcp_stream(void * data) {
 }
 
 static JSValue js_camera_start_tcp_stream(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    CHECK_ARGC(1)
+    ASSERT_ARGC(1)
     ARGV_TO_CSTRING_E(0, url, "invalid url")
     
     if(task_cam_tcp_handle) {
@@ -364,7 +364,7 @@ static JSValue js_camera_unsetup(JSContext *ctx, JSValueConst this_val, int argc
 }
 
 static JSValue js_camera_capture(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    CHECK_ARGC(0)
+    ASSERT_ARGC(0)
     
     if(!inited) {
         JSTHROW("camera device not setup yet.")
@@ -392,7 +392,7 @@ static JSValue js_camera_capture(JSContext *ctx, JSValueConst this_val, int argc
 }
 
 static JSValue js_camera_jpeg2rgb888(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    CHECK_ARGC(2)
+    ASSERT_ARGC(2)
 
     // JSValue propWidth = JS_GetPropertyStr(ctx, argv[0], "width") ;
     // JSValue propHeight = JS_GetPropertyStr(ctx, argv[0], "height") ;

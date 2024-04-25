@@ -84,21 +84,21 @@ namespace be::lv {
         return JS_DupValue(ctx,Obj::wrap(ctx,lvobj)->jsobj) ;
     }
     JSValue LVModule::load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(Obj, argv[0], obj)
         lv_screen_load(obj->lvobj()) ;
         return JS_UNDEFINED ;
     }
     
     JSValue LVModule::pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT16(0,val)
         return JS_NewUint32(ctx,LV_PCT(val)) ;
     }
 
 
     JSValue LVModule::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::display::Display, argv[0], display)
         return JS_NewBool(ctx, display->registerToLV()) ;
     }
@@ -220,7 +220,7 @@ namespace be::lv {
     } _lv_indev_t ;
 
     JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
 
         // @todo

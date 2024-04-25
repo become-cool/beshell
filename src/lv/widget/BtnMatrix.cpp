@@ -116,7 +116,7 @@ namespace be::lv {
     #ifndef METHOD_BtnMatrix_setButtonCtrl
     JSValue BtnMatrix::setButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t btn_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","setButtonCtrl","number")
@@ -138,7 +138,7 @@ namespace be::lv {
     #ifndef METHOD_BtnMatrix_clearButtonCtrl
     JSValue BtnMatrix::clearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t btn_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","clearButtonCtrl","number")
@@ -160,7 +160,7 @@ namespace be::lv {
     #ifndef METHOD_BtnMatrix_clearButtonCtrlAll
     JSValue BtnMatrix::clearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv ctrl
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_buttonmatrix_ctrl_t ctrl;
@@ -178,7 +178,7 @@ namespace be::lv {
     #ifndef METHOD_BtnMatrix_setButtonWidth
     JSValue BtnMatrix::setButtonWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t btn_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","setButtonWidth","number")
@@ -198,7 +198,7 @@ namespace be::lv {
     #ifndef METHOD_BtnMatrix_hasButtonCtrl
     JSValue BtnMatrix::hasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t btn_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &btn_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","btn_id","BtnMatrix","hasButtonCtrl","number")

@@ -37,7 +37,7 @@ namespace be::driver {
      * } 
      */
     JSValue SDCard::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         spi_host_device_t GET_INT32_PROP(argv[0], "spi", spi, )
         gpio_num_t GET_INT32_PROP(argv[0], "cs", cs, )

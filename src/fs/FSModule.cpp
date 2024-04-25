@@ -79,7 +79,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
 
@@ -98,7 +98,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         bool recursive = false ;
@@ -116,7 +116,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         return (unlink(path.c_str())>=0)? JS_TRUE: JS_FALSE ;
@@ -139,7 +139,7 @@ namespace be {
      */
     JSValue FSModule:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
 
@@ -196,7 +196,7 @@ namespace be {
      */
     JSValue FSModule:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         FETCH_FS
         ARGV_PATH(path, 0)
 
@@ -265,7 +265,7 @@ namespace be {
      */
     JSValue FSModule:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
 
@@ -348,7 +348,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
 
@@ -373,7 +373,7 @@ namespace be {
      */
     JSValue FSModule:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(oldpath, 0)
         ARGV_PATH(newpath, 1)
@@ -393,7 +393,7 @@ namespace be {
      * @return null|{dev:number,ino:number,mode:number,size:number,isDir:bool,atime:number,mtime:number,ctime:number}
      */
     JSValue FSModule:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         struct stat statbuf;
@@ -429,7 +429,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         return fs->exist(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -444,7 +444,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         return fs->isFile(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -459,7 +459,7 @@ namespace be {
      * @return bool
      */
     JSValue FSModule::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         FETCH_FS
         ARGV_PATH(path, 0)
         return fs->isDir(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -474,7 +474,7 @@ namespace be {
      */
     JSValue FSModule:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING(0, jslabel)
 
         size_t total = 0 ;
@@ -537,7 +537,7 @@ namespace be {
 
     
     JSValue FSModule::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
         string ARGV_TO_STRING_OPT(1, mode, "rw")
 
@@ -549,7 +549,7 @@ namespace be {
         return JS_NewInt64(ctx, (int64_t)handle) ;
     }
     JSValue FSModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
         ARGV_TO_UINT32(1, length)
 
@@ -561,7 +561,7 @@ namespace be {
         return JS_NewArrayBuffer(ctx, (uint8_t*)buff, readed, freeArrayBuffer, NULL, false) ;
     }
     JSValue FSModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
 
         
@@ -583,26 +583,26 @@ namespace be {
     }
 
     JSValue FSModule::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
         ARGV_TO_UINT32(1, offset)
         ARGV_TO_INT32_OPT(2, whence, SEEK_SET)
         return JS_NewInt32(ctx, fseek((FILE*)handle, offset, whence)) ;
     }
     JSValue FSModule::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
     }
     JSValue FSModule::sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         int fd = fileno((FILE*)handle);
         return JS_NewInt32(ctx, fsync(fd)) ;
     }
 
     JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fclose((FILE*)handle)) ;
     }

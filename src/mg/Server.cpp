@@ -60,7 +60,7 @@ namespace be::mg {
     }
 
     JSValue Server::setHandler(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("arg callback must be a function")
         }
@@ -244,7 +244,7 @@ namespace be::mg {
     */
     JSValue Server::listenHttp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         string addr ;
         JSValue callback = JS_NULL ;
@@ -267,7 +267,7 @@ namespace be::mg {
 
         // addr + callback
         else {
-            CHECK_ARGC(2)
+            ASSERT_ARGC(2)
 
             if( !JS_IsFunction(ctx, argv[1]) ) {
                 JSTHROW("arg callback must be a function") ;

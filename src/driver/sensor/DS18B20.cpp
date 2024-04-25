@@ -39,7 +39,7 @@ namespace be::driver::sensor {
 
     JSValue DS18B20::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(DS18B20, that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         GET_INT32_PROP(argv[0], "pin", that->pin, )
 

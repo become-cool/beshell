@@ -44,7 +44,7 @@ namespace be::lv {
     #ifndef METHOD_List_addText
     JSValue List::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_list_add_text( thisobj->lvobj(), txt ) ;
             JS_FreeCString(ctx, txt) ;
@@ -62,7 +62,7 @@ namespace be::lv {
     #ifndef METHOD_List_setButtonText
     JSValue List::setButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],btn)
         char * txt = (char *)JS_ToCString(ctx, argv[1]) ;
         lv_list_set_button_text( thisobj->lvobj(), btn, txt ) ;

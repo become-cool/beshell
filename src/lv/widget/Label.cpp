@@ -162,7 +162,7 @@ namespace be::lv {
     #ifndef METHOD_Label_insText
     JSValue Label::insText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t pos ;
         if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","insText","number")
@@ -176,7 +176,7 @@ namespace be::lv {
     #ifndef METHOD_Label_cutText
     JSValue Label::cutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t pos ;
         if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","pos","Label","cutText","number")

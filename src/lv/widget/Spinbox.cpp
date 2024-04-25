@@ -129,7 +129,7 @@ namespace be::lv {
     #ifndef METHOD_SpinBox_setDigitFormat
     JSValue SpinBox::setDigitFormat(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t digit_count ;
         if(JS_ToUint32(ctx, (uint32_t *) &digit_count, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","digit_count","SpinBox","setDigitFormat","number")
@@ -146,7 +146,7 @@ namespace be::lv {
     #ifndef METHOD_SpinBox_setRange
     JSValue SpinBox::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t range_min ;
         if(JS_ToInt32(ctx, (int32_t *) &range_min, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","range_min","SpinBox","setRange","number")

@@ -20,7 +20,7 @@ namespace be::sqlite{
         return JS_UNDEFINED ;
     }
     JSValue SQLite3Module::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
         
         sqlite3 * cdb = nullptr ;

@@ -187,7 +187,7 @@ namespace be::lv {
     #ifndef METHOD_Menu_setLoadPageEvent
     JSValue Menu::setLoadPageEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],obj)
         JSVALUE_TO_LVOBJ(argv[1],page)
         lv_menu_set_load_page_event( thisobj->lvobj(), obj, page ) ;
@@ -198,7 +198,7 @@ namespace be::lv {
     #ifndef METHOD_Menu_backButtonIsRoot
     JSValue Menu::backButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         JSVALUE_TO_LVOBJ(argv[0],obj)
         bool retval = lv_menu_back_button_is_root( thisobj->lvobj(), obj ) ;
         JSValue jsretval = JS_NewBool(ctx, retval) ;

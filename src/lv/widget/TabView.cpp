@@ -105,7 +105,7 @@ namespace be::lv {
     #ifndef METHOD_TabView_addTab
     JSValue TabView::addTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * name = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_tabview_add_tab( thisobj->lvobj(), name ) ;
             JS_FreeCString(ctx, name) ;
@@ -117,7 +117,7 @@ namespace be::lv {
     #ifndef METHOD_TabView_renameTab
     JSValue TabView::renameTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t idx ;
         if(JS_ToUint32(ctx, (uint32_t *) &idx, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","idx","TabView","renameTab","number")
@@ -131,7 +131,7 @@ namespace be::lv {
     #ifndef METHOD_TabView_setActive
     JSValue TabView::setActive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t idx ;
         if(JS_ToUint32(ctx, (uint32_t *) &idx, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","idx","TabView","setActive","number")

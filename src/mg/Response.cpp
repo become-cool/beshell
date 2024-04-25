@@ -35,7 +35,7 @@ namespace be::mg {
     {}
 
     JSValue Response::reply(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
         NOT_WS_FUNC("mg.HttpResponse.reply")
         
@@ -71,7 +71,7 @@ namespace be::mg {
 
 
     JSValue Response::redirect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
         const char * url = JS_ToCString(ctx, argv[0]) ;
         
@@ -95,7 +95,7 @@ namespace be::mg {
 
 
     JSValue Response::serveDir(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         THIS_NCLASS(Response, rspn)
         NOT_WS_FUNC("mg.HttpResponse.replay")
 
@@ -114,7 +114,7 @@ namespace be::mg {
 
     JSValue Response::httpUpgrade(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Response, rspn)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         NOT_WS_FUNC("mg.HttpResponse.upgrade")
         JSVALUE_TO_NCLASS(HTTPRequest,argv[0],req)
         struct mg_http_message * msg = req->opaque() ;
@@ -127,7 +127,7 @@ namespace be::mg {
     }
 
     JSValue Response::wsSend(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
         MUST_BE_WS_FUNC("mg.HttpResponse.wsSend")
 

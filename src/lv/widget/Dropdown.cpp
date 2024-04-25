@@ -171,7 +171,7 @@ namespace be::lv {
     #ifndef METHOD_Dropdown_addOption
     JSValue Dropdown::addOption(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         char * option = (char *)JS_ToCString(ctx, argv[0]) ;
         uint32_t pos ;
         if(JS_ToUint32(ctx, (uint32_t *) &pos, argv[1])!=0){
@@ -193,7 +193,7 @@ namespace be::lv {
     #ifndef METHOD_Dropdown_getSelectedStr
     JSValue Dropdown::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         char * buf = (char *)JS_ToCString(ctx, argv[0]) ;
         uint32_t buf_size ;
         if(JS_ToUint32(ctx, (uint32_t *) &buf_size, argv[1])!=0){
@@ -207,7 +207,7 @@ namespace be::lv {
     #ifndef METHOD_Dropdown_getOptionIndex
     JSValue Dropdown::getOptionIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * option = (char *)JS_ToCString(ctx, argv[0]) ;
         int32_t retval = lv_dropdown_get_option_index( thisobj->lvobj(), option ) ;
             JS_FreeCString(ctx, option) ;

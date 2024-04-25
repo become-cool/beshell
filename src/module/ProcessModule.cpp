@@ -57,7 +57,7 @@ namespace be {
 
     JSValue ProcessModule::readEFUSE(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, field)
         if(field>7) {
             JSTHROW("metadata field must 0-7")
@@ -155,7 +155,7 @@ namespace be {
     }
 
     JSValue ProcessModule::setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, ms)
         
         struct timeval tv;

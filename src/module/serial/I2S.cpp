@@ -21,7 +21,7 @@ namespace be {
     JSValue I2S::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         THIS_NCLASS(I2S, that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         i2s_config_t i2s_config = {
             .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX),

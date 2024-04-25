@@ -9,7 +9,7 @@ namespace be::lv {
 
 
     JSValue Obj::style(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(!JS_IsString(argv[0])) {
             JSTHROW("arg %s of method %s.%s() must be a %s","styleName","Obj","style","string")
         }
@@ -84,7 +84,7 @@ namespace be::lv {
     
     JSValue Obj::setStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         JSVALUE_TO_LVOBJ(this_val,lvobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         if(JS_IsObject(argv[0])) {
             ARGV_TO_UINT32_OPT(1, selector, LV_PART_MAIN | LV_STATE_DEFAULT)

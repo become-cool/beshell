@@ -81,7 +81,7 @@ namespace be::lv {
     #ifndef METHOD_MsgBox_addTitle
     JSValue MsgBox::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * title = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_msgbox_add_title( thisobj->lvobj(), title ) ;
             JS_FreeCString(ctx, title) ;
@@ -96,7 +96,7 @@ namespace be::lv {
     #ifndef METHOD_MsgBox_addText
     JSValue MsgBox::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * text = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_msgbox_add_text( thisobj->lvobj(), text ) ;
             JS_FreeCString(ctx, text) ;
@@ -108,7 +108,7 @@ namespace be::lv {
     #ifndef METHOD_MsgBox_addFooterButton
     JSValue MsgBox::addFooterButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * text = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_msgbox_add_footer_button( thisobj->lvobj(), text ) ;
             JS_FreeCString(ctx, text) ;

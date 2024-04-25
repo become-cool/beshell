@@ -246,7 +246,7 @@ namespace be::lv {
     #ifndef METHOD_Arc_setAngles
     JSValue Arc::setAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t start ;
         if(JS_ToInt32(ctx, (int32_t *) &start, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","start","Arc","setAngles","number")
@@ -263,7 +263,7 @@ namespace be::lv {
     #ifndef METHOD_Arc_setBgAngles
     JSValue Arc::setBgAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t start ;
         if(JS_ToInt32(ctx, (int32_t *) &start, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","start","Arc","setBgAngles","number")
@@ -280,7 +280,7 @@ namespace be::lv {
     #ifndef METHOD_Arc_setRange
     JSValue Arc::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t min ;
         if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","min","Arc","setRange","number")
@@ -297,7 +297,7 @@ namespace be::lv {
     #ifndef METHOD_Arc_alignObjToAngle
     JSValue Arc::alignObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],obj_to_align)
         int32_t r_offset ;
         if(JS_ToInt32(ctx, (int32_t *) &r_offset, argv[1])!=0){
@@ -311,7 +311,7 @@ namespace be::lv {
     #ifndef METHOD_Arc_rotateObjToAngle
     JSValue Arc::rotateObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],obj_to_rotate)
         int32_t r_offset ;
         if(JS_ToInt32(ctx, (int32_t *) &r_offset, argv[1])!=0){

@@ -69,7 +69,7 @@ namespace be {
      */
     JSValue SPI::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         THIS_NCLASS(SPI, that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         gpio_num_t GET_INT32_PROP_OPT(argv[0], "miso", misopin, GPIO_NUM_NC)
         gpio_num_t GET_INT32_PROP_OPT(argv[0], "mosi", mosipin, GPIO_NUM_NC)
@@ -106,7 +106,7 @@ namespace be {
     // JSValue SPI::addDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
     //     spi_device_handle_t handle = NULL ;
-    //     CHECK_ARGC(3)
+    //     ASSERT_ARGC(3)
     //     ARGV_TO_UINT8(0, cspin)
     //     ARGV_TO_INT32(1, freq)
     //     ARGV_TO_UINT8(2, mode)
@@ -141,7 +141,7 @@ namespace be {
     //  * length?
     //  */
     // JSValue SPI::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     CHECK_ARGC(2)
+    //     ASSERT_ARGC(2)
     //     ARGV_TO_SPI_HANDLE(0, handle)
 
     //     int offset = 0 ;
@@ -221,7 +221,7 @@ namespace be {
     //  * u8
     //  */
     // JSValue SPI::sendU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     CHECK_ARGC(2)
+    //     ASSERT_ARGC(2)
     //     ARGV_TO_SPI_HANDLE(0, handle)
 
     //     uint8_t in = 0 ;
@@ -241,7 +241,7 @@ namespace be {
     //  * u16
     //  */
     // JSValue SPI::sendU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     CHECK_ARGC(2)
+    //     ASSERT_ARGC(2)
     //     ARGV_TO_SPI_HANDLE(0, handle)
 
     //     uint16_t in = 0 ;
@@ -261,7 +261,7 @@ namespace be {
     //  * u32
     //  */
     // JSValue SPI::sendU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     CHECK_ARGC(2)
+    //     ASSERT_ARGC(2)
     //     ARGV_TO_SPI_HANDLE(0, handle)
     //     ARGV_TO_UINT32(1, val)
 
@@ -284,7 +284,7 @@ namespace be {
             return JS_NewInt32(ctx, in) ;
 
     #define SPI_TRANS_FUNC(type, bit_length) \
-        CHECK_ARGC(1) \
+        ASSERT_ARGC(1) \
         ARGV_TO_SPI_HANDLE(0, handle) \
         type in_var = 0 ; \
         if( argc>1 && !JS_IsUndefined(argv[1]) && !JS_IsUndefined(argv[1]) ) { \
@@ -311,7 +311,7 @@ namespace be {
 
 /*
     #define SPI_RECV_FUNC(type, bit_length)         \
-        CHECK_ARGC(1)                               \
+        ASSERT_ARGC(1)                               \
         ARGV_TO_SPI_HANDLE(0, handle)               \
         type in_var = 0 ;                           \
         SPI_TRANS(handle, in_var, NULL, bit_length)

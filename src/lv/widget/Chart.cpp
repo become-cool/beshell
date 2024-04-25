@@ -140,7 +140,7 @@ namespace be::lv {
     #ifndef METHOD_Chart_setRange
     JSValue Chart::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         // argv axis
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_chart_axis_t axis;
@@ -166,7 +166,7 @@ namespace be::lv {
     #ifndef METHOD_Chart_setDivLineCount
     JSValue Chart::setDivLineCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint8_t hdiv ;
         if(JS_ToUint32(ctx, (uint32_t *) &hdiv, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","hdiv","Chart","setDivLineCount","number")

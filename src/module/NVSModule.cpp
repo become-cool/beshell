@@ -62,7 +62,7 @@ using namespace std ;
 
 #define NVS_INT_JS_GETTER(name,ctype,jstype)                        \
     JSValue NVSModule::read##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
-        CHECK_ARGC(1)                           \
+        ASSERT_ARGC(1)                           \
         ARGV_TO_CSTRING(0,key)                  \
         ctype value = 0 ;                       \
         if(read##name(key, value, "beshell")){  \
@@ -75,7 +75,7 @@ using namespace std ;
 
 #define NVS_INT_JS_SETTER(name,ctype,jstype,apitype)               \
     JSValue NVSModule::write##name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {    \
-        CHECK_ARGC(2)                                                   \
+        ASSERT_ARGC(2)                                                   \
         ARGV_TO_CSTRING(0,key)                                          \
         ctype value = 0 ;                                               \
         if(JS_To##jstype(ctx, (apitype*)&value, argv[1])!=0) {          \
@@ -188,7 +188,7 @@ namespace be {
     NVS_INT_JS_SETTER(Uint32, uint32_t, Uint32, uint32_t)
 
     JSValue NVSModule::erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
 #ifdef ESP_PLATFORM
         ARGV_TO_CSTRING(0,key)
@@ -212,7 +212,7 @@ namespace be {
     }
 
     JSValue NVSModule::readString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         string ARGV_TO_STRING(0,key)
         ARGV_TO_UINT32_OPT(1,buff_size,128)
 
@@ -256,7 +256,7 @@ namespace be {
     }
 
     JSValue NVSModule::writeString(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         string ARGV_TO_STRING(0,key)
         string ARGV_TO_STRING(1,value)
 

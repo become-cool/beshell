@@ -45,7 +45,7 @@ namespace be::mg {
     }
     JSValue HTTPRequest::header(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0,name, "arg headerName must be a string")
         struct mg_str * val = mg_http_get_header(req->mg_msg, name) ;
         JS_FreeCString(ctx, name) ;
@@ -81,7 +81,7 @@ namespace be::mg {
         return JS_NewStringLen(ctx, req->mg_msg->head.ptr, req->mg_msg->head.len) ;
     }
     JSValue HTTPRequest::match_uri(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(HTTPRequest,req)
         ARGV_TO_CSTRING(0, uri) ;
         bool ret = mg_http_match_uri(req->mg_msg, uri) ;

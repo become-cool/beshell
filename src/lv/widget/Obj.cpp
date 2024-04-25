@@ -345,7 +345,7 @@ namespace be::lv {
     JSValue Obj::animation(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,that)
 
-        CHECK_ARGC(4)
+        ASSERT_ARGC(4)
         string ARGV_TO_STRING(0, propName)
         ARGV_TO_INT32(1, valueFrom)
         ARGV_TO_INT32(2, valueTo)
@@ -873,7 +873,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_addFlag
     JSValue Obj::addFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv f
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_obj_flag_t f;
@@ -891,7 +891,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_removeFlag
     JSValue Obj::removeFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv f
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_obj_flag_t f;
@@ -909,7 +909,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_updateFlag
     JSValue Obj::updateFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         // argv f
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_obj_flag_t f;
@@ -928,7 +928,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_addState
     JSValue Obj::addState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv state
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_state_t state;
@@ -946,7 +946,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_removeState
     JSValue Obj::removeState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv state
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_state_t state;
@@ -964,7 +964,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setState
     JSValue Obj::setState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         // argv state
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_state_t state;
@@ -983,7 +983,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_hasFlag
     JSValue Obj::hasFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv f
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_obj_flag_t f;
@@ -1002,7 +1002,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_hasFlagAny
     JSValue Obj::hasFlagAny(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv f
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_obj_flag_t f;
@@ -1021,7 +1021,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_hasState
     JSValue Obj::hasState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv state
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_state_t state;
@@ -1107,7 +1107,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_calculateExtDrawSize
     JSValue Obj::calculateExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t part ;
         if(JS_ToUint32(ctx, (uint32_t *) &part, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","part","Obj","calculateExtDrawSize","number")
@@ -1141,7 +1141,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_removeEvent
     JSValue Obj::removeEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t index ;
         if(JS_ToUint32(ctx, (uint32_t *) &index, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","removeEvent","number")
@@ -1161,7 +1161,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setPos
     JSValue Obj::setPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","setPos","number")
@@ -1178,7 +1178,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setSize
     JSValue Obj::setSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t w ;
         if(JS_ToInt32(ctx, (int32_t *) &w, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","w","Obj","setSize","number")
@@ -1229,7 +1229,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_alignTo
     JSValue Obj::alignTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(4)
+        ASSERT_ARGC(4)
         JSVALUE_TO_LVOBJ(argv[0],base)
         // argv align
         const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
@@ -1279,7 +1279,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_moveTo
     JSValue Obj::moveTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","moveTo","number")
@@ -1296,7 +1296,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_moveChildrenBy
     JSValue Obj::moveChildrenBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         int32_t x_diff ;
         if(JS_ToInt32(ctx, (int32_t *) &x_diff, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x_diff","Obj","moveChildrenBy","number")
@@ -1361,7 +1361,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollBy
     JSValue Obj::scrollBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollBy","number")
@@ -1387,7 +1387,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollByBounded
     JSValue Obj::scrollByBounded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         int32_t dx ;
         if(JS_ToInt32(ctx, (int32_t *) &dx, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","dx","Obj","scrollByBounded","number")
@@ -1413,7 +1413,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollTo
     JSValue Obj::scrollTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollTo","number")
@@ -1439,7 +1439,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollToX
     JSValue Obj::scrollToX(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Obj","scrollToX","number")
@@ -1461,7 +1461,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollToY
     JSValue Obj::scrollToY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t y ;
         if(JS_ToInt32(ctx, (int32_t *) &y, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","y","Obj","scrollToY","number")
@@ -1483,7 +1483,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollToView
     JSValue Obj::scrollToView(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv anim_en
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_anim_enable_t anim_en;
@@ -1501,7 +1501,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_scrollToViewRecursive
     JSValue Obj::scrollToViewRecursive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv anim_en
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_anim_enable_t anim_en;
@@ -1528,7 +1528,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_updateSnap
     JSValue Obj::updateSnap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv anim_en
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_anim_enable_t anim_en;
@@ -1557,7 +1557,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_readjustScroll
     JSValue Obj::readjustScroll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         // argv anim_en
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_anim_enable_t anim_en;
@@ -1616,7 +1616,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_fadeIn
     JSValue Obj::fadeIn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t time ;
         if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeIn","number")
@@ -1633,7 +1633,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_fadeOut
     JSValue Obj::fadeOut(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t time ;
         if(JS_ToUint32(ctx, (uint32_t *) &time, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","time","Obj","fadeOut","number")
@@ -1996,7 +1996,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_deleteDelayed
     JSValue Obj::deleteDelayed(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t delay_ms ;
         if(JS_ToUint32(ctx, (uint32_t *) &delay_ms, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","delay_ms","Obj","deleteDelayed","number")
@@ -2020,7 +2020,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_swap
     JSValue Obj::swap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         JSVALUE_TO_LVOBJ(argv[0],obj2)
         lv_obj_swap( thisobj->lvobj(), obj2 ) ;
         return JS_UNDEFINED ;
@@ -2030,7 +2030,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_moveToIndex
     JSValue Obj::moveToIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         int32_t index ;
         if(JS_ToInt32(ctx, (int32_t *) &index, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","index","Obj","moveToIndex","number")
@@ -2043,7 +2043,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_getChild
     JSValue Obj::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         int32_t idx ;
         if(JS_ToInt32(ctx, (int32_t *) &idx, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","idx","Obj","getChild","number")
@@ -2060,7 +2060,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_getSibling
     JSValue Obj::getSibling(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         int32_t idx ;
         if(JS_ToInt32(ctx, (int32_t *) &idx, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","idx","Obj","getSibling","number")
@@ -2097,7 +2097,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setFlexAlign
     JSValue Obj::setFlexAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         // argv main_place
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_flex_align_t main_place;
@@ -2136,7 +2136,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setGridAlign
     JSValue Obj::setGridAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         // argv column_align
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_grid_align_t column_align;
@@ -2163,7 +2163,7 @@ namespace be::lv {
     #ifndef METHOD_Obj_setGridCell
     JSValue Obj::setGridCell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(6)
+        ASSERT_ARGC(6)
         // argv column_align
         const char * cstr_argv_0_ = JS_ToCString(ctx, argv[0]) ;
         lv_grid_align_t column_align;

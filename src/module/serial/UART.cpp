@@ -49,7 +49,7 @@ namespace be{
      */
     JSValue UART::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, tx)
         ARGV_TO_UINT8(1, rx)
         ARGV_TO_UINT32_OPT(2, baudrate, 115200)
@@ -86,7 +86,7 @@ namespace be{
      */
     JSValue UART::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT32(0, len) ;
         ARGV_TO_UINT32_OPT(1, timeout, 20) ;
 
@@ -101,7 +101,7 @@ namespace be{
 
     JSValue UART::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
@@ -159,7 +159,7 @@ namespace be{
     #define DATA_QUEUE_LEN 10
     JSValue UART::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("arg callback must be a function")
         }

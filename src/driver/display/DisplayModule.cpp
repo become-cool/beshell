@@ -42,14 +42,14 @@ namespace be::driver::display {
     }
 
     JSValue DisplayModule::jsFromRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)
         return JS_NewUint32(ctx, fromRGB(r,g,b)) ;
     }
     JSValue DisplayModule::jsFromRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)

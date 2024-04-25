@@ -89,7 +89,7 @@ namespace be::lv {
     #ifndef METHOD_Table_setCellValue
     JSValue Table::setCellValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t row ;
         if(JS_ToUint32(ctx, (uint32_t *) &row, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","row","Table","setCellValue","number")
@@ -110,7 +110,7 @@ namespace be::lv {
     #ifndef METHOD_Table_setColumnWidth
     JSValue Table::setColumnWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t col_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &col_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","col_id","Table","setColumnWidth","number")
@@ -127,7 +127,7 @@ namespace be::lv {
     #ifndef METHOD_Table_addCellCtrl
     JSValue Table::addCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t row ;
         if(JS_ToUint32(ctx, (uint32_t *) &row, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","row","Table","addCellCtrl","number")
@@ -153,7 +153,7 @@ namespace be::lv {
     #ifndef METHOD_Table_clearCellCtrl
     JSValue Table::clearCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t row ;
         if(JS_ToUint32(ctx, (uint32_t *) &row, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","row","Table","clearCellCtrl","number")
@@ -185,7 +185,7 @@ namespace be::lv {
     #ifndef METHOD_Table_getColumnWidth
     JSValue Table::getColumnWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t col ;
         if(JS_ToUint32(ctx, (uint32_t *) &col, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","col","Table","getColumnWidth","number")
@@ -199,7 +199,7 @@ namespace be::lv {
     #ifndef METHOD_Table_hasCellCtrl
     JSValue Table::hasCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t row ;
         if(JS_ToUint32(ctx, (uint32_t *) &row, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","row","Table","hasCellCtrl","number")

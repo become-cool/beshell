@@ -102,7 +102,7 @@ namespace be::lv {
     #ifndef METHOD_Bar_setValue
     JSValue Bar::setValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t value ;
         if(JS_ToInt32(ctx, (int32_t *) &value, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","value","Bar","setValue","number")
@@ -124,7 +124,7 @@ namespace be::lv {
     #ifndef METHOD_Bar_setStartValue
     JSValue Bar::setStartValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t start_value ;
         if(JS_ToInt32(ctx, (int32_t *) &start_value, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","start_value","Bar","setStartValue","number")
@@ -146,7 +146,7 @@ namespace be::lv {
     #ifndef METHOD_Bar_setRange
     JSValue Bar::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t min ;
         if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","min","Bar","setRange","number")

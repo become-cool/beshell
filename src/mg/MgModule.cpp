@@ -155,7 +155,7 @@ namespace be::mg {
 
     // JSValue MgModule::sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-    //     CHECK_ARGC(2)
+    //     ASSERT_ARGC(2)
 
     //     ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
     //     if(!JS_IsFunction(ctx, argv[1])) {
@@ -191,7 +191,7 @@ namespace be::mg {
 
     JSValue MgModule::connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT16(0, idx)
 
         struct mg_connection * conn = mgr.conns ;
@@ -222,7 +222,7 @@ namespace be::mg {
     }
 
     JSValue MgModule::parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0,url,"arg url must be a string")
 
         JSValue obj = JS_NewObject(ctx) ;
@@ -238,7 +238,7 @@ namespace be::mg {
     }
 
     JSValue MgModule::setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0, log, "arg loglevel must be a string")
 
         mg_log_set(log) ;

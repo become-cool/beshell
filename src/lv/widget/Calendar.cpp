@@ -69,7 +69,7 @@ namespace be::lv {
     #ifndef METHOD_Calendar_setTodayDate
     JSValue Calendar::setTodayDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t year ;
         if(JS_ToUint32(ctx, (uint32_t *) &year, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","year","Calendar","setTodayDate","number")
@@ -90,7 +90,7 @@ namespace be::lv {
     #ifndef METHOD_Calendar_setShowedDate
     JSValue Calendar::setShowedDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t year ;
         if(JS_ToUint32(ctx, (uint32_t *) &year, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","year","Calendar","setShowedDate","number")
@@ -131,7 +131,7 @@ namespace be::lv {
     #ifndef METHOD_Calendar_headerDropdownSetYearList
     JSValue Calendar::headerDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * years_list = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_calendar_header_dropdown_set_year_list( thisobj->lvobj(), years_list ) ;
         return JS_UNDEFINED ;

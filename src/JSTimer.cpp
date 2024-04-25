@@ -108,7 +108,7 @@ namespace be {
 
     static inline JSValue __js_set_timeout(JSContext *ctx, int argc, JSValueConst *argv, bool repeat){
         CHECK_ENGINE
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
 
         if(!JS_IsFunction(ctx, argv[0])) {
             JSTHROW("arg callback is not a function")
@@ -135,7 +135,7 @@ namespace be {
 
     JSValue JSTimer::jsSetImmediate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ENGINE
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(!JS_IsFunction(ctx, argv[0])) {
             JSTHROW("arg callback is not a function")
         }
@@ -148,7 +148,7 @@ namespace be {
     }
     JSValue JSTimer::jsClearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ENGINE
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT32(0, id)
         engine->timer.removeTimer(ctx, id) ;
         return JS_UNDEFINED ;

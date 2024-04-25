@@ -30,7 +30,7 @@ namespace be {
         }
         
         static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            CHECK_ARGC(1)
+            ASSERT_ARGC(1)
             const char * modulename = JS_ToCString(ctx, argv[0]) ;
 
             JSAtom atom = JS_GetScriptOrModuleName(ctx, 1) ;

@@ -32,7 +32,7 @@ namespace be::mg {
     }
     
     JSValue Client::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(Client,client)
 
         ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
@@ -50,7 +50,7 @@ namespace be::mg {
 
 
     JSValue Client::initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0, host, "arg host must be a string")
 
         THIS_NCLASS(Client,client)
@@ -145,7 +145,7 @@ namespace be::mg {
     
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         if( !JS_IsFunction(ctx, argv[1]) ) {
             JSTHROW("arg callback must be a function")
         }

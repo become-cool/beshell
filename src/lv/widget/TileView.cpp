@@ -49,7 +49,7 @@ namespace be::lv {
     #ifndef METHOD_TileView_addTile
     JSValue TileView::addTile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint8_t col_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &col_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","col_id","TileView","addTile","number")
@@ -76,7 +76,7 @@ namespace be::lv {
     #ifndef METHOD_TileView_setTile
     JSValue TileView::setTile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],tile_obj)
         // argv anim_en
         const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
@@ -95,7 +95,7 @@ namespace be::lv {
     #ifndef METHOD_TileView_setTileByIndex
     JSValue TileView::setTileByIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         uint32_t col_id ;
         if(JS_ToUint32(ctx, (uint32_t *) &col_id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","col_id","TileView","setTileByIndex","number")

@@ -189,7 +189,7 @@ namespace be::lv {
     #ifndef METHOD_Span_getChild
     JSValue Span::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         int32_t id ;
         if(JS_ToInt32(ctx, (int32_t *) &id, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","id","Span","getChild","number")
@@ -203,7 +203,7 @@ namespace be::lv {
     #ifndef METHOD_Span_getExpandWidth
     JSValue Span::getExpandWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t max_width ;
         if(JS_ToUint32(ctx, (uint32_t *) &max_width, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","max_width","Span","getExpandWidth","number")
@@ -217,7 +217,7 @@ namespace be::lv {
     #ifndef METHOD_Span_getExpandHeight
     JSValue Span::getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         int32_t width ;
         if(JS_ToInt32(ctx, (int32_t *) &width, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","width","Span","getExpandHeight","number")

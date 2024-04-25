@@ -272,7 +272,7 @@ namespace be::lv {
     #ifndef METHOD_TextArea_addChar
     JSValue TextArea::addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         uint32_t c ;
         if(JS_ToUint32(ctx, (uint32_t *) &c, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","c","TextArea","addChar","number")
@@ -285,7 +285,7 @@ namespace be::lv {
     #ifndef METHOD_TextArea_addText
     JSValue TextArea::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_textarea_add_text( thisobj->lvobj(), txt ) ;
         return JS_UNDEFINED ;

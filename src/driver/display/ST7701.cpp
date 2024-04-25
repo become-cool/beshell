@@ -38,7 +38,7 @@ namespace be::driver::display {
 
     JSValue ST7701::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(ST7701,that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         if( JS_IsException(RGB565::setup(ctx, this_val, argc, argv)) ) {
             return JS_EXCEPTION ;

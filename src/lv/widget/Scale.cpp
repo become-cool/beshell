@@ -188,7 +188,7 @@ namespace be::lv {
     #ifndef METHOD_Scale_setRange
     JSValue Scale::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         int32_t min ;
         if(JS_ToInt32(ctx, (int32_t *) &min, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","min","Scale","setRange","number")
@@ -205,7 +205,7 @@ namespace be::lv {
     #ifndef METHOD_Scale_setLineNeedleValue
     JSValue Scale::setLineNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(3)
+        ASSERT_ARGC(3)
         JSVALUE_TO_LVOBJ(argv[0],needle_line)
         int32_t needle_length ;
         if(JS_ToInt32(ctx, (int32_t *) &needle_length, argv[1])!=0){
@@ -223,7 +223,7 @@ namespace be::lv {
     #ifndef METHOD_Scale_setImageNeedleValue
     JSValue Scale::setImageNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         JSVALUE_TO_LVOBJ(argv[0],needle_img)
         int32_t value ;
         if(JS_ToInt32(ctx, (int32_t *) &value, argv[1])!=0){

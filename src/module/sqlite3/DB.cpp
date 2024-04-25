@@ -50,7 +50,7 @@ namespace be::sqlite{
         if( !thisdb->db ) {
             JSTHROW("db not open")
         }
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         string ARGV_TO_STRING(0, sql)
         
         sql_exec_opaque_t opa ;

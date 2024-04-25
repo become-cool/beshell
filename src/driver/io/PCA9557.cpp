@@ -119,7 +119,7 @@ namespace be::driver {
     
     JSValue PCA9557::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(PCA9557, thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, busnum)
         ARGV_TO_UINT8_OPT(1, addr, 0x38)
         I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;

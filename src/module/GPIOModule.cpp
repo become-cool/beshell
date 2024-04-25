@@ -37,7 +37,7 @@ function (gpio,time) {
     }
 
     JSValue GPIOModule::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         const char * mode = JS_ToCString(ctx, argv[1]) ;
 
@@ -99,7 +99,7 @@ function (gpio,time) {
      * @return undefined
      */
     JSValue GPIOModule::pull(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_CSTRING(1, mode)
 
@@ -128,13 +128,13 @@ function (gpio,time) {
         return JS_UNDEFINED ;
     }
     JSValue GPIOModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_UINT8(1, value)
         return gpio_set_level((gpio_num_t)pin, value)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
     JSValue GPIOModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, pin)
         gpio_get_level((gpio_num_t)pin);
         return JS_NewUint32(ctx, gpio_get_level((gpio_num_t)pin)) ;
@@ -147,7 +147,7 @@ function (gpio,time) {
     }
     
     JSValue GPIOModule::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, adc)
         ARGV_TO_UINT8(1, bits)
         if(adc!=1) {
@@ -192,7 +192,7 @@ function (gpio,time) {
         }
     JSValue GPIOModule::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_UINT8(1, atten)
 

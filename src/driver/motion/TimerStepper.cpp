@@ -288,7 +288,7 @@ namespace be::driver::motion {
      */
     JSValue TimerStepper::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         JSValue optPin = JS_GetPropertyStr(ctx, argv[0], "pin") ;
         if( !JS_IsObject(optPin) ) {
@@ -454,7 +454,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::runTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(stepper->is_running) {
             JSTHROW("stepper is running already")
         }
@@ -476,7 +476,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::runSteps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(stepper->is_running) {
             JSTHROW("stepper is running already")
         }
@@ -519,7 +519,7 @@ namespace be::driver::motion {
     }
 
     JSValue TimerStepper::setFreq(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(TimerStepper, stepper)
         ARGV_TO_INT32(0, freq) ;
         SET_FREQ(freq) ;
@@ -531,7 +531,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::setAccel(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
     
         ARGV_TO_INT32(0, accel) ;
         if(accel<0) {
@@ -558,7 +558,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::setPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, pos) ;
         stepper->_pos = pos ;
         return JS_UNDEFINED ;
@@ -581,7 +581,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::setPassing(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, passing) ;
         stepper->_passing = passing ;
         stepper->use_passing = true ;
@@ -594,7 +594,7 @@ namespace be::driver::motion {
     }
     JSValue TimerStepper::calculateTravelTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_INT64(0, steps)
         
         float accel_time = 0 ;

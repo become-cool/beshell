@@ -125,7 +125,7 @@ namespace be::driver {
 
     JSValue GT911::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(GT911, thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         int GET_INT32_PROP_OPT(argv[0], "i2c", i2cnum, 0)
         GET_INT32_PROP_OPT(argv[1], "addr", thisobj->addr, -1)

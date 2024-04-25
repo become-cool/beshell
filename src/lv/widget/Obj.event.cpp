@@ -58,7 +58,7 @@ namespace be::lv {
     }
     JSValue Obj::enableEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         lv_event_code_t event ;
         if(!lv_event_code_jsstr_to_const(ctx, argv[0], &event)) {
             return JS_UNDEFINED ;

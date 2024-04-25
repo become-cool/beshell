@@ -36,7 +36,7 @@ namespace be::driver::display {
         if(!disp) {
             JSTHROW("not a valid object")
         }
-        CHECK_ARGC(5)
+        ASSERT_ARGC(5)
         ARGV_TO_INT16(0,x1)
         ARGV_TO_INT16(1,y1)
         ARGV_TO_INT16(2,x2)

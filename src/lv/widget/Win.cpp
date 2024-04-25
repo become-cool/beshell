@@ -58,7 +58,7 @@ namespace be::lv {
     #ifndef METHOD_Win_addTitle
     JSValue Win::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         char * txt = (char *)JS_ToCString(ctx, argv[0]) ;
         lv_obj_t * retval = lv_win_add_title( thisobj->lvobj(), txt ) ;
             JS_FreeCString(ctx, txt) ;

@@ -62,7 +62,7 @@ namespace be::lv {
     #ifndef METHOD_Canvas_setPx
     JSValue Canvas::setPx(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(4)
+        ASSERT_ARGC(4)
         int32_t x ;
         if(JS_ToInt32(ctx, (int32_t *) &x, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","x","Canvas","setPx","number")
@@ -101,7 +101,7 @@ namespace be::lv {
     #ifndef METHOD_Canvas_fillBg
     JSValue Canvas::fillBg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         lv_color_t color ;
         if(JS_ToUint32(ctx, (uint32_t *) &color, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","color","Canvas","fillBg","number")

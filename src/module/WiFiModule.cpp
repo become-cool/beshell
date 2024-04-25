@@ -276,7 +276,7 @@ namespace be {
      */
     JSValue WiFiModule::setPS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT32(0, ps_mode)
         return JS_NewInt32(ctx, esp_wifi_set_ps((wifi_ps_type_t)ps_mode)) ;
     }
@@ -411,7 +411,7 @@ namespace be {
      */
     JSValue WiFiModule::setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(!JS_IsObject(argv[0])) {
             JSTHROW("missing options arg")
         }
@@ -467,7 +467,7 @@ namespace be {
      */
     JSValue WiFiModule::setStaConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if(!JS_IsObject(argv[0])) {
             JSTHROW("missing options arg")
         }
@@ -506,7 +506,7 @@ namespace be {
      */
     JSValue WiFiModule::config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0,netif)
 
         wifi_config_t conf ;
@@ -591,7 +591,7 @@ namespace be {
      */
     JSValue WiFiModule::getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0,type)
 
         esp_netif_ip_info_t ipinfo;
@@ -630,7 +630,7 @@ namespace be {
      */
     JSValue WiFiModule::setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         const char * hostname = JS_ToCString(ctx, argv[0]) ;
         esp_netif_set_hostname(netif_sta, hostname);
@@ -683,7 +683,7 @@ namespace be {
         return arr ;
     }
     JSValue WiFiModule::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("wifi event handle must be a function")
         }

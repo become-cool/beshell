@@ -40,7 +40,7 @@ namespace be::lv {
     #ifndef METHOD_Spinner_setAnimParams
     JSValue Spinner::setAnimParams(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t t ;
         if(JS_ToUint32(ctx, (uint32_t *) &t, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","t","Spinner","setAnimParams","number")

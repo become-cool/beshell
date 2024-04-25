@@ -100,7 +100,7 @@ namespace be {
      */
     JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         gpio_num_t GET_INT32_PROP(argv[0], "sda", sda, )
         gpio_num_t GET_INT32_PROP(argv[0], "scl", scl, )
@@ -184,7 +184,7 @@ namespace be {
     }
 
     JSValue I2C::ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(I2C, that)
         JSCHECK_MASTER
         ARGV_TO_UINT8(0, addr)
@@ -201,7 +201,7 @@ namespace be {
     }
     
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         THIS_NCLASS(I2C, that)
         JSCHECK_MASTER
         ARGV_TO_UINT8(0, addr)
@@ -229,7 +229,7 @@ namespace be {
     }
 
     #define I2C_WRITE(type, ARGV_CONVERT)   \
-        CHECK_ARGC(3)                       \
+        ASSERT_ARGC(3)                       \
         THIS_NCLASS(I2C, that)              \
         JSCHECK_MASTER                      \
         ARGV_TO_UINT8(0, addr)              \
@@ -248,7 +248,7 @@ namespace be {
     }
 
     JSValue I2C::recv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, addr)
         ARGV_TO_UINT8(1, len)
         THIS_NCLASS(I2C, that)
@@ -268,7 +268,7 @@ namespace be {
     }
 
     JSValue I2C::recvUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, addr)
         THIS_NCLASS(I2C, that)
         JSCHECK_MASTER
@@ -282,7 +282,7 @@ namespace be {
     #define READ_REG(bits)                                      \
         THIS_NCLASS(I2C, that)                                  \
         JSCHECK_MASTER                                          \
-        CHECK_ARGC(3)                                           \
+        ASSERT_ARGC(3)                                           \
         ARGV_TO_UINT8(0, addr)                                  \
         ARGV_TO_UINT##bits(1, reg)                              \
         ARGV_TO_UINT32(2, len)                                  \
@@ -343,7 +343,7 @@ namespace be {
     }
     
     JSValue I2C::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("arg callback must be a function")
         }
@@ -367,7 +367,7 @@ namespace be {
     }
 
     JSValue I2C::slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
         THIS_NCLASS(I2C, that)
 
         int len ;

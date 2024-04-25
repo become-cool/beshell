@@ -95,7 +95,7 @@ namespace be::driver::display {
     JSValue RGB565::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         THIS_NCLASS(RGB565,that)
-        CHECK_ARGC(1)
+        ASSERT_ARGC(1)
 
         GET_INT32_PROP(argv[0], "width", that->_width, )
         GET_INT32_PROP(argv[0], "height", that->_height, )

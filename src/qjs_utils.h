@@ -25,10 +25,11 @@ extern "C" {
     JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
     goto label ;
 
-#define CHECK_ARGC(num)                             \
+#define ASSERT_ARGC(num)                             \
     if(argc<num) {                                  \
         JSTHROW("Missing param")                    \
     }
+#define CHECK_ARGC(num) ASSERT_ARGC(num)
 
 #define ARGV_TO_INT_VAR(i, var, api)                \
 	if( api(ctx, &var, argv[i])!=0 ) {              \

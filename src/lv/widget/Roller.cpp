@@ -78,7 +78,7 @@ namespace be::lv {
     #ifndef METHOD_Roller_setOptions
     JSValue Roller::setOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         char * options = (char *)JS_ToCString(ctx, argv[0]) ;
         // argv mode
         const char * cstr_argv_1_ = JS_ToCString(ctx, argv[1]) ;
@@ -97,7 +97,7 @@ namespace be::lv {
     #ifndef METHOD_Roller_setSelected
     JSValue Roller::setSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         uint32_t sel_opt ;
         if(JS_ToUint32(ctx, (uint32_t *) &sel_opt, argv[0])!=0){
             JSTHROW("arg %s of method %s.%s() must be a %s","sel_opt","Roller","setSelected","number")
@@ -119,7 +119,7 @@ namespace be::lv {
     #ifndef METHOD_Roller_getSelectedStr
     JSValue Roller::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
-        CHECK_ARGC(2)
+        ASSERT_ARGC(2)
         char * buf = (char *)JS_ToCString(ctx, argv[0]) ;
         uint32_t buf_size ;
         if(JS_ToUint32(ctx, (uint32_t *) &buf_size, argv[1])!=0){
