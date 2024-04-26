@@ -2,13 +2,15 @@
 
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
+#include "driver/gpio.h"
 
 namespace be {
-
-
+ 
     class GPIOModule: public be::NativeModule {
+    private:
     public:
         GPIOModule(JSContext * ctx, const char * name) ;
+        static void loop(JSContext *, void * arg) ;
 
         void import(JSContext *ctx) ;
 
@@ -29,6 +31,8 @@ namespace be {
 
         static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        
+        static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
 

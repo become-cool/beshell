@@ -8,7 +8,7 @@ namespace be{
 
     private:
         static const char * deviceJsonPath ;
-    
+
     public:
         static const char * name ;
         DeviceModule(JSContext * ctx, const char * name) ;
