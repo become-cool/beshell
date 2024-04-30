@@ -70,7 +70,7 @@ namespace be {
      * 
      * @beapi fs.mkdirSync
      * @param path:string 路径
-     * @param recursive:bool=false 路径
+     * @param recursive:bool=false 是否递归创建目录
      * @return bool
      */
     JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
