@@ -57,6 +57,15 @@ function (gpio,time) {
         exportValue("blink", jsBlink) ;
     }
 
+    /**
+     * 设置 GPIO 的工作模式
+     * 
+     * @beapi fs.setMode
+     * @param pin:number 引脚序号
+     * @param mode:string 模式, 可用值: "input"|"output"|"output-od"|"input-output"|"input-output-od"
+     * 
+     * @return bool
+     */
     JSValue GPIOModule::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
@@ -114,9 +123,9 @@ function (gpio,time) {
      * * updown 同时上下拉
      * * floating 悬空
      * 
-     * @beapi gpio.pinPull
+     * @beapi gpio.pull
      * @param pin:number mcu可用的gpio编号
-     * @param pullMode:string
+     * @param mode:string
      * @return undefined
      */
     JSValue GPIOModule::pull(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -148,12 +157,28 @@ function (gpio,time) {
         JS_FreeCString(ctx, mode) ;
         return JS_UNDEFINED ;
     }
+
+    /**
+     * gpio 电平输出
+     * 
+     * @beapi gpio.write
+     * @param pin:number mcu可用的gpio编号
+     * @param value:number 输出电平 0|1 
+     * @return undefined
+     */
     JSValue GPIOModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_UINT8(1, value)
         return gpio_set_level((gpio_num_t)pin, value)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
+    /**
+     * gpio 电平输入
+     * 
+     * @beapi gpio.read
+     * @param pin:number mcu可用的gpio编号
+     * @return 0|1
+     */
     JSValue GPIOModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, pin)
@@ -167,6 +192,15 @@ function (gpio,time) {
         return JS_UNDEFINED ;
     }
     
+    
+    /**
+     * 设置 adc 的位宽
+     * 
+     * @beapi gpio.adcSetBits
+     * @param adc:number adc (目前版本只能为 1)
+     * @param bits:number 位宽 (9-12)
+     * @return bool
+     */
     JSValue GPIOModule::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, adc)
@@ -211,6 +245,15 @@ function (gpio,time) {
         else {                                                  \
             JSTHROW("pin is not a valid adc pin, must be 0, 2, 4, 12-15, 25-27, 32-39.")   \
         }
+    
+    /**
+     * 设置 gpio 使用哪个 adc 通道
+     * 
+     * @beapi gpio.adcSetChannelAtten
+     * param pin:number mcu可用的gpio编号
+     * param atten:number adc通道 (1|2)
+     * @return bool
+     */
     JSValue GPIOModule::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(2)
@@ -268,6 +311,15 @@ function (gpio,time) {
         pending_event = true ;
     }
 
+    /**
+     * 监听 gpio 外部电平变化
+     * 
+     * @beapi gpio.watch
+     * @param pin:number mcu可用的gpio编号
+     * @param mode:string 监听模式， 可选值为: "rising"|"falling"|"both"
+     * @param callback:function 回调函数，callback 的原型为 `function(pin, value)`
+     * @return bool
+     */
     JSValue GPIOModule::watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(3)
         ARGV_TO_UINT8(0, pin)
@@ -288,8 +340,8 @@ function (gpio,time) {
         }
 
         esp_err_t ret = gpio_install_isr_service(0);
-        dn(ret)
-        dn4(ESP_ERR_NO_MEM,ESP_ERR_INVALID_ARG,ESP_ERR_NOT_SUPPORTED,ESP_ERR_INVALID_STATE)
+        // dn(ret)
+        // dn4(ESP_ERR_NO_MEM,ESP_ERR_INVALID_ARG,ESP_ERR_NOT_SUPPORTED,ESP_ERR_INVALID_STATE)
 
         gpio_isr_handler_remove((gpio_num_t)pin);
 
