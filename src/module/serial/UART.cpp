@@ -43,9 +43,9 @@ namespace be{
     }
 
     /**
-     * @param tx pin 
-     * @param rx pin
-     * @param baudrate=115200
+     * @param tx:number pin 
+     * @param rx:number pin
+     * @param baudrate:number=115200
      */
     JSValue UART::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
