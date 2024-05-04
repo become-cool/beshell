@@ -73,7 +73,7 @@ namespace be {
     /**
      * 同步创建目录
      * 
-     * @function .mkdirSync
+     * @function mkdirSync
      * @param path:string 路径
      * @param recursive:bool=false 是否递归创建目录
      * @return bool
@@ -93,7 +93,7 @@ namespace be {
     /**
      * 同步删除目录。如果目录非空返回 false。
      * 
-     * @function .rmdirSync
+     * @function rmdirSync
      * @param path:string 路径
      * @return bool
      */
@@ -111,7 +111,7 @@ namespace be {
     /**
      * 同步删除文件
      * 
-     * @function .unlinkSync
+     * @function unlinkSync
      * @param path:string 路径
      * @return bool
      */
@@ -131,7 +131,7 @@ namespace be {
      * > console.log(content)
      * > ```
      * 
-     * @function .readFileSync
+     * @function readFileSync
      * @param path:string 路径
      * @param readlen:number=-1 读取长度，-1表示全文
      * @param offset:number=0 开始位置
@@ -188,7 +188,7 @@ namespace be {
     /**
      * 同步写入文件，返回写入字节数量
      * 
-     * @function .writeFileSync
+     * @function writeFileSync
      * @param path:string 路径
      * @param data:string|ArrayBuffer 数据内容
      * @param append:bool=false 是否追加写入
@@ -272,7 +272,7 @@ namespace be {
      * ]
      * ```
      * 
-     * @function .readdirSync
+     * @function readdirSync
      * @param path:string 路径
      * @param detail:bool=false 是否范围详细信息
      * @return string[] | object[]
@@ -569,6 +569,14 @@ namespace be {
     }
 
     
+    /**
+     * 打开文件，返回文件句柄，用于后续操作
+     * 
+     * @function open
+     * @param path string 文件路径
+     * @param mode="rw" string 打开方式
+     * @return number
+     */
     JSValue FSModule::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
@@ -581,6 +589,24 @@ namespace be {
 
         return JS_NewInt64(ctx, (int64_t)handle) ;
     }
+
+    /**
+     * 从文件中读指定长度的数据, 如果遇到错误抛出异常
+     * 
+     * ```js
+     * import {open,read,close} from "fs"
+     * 
+     * const handle = open("/sdcard/test.txt", "w") ;
+     * const data = read(handle, 10) ;
+     * console.log("readed string:",data.toString()) ;
+     * close(handle) ;
+     * ```
+     * 
+     * @function read
+     * @param handle number 由open()返回的文件句柄
+     * @param length number 读取长度
+     * @return ArrayBuffer
+     */
     JSValue FSModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
@@ -593,6 +619,24 @@ namespace be {
         int readed = fread(buff, 1, length, (FILE*)handle) ;
         return JS_NewArrayBuffer(ctx, (uint8_t*)buff, readed, freeArrayBuffer, NULL, false) ;
     }
+
+    /**
+     * 向文件写入数据,返回写入的字节数
+     * 
+     * ```js
+     * import {open,write,close} from "fs"
+     * 
+     * const handle = open("/sdcard/test.txt", "w") ;
+     * let wrote = write(handle, "hello world") ;
+     * console.log("wrote bytes:",wrote) ;
+     * close(handle) ;
+     * ```
+     * 
+     * @function write
+     * @param handle number 由open()返回的文件句柄
+     * @param data ArrayBuffer|string 写入的数据
+     * @return number 写入的字节数
+     */
     JSValue FSModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
@@ -615,6 +659,15 @@ namespace be {
         }
     }
 
+    /**
+     * 移动文件指针到指定位置，影响 read/write 操作
+     * 
+     * @function seek
+     * @param handle number 由open()返回的文件句柄
+     * @param offset number 偏移量
+     * @param whence 0|1|2 0:从文件头开始，1:从当前位置开始，2:从文件尾开始
+     * @return number 返回0表示成功，非0表示失败原因
+     */
     JSValue FSModule::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
@@ -622,11 +675,27 @@ namespace be {
         ARGV_TO_INT32_OPT(2, whence, SEEK_SET)
         return JS_NewInt32(ctx, fseek((FILE*)handle, offset, whence)) ;
     }
+    
+    /**
+     * 刷新文件缓冲区，将数据写入磁盘 (esp32 平台上没有实际效果)
+     * 
+     * @function flush
+     * @param handle number 由open()返回的文件句柄
+     * @return number 返回0表示成功，非0表示失败原因
+     */
     JSValue FSModule::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
     }
+    
+    /**
+     * 将数据立即写入存储介质（esp32 平台上没有实际效果）
+     * 
+     * @function sync
+     * @param handle number 由open()返回的文件句柄
+     * @return number 返回0表示成功，非0表示失败原因
+     */
     JSValue FSModule::sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
@@ -634,6 +703,13 @@ namespace be {
         return JS_NewInt32(ctx, fsync(fd)) ;
     }
 
+    /**
+     * 关闭 open 打开的文件句柄
+     * 
+     * @function close
+     * @param handle number 由open()返回的文件句柄
+     * @return number 返回0表示成功，非0表示失败原因
+     */
     JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
