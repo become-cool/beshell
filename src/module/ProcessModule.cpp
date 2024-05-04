@@ -12,6 +12,16 @@
 using namespace std;
 
 namespace be {
+
+
+    /**
+     * 系统功能模块
+     * 
+     * > `process` 命名是为了和 `nodejs` 习惯一致
+     * 
+     * @module process
+     * @global
+     */
     ProcessModule::ProcessModule(JSContext *ctx, const char *name, uint8_t flagGlobal)
             : NativeModule(ctx, name, flagGlobal) {
 
@@ -19,6 +29,7 @@ namespace be {
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
+        exportFunction("setTimezoneOffset", setTimezoneOffset);
         exportFunction("readEFUSE", readEFUSE);
 
         exportName("versions") ;
@@ -232,4 +243,26 @@ namespace be {
 
         return JS_UNDEFINED ;
     }
+
+
+    /**
+     * 设置系统时区时间偏置量(分钟)
+     * 
+     * ```javascript
+     * process.setTimezoneOffset(8*60); // 设置时区为东八区
+     * ```
+     * 
+     * @function setTimezoneOffset
+     * @param minute:number 时间偏置分钟
+     * @return undefined
+     */
+    JSValue ProcessModule::setTimezoneOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        ARGV_TO_INT32(0, minute)
+
+        setTimezoneOffset(minute) ;
+
+        return JS_UNDEFINED ;
+    }
+    
 }
