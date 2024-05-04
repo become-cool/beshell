@@ -60,7 +60,7 @@ function (gpio,time) {
     /**
      * 设置 GPIO 的工作模式
      * 
-     * @beapi fs.setMode
+     * @function setMode
      * @param pin:number 引脚序号
      * @param mode:string 模式, 可用值: "input"|"output"|"output-od"|"input-output"|"input-output-od"
      * 
@@ -123,7 +123,7 @@ function (gpio,time) {
      * * updown 同时上下拉
      * * floating 悬空
      * 
-     * @beapi gpio.pull
+     * @function pull
      * @param pin:number mcu可用的gpio编号
      * @param mode:string
      * @return undefined
@@ -161,7 +161,7 @@ function (gpio,time) {
     /**
      * gpio 电平输出
      * 
-     * @beapi gpio.write
+     * @function write
      * @param pin:number mcu可用的gpio编号
      * @param value:number 输出电平 0|1 
      * @return undefined
@@ -175,7 +175,7 @@ function (gpio,time) {
     /**
      * gpio 电平输入
      * 
-     * @beapi gpio.read
+     * @function read
      * @param pin:number mcu可用的gpio编号
      * @return 0|1
      */
@@ -196,7 +196,7 @@ function (gpio,time) {
     /**
      * 设置 adc 的位宽
      * 
-     * @beapi gpio.adcSetBits
+     * @function adcSetBits
      * @param adc:number adc (目前版本只能为 1)
      * @param bits:number 位宽 (9-12)
      * @return bool
@@ -249,7 +249,7 @@ function (gpio,time) {
     /**
      * 设置 gpio 使用哪个 adc 通道
      * 
-     * @beapi gpio.adcSetChannelAtten
+     * @function adcSetChannelAtten
      * param pin:number mcu可用的gpio编号
      * param atten:number adc通道 (1|2)
      * @return bool
@@ -314,7 +314,7 @@ function (gpio,time) {
     /**
      * 监听 gpio 外部电平变化
      * 
-     * @beapi gpio.watch
+     * @function watch
      * @param pin:number mcu可用的gpio编号
      * @param mode:string 监听模式， 可选值为: "rising"|"falling"|"both"
      * @param callback:function 回调函数，callback 的原型为 `function(pin, value)`
