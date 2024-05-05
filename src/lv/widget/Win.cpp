@@ -36,6 +36,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_win_get_header` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Win
+     * @property header:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Win_Header
     JSValue Win::getHeader(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Win,thisobj)
@@ -44,6 +55,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_win_get_content` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Win
+     * @property content:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Win_Content
     JSValue Win::getContent(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Win,thisobj)
@@ -56,6 +78,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Win_addTitle
+    /**
+     * > 该方法是对 LVGL C API `lv_win_add_title` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Win
+     * @method addTitle
+     *
+     */
     JSValue Win::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)

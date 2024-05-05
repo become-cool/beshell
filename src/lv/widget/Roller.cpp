@@ -39,6 +39,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_roller_set_visible_row_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @property visibleRowCount:number
+     *
+     */
     #ifndef SETTER_Roller_VisibleRowCount
     JSValue Roller::setVisibleRowCount(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Roller,thisobj)
@@ -50,6 +61,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_roller_get_selected` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @property selected:number
+     *
+     */
     #ifndef GETTER_Roller_Selected
     JSValue Roller::getSelected(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Roller,thisobj)
@@ -61,6 +83,17 @@ namespace be::lv {
     // unspported type: const char *
     // JSValue Roller::getOptions(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_roller_get_options(const lv_obj_t * obj)
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_roller_get_option_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @property optionCount:number
+     *
+     */
     #ifndef GETTER_Roller_OptionCount
     JSValue Roller::getOptionCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Roller,thisobj)
@@ -76,6 +109,14 @@ namespace be::lv {
     // lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     #ifndef METHOD_Roller_setOptions
+    /**
+     * > 该方法是对 LVGL C API `lv_roller_set_options` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @method setOptions
+     *
+     */
     JSValue Roller::setOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -95,6 +136,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Roller_setSelected
+    /**
+     * > 该方法是对 LVGL C API `lv_roller_set_selected` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @method setSelected
+     *
+     */
     JSValue Roller::setSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -117,6 +166,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Roller_getSelectedStr
+    /**
+     * > 该方法是对 LVGL C API `lv_roller_get_selected_str` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Roller
+     * @method getSelectedStr
+     *
+     */
     JSValue Roller::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

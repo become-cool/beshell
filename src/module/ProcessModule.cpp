@@ -15,12 +15,10 @@ namespace be {
 
 
     /**
-     * 系统功能模块
-     * 
-     * > `process` 命名是为了和 `nodejs` 习惯一致
+     * 系统功能模块, 命名为 `process` 是为了和 nodejs 的习惯一致
      * 
      * @module process
-     * @global
+     * @global process
      */
     ProcessModule::ProcessModule(JSContext *ctx, const char *name, uint8_t flagGlobal)
             : NativeModule(ctx, name, flagGlobal) {

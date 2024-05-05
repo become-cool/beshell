@@ -34,6 +34,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_checkbox_set_text` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Checkbox
+     * @property text:
+     *
+     */
     // unspported type: const char *
     // JSValue Checkbox::getText(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_checkbox_get_text(const lv_obj_t * obj)
@@ -46,6 +57,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_checkbox_set_text_static` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Checkbox
+     * @property textStatic:
+     *
+     */
     #ifndef SETTER_Checkbox_TextStatic
     JSValue Checkbox::setTextStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Checkbox,thisobj)

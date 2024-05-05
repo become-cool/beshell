@@ -45,6 +45,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_align`, `lv_spangroup_set_align` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property align:number
+     *
+     */
     #ifndef GETTER_Span_Align
     JSValue Span::getAlign(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -69,6 +80,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_overflow`, `lv_spangroup_set_overflow` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property overflow:LV-CONST
+     *
+     */
     #ifndef GETTER_Span_Overflow
     JSValue Span::getOverflow(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -93,6 +115,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_indent`, `lv_spangroup_set_indent` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property indent:number
+     *
+     */
     #ifndef GETTER_Span_Indent
     JSValue Span::getIndent(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -112,6 +145,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_mode`, `lv_spangroup_set_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property mode:LV-CONST
+     *
+     */
     #ifndef GETTER_Span_Mode
     JSValue Span::getMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -136,6 +180,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_max_lines`, `lv_spangroup_set_max_lines` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property maxLines:number
+     *
+     */
     #ifndef GETTER_Span_MaxLines
     JSValue Span::getMaxLines(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -155,6 +210,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_span_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property spanCount:number
+     *
+     */
     #ifndef GETTER_Span_SpanCount
     JSValue Span::getSpanCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -163,6 +229,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_spangroup_get_max_line_height` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @property maxLineHeight:number
+     *
+     */
     #ifndef GETTER_Span_MaxLineHeight
     JSValue Span::getMaxLineHeight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Span,thisobj)
@@ -175,6 +252,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Span_newSpan
+    /**
+     * > 该方法是对 LVGL C API `lv_spangroup_new_span` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @method newSpan
+     *
+     */
     JSValue Span::newSpan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_span_t * retval = lv_spangroup_new_span( thisobj->lvobj() ) ;
@@ -187,6 +272,14 @@ namespace be::lv {
     // void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
 
     #ifndef METHOD_Span_getChild
+    /**
+     * > 该方法是对 LVGL C API `lv_spangroup_get_child` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @method getChild
+     *
+     */
     JSValue Span::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -201,6 +294,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Span_getExpandWidth
+    /**
+     * > 该方法是对 LVGL C API `lv_spangroup_get_expand_width` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @method getExpandWidth
+     *
+     */
     JSValue Span::getExpandWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -215,6 +316,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Span_getExpandHeight
+    /**
+     * > 该方法是对 LVGL C API `lv_spangroup_get_expand_height` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @method getExpandHeight
+     *
+     */
     JSValue Span::getExpandHeight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -229,6 +338,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Span_refrMode
+    /**
+     * > 该方法是对 LVGL C API `lv_spangroup_refr_mode` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Span
+     * @method refrMode
+     *
+     */
     JSValue Span::refrMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_spangroup_refr_mode( thisobj->lvobj() ) ;

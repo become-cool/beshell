@@ -51,6 +51,17 @@ namespace be::lv {
     // unspported type: const lv_buttonmatrix_ctrl_t*
     // JSValue BtnMatrix::setCtrlMap(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t ctrl_map[])
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_buttonmatrix_get_selected_button`, `lv_buttonmatrix_set_selected_button` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @property selectedButton:number
+     *
+     */
     #ifndef GETTER_BtnMatrix_SelectedButton
     JSValue BtnMatrix::getSelectedButton(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(BtnMatrix,thisobj)
@@ -70,6 +81,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_buttonmatrix_set_button_ctrl_all` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @property buttonCtrlAll:LV-CONST
+     *
+     */
     #ifndef SETTER_BtnMatrix_ButtonCtrlAll
     JSValue BtnMatrix::setButtonCtrlAll(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(BtnMatrix,thisobj)
@@ -86,6 +108,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_buttonmatrix_get_one_checked`, `lv_buttonmatrix_set_one_checked` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @property oneChecked:number
+     *
+     */
     #ifndef GETTER_BtnMatrix_OneChecked
     JSValue BtnMatrix::getOneChecked(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(BtnMatrix,thisobj)
@@ -102,6 +135,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_buttonmatrix_get_popovers` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @property popovers:number
+     *
+     */
     #ifndef GETTER_BtnMatrix_Popovers
     JSValue BtnMatrix::getPopovers(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(BtnMatrix,thisobj)
@@ -114,6 +158,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_BtnMatrix_setButtonCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_buttonmatrix_set_button_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @method setButtonCtrl
+     *
+     */
     JSValue BtnMatrix::setButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -136,6 +188,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_BtnMatrix_clearButtonCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_buttonmatrix_clear_button_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @method clearButtonCtrl
+     *
+     */
     JSValue BtnMatrix::clearButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -158,6 +218,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_BtnMatrix_clearButtonCtrlAll
+    /**
+     * > 该方法是对 LVGL C API `lv_buttonmatrix_clear_button_ctrl_all` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @method clearButtonCtrlAll
+     *
+     */
     JSValue BtnMatrix::clearButtonCtrlAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -176,6 +244,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_BtnMatrix_setButtonWidth
+    /**
+     * > 该方法是对 LVGL C API `lv_buttonmatrix_set_button_width` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @method setButtonWidth
+     *
+     */
     JSValue BtnMatrix::setButtonWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -196,6 +272,14 @@ namespace be::lv {
         // const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 
     #ifndef METHOD_BtnMatrix_hasButtonCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_buttonmatrix_has_button_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class BtnMatrix
+     * @method hasButtonCtrl
+     *
+     */
     JSValue BtnMatrix::hasButtonCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
