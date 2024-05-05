@@ -53,6 +53,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_label_get_text`, `lv_label_set_text` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @property text:number
+     *
+     */
     #ifndef GETTER_Label_Text
     JSValue Label::getText(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Label,thisobj)
@@ -70,6 +81,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_label_set_text_static` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @property textStatic:
+     *
+     */
     #ifndef SETTER_Label_TextStatic
     JSValue Label::setTextStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Label,thisobj)
@@ -79,6 +101,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_label_get_long_mode`, `lv_label_set_long_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @property longMode:number
+     *
+     */
     #ifndef GETTER_Label_LongMode
     JSValue Label::getLongMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Label,thisobj)
@@ -103,6 +136,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_label_get_text_selection_start`, `lv_label_set_text_selection_start` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @property textSelectionStart:number
+     *
+     */
     #ifndef GETTER_Label_TextSelectionStart
     JSValue Label::getTextSelectionStart(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Label,thisobj)
@@ -122,6 +166,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_label_get_text_selection_end`, `lv_label_set_text_selection_end` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @property textSelectionEnd:number
+     *
+     */
     #ifndef GETTER_Label_TextSelectionEnd
     JSValue Label::getTextSelectionEnd(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Label,thisobj)
@@ -160,6 +215,14 @@ namespace be::lv {
     // bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     #ifndef METHOD_Label_insText
+    /**
+     * > 该方法是对 LVGL C API `lv_label_ins_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @method insText
+     *
+     */
     JSValue Label::insText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -174,6 +237,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Label_cutText
+    /**
+     * > 该方法是对 LVGL C API `lv_label_cut_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Label
+     * @method cutText
+     *
+     */
     JSValue Label::cutText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

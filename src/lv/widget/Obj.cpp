@@ -446,6 +446,17 @@ namespace be::lv {
     #define SETTER_Obj_Height
     
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_state` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property state:number
+     *
+     */
     #ifndef GETTER_Obj_State
     JSValue Obj::getState(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -460,6 +471,17 @@ namespace be::lv {
     // unspported type: const lv_obj_class_t *
     // JSValue Obj::getClass(JSContext *ctx, JSValueConst this_val){}
     // const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_event_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property eventCount:number
+     *
+     */
     #ifndef GETTER_Obj_EventCount
     JSValue Obj::getEventCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -468,6 +490,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_x`, `lv_obj_set_x` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property x:number
+     *
+     */
     #ifndef GETTER_Obj_X
     JSValue Obj::getX(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -487,6 +520,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_y`, `lv_obj_set_y` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property y:number
+     *
+     */
     #ifndef GETTER_Obj_Y
     JSValue Obj::getY(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -506,6 +550,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_width`, `lv_obj_set_width` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property width:number
+     *
+     */
     #ifndef GETTER_Obj_Width
     JSValue Obj::getWidth(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -525,6 +580,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_height`, `lv_obj_set_height` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property height:number
+     *
+     */
     #ifndef GETTER_Obj_Height
     JSValue Obj::getHeight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -544,6 +610,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_content_width`, `lv_obj_set_content_width` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property contentWidth:number
+     *
+     */
     #ifndef GETTER_Obj_ContentWidth
     JSValue Obj::getContentWidth(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -563,6 +640,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_content_height`, `lv_obj_set_content_height` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property contentHeight:number
+     *
+     */
     #ifndef GETTER_Obj_ContentHeight
     JSValue Obj::getContentHeight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -582,6 +670,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_set_layout` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property layout:number
+     *
+     */
     #ifndef SETTER_Obj_Layout
     JSValue Obj::setLayout(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
@@ -593,6 +692,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_set_align` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property align:LV-CONST
+     *
+     */
     #ifndef SETTER_Obj_Align
     JSValue Obj::setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
@@ -609,6 +719,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_x_aligned` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property xAligned:number
+     *
+     */
     #ifndef GETTER_Obj_XAligned
     JSValue Obj::getXAligned(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -617,6 +738,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_y_aligned` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property yAligned:number
+     *
+     */
     #ifndef GETTER_Obj_YAligned
     JSValue Obj::getYAligned(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -625,6 +757,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_self_width` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property selfWidth:number
+     *
+     */
     #ifndef GETTER_Obj_SelfWidth
     JSValue Obj::getSelfWidth(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -633,6 +776,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_self_height` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property selfHeight:number
+     *
+     */
     #ifndef GETTER_Obj_SelfHeight
     JSValue Obj::getSelfHeight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -641,6 +795,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_set_ext_click_area` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property extClickArea:number
+     *
+     */
     #ifndef SETTER_Obj_ExtClickArea
     JSValue Obj::setExtClickArea(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
@@ -652,6 +817,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scrollbar_mode`, `lv_obj_set_scrollbar_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollbarMode:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollbarMode
     JSValue Obj::getScrollbarMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -676,6 +852,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_dir`, `lv_obj_set_scroll_dir` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollDir:LV-CONST
+     *
+     */
     #ifndef GETTER_Obj_ScrollDir
     JSValue Obj::getScrollDir(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -700,6 +887,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_snap_x`, `lv_obj_set_scroll_snap_x` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollSnapX:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollSnapX
     JSValue Obj::getScrollSnapX(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -724,6 +922,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_snap_y`, `lv_obj_set_scroll_snap_y` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollSnapY:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollSnapY
     JSValue Obj::getScrollSnapY(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -748,6 +957,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_x` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollX:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollX
     JSValue Obj::getScrollX(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -756,6 +976,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_y` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollY:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollY
     JSValue Obj::getScrollY(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -764,6 +995,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_top` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollTop:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollTop
     JSValue Obj::getScrollTop(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -772,6 +1014,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_bottom` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollBottom:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollBottom
     JSValue Obj::getScrollBottom(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -780,6 +1033,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_left` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollLeft:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollLeft
     JSValue Obj::getScrollLeft(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -788,6 +1052,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_scroll_right` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property scrollRight:number
+     *
+     */
     #ifndef GETTER_Obj_ScrollRight
     JSValue Obj::getScrollRight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -796,6 +1071,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_parent`, `lv_obj_set_parent` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property parent:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Obj_Parent
     JSValue Obj::getParent(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -812,6 +1098,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_screen` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property screen:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Obj_Screen
     JSValue Obj::getScreen(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -823,6 +1120,17 @@ namespace be::lv {
     // unspported type: lv_display_t *
     // JSValue Obj::getDisplay(JSContext *ctx, JSValueConst this_val){}
     // lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_child_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property childCount:number
+     *
+     */
     #ifndef GETTER_Obj_ChildCount
     JSValue Obj::getChildCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -831,6 +1139,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_obj_get_index` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property index:number
+     *
+     */
     #ifndef GETTER_Obj_Index
     JSValue Obj::getIndex(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Obj,thisobj)
@@ -839,6 +1158,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_set_flex_flow` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property flexFlow:LV-CONST
+     *
+     */
     #ifndef SETTER_Obj_FlexFlow
     JSValue Obj::setFlexFlow(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
@@ -855,6 +1185,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_obj_set_flex_grow` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @property flexGrow:number
+     *
+     */
     #ifndef SETTER_Obj_FlexGrow
     JSValue Obj::setFlexGrow(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Obj,thisobj)
@@ -871,6 +1212,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Obj_addFlag
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_add_flag` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method addFlag
+     *
+     */
     JSValue Obj::addFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -889,6 +1238,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_removeFlag
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_remove_flag` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method removeFlag
+     *
+     */
     JSValue Obj::removeFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -907,6 +1264,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_updateFlag
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_update_flag` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method updateFlag
+     *
+     */
     JSValue Obj::updateFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -926,6 +1291,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_addState
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_add_state` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method addState
+     *
+     */
     JSValue Obj::addState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -944,6 +1317,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_removeState
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_remove_state` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method removeState
+     *
+     */
     JSValue Obj::removeState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -962,6 +1343,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_setState
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_state` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setState
+     *
+     */
     JSValue Obj::setState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -981,6 +1370,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_hasFlag
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_has_flag` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method hasFlag
+     *
+     */
     JSValue Obj::hasFlag(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1000,6 +1397,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_hasFlagAny
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_has_flag_any` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method hasFlagAny
+     *
+     */
     JSValue Obj::hasFlagAny(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1019,6 +1424,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_hasState
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_has_state` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method hasState
+     *
+     */
     JSValue Obj::hasState(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1038,6 +1451,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_allocateSpecAttr
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_allocate_spec_attr` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method allocateSpecAttr
+     *
+     */
     JSValue Obj::allocateSpecAttr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_allocate_spec_attr( thisobj->lvobj() ) ;
@@ -1052,6 +1473,14 @@ namespace be::lv {
     // bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
     #ifndef METHOD_Obj_isValid
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_valid` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isValid
+     *
+     */
     JSValue Obj::isValid(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_valid( thisobj->lvobj() ) ;
@@ -1064,6 +1493,14 @@ namespace be::lv {
     // lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
 
     #ifndef METHOD_Obj_classInitObj
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_class_init_obj` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method classInitObj
+     *
+     */
     JSValue Obj::classInitObj(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_class_init_obj( thisobj->lvobj() ) ;
@@ -1072,6 +1509,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_isEditable
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_editable` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isEditable
+     *
+     */
     JSValue Obj::isEditable(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_editable( thisobj->lvobj() ) ;
@@ -1081,6 +1526,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_isGroupDef
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_group_def` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isGroupDef
+     *
+     */
     JSValue Obj::isGroupDef(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_group_def( thisobj->lvobj() ) ;
@@ -1105,6 +1558,14 @@ namespace be::lv {
     // void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
 
     #ifndef METHOD_Obj_calculateExtDrawSize
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_calculate_ext_draw_size` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method calculateExtDrawSize
+     *
+     */
     JSValue Obj::calculateExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1119,6 +1580,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_refreshExtDrawSize
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_refresh_ext_draw_size` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method refreshExtDrawSize
+     *
+     */
     JSValue Obj::refreshExtDrawSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_refresh_ext_draw_size( thisobj->lvobj() ) ;
@@ -1139,6 +1608,14 @@ namespace be::lv {
         // lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 
     #ifndef METHOD_Obj_removeEvent
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_remove_event` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method removeEvent
+     *
+     */
     JSValue Obj::removeEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1159,6 +1636,14 @@ namespace be::lv {
     // uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 
     #ifndef METHOD_Obj_setPos
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_pos` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setPos
+     *
+     */
     JSValue Obj::setPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1176,6 +1661,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_setSize
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_size` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setSize
+     *
+     */
     JSValue Obj::setSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1193,6 +1686,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_refrSize
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_refr_size` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method refrSize
+     *
+     */
     JSValue Obj::refrSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_refr_size( thisobj->lvobj() ) ;
@@ -1202,6 +1703,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_isLayoutPositioned
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_layout_positioned` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isLayoutPositioned
+     *
+     */
     JSValue Obj::isLayoutPositioned(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_layout_positioned( thisobj->lvobj() ) ;
@@ -1211,6 +1720,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_markLayoutAsDirty
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_mark_layout_as_dirty` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method markLayoutAsDirty
+     *
+     */
     JSValue Obj::markLayoutAsDirty(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_mark_layout_as_dirty( thisobj->lvobj() ) ;
@@ -1219,6 +1736,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_updateLayout
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_update_layout` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method updateLayout
+     *
+     */
     JSValue Obj::updateLayout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_update_layout( thisobj->lvobj() ) ;
@@ -1227,6 +1752,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_alignTo
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_align_to` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method alignTo
+     *
+     */
     JSValue Obj::alignTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(4)
@@ -1260,6 +1793,14 @@ namespace be::lv {
     // void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
     #ifndef METHOD_Obj_refreshSelfSize
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_refresh_self_size` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method refreshSelfSize
+     *
+     */
     JSValue Obj::refreshSelfSize(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_refresh_self_size( thisobj->lvobj() ) ;
@@ -1269,6 +1810,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_refrPos
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_refr_pos` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method refrPos
+     *
+     */
     JSValue Obj::refrPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_refr_pos( thisobj->lvobj() ) ;
@@ -1277,6 +1826,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_moveTo
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_move_to` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method moveTo
+     *
+     */
     JSValue Obj::moveTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1294,6 +1851,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_moveChildrenBy
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_move_children_by` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method moveChildrenBy
+     *
+     */
     JSValue Obj::moveChildrenBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -1321,6 +1886,14 @@ namespace be::lv {
     // void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     #ifndef METHOD_Obj_invalidate
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_invalidate` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method invalidate
+     *
+     */
     JSValue Obj::invalidate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_invalidate( thisobj->lvobj() ) ;
@@ -1332,6 +1905,14 @@ namespace be::lv {
     // bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
     #ifndef METHOD_Obj_isVisible
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_visible` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isVisible
+     *
+     */
     JSValue Obj::isVisible(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_visible( thisobj->lvobj() ) ;
@@ -1359,6 +1940,14 @@ namespace be::lv {
     // void lv_obj_get_scroll_end(lv_obj_t * obj, lv_point_t * end)
 
     #ifndef METHOD_Obj_scrollBy
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_by` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollBy
+     *
+     */
     JSValue Obj::scrollBy(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -1385,6 +1974,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollByBounded
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_by_bounded` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollByBounded
+     *
+     */
     JSValue Obj::scrollByBounded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -1411,6 +2008,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollTo
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_to` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollTo
+     *
+     */
     JSValue Obj::scrollTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -1437,6 +2042,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollToX
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_to_x` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollToX
+     *
+     */
     JSValue Obj::scrollToX(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1459,6 +2072,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollToY
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_to_y` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollToY
+     *
+     */
     JSValue Obj::scrollToY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1481,6 +2102,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollToView
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_to_view` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollToView
+     *
+     */
     JSValue Obj::scrollToView(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1499,6 +2128,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_scrollToViewRecursive
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scroll_to_view_recursive` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollToViewRecursive
+     *
+     */
     JSValue Obj::scrollToViewRecursive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1517,6 +2154,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_isScrolling
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_is_scrolling` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method isScrolling
+     *
+     */
     JSValue Obj::isScrolling(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_obj_is_scrolling( thisobj->lvobj() ) ;
@@ -1526,6 +2171,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_updateSnap
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_update_snap` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method updateSnap
+     *
+     */
     JSValue Obj::updateSnap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1547,6 +2200,14 @@ namespace be::lv {
     // void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor, lv_area_t * ver)
 
     #ifndef METHOD_Obj_scrollbarInvalidate
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_scrollbar_invalidate` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method scrollbarInvalidate
+     *
+     */
     JSValue Obj::scrollbarInvalidate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_scrollbar_invalidate( thisobj->lvobj() ) ;
@@ -1555,6 +2216,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_readjustScroll
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_readjust_scroll` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method readjustScroll
+     *
+     */
     JSValue Obj::readjustScroll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -1582,6 +2251,14 @@ namespace be::lv {
     // void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 
     #ifndef METHOD_Obj_removeStyleAll
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_remove_style_all` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method removeStyleAll
+     *
+     */
     JSValue Obj::removeStyleAll(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_remove_style_all( thisobj->lvobj() ) ;
@@ -1614,6 +2291,14 @@ namespace be::lv {
     // bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
 
     #ifndef METHOD_Obj_fadeIn
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_fade_in` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method fadeIn
+     *
+     */
     JSValue Obj::fadeIn(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1631,6 +2316,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_fadeOut
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_fade_out` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method fadeOut
+     *
+     */
     JSValue Obj::fadeOut(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -1978,6 +2671,14 @@ namespace be::lv {
     // void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 
     #ifndef METHOD_Obj__delete
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_delete` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method _delete
+     *
+     */
     JSValue Obj::_delete(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_delete( thisobj->lvobj() ) ;
@@ -1986,6 +2687,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_clean
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_clean` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method clean
+     *
+     */
     JSValue Obj::clean(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_clean( thisobj->lvobj() ) ;
@@ -1994,6 +2703,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_deleteDelayed
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_delete_delayed` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method deleteDelayed
+     *
+     */
     JSValue Obj::deleteDelayed(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -2010,6 +2727,14 @@ namespace be::lv {
     // void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
 
     #ifndef METHOD_Obj_deleteAsync
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_delete_async` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method deleteAsync
+     *
+     */
     JSValue Obj::deleteAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_delete_async( thisobj->lvobj() ) ;
@@ -2018,6 +2743,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_swap
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_swap` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method swap
+     *
+     */
     JSValue Obj::swap(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -2028,6 +2761,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_moveToIndex
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_move_to_index` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method moveToIndex
+     *
+     */
     JSValue Obj::moveToIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -2041,6 +2782,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_getChild
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_get_child` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method getChild
+     *
+     */
     JSValue Obj::getChild(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -2058,6 +2807,14 @@ namespace be::lv {
     // lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
 
     #ifndef METHOD_Obj_getSibling
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_get_sibling` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method getSibling
+     *
+     */
     JSValue Obj::getSibling(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -2084,6 +2841,14 @@ namespace be::lv {
     // void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 
     #ifndef METHOD_Obj_dumpTree
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_dump_tree` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method dumpTree
+     *
+     */
     JSValue Obj::dumpTree(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_dump_tree( thisobj->lvobj() ) ;
@@ -2095,6 +2860,14 @@ namespace be::lv {
     // void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
     #ifndef METHOD_Obj_setFlexAlign
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_flex_align` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setFlexAlign
+     *
+     */
     JSValue Obj::setFlexAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -2134,6 +2907,14 @@ namespace be::lv {
     // void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const int32_t row_dsc[])
 
     #ifndef METHOD_Obj_setGridAlign
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_grid_align` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setGridAlign
+     *
+     */
     JSValue Obj::setGridAlign(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -2161,6 +2942,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Obj_setGridCell
+    /**
+     * > 该方法是对 LVGL C API `lv_obj_set_grid_cell` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Obj
+     * @method setGridCell
+     *
+     */
     JSValue Obj::setGridCell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(6)

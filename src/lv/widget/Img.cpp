@@ -122,6 +122,17 @@ namespace be::lv {
     // unspported type: const void *
     // JSValue Img::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_image_set_src(lv_obj_t * obj, const void * src)
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_offset_x`, `lv_image_set_offset_x` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property offsetX:number
+     *
+     */
     #ifndef GETTER_Img_OffsetX
     JSValue Img::getOffsetX(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -141,6 +152,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_offset_y`, `lv_image_set_offset_y` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property offsetY:number
+     *
+     */
     #ifndef GETTER_Img_OffsetY
     JSValue Img::getOffsetY(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -160,6 +182,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_rotation`, `lv_image_set_rotation` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property rotation:number
+     *
+     */
     #ifndef GETTER_Img_Rotation
     JSValue Img::getRotation(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -179,6 +212,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_scale`, `lv_image_set_scale` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property scale:number
+     *
+     */
     #ifndef GETTER_Img_Scale
     JSValue Img::getScale(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -198,6 +242,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_scale_x`, `lv_image_set_scale_x` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property scaleX:number
+     *
+     */
     #ifndef GETTER_Img_ScaleX
     JSValue Img::getScaleX(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -217,6 +272,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_scale_y`, `lv_image_set_scale_y` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property scaleY:number
+     *
+     */
     #ifndef GETTER_Img_ScaleY
     JSValue Img::getScaleY(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -236,6 +302,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_blend_mode`, `lv_image_set_blend_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property blendMode:LV-CONST
+     *
+     */
     #ifndef GETTER_Img_BlendMode
     JSValue Img::getBlendMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -260,6 +337,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_antialias`, `lv_image_set_antialias` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property antialias:number
+     *
+     */
     #ifndef GETTER_Img_Antialias
     JSValue Img::getAntialias(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -276,6 +364,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_image_get_align`, `lv_image_set_align` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @property align:LV-CONST
+     *
+     */
     #ifndef GETTER_Img_Align
     JSValue Img::getAlign(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Img,thisobj)
@@ -355,6 +454,14 @@ namespace be::lv {
     // void lv_image_cache_drop(const void * src)
 
     #ifndef METHOD_Img_setPivot
+    /**
+     * > 该方法是对 LVGL C API `lv_image_set_pivot` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Img
+     * @method setPivot
+     *
+     */
     JSValue Img::setPivot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

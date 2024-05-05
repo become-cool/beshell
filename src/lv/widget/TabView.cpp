@@ -40,6 +40,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_set_tab_bar_position` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property tabBarPosition:LV-CONST
+     *
+     */
     #ifndef SETTER_TabView_TabBarPosition
     JSValue TabView::setTabBarPosition(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(TabView,thisobj)
@@ -56,6 +67,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_set_tab_bar_size` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property tabBarSize:number
+     *
+     */
     #ifndef SETTER_TabView_TabBarSize
     JSValue TabView::setTabBarSize(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(TabView,thisobj)
@@ -67,6 +89,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_get_tab_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property tabCount:number
+     *
+     */
     #ifndef GETTER_TabView_TabCount
     JSValue TabView::getTabCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TabView,thisobj)
@@ -75,6 +108,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_get_tab_active` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property tabActive:number
+     *
+     */
     #ifndef GETTER_TabView_TabActive
     JSValue TabView::getTabActive(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TabView,thisobj)
@@ -83,6 +127,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_get_content` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property content:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_TabView_Content
     JSValue TabView::getContent(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TabView,thisobj)
@@ -91,6 +146,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_tabview_get_tab_bar` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @property tabBar:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_TabView_TabBar
     JSValue TabView::getTabBar(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TabView,thisobj)
@@ -103,6 +169,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_TabView_addTab
+    /**
+     * > 该方法是对 LVGL C API `lv_tabview_add_tab` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @method addTab
+     *
+     */
     JSValue TabView::addTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -115,6 +189,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TabView_renameTab
+    /**
+     * > 该方法是对 LVGL C API `lv_tabview_rename_tab` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @method renameTab
+     *
+     */
     JSValue TabView::renameTab(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -129,6 +211,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TabView_setActive
+    /**
+     * > 该方法是对 LVGL C API `lv_tabview_set_active` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TabView
+     * @method setActive
+     *
+     */
     JSValue TabView::setActive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

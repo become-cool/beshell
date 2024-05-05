@@ -48,6 +48,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_set_text` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property text:
+     *
+     */
     // unspported type: const char *
     // JSValue Dropdown::getText(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_dropdown_get_text(lv_obj_t * obj)
@@ -60,6 +71,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_set_options` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property options:
+     *
+     */
     // unspported type: const char *
     // JSValue Dropdown::getOptions(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_dropdown_get_options(const lv_obj_t * obj)
@@ -72,6 +94,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_set_options_static` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property optionsStatic:
+     *
+     */
     #ifndef SETTER_Dropdown_OptionsStatic
     JSValue Dropdown::setOptionsStatic(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -81,6 +114,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_get_selected`, `lv_dropdown_set_selected` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property selected:number
+     *
+     */
     #ifndef GETTER_Dropdown_Selected
     JSValue Dropdown::getSelected(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -100,6 +144,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_get_dir`, `lv_dropdown_set_dir` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property dir:LV-CONST
+     *
+     */
     #ifndef GETTER_Dropdown_Dir
     JSValue Dropdown::getDir(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -130,6 +185,17 @@ namespace be::lv {
     // unspported type: const void *
     // JSValue Dropdown::setSymbol(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_get_selected_highlight`, `lv_dropdown_set_selected_highlight` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property selectedHighlight:number
+     *
+     */
     #ifndef GETTER_Dropdown_SelectedHighlight
     JSValue Dropdown::getSelectedHighlight(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -146,6 +212,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_get_list` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property list:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Dropdown_List
     JSValue Dropdown::getList(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -154,6 +231,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_dropdown_get_option_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @property optionCount:number
+     *
+     */
     #ifndef GETTER_Dropdown_OptionCount
     JSValue Dropdown::getOptionCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Dropdown,thisobj)
@@ -169,6 +257,14 @@ namespace be::lv {
     // lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     #ifndef METHOD_Dropdown_addOption
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_add_option` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method addOption
+     *
+     */
     JSValue Dropdown::addOption(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -183,6 +279,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_clearOptions
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_clear_options` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method clearOptions
+     *
+     */
     JSValue Dropdown::clearOptions(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_dropdown_clear_options( thisobj->lvobj() ) ;
@@ -191,6 +295,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_getSelectedStr
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_get_selected_str` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method getSelectedStr
+     *
+     */
     JSValue Dropdown::getSelectedStr(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -205,6 +317,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_getOptionIndex
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_get_option_index` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method getOptionIndex
+     *
+     */
     JSValue Dropdown::getOptionIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -217,6 +337,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_open
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_open` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method open
+     *
+     */
     JSValue Dropdown::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_dropdown_open( thisobj->lvobj() ) ;
@@ -225,6 +353,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_close
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_close` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method close
+     *
+     */
     JSValue Dropdown::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_dropdown_close( thisobj->lvobj() ) ;
@@ -233,6 +369,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Dropdown_isOpen
+    /**
+     * > 该方法是对 LVGL C API `lv_dropdown_is_open` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Dropdown
+     * @method isOpen
+     *
+     */
     JSValue Dropdown::isOpen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_dropdown_is_open( thisobj->lvobj() ) ;

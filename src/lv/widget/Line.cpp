@@ -34,6 +34,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_line_get_y_invert`, `lv_line_set_y_invert` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Line
+     * @property yInvert:number
+     *
+     */
     #ifndef GETTER_Line_YInvert
     JSValue Line::getYInvert(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Line,thisobj)

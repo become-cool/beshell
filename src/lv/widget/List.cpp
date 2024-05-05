@@ -42,6 +42,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_List_addText
+    /**
+     * > 该方法是对 LVGL C API `lv_list_add_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class List
+     * @method addText
+     *
+     */
     JSValue List::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -60,6 +68,14 @@ namespace be::lv {
         // const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 
     #ifndef METHOD_List_setButtonText
+    /**
+     * > 该方法是对 LVGL C API `lv_list_set_button_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class List
+     * @method setButtonText
+     *
+     */
     JSValue List::setButtonText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

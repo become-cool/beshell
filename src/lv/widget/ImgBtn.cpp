@@ -37,6 +37,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_imagebutton_set_state` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class ImgBtn
+     * @property state:LV-CONST
+     *
+     */
     #ifndef SETTER_ImgBtn_State
     JSValue ImgBtn::setState(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(ImgBtn,thisobj)

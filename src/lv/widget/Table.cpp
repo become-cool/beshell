@@ -45,6 +45,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_table_get_row_count`, `lv_table_set_row_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @property rowCount:number
+     *
+     */
     #ifndef GETTER_Table_RowCount
     JSValue Table::getRowCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Table,thisobj)
@@ -64,6 +75,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_table_get_column_count`, `lv_table_set_column_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @property columnCount:number
+     *
+     */
     #ifndef GETTER_Table_ColumnCount
     JSValue Table::getColumnCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Table,thisobj)
@@ -87,6 +109,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Table_setCellValue
+    /**
+     * > 该方法是对 LVGL C API `lv_table_set_cell_value` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method setCellValue
+     *
+     */
     JSValue Table::setCellValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -108,6 +138,14 @@ namespace be::lv {
     // void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt, ...)
 
     #ifndef METHOD_Table_setColumnWidth
+    /**
+     * > 该方法是对 LVGL C API `lv_table_set_column_width` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method setColumnWidth
+     *
+     */
     JSValue Table::setColumnWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -125,6 +163,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Table_addCellCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_table_add_cell_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method addCellCtrl
+     *
+     */
     JSValue Table::addCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -151,6 +197,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Table_clearCellCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_table_clear_cell_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method clearCellCtrl
+     *
+     */
     JSValue Table::clearCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -183,6 +237,14 @@ namespace be::lv {
         // const char * lv_table_get_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col)
 
     #ifndef METHOD_Table_getColumnWidth
+    /**
+     * > 该方法是对 LVGL C API `lv_table_get_column_width` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method getColumnWidth
+     *
+     */
     JSValue Table::getColumnWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -197,6 +259,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Table_hasCellCtrl
+    /**
+     * > 该方法是对 LVGL C API `lv_table_has_cell_ctrl` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Table
+     * @method hasCellCtrl
+     *
+     */
     JSValue Table::hasCellCtrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)

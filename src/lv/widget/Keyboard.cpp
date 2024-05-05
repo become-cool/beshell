@@ -37,6 +37,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_keyboard_get_textarea`, `lv_keyboard_set_textarea` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Keyboard
+     * @property textarea:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Keyboard_Textarea
     JSValue Keyboard::getTextarea(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Keyboard,thisobj)
@@ -53,6 +64,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_keyboard_get_mode`, `lv_keyboard_set_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Keyboard
+     * @property mode:number
+     *
+     */
     #ifndef GETTER_Keyboard_Mode
     JSValue Keyboard::getMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Keyboard,thisobj)
@@ -77,6 +99,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_keyboard_set_popovers` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Keyboard
+     * @property popovers:number
+     *
+     */
     #ifndef SETTER_Keyboard_Popovers
     JSValue Keyboard::setPopovers(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Keyboard,thisobj)
