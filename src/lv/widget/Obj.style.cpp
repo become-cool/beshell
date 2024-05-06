@@ -7,7 +7,19 @@ using namespace std ;
 
 namespace be::lv {
 
-
+    /**
+     * 返回样式的值
+     * 
+     * 如果样式不存在，抛出异常
+     * 
+     * [可用的样式参考](../styles.html#样式属性)
+     * 
+     * @module lv
+     * @class Obj
+     * @method style
+     * @param styleName:string 样式名称
+     * @return number|string
+     */
     JSValue Obj::style(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         if(!JS_IsString(argv[0])) {
@@ -35,7 +47,6 @@ namespace be::lv {
         return Style::propToJS(ctx, prop, value) ;
     }
 
-    
     static JSValue set_style(JSContext *ctx, lv_obj_t * lvobj, const char * jsStyleName, JSValue value, lv_style_selector_t selector) {
         lv_style_value_t jsStyleValue ;
         
@@ -82,6 +93,37 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+
+    
+    /**
+     * 设置样式
+     * 
+     * 如果样式不存在，抛出异常。
+     * 
+     * [可用的样式参考](../styles.html#样式属性)
+     * 
+     * ```javascript
+     * import * as lv from 'lv'
+     * 
+     * let obj = lv.Obj( lv.screen() )
+     * 
+     * // 对象类型参数，设置多个样式
+     * obj.setStyle({
+     *     "border-width": 1 ,                 // 边线宽
+     *     "border-color": lv.color(255,0,0) , // 边线颜色
+     *     "border-opa": 100255 ,              // 边线不透明度
+     * })
+     * // 设置单个样式
+     * obj.setStyle("width","100%")
+     * ```
+     * 
+     * @module lv
+     * @class Obj
+     * @method setStyle
+     * @param style:string|object 样式名称或多个样式的对象
+     * @param value:number|string 样式值，当第一个参数是对象的时候，此参数无效
+     * @return number|string
+     */
     JSValue Obj::setStyle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         JSVALUE_TO_LVOBJ(this_val,lvobj)
         ASSERT_ARGC(1)
