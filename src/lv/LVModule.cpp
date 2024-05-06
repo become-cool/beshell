@@ -76,6 +76,16 @@ namespace be::lv {
         beshell->useModule<driver::display::DisplayModule>() ;
     }
 
+
+    /**
+     * 返回当前激活的 `屏幕对象`
+     * 
+     * `屏幕对象` 是指当前显示在屏幕上的对象，是所有可见组件的根节点，自身没有父节对象。
+     * 
+     * @module lv
+     * @function screen
+     * @return Obj[widget/Obj] 当前激活的屏幕对象
+     */
     JSValue LVModule::screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         lv_obj_t * lvobj = lv_screen_active() ;
         if(!lvobj) {
@@ -83,6 +93,18 @@ namespace be::lv {
         }
         return JS_DupValue(ctx,Obj::wrap(ctx,lvobj)->jsobj) ;
     }
+
+    
+    /**
+     * 将参数指定的对象作为 `屏幕对象` 加载到当前显示器上
+     * 
+     * 加载成功后，传入对象的父对象会被设置为 null
+     * 
+     * @module lv
+     * @function load
+     * @param obj:Obj[widget/Obj] 要加载的屏幕对象
+     * @return undefined
+     */
     JSValue LVModule::load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(Obj, argv[0], obj)
@@ -90,6 +112,16 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+    /**
+     * 将 0-100 范围的整数转换为能够表示百分比的 16位整数值
+     * 
+     * 改数值是 lvgl 内部使用的格式
+     * 
+     * @module lv
+     * @function pct
+     * @param value:number 0-100范围的整数
+     * @return number
+     */
     JSValue LVModule::pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_UINT16(0,val)
@@ -97,6 +129,15 @@ namespace be::lv {
     }
 
 
+    
+    /**
+     * 将传入的屏幕驱动对象注册为 lv 的屏幕
+     * 
+     * @module lv
+     * @function registerDisplay
+     * @param driver 屏幕驱动对象
+     * @return bool 是否注册成功
+     */
     JSValue LVModule::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::display::Display, argv[0], display)
@@ -219,6 +260,14 @@ namespace be::lv {
         lv_anim_t * scroll_throw_anim;
     } _lv_indev_t ;
 
+    /**
+     * 将一个输入设备的驱动对象注册为 lv 的输入设备
+     * 
+     * @module lv
+     * @function registerInputDevice
+     * @param driver 输入设备驱动对象
+     * @return bool 是否注册成功
+     */
     JSValue LVModule::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
@@ -241,6 +290,13 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+    /**
+     * 禁用所有的输入设备，可用于锁定系统
+     * 
+     * @module lv
+     * @function disableAllInDev
+     * @return undefined
+     */
     JSValue LVModule::disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         lv_indev_t * indev = NULL;
         for(;;) {
@@ -256,6 +312,13 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     
+    /**
+     * 恢复输入设备
+     * 
+     * @module lv
+     * @function disableAllInDev
+     * @return undefined
+     */
     JSValue LVModule::enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         lv_indev_t * indev = NULL;
         for(;;) {
