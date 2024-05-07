@@ -1,35 +1,16 @@
 #include "RGB565.hpp"
 #include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
 // #include "qjs_utils.h"
 
+#ifdef CONFIG_IDF_TARGET_ESP32S3
 
 using namespace std ;
 
 namespace be::driver::display {
 
-// #define GPIO_LCD_DE     (GPIO_NUM_5)
-// #define GPIO_LCD_VSYNC  (GPIO_NUM_6)
-// #define GPIO_LCD_HSYNC  (GPIO_NUM_7)
-// #define GPIO_LCD_PCLK   (GPIO_NUM_4)
-
-// #define GPIO_LCD_R0    (GPIO_NUM_11)
-// #define GPIO_LCD_R1    (GPIO_NUM_21)
-// #define GPIO_LCD_R2    (GPIO_NUM_47)
-// #define GPIO_LCD_R3    (GPIO_NUM_48)
-// #define GPIO_LCD_R4    (GPIO_NUM_45)
-
-// #define GPIO_LCD_G0    (GPIO_NUM_19)
-// #define GPIO_LCD_G1    (GPIO_NUM_20)
-// #define GPIO_LCD_G2    (GPIO_NUM_4)
-// #define GPIO_LCD_G3    (GPIO_NUM_46)
-// #define GPIO_LCD_G4    (GPIO_NUM_9)
-// #define GPIO_LCD_G5    (GPIO_NUM_10)
-
-// #define GPIO_LCD_B0    (GPIO_NUM_15)
-// #define GPIO_LCD_B1    (GPIO_NUM_16)
-// #define GPIO_LCD_B2    (GPIO_NUM_17)
-// #define GPIO_LCD_B3    (GPIO_NUM_18)
-// #define GPIO_LCD_B4    (GPIO_NUM_8)
 
 // typedef struct {
 //     lcd_clock_source_t clk_src;   /*!< Clock source for the RGB LCD peripheral */
@@ -253,3 +234,5 @@ namespace be::driver::display {
     }
     
 }
+
+#endif

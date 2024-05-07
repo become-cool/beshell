@@ -1,4 +1,5 @@
 #pragma once
+#ifdef CONFIG_IDF_TARGET_ESP32S3
 
 #include "RGB565.hpp"
 #include "driver/gpio.h"
@@ -29,3 +30,5 @@ namespace be::driver::display {
     } ;
 
 }
+
+#endif

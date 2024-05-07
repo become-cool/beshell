@@ -3,6 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+
+
 using namespace std ;
 
 namespace be::driver::display {
@@ -342,3 +345,5 @@ namespace be::driver::display {
     }
 
 }
+
+#endif

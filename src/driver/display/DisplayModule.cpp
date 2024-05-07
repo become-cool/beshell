@@ -11,8 +11,10 @@ namespace be::driver::display {
     DisplayModule::DisplayModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
+#ifdef CONFIG_IDF_TARGET_ESP32S3
         exportClass<RGB565>() ;
         exportClass<ST7701>() ;
+#endif
         exportFunction("rgb", jsFromRGB) ;
         exportFunction("rgb565", jsFromRGB565) ;
         exportFunction("toRGB", jsToRGB) ;

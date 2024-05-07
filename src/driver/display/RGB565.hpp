@@ -1,4 +1,5 @@
 #pragma once
+#ifdef CONFIG_IDF_TARGET_ESP32S3
 
 #include "Display.hpp"
 
@@ -6,10 +7,6 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "freertos/task.h"
 
 namespace be::driver::display {
 
@@ -38,3 +35,5 @@ namespace be::driver::display {
     } ;
 
 }
+
+#endif

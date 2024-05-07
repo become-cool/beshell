@@ -24,14 +24,7 @@ namespace be::mg {
 
         static void loop(const BeShell & beshell, void * data) ;
 
-        static void use(be::BeShell * beshell) {
-            // beshell.useModule<MgModule>("mg") ;
-            beshell->addLoopFunction(loop, nullptr) ;
-
-            ca_path = beshell->fs->toVFSPath("/var/ca.pem") ;
-            cert_path = beshell->fs->toVFSPath("/var/cert.pem") ;
-            certkey_path = beshell->fs->toVFSPath("/var/key.pem") ;
-        }
+        static void use(be::BeShell * beshell) ;
 
         static const char * eventName(int ev) ;
         static int eventConst(const char * evname) ;
