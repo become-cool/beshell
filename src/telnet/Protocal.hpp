@@ -15,6 +15,7 @@ namespace be {
 		HEAD2 = 18 ,
 		HEAD2_V = 19 ,
 	} ;
+	#undef OUTPUT  // esp-idf define MACRO as same name
 	enum Cmd {
 		LINE = 0					// 行数数据
 		, RUN = 1					// 执行js代码，无返回值

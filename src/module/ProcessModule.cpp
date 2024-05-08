@@ -195,23 +195,23 @@ namespace be {
     JSValue ProcessModule::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
-        uint8_t CPU_RunInfo[400];
-        memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+        // uint8_t CPU_RunInfo[400];
+        // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
  
-        vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
+        // vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
 
-        printf("----------------------------------------------------\r\n");
-        printf("task_name     task_status     priority stack task_id\r\n");
-        printf("%s", CPU_RunInfo);
-        printf("----------------------------------------------------\r\n");
+        // printf("----------------------------------------------------\r\n");
+        // printf("task_name     task_status     priority stack task_id\r\n");
+        // printf("%s", CPU_RunInfo);
+        // printf("----------------------------------------------------\r\n");
 
-        memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+        // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
 
-        vTaskGetRunTimeStats((char *)&CPU_RunInfo);
+        // vTaskGetRunTimeStats((char *)&CPU_RunInfo);
 
-        printf("task_name      run_cnt                 usage_rate   \r\n");
-        printf("%s", CPU_RunInfo);
-        printf("----------------------------------------------------\r\n");
+        // printf("task_name      run_cnt                 usage_rate   \r\n");
+        // printf("%s", CPU_RunInfo);
+        // printf("----------------------------------------------------\r\n");
 #endif
 #endif
 

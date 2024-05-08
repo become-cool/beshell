@@ -38,6 +38,9 @@
 #include <algorithm>
 #include <cxxabi.h>
 #include <cstdlib>
+#include <type_traits>
+
+#undef F
 
 namespace cmdline{
 
@@ -118,7 +121,7 @@ std::string readable_typename()
   return demangle(typeid(T).name());
 #else
   std::string tpname = "unknown" ;
-  if(std::is_same_v<T, float>) {
+  if(std::is_same<T, float>::value) {
     tpname = "float" ;
   }
   return demangle(tpname);

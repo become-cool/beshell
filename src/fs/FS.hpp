@@ -18,7 +18,7 @@ namespace be {
     private:
 
 #ifdef ESP_PLATFORM
-        map<std::string, FSPartition *> partitions;
+        std::map<std::string, FSPartition *> partitions;
         std::string pwd = "/" ;
 #endif
         std::string prefix ;
