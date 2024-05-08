@@ -47,8 +47,10 @@ namespace be {
         JS_CFUNC_DEF("readR8", 2, I2C::readR8),
         JS_CFUNC_DEF("readR16", 2, I2C::readR16),
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
+        #if SOC_I2C_SUPPORT_SLAVE
         JS_CFUNC_DEF("listen", 2, I2C::listen),
         JS_CFUNC_DEF("slaveWrite", 2, I2C::slaveWrite),
+        #endif
     } ;
 
     I2C::I2C(JSContext * ctx, i2c_port_t busnum)
@@ -85,12 +87,14 @@ namespace be {
             }
             return i2c0 ;
         }
+        #ifdef I2C_NUM_1
         else if(bus==I2C_NUM_1) {
             if(!i2c1) {
                 i2c1 = new I2C(ctx, I2C_NUM_1) ;
             }
             return i2c1 ;
         }
+        #endif
         return nullptr ;
     }
     
@@ -144,13 +148,17 @@ namespace be {
             GET_INT32_PROP_OPT(argv[0], "freq", i2c_config.master.clk_speed, 100000)
             GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 0)
             GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 0)
-
-        } else if(mode==I2C_MODE_SLAVE) {
+        }
+        
+        #if SOC_I2C_SUPPORT_SLAVE
+        else if(mode==I2C_MODE_SLAVE) {
             GET_UINT32_PROP_OPT(argv[0], "rx_buffer_len", rx_buffer_len, 1024 )
             GET_UINT32_PROP_OPT(argv[0], "tx_buffer_len", tx_buffer_len, 1024 )
             GET_INT32_PROP_OPT(argv[0], "addr_10bit_en", i2c_config.slave.addr_10bit_en, 0)
             GET_INT32_PROP(argv[0], "slave_addr", i2c_config.slave.slave_addr, )
         }
+        #endif
+
         else {
             JSTHROW("invalid mode")
         }
@@ -383,6 +391,7 @@ namespace be {
     }
 
     // for slave 
+    #if SOC_I2C_SUPPORT_SLAVE
     typedef struct {
         uint8_t * data ;
         int len ;
@@ -466,4 +475,5 @@ namespace be {
             return JS_FALSE ;
         }
     }
+    #endif
 }

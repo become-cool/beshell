@@ -105,7 +105,6 @@ idf_component_register(
             esp_lcd
             bt
             ${requires}
-        # EMBED_FILES src/js/wifi.js
 )
 
 # for lvgl
@@ -114,7 +113,7 @@ add_definitions(-DLV_CONF_INCLUDE_SIMPLE)
 
 # # for mongoose tls/ssl
 add_definitions(-DMG_ENABLE_MBEDTLS)
-add_definitions(-DMG_ARCH_ESP32)
+# add_definitions(-DMG_ARCH_ESP32)
 # add_definitions(-DMG_ENABLE_OPENSSL)
 # add_definitions(-DMG_ENABLE_LINES)
 # add_definitions(-DMBEDTLS_X509_CA_CHAIN_ON_DISK)
@@ -141,7 +140,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-conversion")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
 
-target_compile_options(${COMPONENT_LIB} PRIVATE -fno-stack-protector -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -mlongcalls -nostdlib -Wpointer-arith -Wno-error=unused-value -Wno-error=unused-label -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-error=char-subscripts -Wno-error=maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-error=misleading-indentation -Wno-error=stringop-truncation)
+
+# -mlongcalls
+target_compile_options(${COMPONENT_LIB} PRIVATE -fno-stack-protector -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -nostdlib -Wpointer-arith -Wno-error=unused-value -Wno-error=unused-label -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-error=char-subscripts -Wno-error=maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-error=misleading-indentation -Wno-error=stringop-truncation)
 
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
@@ -152,6 +153,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-value")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-brace")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-enum-enum-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=comment")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-pointer-arith")
 
 if (COMMAND component_compile_options)
     # both c and c++

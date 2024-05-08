@@ -270,9 +270,12 @@ function (gpio,time) {
         if(adc==1) {
             ret = adc1_config_channel_atten((adc1_channel_t)channel, (adc_atten_t)atten) ;
         }
+        
+        #if (SOC_ADC_PERIPH_NUM >= 2)
         else if(adc==2) {
             ret = adc2_config_channel_atten((adc2_channel_t)channel, (adc_atten_t)atten) ;
         }
+        #endif
         
         return (ret==ESP_OK)? JS_TRUE: JS_FALSE ;
     }

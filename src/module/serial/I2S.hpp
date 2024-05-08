@@ -11,7 +11,10 @@ namespace be {
         // static std::vector<JSCFunctionListEntry> staticMethods ;
 
         static I2S * i2s0 ;
+
+        #ifdef I2S_NUM_1
         static I2S * i2s1 ;
+        #endif
         
         i2s_port_t busnum ;
 

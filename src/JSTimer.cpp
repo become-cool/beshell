@@ -7,7 +7,7 @@
 using namespace std;
 
 #define _MUTEX(fromISR, createWhenFirst, critical)     \
-    {                                                  \  
+    {                                                  \
         bool toke = take(fromISR, createWhenFirst) ;   \
         critical                                       \
         if(toke) {                                     \

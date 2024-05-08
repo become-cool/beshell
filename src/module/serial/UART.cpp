@@ -33,8 +33,12 @@ namespace be{
         }
     UART * UART::flyweight(JSContext * ctx, uart_port_t bus) {
         DEFINE_BUS(UART_NUM_0, uart0)
+        #ifdef UART_NUM_1
         else DEFINE_BUS(UART_NUM_1, uart1)
+        #endif
+        #ifdef UART_NUM_2
         else DEFINE_BUS(UART_NUM_2, uart2)
+        #endif
         return nullptr ;
     }
 

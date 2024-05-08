@@ -1,12 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "debug.h"
-#include "JSEngine.hpp"
-#include "repl/REPL.hpp"
-#include "fs/FS.hpp"
-#include "telnet/Telnet.hpp"
-#include "driver/DriverModule.hpp"
+#include "include.hpp"
 
 #ifdef ESP_PLATFORM
 #include "lv/LV.hpp"

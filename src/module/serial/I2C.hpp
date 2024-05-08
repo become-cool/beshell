@@ -33,11 +33,13 @@ namespace be {
 
         i2c_mode_t mode = I2C_MODE_MASTER ;
 
+        #if SOC_I2C_SUPPORT_SLAVE
         TaskHandle_t slaveTask = nullptr ;
         JSValue slaveListener = JS_NULL ;
         QueueHandle_t data_queue = nullptr ;
         static void loop(JSContext * ctx, void * opaque) ;
         static void task_i2c_slave(void *arg) ;
+        #endif
 
         static I2C * i2c0 ;
         static I2C * i2c1 ;
@@ -112,8 +114,10 @@ namespace be {
         static JSValue readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         // for slave mode
+        #if SOC_I2C_SUPPORT_SLAVE
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        #endif
 
     } ;
 

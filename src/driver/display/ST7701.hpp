@@ -1,9 +1,9 @@
 #pragma once
-#ifdef CONFIG_IDF_TARGET_ESP32S3
 
 #include "RGB565.hpp"
 #include "driver/gpio.h"
 
+#ifdef CONFIG_IDF_TARGET_ESP32S3
 namespace be::driver::display {
 
     class ST7701: public RGB565 {

@@ -43,8 +43,12 @@ namespace be {
         }
     SPI * SPI::flyweight(JSContext * ctx, spi_host_device_t bus) {
         DEFINE_BUS(SPI1_HOST, spi0)
+        #ifdef SPI2_HOST
         else DEFINE_BUS(SPI2_HOST, spi1)
+        #endif
+        #ifdef SPI3_HOST
         else DEFINE_BUS(SPI3_HOST, spi2)
+        #endif
         return nullptr ;
     }
 
