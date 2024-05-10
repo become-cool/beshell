@@ -10,7 +10,7 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 #include "debug.h"
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 
 
 #include "freertos/FreeRTOS.h"
@@ -23,10 +23,10 @@ extern "C" {
 #include "psram.h"
 #include <sys/stat.h>
 
-#include "mp3dec.h"
+#include "deps/helix/src/mp3dec.h"
 
-#include "tsf.h"
-#include "tml.h"
+#include "deps/TinySoundFont/tsf.h"
+#include "deps/TinySoundFont/tml.h"
 
 #define STAT_RUNNING        1
 #define STAT_STOPPING       2

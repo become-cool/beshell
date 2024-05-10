@@ -134,8 +134,8 @@ namespace be {
         timer.loop(ctx) ;
         js_std_loop(ctx) ;
 
-        for(auto pair:loopFunctions) {
-            pair.first(ctx, pair.second) ;
+        for(auto _pair:loopFunctions) {
+            _pair.first(ctx, _pair.second) ;
         }
 
         for(auto obj:loopables) {
@@ -235,13 +235,13 @@ namespace be {
 
     void JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat) {
         if(ignoreRepeat) {
-            for(auto pair:loopFunctions) {
-                if(func==pair.first) {
+            for(auto _pair:loopFunctions) {
+                if(func==_pair.first) {
                     return ;
                 }
             }
         }
-        loopFunctions.push_back( pair(func,opaque) ) ;
+        loopFunctions.push_back( std::pair<EngineLoopFunction,void *>(func,opaque) ) ;
     }
 
     void JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat) {

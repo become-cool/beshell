@@ -16,14 +16,6 @@ using namespace std ;
 
 namespace be {
 
-    /**
-     * 该类的构造函数没有绑定给 JS , 无法从 JS 创建实例。
-     * 
-     * 模块 [serial](overview.md) 创建了和硬件对应的 I2C 实例，`import serial` 即可。
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     */
     
     DEFINE_NCLASS_META(I2C, NativeClass)
 
@@ -98,31 +90,6 @@ namespace be {
         return nullptr ;
     }
     
-    /**
-     * 设置 i2c 外设, 若遇到错误则抛出异常
-     * 
-     * ```typescript
-     * options: {
-     *   sda: number,
-     *   scl: number,
-     *   mode: number = 0
-     *   rx_buffer_len: number = 0
-     *   tx_buffer_len: number = 0
-     *   freq: number = 400000
-     *   addr_10bit_en: number = 0
-     *   slave_addr: number|undefined = undefined
-     *   timeout: number = 1000
-     * }
-     * ```
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     * @method setup
-     * 
-     * @param options:object
-     * @return undefined
-     * 
-     */
     JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
         ASSERT_ARGC(1)
@@ -212,16 +179,6 @@ namespace be {
         return res == ESP_OK ;
     }
 
-    /**
-     * 测试总线上的设备是否存在
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     * @method ping
-     * 
-     * @param addr:number 设备地址
-     * @return bool true 表示该地址上设备存在，false 表示不存在
-     */
     JSValue I2C::ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(I2C, that)
@@ -229,18 +186,6 @@ namespace be {
         ARGV_TO_UINT8(0, addr)
         return that->ping(addr)? JS_TRUE: JS_FALSE ;
     }
-    
-    /**
-     * 在总线上扫描设备给定地址范围的所有设备，在控制台上输出存在的地址
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     * @method scan
-     * 
-     * @param from:number=0 起始地址
-     * @param to:number=127 结束地址
-     * @return undefined
-     */
     JSValue I2C::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
         JSCHECK_MASTER
@@ -249,25 +194,6 @@ namespace be {
         that->scan(from,to) ;
         return JS_UNDEFINED ;
     }
-    
-    
-    /**
-     * 在总线上向指定设备发送数据
-     * 
-     * 参数 `data` 可以是 ArrayBuffer 对象, 也可以是字节数值的数值, 例如：[0x1, 0x2, 0x3]
-     * 
-     * * 发送数据后，接收到设备的 ack 回应则返回 true
-     * * 否则返回 false (总线上设备可能不存在)
-     * * 其他错误抛出异常
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     * @method send
-     * 
-     * @param addr:number 设备地址
-     * @param data:number[]|ArrayBuffer 字节数据
-     * @return bool
-     */
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         THIS_NCLASS(I2C, that)
@@ -315,21 +241,6 @@ namespace be {
         I2C_WRITE(uint32_t,ARGV_TO_UINT32)
     }
 
-    /**
-     * 在总线上从指定地址(参数`addr`)的设备, 接收指定长度(参数`length`)的数据
-     * 
-     * * 接收到的数据以 ArrayBuffer 对象返回
-     * * 如果总线上设备不存在则返回 null
-     * * 其他错误抛出异常
-     * 
-     * @module [serial](../serial)
-     * @class I2C
-     * @method recv
-     * 
-     * @param addr:number 设备地址
-     * @param length:number 接收数据的长度
-     * @return ArrayBuffer|null
-     */
     JSValue I2C::recv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, addr)

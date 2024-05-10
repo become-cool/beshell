@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include "NativeClass.hpp"
 #include "debug.h"
 #include <vector>

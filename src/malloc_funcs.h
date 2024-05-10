@@ -1,7 +1,7 @@
 #ifndef ONCE_H_MALLOC_FUNCS
 #define ONCE_H_MALLOC_FUNCS
 
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 
 #ifdef __cplusplus
 extern "C" {

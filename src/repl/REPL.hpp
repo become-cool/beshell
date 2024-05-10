@@ -2,11 +2,11 @@
 #include <vector>
 #include <set>
 #include <memory>
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include "telnet/Protocal.hpp"
-#include "cmdline/cmdline.hpp"
-// #include "argparse.hpp"
-#include "Options.hpp"
+#include "deps/cmdline/cmdline.hpp"
+// #include "deps/argparse.hpp"
+#include "deps/Options.hpp"
 
 
 namespace be {

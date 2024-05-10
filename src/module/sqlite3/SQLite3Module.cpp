@@ -1,6 +1,6 @@
 #include "SQLite3Module.hpp"
 #include "DB.hpp"
-#include "sqlite3/sqlite3.h"
+#include "deps/sqlite3/sqlite3.h"
 #include <fs/FS.hpp>
 
 namespace be::sqlite{

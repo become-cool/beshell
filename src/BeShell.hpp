@@ -8,7 +8,7 @@
 #endif
 
 
-#define BESHELL_VERSION "0.3.0"
+#define BESHELL_VERSION "0.3.1"
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
 
@@ -68,8 +68,12 @@ namespace be {
 #endif
         
         template <typename ModuleClass>
-        void useModule(const char * name=nullptr) {
+        void use(const char * name=nullptr) {
             engine->mloader.add<ModuleClass>(this, name) ;
+        }
+        template <typename ModuleClass>
+        void useModule(const char * name=nullptr) {
+            use<ModuleClass>(name) ;
         }
 
         template <typename DriverClass>

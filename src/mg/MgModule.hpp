@@ -6,7 +6,7 @@
 #include "Client.hpp"
 #include "HTTPRequest.hpp"
 #include "Response.hpp"
-#include "mongoose/mongoose.h"
+#include "deps/mongoose/mongoose.h"
 
 
 namespace be::mg {

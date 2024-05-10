@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EventEmitter.hpp"
-#include "lvgl.h"
+#include "deps/lvgl/lvgl.h"
 #include "../const.hpp"
 
 

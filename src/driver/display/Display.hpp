@@ -3,7 +3,7 @@
 #include <BeShell.hpp>
 #include <NativeClass.hpp>
 #ifdef MODULE_LV
-#include "lvgl.h"
+#include "deps/lvgl/lvgl.h"
 #endif
 
 namespace be::driver::display {

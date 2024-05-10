@@ -1,8 +1,8 @@
 #pragma once
 
 #include "debug.h"
-#include "quickjs/quickjs-libc.h"
-#include "quickjs/cutils.h"
+#include "deps/quickjs/quickjs-libc.h"
+#include "deps/quickjs/cutils.h"
 #include <stdbool.h>
 
 #ifdef __cplusplus

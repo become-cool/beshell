@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lvgl/lvgl.h"
+#include "deps/lvgl/lvgl.h"
 #include "esp_timer.h"
 #include <map>
 #include <string>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <NativeClass.hpp>
-#include <lvgl.h>
+#include "deps/lvgl/lvgl.h"
 
 namespace be::lv {
 

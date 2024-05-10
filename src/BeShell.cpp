@@ -88,13 +88,13 @@ namespace be {
 
     void BeShell::addLoopFunction(LoopFunction func, void * opaque, bool ignoreRepeat) {
         if(ignoreRepeat) {
-            for(auto pair:loopFunctions) {
-                if(func==pair.first) {
+            for(auto _pair:loopFunctions) {
+                if(func==_pair.first) {
                     return ;
                 }
             }
         }
-        loopFunctions.push_back( pair(func,opaque) ) ;
+        loopFunctions.push_back( std::pair<LoopFunction,void *>(func,opaque) ) ;
     }
 
     void BeShell::setup() {

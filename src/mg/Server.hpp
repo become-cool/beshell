@@ -1,7 +1,7 @@
 #pragma once
 
 #include <NativeClass.hpp>
-#include "mongoose/mongoose.h"
+#include "deps/mongoose/mongoose.h"
 
 namespace be::mg {
     class Server: public ::be::NativeClass {
