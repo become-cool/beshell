@@ -27,7 +27,7 @@ namespace be {
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
-        exportFunction("setTimezoneOffset", setTimezoneOffset);
+        exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("readEFUSE", readEFUSE);
 
         exportName("versions") ;
@@ -254,7 +254,7 @@ namespace be {
      * @param minute:number 时间偏置分钟
      * @return undefined
      */
-    JSValue ProcessModule::setTimezoneOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue ProcessModule::setTimezone(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ARGC(1)
         ARGV_TO_INT32(0, minute)
 
