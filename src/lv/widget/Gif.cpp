@@ -38,14 +38,10 @@ namespace be::lv {
     }
 
     JSValue Gif::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){
-        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
-        if(!engine || !engine->beshell || !engine->beshell) {
-            JSTHROW("sth wrong")
-        }
         THIS_NCLASS(Img,thisobj)
         const char * src = (char *)JS_ToCString(ctx, value) ;
 
-        string path = string("C:") + engine->beshell->fs->toVFSPath(src) ;
+        string path = string("C:") + FS::toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
 
         lv_gif_set_src(thisobj->lvobj(), path.c_str()) ;

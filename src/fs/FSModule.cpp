@@ -43,30 +43,25 @@ namespace be {
         EXPORT_FUNCTION(close) ;
     }
 
-    #define FETCH_FS                                                \
-            FS * fs = JSEngine::fromJSContext(ctx)->beshell->fs ;   \
-            if(!fs) {                                               \
-                JSTHROW("call BeShell::USE_FS() first")             \
-            }
     #define ARGV_PATH(var, i)                                       \
             string var ;                                            \
             {                                                       \
                 const char * cpath = JS_ToCString(ctx, argv[i]) ;   \
-                var = fs->toVFSPath(cpath) ;                        \
+                var = FS::toVFSPath(cpath) ;                        \
                 JS_FreeCString(ctx, cpath) ;                        \
             }
 
     #define STAT_PATH(path)                                                             \
         struct stat statbuf;                                                            \
         if(stat(path.c_str(),&statbuf)<0) {                                             \
-            JS_ThrowReferenceError(ctx, "Failed to stat file %s", fs->trimVFSPath(path).c_str()); \
+            JS_ThrowReferenceError(ctx, "Failed to stat file %s", FS::trimVFSPath(path).c_str()); \
             return JS_EXCEPTION ;                                                       \
         }
 
     #define CHECK_IS_NOT_DIR(path)                                                      \
         STAT_PATH(path)                                                                 \
         if(S_ISDIR(statbuf.st_mode)) {                                                  \
-            JS_ThrowReferenceError(ctx, "Path is a directory %s", fs->trimVFSPath(path).c_str()); \
+            JS_ThrowReferenceError(ctx, "Path is a directory %s", FS::trimVFSPath(path).c_str()); \
             return JS_EXCEPTION ;                                                       \
         }
 
@@ -80,14 +75,13 @@ namespace be {
      */
     JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
 
         bool recursive = false ;
         if(argc>1) {
             recursive = JS_ToBool(ctx, argv[1]) ;
         }
-        return JSEngine::fromJSContext(ctx)->beshell->fs->mkdir(path.c_str(), recursive)? JS_TRUE: JS_FALSE ;
+        return FS::mkdir(path.c_str(), recursive)? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -99,13 +93,12 @@ namespace be {
      */
     JSValue FSModule:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
         bool recursive = false ;
         if(argc>1) {
             recursive = JS_ToBool(ctx, argv[1]) ;
         }
-        return JSEngine::fromJSContext(ctx)->beshell->fs->rm(path.c_str(), recursive)? JS_TRUE: JS_FALSE ;
+        return FS::rm(path.c_str(), recursive)? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -117,7 +110,6 @@ namespace be {
      */
     JSValue FSModule:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
         return (unlink(path.c_str())>=0)? JS_TRUE: JS_FALSE ;
     }
@@ -140,7 +132,6 @@ namespace be {
     JSValue FSModule:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
 
         CHECK_IS_NOT_DIR(path)
@@ -197,7 +188,6 @@ namespace be {
     JSValue FSModule:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         ASSERT_ARGC(2)
-        FETCH_FS
         ARGV_PATH(path, 0)
 
         bool append = false ;
@@ -214,7 +204,7 @@ namespace be {
 
         FILE * fd = fopen(path.c_str(), append? "a+": "w");
         if(NULL==fd) {
-            JS_ThrowReferenceError(ctx, "Failed to open file %s", fs->trimVFSPath(path).c_str());
+            JS_ThrowReferenceError(ctx, "Failed to open file %s", FS::trimVFSPath(path).c_str());
             return JS_EXCEPTION ;
         }
 
@@ -266,7 +256,6 @@ namespace be {
     JSValue FSModule:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
 
         DIR* dir = opendir(path.c_str());
@@ -278,7 +267,7 @@ namespace be {
         }
 
         if(!dir) {
-            JS_ThrowReferenceError(ctx, "Cound not open dir %s", fs->trimVFSPath(path).c_str());
+            JS_ThrowReferenceError(ctx, "Cound not open dir %s", FS::trimVFSPath(path).c_str());
             return JS_EXCEPTION ;
         }
         
@@ -349,7 +338,6 @@ namespace be {
      */
     JSValue FSModule:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
 
         bool recursive = false ;
@@ -357,7 +345,7 @@ namespace be {
             recursive = JS_ToBool(ctx, argv[1]) ;
         }
 
-        bool ret = fs->rm(path.c_str(), recursive) ;
+        bool ret = FS::rm(path.c_str(), recursive) ;
 
         return ret? JS_TRUE: JS_FALSE ;
     }
@@ -374,7 +362,6 @@ namespace be {
     JSValue FSModule:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(oldpath, 0)
         ARGV_PATH(newpath, 1)
 
@@ -394,7 +381,6 @@ namespace be {
      */
     JSValue FSModule:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
         struct stat statbuf;
         if(stat(path.c_str(),&statbuf)<0) {
@@ -430,9 +416,8 @@ namespace be {
      */
     JSValue FSModule:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->exist(path.c_str())? JS_TRUE: JS_FALSE ;
+        return FS::exist(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -445,9 +430,8 @@ namespace be {
      */
     JSValue FSModule:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->isFile(path.c_str())? JS_TRUE: JS_FALSE ;
+        return FS::isFile(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**
@@ -460,9 +444,8 @@ namespace be {
      */
     JSValue FSModule::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
-        FETCH_FS
         ARGV_PATH(path, 0)
-        return fs->isDir(path.c_str())? JS_TRUE: JS_FALSE ;
+        return FS::isDir(path.c_str())? JS_TRUE: JS_FALSE ;
     }
 
     /**

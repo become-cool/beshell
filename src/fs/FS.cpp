@@ -31,6 +31,10 @@ using namespace std ;
 
 
 namespace be {
+    
+    map<std::string, FSPartition *> FS::partitions;
+    std::string FS::pwd = "/" ;
+    std::string FS::prefix ;
 
     inline static bool isDir(const char * path) {
         struct stat statbuf;
@@ -127,27 +131,11 @@ namespace be {
         return path ;
     }
     
-    std::string FS::toVFSPath(JSContext * ctx, const char * path) {
-        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
-        if(!engine) {
-            return std::string(path) ;
-        }
-        assert(engine->beshell) ;
-        assert(engine->beshell->fs) ;
-        return engine->beshell->fs->toVFSPath(path) ;
-    }
-    
     std::string FS::toVFSPath(JSContext * ctx, JSValue path) {
-        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         const char * cpath = JS_ToCString(ctx, path) ;
         std::string cstrpath(cpath) ;
         JS_FreeCString(ctx, cpath) ;
-        if(!engine) {
-            return cstrpath ;
-        }
-        assert(engine->beshell) ;
-        assert(engine->beshell->fs) ;
-        return engine->beshell->fs->toVFSPath(cstrpath) ;
+        return FS::toVFSPath(cstrpath) ;
     }
 
     std::string FS::trimVFSPath(const std::string & path) {

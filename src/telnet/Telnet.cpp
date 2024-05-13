@@ -72,12 +72,6 @@ namespace be {
         }
     }
 
-#define CHECK_FS_USED       \
-        if(!beshell->fs) {  \
-            ch->sendError(pkg->head.fields.pkgid, "Do not use FS.") ; \
-            return ;        \
-        }
-
     void Telnet::output(const char * data, size_t datalen, int pkgid, uint8_t cmd) {
         if(pkgid<0) {
             pkgid = autoIncreasePkgId ++ ;
@@ -110,8 +104,7 @@ namespace be {
         return nullptr ;
     }
     void Telnet::openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) {
-        CHECK_FS_USED
-
+        
         if( pkg->body()[pkg->body_len-1]!=0 ) {
             ch->sendError(pkg->head.fields.pkgid, "Invalid path value(must be null ending)") ;
             return ;
@@ -123,7 +116,7 @@ namespace be {
         }
         
         const char * cpath = (const char *)pkg->body() ;
-        string path = beshell->fs->toVFSPath(cpath) ;
+        string path = FS::toVFSPath(cpath) ;
 
         ch->openedFile = fopen(path.c_str(), append?"a+":"w+") ;
 
@@ -134,12 +127,10 @@ namespace be {
         }
     }
     void Telnet::offsetFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        CHECK_FS_USED
         ch->sendError(pkg->head.fields.pkgid, "cmd not implements") ;
     }
     void Telnet::closeFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        CHECK_FS_USED
-
+        
         if(ch->openedFile) {
             fclose(ch->openedFile) ;
             ch->openedFile = nullptr ;
@@ -149,8 +140,7 @@ namespace be {
     }
     
     void Telnet::pushFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        CHECK_FS_USED
-
+        
         if(!ch->openedFile) {
             ch->sendError(pkg->head.fields.pkgid, "file not opened") ;
             return ;
@@ -177,8 +167,7 @@ namespace be {
         }
     }
     void Telnet::pullFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        CHECK_FS_USED
-
+        
         const char * cpath = (const char *)pkg->body() ;
         int pathlen = strlen(cpath) + 1 ;
         
@@ -187,7 +176,7 @@ namespace be {
             return ;
         }
 
-        string path = beshell->fs->toVFSPath(cpath) ;
+        string path = FS::toVFSPath(cpath) ;
         // dstr(path)
         
         struct stat statbuf;

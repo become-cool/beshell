@@ -43,7 +43,7 @@ namespace be::driver {
         gpio_num_t GET_INT32_PROP(argv[0], "cs", cs, )
         int GET_INT32_PROP_OPT(argv[0], "khz", khz, 20000)
         string GET_STR_PROP(argv[0], "mount", mount, )
-        mount = FS::toVFSPath(ctx,mount.c_str()) ;
+        mount = FS::toVFSPath(mount.c_str()) ;
 
         esp_err_t ret;
         esp_vfs_fat_sdmmc_mount_config_t mount_config = {

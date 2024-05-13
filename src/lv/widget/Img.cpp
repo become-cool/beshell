@@ -67,10 +67,6 @@ namespace be::lv {
 
 
     JSValue Img::getSrc(JSContext *ctx, JSValueConst this_val){
-        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
-        if(!engine || !engine->beshell || !engine->beshell) {
-            JSTHROW("sth wrong")
-        }
         THIS_NCLASS(Img,thisobj)
 
         char * value = (char *)lv_image_get_src(thisobj->lvobj()) ;
@@ -78,7 +74,7 @@ namespace be::lv {
         if( strncmp(value,"C:",2)==0 ) {
             value+= 2 ;
         }
-        string path = engine->beshell->fs->trimVFSPath(value) ;
+        string path = FS::trimVFSPath(value) ;
 
         return value? JS_NewString(ctx, path.c_str()): JS_NULL ;
     }
@@ -106,7 +102,7 @@ namespace be::lv {
             return JS_UNDEFINED ;
         }
 
-        string path = string("C:") + engine->beshell->fs->toVFSPath(src) ;
+        string path = string("C:") + FS::toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
 
         lv_image_set_src(thisobj->lvobj(), path.c_str()) ;
