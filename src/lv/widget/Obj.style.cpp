@@ -72,7 +72,7 @@ namespace be::lv {
             if( prop==LV_STYLE_BG_IMAGE_SRC || prop==LV_STYLE_ARC_IMAGE_SRC ) {
 
                 const char * cpath = JS_ToCString(ctx, value) ;
-                string path = FS::toVFSPath(ctx, cpath) ;
+                string path = FS::toVFSPath(cpath) ;
                 char * cvfspath = (char *) malloc(path.length()) ;
                 strcpy(cvfspath, path.c_str()) ;
 

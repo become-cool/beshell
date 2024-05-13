@@ -102,7 +102,7 @@ namespace be::mg {
         JSVALUE_TO_NCLASS(HTTPRequest,argv[0],req)
 
         ARGV_TO_CSTRING_E(1, _path, "arg path must be a string")
-        string path = FS::toVFSPath(ctx, _path) ;
+        string path = FS::toVFSPath(_path) ;
 
         struct mg_http_serve_opts opts = {.root_dir = path.c_str()};
         mg_http_serve_dir(rspn->conn, req->opaque(), &opts);

@@ -55,9 +55,9 @@ namespace be::mg {
         // beshell.useModule<MgModule>("mg") ;
         beshell->addLoopFunction(loop, nullptr) ;
 
-        ca_path = beshell->fs->toVFSPath("/var/ca.pem") ;
-        cert_path = beshell->fs->toVFSPath("/var/cert.pem") ;
-        certkey_path = beshell->fs->toVFSPath("/var/key.pem") ;
+        ca_path = FS::toVFSPath("/var/ca.pem") ;
+        cert_path = FS::toVFSPath("/var/cert.pem") ;
+        certkey_path = FS::toVFSPath("/var/key.pem") ;
     }
     
     const char * MgModule::eventName(int ev) {

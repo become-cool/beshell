@@ -14,7 +14,7 @@ namespace be::lv {
         ARGV_TO_CSTRING(0, name) 
         ARGV_TO_CSTRING(1, cpath)
 
-        string path = string("C:") + FS::toVFSPath(ctx, cpath) ;
+        string path = string("C:") + FS::toVFSPath(cpath) ;
         JS_FreeCString(ctx, cpath) ;
 
         lv_font_t * font = lv_binfont_create(path.c_str());

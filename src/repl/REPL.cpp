@@ -20,25 +20,18 @@
 
 using namespace std ;
 
-
-#define CHECK_FS_USED                           \
-    if(!beshell->fs) {                          \
-        ch->send("call useFS() first\n") ;      \
-        return ;                                \
-    }
-
 #define ARGS_TO_DIR(i, var)                     \
-    string var = beshell->fs->resolve(args[i]) ;\
-    beshell->fs->toVFSPath(var) ;               \
-    if( !beshell->fs->isDir(var.c_str()) ){     \
+    string var = FS::resolve(args[i]) ;         \
+    FS::toVFSPath(var) ;                        \
+    if( !FS::isDir(var.c_str()) ){              \
         ch->send("is not a exists dir\n") ;     \
         return ;                                \
     }
 
 #define ARGS_TO_FILE(i, var)                    \
-    string var = beshell->fs->resolve(args[i]) ;\
-    beshell->fs->toVFSPath(var) ;               \
-    if( !beshell->fs->isFile(var.c_str()) ){    \
+    string var = FS::resolve(args[i]) ;         \
+    FS::toVFSPath(var) ;                        \
+    if( !FS::isFile(var.c_str()) ){             \
         ch->send("is not a exists file\n") ;    \
         return ;                                \
     }
@@ -71,12 +64,11 @@ namespace be {
                 "  -(h)                         with -l, print human readable sizes\n"
                 "  -(?|-help)                   print this message and exit\n"
             , [](BeShell * beshell, TelnetChannel * ch, Options & args){
-                CHECK_FS_USED
                 
-                string path = beshell->fs->resolve(args[0]) ;
-                beshell->fs->toVFSPath(path) ;
+                string path = FS::resolve(args[0]) ;
+                FS::toVFSPath(path) ;
 
-                if( !beshell->fs->exist(path.c_str()) ){
+                if( !FS::exist(path.c_str()) ){
                     ch->send("path is not a exists\n") ;
                     return ;
                 }
@@ -90,7 +82,7 @@ namespace be {
 
                 std::ostringstream dirsBuff, filesBuff;
 
-                if( beshell->fs->isFile(path.c_str()) ){
+                if( FS::isFile(path.c_str()) ){
                     stat(path.c_str(),&statbuf) ;
                     if(bReadable) {
                         printFileSize(statbuf.st_size, filesBuff) ;
@@ -148,26 +140,24 @@ namespace be {
         ) ;
         
         registerCommand("pwd", nullptr, [](BeShell * beshell, TelnetChannel * ch, Options & args){
-                ch->send(beshell->fs->cwd()+"\n") ;
+                ch->send(FS::cwd()+"\n") ;
             }
         ) ;
 
         registerCommand("cd",
             "Usage: cd <path>"
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
-                CHECK_FS_USED
                 ARGS_TO_DIR(0, path)
-                beshell->fs->setCwd(path) ;
+                FS::setCwd(path) ;
             }
         ) ;
         
         registerCommand("cat",
             "Usage: cat <filepath>"
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
-                CHECK_FS_USED
                 ARGS_TO_FILE(0, path)
                 int readed = 0 ;
-                unique_ptr<char> content = beshell->fs->readFileSync(path.c_str(), &readed) ;
+                unique_ptr<char> content = FS::readFileSync(path.c_str(), &readed) ;
                 ch->send(content.get(), readed) ;
             }
         ) ;
@@ -175,7 +165,6 @@ namespace be {
         registerCommand("source", 
             "Usage: source <filepath>"
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
-                CHECK_FS_USED
                 ARGS_TO_FILE(0, path)
                 JSValue ret = beshell->engine->evalScript(path.c_str()) ;
                 if(JS_IsException(ret)) {
@@ -194,8 +183,7 @@ namespace be {
                 ch->send("Miss filename") ;
                 return ;
             }
-            CHECK_FS_USED
-            if(!beshell->fs->touch(beshell->fs->resolve(args[0]).c_str())) {
+            if(!FS::touch(FS::resolve(args[0]).c_str())) {
                 ch->send("Error creating file\n");
             }
         }) ;
@@ -208,9 +196,8 @@ namespace be {
             if(args.length()<1) {
                 ch->send("missing path") ;
             }
-            CHECK_FS_USED
-            string path = beshell->fs->resolve(args[0]) ;
-            if( !beshell->fs->rm(path.c_str(), args.has("-r")) ){
+            string path = FS::resolve(args[0]) ;
+            if( !FS::rm(path.c_str(), args.has("-r")) ){
                 ch->send("rm faild") ;
             }
         }) ;
@@ -223,9 +210,8 @@ namespace be {
             if(args.length()<1) {
                 ch->send("missing path") ;
             }
-            CHECK_FS_USED
-            string path = beshell->fs->resolve(args[0]) ;
-            if( !beshell->fs->mkdir(path.c_str(), args.has("-r")) ){
+            string path = FS::resolve(args[0]) ;
+            if( !FS::mkdir(path.c_str(), args.has("-r")) ){
                 ch->send("mkdir falid") ;
             }
         }) ;
@@ -247,9 +233,8 @@ namespace be {
             if(args.length()<2) {
                 ch->send("missing source or dest path") ;
             }
-            CHECK_FS_USED
-            string source = beshell->fs->resolve(args[0]) ;
-            string dest = beshell->fs->resolve(args[1]) ;
+            string source = FS::resolve(args[0]) ;
+            string dest = FS::resolve(args[1]) ;
             ch->send("command not implements.") ;
         }) ;
 
@@ -259,9 +244,8 @@ namespace be {
             if(args.length()<2) {
                 ch->send("missing from or to path") ;
             }
-            CHECK_FS_USED
-            string source = beshell->fs->resolve(args[0]) ;
-            string dest = beshell->fs->resolve(args[1]) ;
+            string source = FS::resolve(args[0]) ;
+            string dest = FS::resolve(args[1]) ;
             ch->send("command not implements.") ;
         }) ;
 

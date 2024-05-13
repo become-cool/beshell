@@ -127,7 +127,6 @@ namespace be {
     }
 
     void BeShell::main() {
-        useBasic() ;
         setup() ;
         run() ;
     }

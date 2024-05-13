@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 # 头文件目录
 set(include_dirs
         ./src
-        ./deps
+        ./src/deps
     )
 
 # 源码目录
@@ -14,39 +14,39 @@ file(GLOB_RECURSE src_beshell
 
 # little fs
 set(src_littlefs
-        deps/littlefs/src/esp_littlefs.c
-        deps/littlefs/src/littlefs_api.c
-        deps/littlefs/src/littlefs/lfs.c
-        deps/littlefs/src/littlefs/lfs_util.c
+         src/deps/littlefs/src/esp_littlefs.c
+         src/deps/littlefs/src/littlefs_api.c
+         src/deps/littlefs/src/littlefs/lfs.c
+         src/deps/littlefs/src/littlefs/lfs_util.c
     )
 
 # quickjs
-file(GLOB_RECURSE src_quickjs deps/quickjs/*.c)
+file(GLOB_RECURSE src_quickjs  src/deps/quickjs/*.c)
 
 # lvgl
-file(GLOB_RECURSE src_lvgl deps/lvgl/src/*.c)
-list(APPEND include_dirs deps/lvgl)
-list(APPEND include_dirs deps/lvgl/src)
+file(GLOB_RECURSE src_lvgl  src/deps/lvgl/src/*.c)
+list(APPEND include_dirs  src/deps/lvgl)
+list(APPEND include_dirs  src/deps/lvgl/src)
 
 # # TinyUntar
-list(APPEND include_dirs deps/TinyUntar/tinyuntar)
-list(APPEND src_untar deps/TinyUntar/tinyuntar)
+list(APPEND include_dirs  src/deps/TinyUntar/tinyuntar)
+list(APPEND src_untar  src/deps/TinyUntar/tinyuntar)
 
 # TinySoundFont
-list(APPEND include_dirs deps/TinySoundFont)
-file(GLOB_RECURSE src_tsf deps/TinySoundFont/*.c)
+list(APPEND include_dirs  src/deps/TinySoundFont)
+file(GLOB_RECURSE src_tsf  src/deps/TinySoundFont/*.c)
 
 # mongoose
-file(GLOB_RECURSE src_mg deps/mongoose/*.c)
+file(GLOB_RECURSE src_mg  src/deps/mongoose/*.c)
 
 # helix
-list(APPEND include_dirs deps/helix/include)
-file(GLOB_RECURSE src_helix deps/helix/src/*.c)
+list(APPEND include_dirs  src/deps/helix/src)
+file(GLOB_RECURSE src_helix  src/deps/helix/src/*.c)
 
 # sqlite3
 file(GLOB_RECURSE src_sqlite3
-    deps/sqlite3/*.c
-    deps/sqlite3/*.cpp
+     src/deps/sqlite3/*.c
+     src/deps/sqlite3/*.cpp
 )
 
 
@@ -78,14 +78,14 @@ endif ()
 idf_component_register(
         SRCS
             ${src_beshell}
-            ${src_quickjs}
-            ${src_littlefs}
-            ${src_lvgl}
-            ${src_mg}
-            ${src_helix}
-            ${src_tsf}
-            ${src_untar}
-            ${src_sqlite3}
+            # ${src_quickjs}
+            # ${src_littlefs}
+            # ${src_lvgl}
+            # ${src_mg}
+            # ${src_helix}
+            # ${src_tsf}
+            # ${src_untar}
+            # ${src_sqlite3}
         # SRC_DIRS
         #     ${src_dirs}
         INCLUDE_DIRS
