@@ -35,6 +35,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_tileview_get_tile_active` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TileView
+     * @property tileActive:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_TileView_TileActive
     JSValue TileView::getTileActive(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TileView,thisobj)
@@ -47,6 +58,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_TileView_addTile
+    /**
+     * > 该方法是对 LVGL C API `lv_tileview_add_tile` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TileView
+     * @method addTile
+     *
+     */
     JSValue TileView::addTile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -74,6 +93,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TileView_setTile
+    /**
+     * > 该方法是对 LVGL C API `lv_tileview_set_tile` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TileView
+     * @method setTile
+     *
+     */
     JSValue TileView::setTile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -93,6 +120,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TileView_setTileByIndex
+    /**
+     * > 该方法是对 LVGL C API `lv_tileview_set_tile_by_index` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TileView
+     * @method setTileByIndex
+     *
+     */
     JSValue TileView::setTileByIndex(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)

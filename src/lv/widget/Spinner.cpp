@@ -38,6 +38,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Spinner_setAnimParams
+    /**
+     * > 该方法是对 LVGL C API `lv_spinner_set_anim_params` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Spinner
+     * @method setAnimParams
+     *
+     */
     JSValue Spinner::setAnimParams(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

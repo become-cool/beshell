@@ -12,6 +12,14 @@
 using namespace std;
 
 namespace be {
+
+
+    /**
+     * 系统功能模块, 命名为 `process` 是为了和 nodejs 的习惯一致
+     * 
+     * @module process
+     * @global process
+     */
     ProcessModule::ProcessModule(JSContext *ctx, const char *name, uint8_t flagGlobal)
             : NativeModule(ctx, name, flagGlobal) {
 
@@ -19,6 +27,7 @@ namespace be {
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
+        exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("readEFUSE", readEFUSE);
 
         exportName("versions") ;
@@ -48,6 +57,12 @@ namespace be {
 #endif
     }
 
+    /**
+     * 重启系统
+     * 
+     * @function reboot
+     * @return undefined
+     */
     JSValue ProcessModule::reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 #ifdef ESP_PLATFORM
         esp_restart();
@@ -55,6 +70,15 @@ namespace be {
         return JS_NewBool(ctx, true);
     }
 
+    /**
+     * 从一次性写入区(只读区) efuse 读取数据
+     * 
+     * ESP32 一共8个32位寄存器共自定义使用
+     * 
+     * @function readEFUSE
+     * @param field:number 要读取的 efuse 块和位，范围 0-7
+     * @return number 读取到的 efuse 数据 (32位整数)
+     */
     JSValue ProcessModule::readEFUSE(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)
@@ -72,6 +96,39 @@ namespace be {
         return JS_NewInt32(ctx, value) ;
     }
 
+
+    /**
+     * 内存使用情况
+     * 
+     * 返回对象的格式：
+     * 
+     * ```javascript
+     * {
+     *   "heap": {
+     *     "total": number,
+     *     "used": number,
+     *     "free": number
+     *   },
+     *   "psram": {
+     *     "total": number,
+     *     "used": number,
+     *     "free": number
+     *   },
+     *   "dma": {
+     *     "total": number,
+     *     "used": number,
+     *     "free": number
+     *   }
+     * }
+     * ```
+     * 
+     * 其中，`total` 表示总内存大小，`used` 表示已用内存大小，`free` 表示剩余内存大小。
+     * 
+     * psram 表示伪静态内存，通常是外挂的IC存储器；
+     * 
+     * @function usage
+     * @return object 
+     */
     JSValue ProcessModule::usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         (void) argc ;
         (void) argv ;
@@ -128,6 +185,13 @@ namespace be {
         return obj ;
     }
     
+
+    /**
+     * 打印系统任务运行状态，包括任务名称、状态、优先级、栈大小、任务ID、运行次数、运行时间等信息。
+     * 
+     * @function top
+     * @return undefined
+     */
     JSValue ProcessModule::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
@@ -154,6 +218,13 @@ namespace be {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 设置系统时间
+     * 
+     * @function setTime
+     * @param ms:number UNIX时间戳，单位为毫秒
+     * @return undefined
+     */
     JSValue ProcessModule::setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, ms)
@@ -170,4 +241,26 @@ namespace be {
 
         return JS_UNDEFINED ;
     }
+
+
+    /**
+     * 设置系统时区时间偏置量(分钟)
+     * 
+     * ```javascript
+     * process.setTimezoneOffset(8*60); // 设置时区为东八区
+     * ```
+     * 
+     * @function setTimezoneOffset
+     * @param minute:number 时间偏置分钟
+     * @return undefined
+     */
+    JSValue ProcessModule::setTimezone(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ARGC(1)
+        ARGV_TO_INT32(0, minute)
+
+        setTimezoneOffset(minute) ;
+
+        return JS_UNDEFINED ;
+    }
+    
 }

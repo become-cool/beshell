@@ -59,6 +59,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_chart_get_type`, `lv_chart_set_type` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @property type:LV-CONST
+     *
+     */
     #ifndef GETTER_Chart_Type
     JSValue Chart::getType(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Chart,thisobj)
@@ -83,6 +94,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_chart_get_point_count`, `lv_chart_set_point_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @property pointCount:number
+     *
+     */
     #ifndef GETTER_Chart_PointCount
     JSValue Chart::getPointCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Chart,thisobj)
@@ -102,6 +124,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_chart_set_update_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @property updateMode:LV-CONST
+     *
+     */
     #ifndef SETTER_Chart_UpdateMode
     JSValue Chart::setUpdateMode(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Chart,thisobj)
@@ -118,6 +151,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_chart_get_pressed_point` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @property pressedPoint:number
+     *
+     */
     #ifndef GETTER_Chart_PressedPoint
     JSValue Chart::getPressedPoint(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Chart,thisobj)
@@ -126,6 +170,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_chart_get_first_point_center_offset` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @property firstPointCenterOffset:number
+     *
+     */
     #ifndef GETTER_Chart_FirstPointCenterOffset
     JSValue Chart::getFirstPointCenterOffset(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Chart,thisobj)
@@ -138,6 +193,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Chart_setRange
+    /**
+     * > 该方法是对 LVGL C API `lv_chart_set_range` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @method setRange
+     *
+     */
     JSValue Chart::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -164,6 +227,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Chart_setDivLineCount
+    /**
+     * > 该方法是对 LVGL C API `lv_chart_set_div_line_count` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @method setDivLineCount
+     *
+     */
     JSValue Chart::setDivLineCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -187,6 +258,14 @@ namespace be::lv {
     // void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
 
     #ifndef METHOD_Chart_refresh
+    /**
+     * > 该方法是对 LVGL C API `lv_chart_refresh` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Chart
+     * @method refresh
+     *
+     */
     JSValue Chart::refresh(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_chart_refresh( thisobj->lvobj() ) ;

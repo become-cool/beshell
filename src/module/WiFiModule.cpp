@@ -199,8 +199,8 @@ namespace be {
         exportFunction("setAPConfig",setAPConfig,0) ;
         exportFunction("setStaConfig",setStaConfig,0) ;
         exportFunction("config",config,0) ;
-        exportFunction("connect",connect,0) ;
-        exportFunction("disconnect",disconnect,0) ;
+        exportFunction("staConnect",staConnect,0) ;
+        exportFunction("staDisconnect",staDisconnect,0) ;
         exportFunction("getIpInfo",getIpInfo,0) ;
         exportFunction("setHostname",setHostname,0) ;
         exportFunction("allSta",allSta,0) ;
@@ -266,11 +266,12 @@ namespace be {
      * 设置 wifi 的节能模式 (PowerSafe)
      * 
      * 参数 mode :
+     * 
      * * 0 关闭节能模式
      * * 1 最小
      * * 2 最大
      * 
-     * @beapi wifi.setPS
+     * @function setPS
      * @param mode:0|1|2
      * @return number
      */
@@ -284,6 +285,7 @@ namespace be {
      * 设置 wifi 的工作模式
      * 
      * 参数 mode :
+     * 
      * * 0 未启动
      * * 1 STA
      * * 2 AP
@@ -291,7 +293,7 @@ namespace be {
      * 
      * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
-     * @beapi wifi.setMode
+     * @function setMode
      * @param mode:0|1|2|3
      * @return number
      */
@@ -309,7 +311,7 @@ namespace be {
      * * 2 AP
      * * 3 STA + AP
      * 
-     * @beapi wifi.getMode
+     * @function getMode
      * @return number
      */
     JSValue WiFiModule::mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -387,7 +389,7 @@ namespace be {
      * 设置 wifi AP 模式的参数
      * 
      * 参数 mode :
-     * ```
+     * ```javascript
      * {
      *     ssid: string ,
      *     password?: string ,
@@ -405,7 +407,7 @@ namespace be {
      * 
      * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
-     * @beapi wifi.setAPConfig
+     * @function setAPConfig
      * @param config:object
      * @return number
      */
@@ -445,7 +447,7 @@ namespace be {
      * 设置 wifi STA 模式的参数
      * 
      * 参数 mode :
-     * ```
+     * ```javascript
      * {
      *     ssid: string ,
      *     password?: string ,
@@ -461,7 +463,7 @@ namespace be {
      * 
      * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
-     * @beapi wifi.setStaConfig
+     * @function setStaConfig
      * @param config:object
      * @return number
      */
@@ -500,7 +502,7 @@ namespace be {
      * 
      * 返回的对象可参考 `setStaConfig()` 和 `setAPConfig()` 的 `mode` 参数
      * 
-     * @beapi wifi.getConfig
+     * @function getConfig
      * @param mode:1|2  1代表 sta , 2代表 ap
      * @return object
      */
@@ -557,10 +559,10 @@ namespace be {
      * 
      * 连接成功或失败回触发回调函数, 回调函数由 wifi.registerEventHandle() 设置
      * 
-     * @beapi wifi.connect
+     * @function staConnect
      * @return number
      */
-    JSValue WiFiModule::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFiModule::staConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         if( JS_IsFunction(ctx, __event_handle) ) {
             MAKE_ARGV2(argv, JS_NewInt32(__event_handle_ctx, 1), JS_NewInt32(__event_handle_ctx, WIFI_EVENT_STA_CONNECTING))
@@ -574,10 +576,10 @@ namespace be {
      * 
      * 返回 0 表示成功; 非 0 代表对应的错误
      * 
-     * @beapi wifi.disconnect
+     * @function staDisconnect
      * @return number
      */
-    JSValue WiFiModule::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFiModule::staDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         return JS_NewInt32(ctx, esp_wifi_disconnect()) ;
     }
@@ -585,9 +587,18 @@ namespace be {
     /**
      * 返回 AP/STA 的 IP 
      * 
-     * @beapi wifi.getIpInfo
+     * function 返回一个对象, 包含 ip, netmask, gw 信息
+     * ```javascript
+     * {
+     *     ip:string,
+     *     netmask:string,
+     *     gw:string
+     * }
+     * ```
+     * 
+     * @function getIpInfo
      * @param type:number 1代表 sta, 2代表 ap
-     * @return {ip:string,netmask:string,gw:string} 
+     * @return object
      */
     JSValue WiFiModule::getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
@@ -625,8 +636,9 @@ namespace be {
     /**
      * 返回设置 wifi 的在局域网中可被显示的主机名
      * 
-     * @beapi wifi.setHostname
+     * @function setHostname
      * @param nane:string
+     * @return undefined
      */
     JSValue WiFiModule::setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
@@ -662,7 +674,16 @@ namespace be {
     /**
      * 返回所有连接到本机AP的客户机
      * 
-     * @beapi wifi.allSta
+     * 返回对象数组, 每个对象包含 mac 和 rssi 信息
+     * ```javascript
+     * [
+     *     {mac: "xx:xx", rssi: -30},
+     * ]
+     * ```
+     * 
+     * `rssi` 值范围 -100 ~ 0, 单位为 dBm，表示信号强度，越大(绝对值越小)表示信号越强。
+     * 
+     * @function allSta
      * @return {mac:string,rssi:string}[]
      */
     JSValue WiFiModule::allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -682,6 +703,14 @@ namespace be {
 
         return arr ;
     }
+
+    
+    /**
+     * 注册一个事件函数, 当 wifi 状态变化时, 该函数会被调用
+     * 
+     * @function registerEventHandle
+     * @return undefined
+     */
     JSValue WiFiModule::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
@@ -697,7 +726,7 @@ namespace be {
      * 
      * > wifi STA 模式必须启动
      * 
-     * @beapi wifi.scanStart
+     * @function scanStart
      * @return bool
      */
     JSValue WiFiModule::scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -724,7 +753,7 @@ namespace be {
     /**
      * 停止AP扫描
      * 
-     * @beapi wifi.scanStop
+     * @function scanStop
      * @return bool
      */
     JSValue WiFiModule::scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -735,7 +764,7 @@ namespace be {
     /**
      * 返回 AP 扫描是否正在进行
      * 
-     * @beapi wifi.isScanning
+     * @function isScanning
      * @return bool
      */
     JSValue WiFiModule::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -776,18 +805,20 @@ namespace be {
     /**
      * 取回 AP 扫描的结果
      * 
-     * AP对象的格式:
-     * ```
-     * {
-     *     bssid:string ,
-     *     ssid:string ,
-     *     channel:number ,
-     *     rssi:number ,
-     *     authmode:number ,
-     * }
+     * 返回的数组格式:
+     * ```javascript
+     * [
+     *     {
+     *         bssid:string ,
+     *          ssid:string ,
+     *          channel:number ,
+     *          rssi:number ,
+     *          authmode:number ,
+     *      }
+     * ]
      * ```
      * 
-     * @beapi wifi.scanRecords
+     * @function scanRecords
      * @return object[]
      */
     JSValue WiFiModule::scanRecords(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -827,7 +858,7 @@ namespace be {
     /**
      * 返回 WiFi STA 模式是否启动
      * 
-     * @beapi wifi.staStarted
+     * @function staStarted
      * @return bool
      */
     JSValue WiFiModule::staStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -838,7 +869,7 @@ namespace be {
     /**
      * 返回 WiFi STA 是否已经连接
      * 
-     * @beapi wifi.staConnected
+     * @function staConnected
      * @return bool
      */
     JSValue WiFiModule::staConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -849,7 +880,7 @@ namespace be {
     /**
      * 返回 WiFi AP 模式是否启用
      * 
-     * @beapi wifi.apStarted
+     * @function apStarted
      * @return bool
      */
     JSValue WiFiModule::apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

@@ -36,6 +36,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_led_set_color` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Led
+     * @property color:number
+     *
+     */
     #ifndef SETTER_Led_Color
     JSValue Led::setColor(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Led,thisobj)
@@ -47,6 +58,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_led_get_brightness`, `lv_led_set_brightness` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Led
+     * @property brightness:number
+     *
+     */
     #ifndef GETTER_Led_Brightness
     JSValue Led::getBrightness(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Led,thisobj)
@@ -70,6 +92,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Led_on
+    /**
+     * > 该方法是对 LVGL C API `lv_led_on` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Led
+     * @method on
+     *
+     */
     JSValue Led::on(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_led_on( thisobj->lvobj() ) ;
@@ -78,6 +108,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Led_off
+    /**
+     * > 该方法是对 LVGL C API `lv_led_off` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Led
+     * @method off
+     *
+     */
     JSValue Led::off(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_led_off( thisobj->lvobj() ) ;
@@ -86,6 +124,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Led_toggle
+    /**
+     * > 该方法是对 LVGL C API `lv_led_toggle` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Led
+     * @method toggle
+     *
+     */
     JSValue Led::toggle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_led_toggle( thisobj->lvobj() ) ;

@@ -56,6 +56,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_text` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property text:
+     *
+     */
     // unspported type: const char *
     // JSValue TextArea::getText(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_textarea_get_text(const lv_obj_t * obj)
@@ -68,6 +79,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_placeholder_text` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property placeholderText:
+     *
+     */
     // unspported type: const char *
     // JSValue TextArea::getPlaceholderText(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_textarea_get_placeholder_text(lv_obj_t * obj)
@@ -80,6 +102,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_cursor_pos`, `lv_textarea_set_cursor_pos` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property cursorPos:number
+     *
+     */
     #ifndef GETTER_TextArea_CursorPos
     JSValue TextArea::getCursorPos(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -99,6 +132,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_cursor_click_pos`, `lv_textarea_set_cursor_click_pos` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property cursorClickPos:number
+     *
+     */
     #ifndef GETTER_TextArea_CursorClickPos
     JSValue TextArea::getCursorClickPos(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -115,6 +159,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_password_mode`, `lv_textarea_set_password_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property passwordMode:number
+     *
+     */
     #ifndef GETTER_TextArea_PasswordMode
     JSValue TextArea::getPasswordMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -131,6 +186,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_password_bullet` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property passwordBullet:
+     *
+     */
     // unspported type: const char *
     // JSValue TextArea::getPasswordBullet(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
@@ -143,6 +209,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_one_line`, `lv_textarea_set_one_line` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property oneLine:number
+     *
+     */
     #ifndef GETTER_TextArea_OneLine
     JSValue TextArea::getOneLine(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -159,6 +236,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_accepted_chars` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property acceptedChars:
+     *
+     */
     // unspported type: const char *
     // JSValue TextArea::getAcceptedChars(JSContext *ctx, JSValueConst this_val){}
     // const char * lv_textarea_get_accepted_chars(lv_obj_t * obj)
@@ -171,6 +259,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_max_length`, `lv_textarea_set_max_length` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property maxLength:number
+     *
+     */
     #ifndef GETTER_TextArea_MaxLength
     JSValue TextArea::getMaxLength(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -190,6 +289,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_insert_replace` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property insertReplace:
+     *
+     */
     #ifndef SETTER_TextArea_InsertReplace
     JSValue TextArea::setInsertReplace(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(TextArea,thisobj)
@@ -199,6 +309,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_text_selection`, `lv_textarea_set_text_selection` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property textSelection:number
+     *
+     */
     #ifndef GETTER_TextArea_TextSelection
     JSValue TextArea::getTextSelection(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -215,6 +336,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_password_show_time`, `lv_textarea_set_password_show_time` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property passwordShowTime:number
+     *
+     */
     #ifndef GETTER_TextArea_PasswordShowTime
     JSValue TextArea::getPasswordShowTime(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -234,6 +366,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_set_align` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property align:number
+     *
+     */
     #ifndef SETTER_TextArea_Align
     JSValue TextArea::setAlign(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(TextArea,thisobj)
@@ -250,6 +393,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_label` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property label:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_TextArea_Label
     JSValue TextArea::getLabel(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -258,6 +412,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_textarea_get_current_char` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @property currentChar:number
+     *
+     */
     #ifndef GETTER_TextArea_CurrentChar
     JSValue TextArea::getCurrentChar(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(TextArea,thisobj)
@@ -270,6 +435,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_TextArea_addChar
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_add_char` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method addChar
+     *
+     */
     JSValue TextArea::addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -283,6 +456,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_addText
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_add_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method addText
+     *
+     */
     JSValue TextArea::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -293,6 +474,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_deleteChar
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_delete_char` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method deleteChar
+     *
+     */
     JSValue TextArea::deleteChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_delete_char( thisobj->lvobj() ) ;
@@ -301,6 +490,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_deleteCharForward
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_delete_char_forward` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method deleteCharForward
+     *
+     */
     JSValue TextArea::deleteCharForward(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_delete_char_forward( thisobj->lvobj() ) ;
@@ -309,6 +506,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_textIsSelected
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_text_is_selected` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method textIsSelected
+     *
+     */
     JSValue TextArea::textIsSelected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_textarea_text_is_selected( thisobj->lvobj() ) ;
@@ -318,6 +523,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_clearSelection
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_clear_selection` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method clearSelection
+     *
+     */
     JSValue TextArea::clearSelection(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_clear_selection( thisobj->lvobj() ) ;
@@ -326,6 +539,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_cursorRight
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_cursor_right` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method cursorRight
+     *
+     */
     JSValue TextArea::cursorRight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_cursor_right( thisobj->lvobj() ) ;
@@ -334,6 +555,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_cursorLeft
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_cursor_left` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method cursorLeft
+     *
+     */
     JSValue TextArea::cursorLeft(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_cursor_left( thisobj->lvobj() ) ;
@@ -342,6 +571,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_cursorDown
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_cursor_down` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method cursorDown
+     *
+     */
     JSValue TextArea::cursorDown(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_cursor_down( thisobj->lvobj() ) ;
@@ -350,6 +587,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_TextArea_cursorUp
+    /**
+     * > 该方法是对 LVGL C API `lv_textarea_cursor_up` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class TextArea
+     * @method cursorUp
+     *
+     */
     JSValue TextArea::cursorUp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_textarea_cursor_up( thisobj->lvobj() ) ;

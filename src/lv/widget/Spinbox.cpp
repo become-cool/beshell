@@ -42,6 +42,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spinbox_get_value`, `lv_spinbox_set_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @property value:number
+     *
+     */
     #ifndef GETTER_SpinBox_Value
     JSValue SpinBox::getValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(SpinBox,thisobj)
@@ -61,6 +72,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spinbox_get_rollover`, `lv_spinbox_set_rollover` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @property rollover:number
+     *
+     */
     #ifndef GETTER_SpinBox_Rollover
     JSValue SpinBox::getRollover(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(SpinBox,thisobj)
@@ -77,6 +99,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_spinbox_get_step`, `lv_spinbox_set_step` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @property step:number
+     *
+     */
     #ifndef GETTER_SpinBox_Step
     JSValue SpinBox::getStep(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(SpinBox,thisobj)
@@ -96,6 +129,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_spinbox_set_cursor_pos` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @property cursorPos:number
+     *
+     */
     #ifndef SETTER_SpinBox_CursorPos
     JSValue SpinBox::setCursorPos(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(SpinBox,thisobj)
@@ -107,6 +151,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_spinbox_set_digit_step_direction` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @property digitStepDirection:LV-CONST
+     *
+     */
     #ifndef SETTER_SpinBox_DigitStepDirection
     JSValue SpinBox::setDigitStepDirection(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(SpinBox,thisobj)
@@ -127,6 +182,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_SpinBox_setDigitFormat
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_set_digit_format` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method setDigitFormat
+     *
+     */
     JSValue SpinBox::setDigitFormat(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -144,6 +207,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_SpinBox_setRange
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_set_range` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method setRange
+     *
+     */
     JSValue SpinBox::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -161,6 +232,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_SpinBox_stepNext
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_step_next` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method stepNext
+     *
+     */
     JSValue SpinBox::stepNext(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_spinbox_step_next( thisobj->lvobj() ) ;
@@ -169,6 +248,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_SpinBox_stepPrev
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_step_prev` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method stepPrev
+     *
+     */
     JSValue SpinBox::stepPrev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_spinbox_step_prev( thisobj->lvobj() ) ;
@@ -177,6 +264,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_SpinBox_increment
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_increment` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method increment
+     *
+     */
     JSValue SpinBox::increment(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_spinbox_increment( thisobj->lvobj() ) ;
@@ -185,6 +280,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_SpinBox_decrement
+    /**
+     * > 该方法是对 LVGL C API `lv_spinbox_decrement` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class SpinBox
+     * @method decrement
+     *
+     */
     JSValue SpinBox::decrement(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_spinbox_decrement( thisobj->lvobj() ) ;

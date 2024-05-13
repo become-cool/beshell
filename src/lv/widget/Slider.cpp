@@ -43,6 +43,14 @@ namespace be::lv {
     // lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     #ifndef METHOD_Slider_isDragged
+    /**
+     * > 该方法是对 LVGL C API `lv_slider_is_dragged` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Slider
+     * @method isDragged
+     *
+     */
     JSValue Slider::isDragged(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         bool retval = lv_slider_is_dragged( thisobj->lvobj() ) ;

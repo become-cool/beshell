@@ -37,6 +37,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_animimg_get_duration`, `lv_animimg_set_duration` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class AnimImg
+     * @property duration:number
+     *
+     */
     #ifndef GETTER_AnimImg_Duration
     JSValue AnimImg::getDuration(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(AnimImg,thisobj)
@@ -56,6 +67,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_animimg_get_repeat_count`, `lv_animimg_set_repeat_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class AnimImg
+     * @property repeatCount:number
+     *
+     */
     #ifndef GETTER_AnimImg_RepeatCount
     JSValue AnimImg::getRepeatCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(AnimImg,thisobj)
@@ -78,6 +100,17 @@ namespace be::lv {
     // unspported type: const void **
     // JSValue AnimImg::getSrc(JSContext *ctx, JSValueConst this_val){}
     // const void ** lv_animimg_get_src(lv_obj_t * img)
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_animimg_get_src_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class AnimImg
+     * @property srcCount:number
+     *
+     */
     #ifndef GETTER_AnimImg_SrcCount
     JSValue AnimImg::getSrcCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(AnimImg,thisobj)
@@ -93,6 +126,14 @@ namespace be::lv {
     // void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num)
 
     #ifndef METHOD_AnimImg_start
+    /**
+     * > 该方法是对 LVGL C API `lv_animimg_start` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class AnimImg
+     * @method start
+     *
+     */
     JSValue AnimImg::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_animimg_start( thisobj->lvobj() ) ;

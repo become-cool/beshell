@@ -43,6 +43,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_msgbox_get_header` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @property header:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_MsgBox_Header
     JSValue MsgBox::getHeader(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(MsgBox,thisobj)
@@ -51,6 +62,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_msgbox_get_footer` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @property footer:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_MsgBox_Footer
     JSValue MsgBox::getFooter(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(MsgBox,thisobj)
@@ -59,6 +81,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_msgbox_get_content` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @property content:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_MsgBox_Content
     JSValue MsgBox::getContent(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(MsgBox,thisobj)
@@ -67,6 +100,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_msgbox_get_title` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @property title:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_MsgBox_Title
     JSValue MsgBox::getTitle(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(MsgBox,thisobj)
@@ -79,6 +123,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_MsgBox_addTitle
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_add_title` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method addTitle
+     *
+     */
     JSValue MsgBox::addTitle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -94,6 +146,14 @@ namespace be::lv {
     // lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 
     #ifndef METHOD_MsgBox_addText
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_add_text` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method addText
+     *
+     */
     JSValue MsgBox::addText(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -106,6 +166,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_MsgBox_addFooterButton
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_add_footer_button` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method addFooterButton
+     *
+     */
     JSValue MsgBox::addFooterButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -118,6 +186,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_MsgBox_addCloseButton
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_add_close_button` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method addCloseButton
+     *
+     */
     JSValue MsgBox::addCloseButton(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_msgbox_add_close_button( thisobj->lvobj() ) ;
@@ -127,6 +203,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_MsgBox_close
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_close` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method close
+     *
+     */
     JSValue MsgBox::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_msgbox_close( thisobj->lvobj() ) ;
@@ -135,6 +219,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_MsgBox_closeAsync
+    /**
+     * > 该方法是对 LVGL C API `lv_msgbox_close_async` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class MsgBox
+     * @method closeAsync
+     *
+     */
     JSValue MsgBox::closeAsync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_msgbox_close_async( thisobj->lvobj() ) ;

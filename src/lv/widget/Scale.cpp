@@ -47,6 +47,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_mode`, `lv_scale_set_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property mode:LV-CONST
+     *
+     */
     #ifndef GETTER_Scale_Mode
     JSValue Scale::getMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -71,6 +82,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_total_tick_count`, `lv_scale_set_total_tick_count` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property totalTickCount:number
+     *
+     */
     #ifndef GETTER_Scale_TotalTickCount
     JSValue Scale::getTotalTickCount(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -90,6 +112,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_major_tick_every`, `lv_scale_set_major_tick_every` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property majorTickEvery:number
+     *
+     */
     #ifndef GETTER_Scale_MajorTickEvery
     JSValue Scale::getMajorTickEvery(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -109,6 +142,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_label_show`, `lv_scale_set_label_show` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property labelShow:number
+     *
+     */
     #ifndef GETTER_Scale_LabelShow
     JSValue Scale::getLabelShow(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -125,6 +169,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_angle_range`, `lv_scale_set_angle_range` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property angleRange:number
+     *
+     */
     #ifndef GETTER_Scale_AngleRange
     JSValue Scale::getAngleRange(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -144,6 +199,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_set_rotation` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property rotation:number
+     *
+     */
     #ifndef SETTER_Scale_Rotation
     JSValue Scale::setRotation(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Scale,thisobj)
@@ -158,6 +224,17 @@ namespace be::lv {
     // unspported type: const char **
     // JSValue Scale::setTextSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_scale_set_post_draw` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property postDraw:number
+     *
+     */
     #ifndef SETTER_Scale_PostDraw
     JSValue Scale::setPostDraw(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Scale,thisobj)
@@ -166,6 +243,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_range_min_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property rangeMinValue:number
+     *
+     */
     #ifndef GETTER_Scale_RangeMinValue
     JSValue Scale::getRangeMinValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -174,6 +262,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_scale_get_range_max_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @property rangeMaxValue:number
+     *
+     */
     #ifndef GETTER_Scale_RangeMaxValue
     JSValue Scale::getRangeMaxValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Scale,thisobj)
@@ -186,6 +285,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Scale_setRange
+    /**
+     * > 该方法是对 LVGL C API `lv_scale_set_range` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @method setRange
+     *
+     */
     JSValue Scale::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -203,6 +310,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Scale_setLineNeedleValue
+    /**
+     * > 该方法是对 LVGL C API `lv_scale_set_line_needle_value` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @method setLineNeedleValue
+     *
+     */
     JSValue Scale::setLineNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -221,6 +336,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Scale_setImageNeedleValue
+    /**
+     * > 该方法是对 LVGL C API `lv_scale_set_image_needle_value` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Scale
+     * @method setImageNeedleValue
+     *
+     */
     JSValue Scale::setImageNeedleValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

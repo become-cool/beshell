@@ -43,6 +43,17 @@ namespace be::lv {
     // unspported type: const char **
     // JSValue Calendar::setDayNames(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names)
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_calendar_get_btnmatrix` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @property btnmatrix:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Calendar_Btnmatrix
     JSValue Calendar::getBtnmatrix(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Calendar,thisobj)
@@ -67,6 +78,14 @@ namespace be::lv {
 
 // AUTO GENERATE CODE START [METHODS] --------
     #ifndef METHOD_Calendar_setTodayDate
+    /**
+     * > 该方法是对 LVGL C API `lv_calendar_set_today_date` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @method setTodayDate
+     *
+     */
     JSValue Calendar::setTodayDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(3)
@@ -88,6 +107,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Calendar_setShowedDate
+    /**
+     * > 该方法是对 LVGL C API `lv_calendar_set_showed_date` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @method setShowedDate
+     *
+     */
     JSValue Calendar::setShowedDate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -111,6 +138,14 @@ namespace be::lv {
     // lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date)
 
     #ifndef METHOD_Calendar_headerArrowCreate
+    /**
+     * > 该方法是对 LVGL C API `lv_calendar_header_arrow_create` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @method headerArrowCreate
+     *
+     */
     JSValue Calendar::headerArrowCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_calendar_header_arrow_create( thisobj->lvobj() ) ;
@@ -120,6 +155,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Calendar_headerDropdownCreate
+    /**
+     * > 该方法是对 LVGL C API `lv_calendar_header_dropdown_create` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @method headerDropdownCreate
+     *
+     */
     JSValue Calendar::headerDropdownCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_calendar_header_dropdown_create( thisobj->lvobj() ) ;
@@ -129,6 +172,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Calendar_headerDropdownSetYearList
+    /**
+     * > 该方法是对 LVGL C API `lv_calendar_header_dropdown_set_year_list` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Calendar
+     * @method headerDropdownSetYearList
+     *
+     */
     JSValue Calendar::headerDropdownSetYearList(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)

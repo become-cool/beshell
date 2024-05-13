@@ -53,6 +53,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_set_start_angle` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property startAngle:number
+     *
+     */
     #ifndef SETTER_Arc_StartAngle
     JSValue Arc::setStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
@@ -64,6 +75,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_set_end_angle` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property endAngle:number
+     *
+     */
     #ifndef SETTER_Arc_EndAngle
     JSValue Arc::setEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
@@ -75,6 +97,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_set_bg_start_angle` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property bgStartAngle:number
+     *
+     */
     #ifndef SETTER_Arc_BgStartAngle
     JSValue Arc::setBgStartAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
@@ -86,6 +119,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_set_bg_end_angle` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property bgEndAngle:number
+     *
+     */
     #ifndef SETTER_Arc_BgEndAngle
     JSValue Arc::setBgEndAngle(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
@@ -97,6 +141,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_rotation`, `lv_arc_set_rotation` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property rotation:number
+     *
+     */
     #ifndef GETTER_Arc_Rotation
     JSValue Arc::getRotation(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -116,6 +171,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_mode`, `lv_arc_set_mode` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property mode:number
+     *
+     */
     #ifndef GETTER_Arc_Mode
     JSValue Arc::getMode(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -140,6 +206,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_value`, `lv_arc_set_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property value:number
+     *
+     */
     #ifndef GETTER_Arc_Value
     JSValue Arc::getValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -159,6 +236,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_set_change_rate` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property changeRate:number
+     *
+     */
     #ifndef SETTER_Arc_ChangeRate
     JSValue Arc::setChangeRate(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Arc,thisobj)
@@ -170,6 +258,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 可读, 可写
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_knob_offset`, `lv_arc_set_knob_offset` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property knobOffset:number
+     *
+     */
     #ifndef GETTER_Arc_KnobOffset
     JSValue Arc::getKnobOffset(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -189,6 +288,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_angle_start` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property angleStart:number
+     *
+     */
     #ifndef GETTER_Arc_AngleStart
     JSValue Arc::getAngleStart(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -197,6 +307,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_angle_end` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property angleEnd:number
+     *
+     */
     #ifndef GETTER_Arc_AngleEnd
     JSValue Arc::getAngleEnd(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -205,6 +326,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_bg_angle_start` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property bgAngleStart:number
+     *
+     */
     #ifndef GETTER_Arc_BgAngleStart
     JSValue Arc::getBgAngleStart(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -213,6 +345,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_bg_angle_end` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property bgAngleEnd:number
+     *
+     */
     #ifndef GETTER_Arc_BgAngleEnd
     JSValue Arc::getBgAngleEnd(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -221,6 +364,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_min_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property minValue:number
+     *
+     */
     #ifndef GETTER_Arc_MinValue
     JSValue Arc::getMinValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -229,6 +383,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_arc_get_max_value` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @property maxValue:number
+     *
+     */
     #ifndef GETTER_Arc_MaxValue
     JSValue Arc::getMaxValue(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Arc,thisobj)
@@ -244,6 +409,14 @@ namespace be::lv {
     // lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     #ifndef METHOD_Arc_setAngles
+    /**
+     * > 该方法是对 LVGL C API `lv_arc_set_angles` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @method setAngles
+     *
+     */
     JSValue Arc::setAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -261,6 +434,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Arc_setBgAngles
+    /**
+     * > 该方法是对 LVGL C API `lv_arc_set_bg_angles` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @method setBgAngles
+     *
+     */
     JSValue Arc::setBgAngles(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -278,6 +459,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Arc_setRange
+    /**
+     * > 该方法是对 LVGL C API `lv_arc_set_range` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @method setRange
+     *
+     */
     JSValue Arc::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -295,6 +484,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Arc_alignObjToAngle
+    /**
+     * > 该方法是对 LVGL C API `lv_arc_align_obj_to_angle` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @method alignObjToAngle
+     *
+     */
     JSValue Arc::alignObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -309,6 +506,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Arc_rotateObjToAngle
+    /**
+     * > 该方法是对 LVGL C API `lv_arc_rotate_obj_to_angle` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Arc
+     * @method rotateObjToAngle
+     *
+     */
     JSValue Arc::rotateObjToAngle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)

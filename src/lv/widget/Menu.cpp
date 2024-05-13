@@ -49,6 +49,17 @@ namespace be::lv {
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_menu_set_page` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property page:[obj](obj.html)
+     *
+     */
     #ifndef SETTER_Menu_Page
     JSValue Menu::setPage(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Menu,thisobj)
@@ -63,6 +74,17 @@ namespace be::lv {
     // unspported type: char const * const
     // JSValue Menu::setPageTitleStatic(JSContext *ctx, JSValueConst this_val, JSValueConst value){}
     // void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title)
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_menu_set_sidebar_page` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property sidebarPage:[obj](obj.html)
+     *
+     */
     #ifndef SETTER_Menu_SidebarPage
     JSValue Menu::setSidebarPage(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Menu,thisobj)
@@ -71,6 +93,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_menu_set_mode_header` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property modeHeader:LV-CONST
+     *
+     */
     #ifndef SETTER_Menu_ModeHeader
     JSValue Menu::setModeHeader(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Menu,thisobj)
@@ -87,6 +120,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只写
+     *
+     * > 该属性是对 LVGL C API `lv_menu_set_mode_root_back_button` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property modeRootBackButton:LV-CONST
+     *
+     */
     #ifndef SETTER_Menu_ModeRootBackButton
     JSValue Menu::setModeRootBackButton(JSContext *ctx, JSValueConst this_val, JSValueConst val){
         THIS_NCLASS(Menu,thisobj)
@@ -103,6 +147,17 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_cur_main_page` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property curMainPage:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_CurMainPage
     JSValue Menu::getCurMainPage(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -111,6 +166,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_cur_sidebar_page` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property curSidebarPage:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_CurSidebarPage
     JSValue Menu::getCurSidebarPage(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -119,6 +185,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_main_header` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property mainHeader:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_MainHeader
     JSValue Menu::getMainHeader(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -127,6 +204,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_main_header_back_button` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property mainHeaderBackButton:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_MainHeaderBackButton
     JSValue Menu::getMainHeaderBackButton(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -135,6 +223,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_sidebar_header` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property sidebarHeader:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_SidebarHeader
     JSValue Menu::getSidebarHeader(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -143,6 +242,17 @@ namespace be::lv {
         return retval ;
     }
     #endif
+    /**
+     * 访问: 只读
+     *
+     * > 该属性是对 LVGL C API `lv_menu_get_sidebar_header_back_button` 的封装，
+     * > 具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @property sidebarHeaderBackButton:[obj](obj.html)
+     *
+     */
     #ifndef GETTER_Menu_SidebarHeaderBackButton
     JSValue Menu::getSidebarHeaderBackButton(JSContext *ctx, JSValueConst this_val){
         THIS_NCLASS(Menu,thisobj)
@@ -158,6 +268,14 @@ namespace be::lv {
     // lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 
     #ifndef METHOD_Menu_contCreate
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_cont_create` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method contCreate
+     *
+     */
     JSValue Menu::contCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_menu_cont_create( thisobj->lvobj() ) ;
@@ -167,6 +285,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Menu_sectionCreate
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_section_create` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method sectionCreate
+     *
+     */
     JSValue Menu::sectionCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_menu_section_create( thisobj->lvobj() ) ;
@@ -176,6 +302,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Menu_separatorCreate
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_separator_create` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method separatorCreate
+     *
+     */
     JSValue Menu::separatorCreate(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_obj_t * retval = lv_menu_separator_create( thisobj->lvobj() ) ;
@@ -185,6 +319,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Menu_setLoadPageEvent
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_set_load_page_event` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method setLoadPageEvent
+     *
+     */
     JSValue Menu::setLoadPageEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(2)
@@ -196,6 +338,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Menu_backButtonIsRoot
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_back_button_is_root` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method backButtonIsRoot
+     *
+     */
     JSValue Menu::backButtonIsRoot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         ASSERT_ARGC(1)
@@ -207,6 +357,14 @@ namespace be::lv {
     #endif
 
     #ifndef METHOD_Menu_clearHistory
+    /**
+     * > 该方法是对 LVGL C API `lv_menu_clear_history` 的封装，具体用法请参考  [LVGL文档](https://docs.lvgl.io/9.0/API/index.html)
+     *
+     * @module lv
+     * @class Menu
+     * @method clearHistory
+     *
+     */
     JSValue Menu::clearHistory(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Obj,thisobj)
         lv_menu_clear_history( thisobj->lvobj() ) ;
