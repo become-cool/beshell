@@ -37,7 +37,6 @@ namespace be {
         std::vector<std::pair<LoopFunction,void *>> loopFunctions ; 
 
     public:
-        FS * fs = nullptr ;
         Telnet * telnet = nullptr ;
         REPL * repl = nullptr ;
 #ifdef MODULE_LV
@@ -55,25 +54,23 @@ namespace be {
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
 
-        void useBasic() ;
-        void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
-        void useREPL() ;
+        // void useBasic() ;
+        // void useREPL() ;
         
-        void useSerial() ;
 #ifdef MODULE_LV
         void useLV() ;
 #endif
 #ifdef ESP_PLATFORM
         void useDeviceJSON(const char * path="/config/device.json") ;
 #endif
-        
+
         template <typename ModuleClass>
         void use(const char * name=nullptr) {
-            engine->mloader.add<ModuleClass>(this, name) ;
+            useModule<ModuleClass>(name) ;
         }
         template <typename ModuleClass>
         void useModule(const char * name=nullptr) {
-            use<ModuleClass>(name) ;
+            engine->mloader.add<ModuleClass>(this, name) ;
         }
 
         template <typename DriverClass>

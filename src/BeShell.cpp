@@ -38,7 +38,6 @@ namespace be {
         }
 
     BeShell::~BeShell() {
-        DELETE_VAR(fs)
         DELETE_VAR(repl)
         DELETE_VAR(telnet)
         DELETE_VAR(engine)
@@ -46,35 +45,7 @@ namespace be {
         DELETE_VAR(lv)
 #endif
     }
-
-    void BeShell::useBasic() {
-        useFS() ;
-        useREPL() ;
-    }
     
-    void BeShell::useFS(const char * mountPath, FSPartition * partition) {
-        if(!fs) {
-            fs = new FS() ;
-            useModule<FSModule>("fs") ;
-        }
-        if(mountPath && partition) {
-            fs->mount(mountPath,partition) ;
-        }
-    }
-    
-    void BeShell::useREPL() {
-        if(repl) {
-            return ;
-        }
-        repl = new REPL(this) ;
-    }
-    
-    #ifdef MODULE_SERIAL
-    void BeShell::useSerial() {
-        useModule<SerialModule>() ;
-    }
-    #endif
-
 #ifdef MODULE_LV
     void BeShell::useLV() {
         if(lv) {
