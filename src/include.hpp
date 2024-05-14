@@ -12,7 +12,6 @@
 #include "fs/FSPartition.hpp"
 #include "fs/LittleFS.hpp"
 #include "fs/RawFS.hpp"
-#include "fs/FSModule.hpp"
 #include "fs/FS.hpp"
 
 // telnet/repl

@@ -1,7 +1,7 @@
-#include "FSModule.hpp"
+#include "FS.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
-#include "FSModule.hpp"
+#include "FS.hpp"
 #include "fs/FS.hpp"
 #include "qjs_utils.h"
 #include <sys/stat.h>
@@ -18,7 +18,7 @@ using namespace std ;
 
 namespace be {
 
-    FSModule::FSModule(JSContext * ctx, const char * name,uint8_t flagGlobal)
+    FS::FS(JSContext * ctx, const char * name,uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
     {
         EXPORT_FUNCTION(mkdirSync) ;
@@ -73,7 +73,7 @@ namespace be {
      * @param recursive:bool=false 是否递归创建目录
      * @return bool
      */
-    JSValue FSModule:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
 
@@ -91,7 +91,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         bool recursive = false ;
@@ -108,7 +108,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         return (unlink(path.c_str())>=0)? JS_TRUE: JS_FALSE ;
@@ -129,7 +129,7 @@ namespace be {
      * @param offset:number=0 开始位置
      * @return ArrayBuffer
      */
-    JSValue FSModule:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
@@ -185,7 +185,7 @@ namespace be {
      * @param append:bool=false 是否追加写入
      * @return number
      */
-    JSValue FSModule:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         ASSERT_ARGC(2)
         ARGV_PATH(path, 0)
@@ -267,7 +267,7 @@ namespace be {
      * @param detail:bool=false 是否范围详细信息
      * @return string[] | object[]
      */
-    JSValue FSModule:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
@@ -350,7 +350,7 @@ namespace be {
      * @param path {string} 路径
      * @return bool
      */
-    JSValue FSModule:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
 
@@ -373,7 +373,7 @@ namespace be {
      * @param name {string} 名称
      * @return number
      */
-    JSValue FSModule:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
 
         ASSERT_ARGC(1)
         ARGV_PATH(oldpath, 0)
@@ -407,7 +407,7 @@ namespace be {
      * @param path:string 文件路径
      * @return null | object
      */
-    JSValue FSModule:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         struct stat statbuf;
@@ -442,7 +442,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         return FS::exist(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -456,7 +456,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS:: isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         return FS::isFile(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -470,7 +470,7 @@ namespace be {
      * @param path:string 路径
      * @return bool
      */
-    JSValue FSModule::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    JSValue FS::isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
         return FS::isDir(path.c_str())? JS_TRUE: JS_FALSE ;
@@ -488,7 +488,7 @@ namespace be {
      * @param path {string} 分区路径
      * @return object
      */
-    JSValue FSModule:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING(0, jslabel)
@@ -560,7 +560,7 @@ namespace be {
      * @param mode="rw" string 打开方式
      * @return number
      */
-    JSValue FSModule::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
         string ARGV_TO_STRING_OPT(1, mode, "rw")
@@ -590,7 +590,7 @@ namespace be {
      * @param length number 读取长度
      * @return ArrayBuffer
      */
-    JSValue FSModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
         ARGV_TO_UINT32(1, length)
@@ -620,7 +620,7 @@ namespace be {
      * @param data ArrayBuffer|string 写入的数据
      * @return number 写入的字节数
      */
-    JSValue FSModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
 
@@ -651,7 +651,7 @@ namespace be {
      * @param whence 0|1|2 0:从文件头开始，1:从当前位置开始，2:从文件尾开始
      * @return number 返回0表示成功，非0表示失败原因
      */
-    JSValue FSModule::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_INT64(0, handle)
         ARGV_TO_UINT32(1, offset)
@@ -666,7 +666,7 @@ namespace be {
      * @param handle number 由open()返回的文件句柄
      * @return number 返回0表示成功，非0表示失败原因
      */
-    JSValue FSModule::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fflush((FILE*)handle)) ;
@@ -679,7 +679,7 @@ namespace be {
      * @param handle number 由open()返回的文件句柄
      * @return number 返回0表示成功，非0表示失败原因
      */
-    JSValue FSModule::sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         int fd = fileno((FILE*)handle);
@@ -693,7 +693,7 @@ namespace be {
      * @param handle number 由open()返回的文件句柄
      * @return number 返回0表示成功，非0表示失败原因
      */
-    JSValue FSModule::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, handle)
         return JS_NewInt32(ctx, fclose((FILE*)handle)) ;

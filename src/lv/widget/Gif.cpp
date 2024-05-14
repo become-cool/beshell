@@ -2,6 +2,8 @@
 #include "Gif.hpp"
 // #include "lv_gif.h"
 
+using namespace std ;
+
 namespace be::lv {
     DEFINE_NCLASS_META(Gif, Img)
     std::vector<JSCFunctionListEntry> Gif::methods = {

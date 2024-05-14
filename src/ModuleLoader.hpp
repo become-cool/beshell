@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include "NativeModule.hpp"
-#include "fs/FSModule.hpp"
 #include "fs/FS.hpp"
 
 namespace be {

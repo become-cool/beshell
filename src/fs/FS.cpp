@@ -34,7 +34,8 @@ namespace be {
     
     map<std::string, FSPartition *> FS::partitions;
     std::string FS::pwd = "/" ;
-    std::string FS::prefix ;
+    std::string FS::prefix = "/fs";
+    const char * FS::name = "fs" ;
 
     inline static bool isDir(const char * path) {
         struct stat statbuf;
@@ -83,14 +84,7 @@ namespace be {
             return 0 ;
     }
 
-
-    FS::FS() {
-#ifdef ESP_PLATFORM
-        setPrefix("/fs") ;
-#else
-#endif
-    }
-    FS::~FS() {
+    void FS::unmountAll() {
 #ifdef ESP_PLATFORM
         for(auto it=partitions.begin(); it!=partitions.end(); ++it) {
             it->second->unmount() ;

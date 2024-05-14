@@ -3,6 +3,8 @@
 #include "deps/sqlite3/sqlite3.h"
 #include <fs/FS.hpp>
 
+using namespace std ;
+
 namespace be::sqlite{
 
     const char * SQLite3Module::name = "sqlite3" ;
