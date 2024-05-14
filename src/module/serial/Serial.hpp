@@ -4,15 +4,15 @@
 #include "NativeModule.hpp"
 
 namespace be {
-    class SerialModule: public NativeModule {
+    class Serial: public NativeModule {
     protected:
         void import(JSContext *ctx) ;
     public:
 
         static const char *name ;
 
-        SerialModule(JSContext * ctx, const char * name) ;
-        ~SerialModule() ;
+        Serial(JSContext * ctx, const char * name) ;
+        ~Serial() ;
         
     } ;
 }

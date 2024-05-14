@@ -1,4 +1,4 @@
-#include "SQLite3Module.hpp"
+#include "SQLite3.hpp"
 #include "DB.hpp"
 #include "deps/sqlite3/sqlite3.h"
 #include <fs/FS.hpp>
@@ -7,9 +7,9 @@ using namespace std ;
 
 namespace be::sqlite{
 
-    const char * SQLite3Module::name = "sqlite3" ;
+    const char * SQLite3::name = "sqlite3" ;
 
-    SQLite3Module::SQLite3Module(JSContext * ctx, const char * name)
+    SQLite3::SQLite3(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
         exportClass<DB>() ;
@@ -17,11 +17,11 @@ namespace be::sqlite{
         exportFunction("open",open,0) ;
     }
 
-    JSValue SQLite3Module::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue SQLite3::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         sqlite3_initialize() ;
         return JS_UNDEFINED ;
     }
-    JSValue SQLite3Module::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue SQLite3::open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
         

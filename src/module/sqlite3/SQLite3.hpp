@@ -4,10 +4,10 @@
 #include "NativeModule.hpp"
 
 namespace be::sqlite{
-    class SQLite3Module: public be::NativeModule {
+    class SQLite3: public be::NativeModule {
     public:
         static const char * name ;
-        SQLite3Module(JSContext * ctx, const char * name) ;
+        SQLite3(JSContext * ctx, const char * name) ;
 
         // void import(JSContext *ctx) ;
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

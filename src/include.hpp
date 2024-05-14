@@ -26,14 +26,14 @@
 
 // module
 #include "module/DeviceModule.hpp"
-#include "module/GPIOModule.hpp"
-#include "module/NVSModule.hpp"
-#include "module/PathModule.hpp"
-#include "module/ProcessModule.hpp"
-#include "module/WiFiModule.hpp"
+#include "module/GPIO.hpp"
+#include "module/NVS.hpp"
+#include "module/Path.hpp"
+#include "module/Process.hpp"
+#include "module/WiFi.hpp"
 
 // serial
-#include "module/serial/SerialModule.hpp"
+#include "module/serial/Serial.hpp"
 #include "module/serial/UART.hpp"
 #include "module/serial/I2C.hpp"
 #include "module/serial/SPI.hpp"
@@ -44,10 +44,10 @@
 #include "mg/HTTPRequest.hpp"
 #include "mg/Client.hpp"
 #include "mg/Server.hpp"
-#include "mg/MgModule.hpp"
+#include "mg/Mg.hpp"
 
 // sqlite3
-#include "module/sqlite3/SQLite3Module.hpp"
+#include "module/sqlite3/SQLite3.hpp"
 #include "module/sqlite3/DB.hpp"
 
 

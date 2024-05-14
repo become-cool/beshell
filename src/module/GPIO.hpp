@@ -6,10 +6,10 @@
 
 namespace be {
  
-    class GPIOModule: public be::NativeModule {
+    class GPIO: public be::NativeModule {
     private:
     public:
-        GPIOModule(JSContext * ctx, const char * name) ;
+        GPIO(JSContext * ctx, const char * name) ;
         static void loop(JSContext *, void * arg) ;
 
         void import(JSContext *ctx) ;

@@ -1,4 +1,4 @@
-#include "WiFiModule.hpp"
+#include "WiFi.hpp"
 
 #include <lwip/apps/sntp.h>
 #include <esp_err.h>
@@ -39,7 +39,7 @@ static esp_event_handler_instance_t instance_any_id;
 static esp_event_handler_instance_t instance_got_ip;
 
 static bool wifi_inited = false ;
-bool WiFiModule::hasInited() {
+bool WiFi::hasInited() {
     return wifi_inited ;
 }
 
@@ -184,9 +184,9 @@ static void esp32_wifi_eventHandler(void* arg, esp_event_base_t event_base, int3
 
 namespace be {
 
-    const char * const WiFiModule::name = "wifi" ;
+    const char * const WiFi::name = "wifi" ;
     
-    WiFiModule::WiFiModule(JSContext * ctx, const char * name)
+    WiFi::WiFi(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
         // exportClass<ClassName>() ;
@@ -219,7 +219,7 @@ namespace be {
                 printf("%s failed, return error code:%d\n", #code, res) ; \
             }
 
-    void WiFiModule::init() {
+    void WiFi::init() {
 
         if(wifi_inited) {
             return ;
@@ -238,7 +238,7 @@ namespace be {
         wifi_inited = true ;
     }
 
-    void WiFiModule::use(be::BeShell & beshell) {
+    void WiFi::use(be::BeShell & beshell) {
 
         // dp(src_js_wifi_js_start)
         // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
@@ -249,13 +249,13 @@ namespace be {
         ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip))
     }
 
-    JSValue WiFiModule::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         init() ;
         esp_err_t err = esp_wifi_start() ;
         _started = err == ESP_OK ;
         return JS_NewInt32(ctx, err);
     }
-    JSValue WiFiModule::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         esp_err_t err = esp_wifi_stop() ;
         _started = ! (err == ESP_OK) ;
@@ -275,7 +275,7 @@ namespace be {
      * @param mode:0|1|2
      * @return number
      */
-    JSValue WiFiModule::setPS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::setPS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
         ARGV_TO_UINT32(0, ps_mode)
@@ -297,7 +297,7 @@ namespace be {
      * @param mode:0|1|2|3
      * @return number
      */
-    JSValue WiFiModule::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ARGV_TO_INT8(0, mode)
         return JS_NewInt32(ctx, esp_wifi_set_mode((wifi_mode_t)mode));
@@ -314,7 +314,7 @@ namespace be {
      * @function getMode
      * @return number
      */
-    JSValue WiFiModule::mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         wifi_mode_t mode_ori;
         esp_wifi_get_mode(&mode_ori) ;
@@ -411,7 +411,7 @@ namespace be {
      * @param config:object
      * @return number
      */
-    JSValue WiFiModule::setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
         if(!JS_IsObject(argv[0])) {
@@ -467,7 +467,7 @@ namespace be {
      * @param config:object
      * @return number
      */
-    JSValue WiFiModule::setStaConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::setStaConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
         if(!JS_IsObject(argv[0])) {
@@ -506,7 +506,7 @@ namespace be {
      * @param mode:1|2  1代表 sta , 2代表 ap
      * @return object
      */
-    JSValue WiFiModule::config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
         ARGV_TO_UINT8(0,netif)
@@ -562,7 +562,7 @@ namespace be {
      * @function staConnect
      * @return number
      */
-    JSValue WiFiModule::staConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::staConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         if( JS_IsFunction(ctx, __event_handle) ) {
             MAKE_ARGV2(argv, JS_NewInt32(__event_handle_ctx, 1), JS_NewInt32(__event_handle_ctx, WIFI_EVENT_STA_CONNECTING))
@@ -579,7 +579,7 @@ namespace be {
      * @function staDisconnect
      * @return number
      */
-    JSValue WiFiModule::staDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::staDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         return JS_NewInt32(ctx, esp_wifi_disconnect()) ;
     }
@@ -600,7 +600,7 @@ namespace be {
      * @param type:number 1代表 sta, 2代表 ap
      * @return object
      */
-    JSValue WiFiModule::getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
         ARGV_TO_UINT8(0,type)
@@ -640,7 +640,7 @@ namespace be {
      * @param nane:string
      * @return undefined
      */
-    JSValue WiFiModule::setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)
 
@@ -686,7 +686,7 @@ namespace be {
      * @function allSta
      * @return {mac:string,rssi:string}[]
      */
-    JSValue WiFiModule::allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         wifi_sta_list_t clients;
         if(esp_wifi_ap_get_sta_list(&clients) != ESP_OK) {
@@ -711,7 +711,7 @@ namespace be {
      * @function registerEventHandle
      * @return undefined
      */
-    JSValue WiFiModule::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("wifi event handle must be a function")
@@ -729,7 +729,7 @@ namespace be {
      * @function scanStart
      * @return bool
      */
-    JSValue WiFiModule::scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         wifi_scan_config_t scanConf = {
             .ssid = NULL,
@@ -756,7 +756,7 @@ namespace be {
      * @function scanStop
      * @return bool
      */
-    JSValue WiFiModule::scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         return esp_wifi_scan_stop() == ESP_OK? JS_TRUE : JS_FALSE;
     }
@@ -767,7 +767,7 @@ namespace be {
      * @function isScanning
      * @return bool
      */
-    JSValue WiFiModule::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         return _scanning? JS_TRUE : JS_FALSE;
     }
@@ -821,7 +821,7 @@ namespace be {
      * @function scanRecords
      * @return object[]
      */
-    JSValue WiFiModule::scanRecords(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::scanRecords(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         JSValue array = JS_NewArray(ctx) ;
 
@@ -861,7 +861,7 @@ namespace be {
      * @function staStarted
      * @return bool
      */
-    JSValue WiFiModule::staStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::staStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if(!wifi_inited)
             return JS_FALSE;
         return JS_NewBool(ctx, _sta_started) ;
@@ -872,7 +872,7 @@ namespace be {
      * @function staConnected
      * @return bool
      */
-    JSValue WiFiModule::staConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::staConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if(!wifi_inited)
             return JS_FALSE;
         return JS_NewBool(ctx, _sta_connected) ;
@@ -883,7 +883,7 @@ namespace be {
      * @function apStarted
      * @return bool
      */
-    JSValue WiFiModule::apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if(!wifi_inited)
             return JS_FALSE;
         return JS_NewBool(ctx, _ap_started) ;

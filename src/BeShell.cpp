@@ -1,6 +1,6 @@
 #include "BeShell.hpp"
 #include "fs/FS.hpp"
-#include "module/NVSModule.hpp"
+#include "module/NVS.hpp"
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
@@ -13,7 +13,7 @@
 #include "esp_event_loop.h"
 
 #include "lv/LV.hpp"
-#include "module/serial/SerialModule.hpp"
+#include "module/serial/Serial.hpp"
 #include "js/device.c"
 #include "module/DeviceModule.hpp"
 #endif

@@ -4,11 +4,11 @@
 #include "NativeModule.hpp"
 
 namespace be {
-    class WiFiModule: public be::NativeModule {
+    class WiFi: public be::NativeModule {
     public:
         static const char * const name ;
 
-        WiFiModule(JSContext * ctx, const char * name) ;
+        WiFi(JSContext * ctx, const char * name) ;
 
         static bool hasInited() ;
         // void import(JSContext *ctx) ;

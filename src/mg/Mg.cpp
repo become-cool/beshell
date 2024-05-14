@@ -1,16 +1,16 @@
-#include "MgModule.hpp"
+#include "Mg.hpp"
 #include <cstdint>
 
 namespace be::mg {
 
-    const char * MgModule::name = "mg" ;
+    const char * Mg::name = "mg" ;
 
-    struct mg_mgr MgModule::mgr ;
-    std::string MgModule::ca_path ;
-    std::string MgModule::cert_path ;
-    std::string MgModule::certkey_path ;
+    struct mg_mgr Mg::mgr ;
+    std::string Mg::ca_path ;
+    std::string Mg::cert_path ;
+    std::string Mg::certkey_path ;
 
-    MgModule::MgModule(JSContext * ctx, const char * name)
+    Mg::Mg(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
         exportClass<Server>() ;
@@ -30,10 +30,10 @@ namespace be::mg {
         exportFunction("connect",Client::connect,0) ;
     }
 
-    // void MgModule::import(JSContext *ctx) {
+    // void Mg::import(JSContext *ctx) {
     // }
 
-    bool MgModule::isListening(const char * url) {
+    bool Mg::isListening(const char * url) {
         struct mg_addr addr ;
         memset(&addr, 0, sizeof(struct mg_addr));
 
@@ -51,8 +51,8 @@ namespace be::mg {
         return true ;
     }
 
-    void MgModule::use(be::BeShell * beshell) {
-        // beshell.useModule<MgModule>("mg") ;
+    void Mg::use(be::BeShell * beshell) {
+        // beshell.useModule<Mg>("mg") ;
         beshell->addLoopFunction(loop, nullptr) ;
 
         ca_path = FS::toVFSPath("/var/ca.pem") ;
@@ -60,7 +60,7 @@ namespace be::mg {
         certkey_path = FS::toVFSPath("/var/key.pem") ;
     }
     
-    const char * MgModule::eventName(int ev) {
+    const char * Mg::eventName(int ev) {
         switch(ev){
             case MG_EV_ERROR: return "error" ;
             case MG_EV_OPEN: return "open" ;
@@ -86,7 +86,7 @@ namespace be::mg {
         }
     }
 
-    int MgModule::eventConst(const char * evname) {
+    int Mg::eventConst(const char * evname) {
         if(strcmp(evname,"error")==0) { return MG_EV_ERROR ;}
         else if(strcmp(evname,"open")==0) { return MG_EV_OPEN ;}
         else if(strcmp(evname,"poll")==0) { return MG_EV_POLL ;}
@@ -109,7 +109,7 @@ namespace be::mg {
         else { return -1 ;}
     }
 
-    void MgModule::loop(const BeShell & beshell, void * data) {
+    void Mg::loop(const BeShell & beshell, void * data) {
         mg_mgr_poll(&mgr, 0);
     }
 
@@ -161,7 +161,7 @@ namespace be::mg {
     //     (void) evd;
     // }
 
-    // JSValue MgModule::sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    // JSValue Mg::sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
     //     ASSERT_ARGC(2)
 
@@ -197,7 +197,7 @@ namespace be::mg {
     //     return JS_UNDEFINED ;
     // }
 
-    JSValue MgModule::connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Mg::connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)
         ARGV_TO_UINT16(0, idx)
@@ -216,7 +216,7 @@ namespace be::mg {
         return JS_NewString(ctx, addr) ;
     }
 
-    JSValue MgModule::connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Mg::connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         int cnt = 0 ;
         for(struct mg_connection * conn = mgr.conns ; conn; conn=conn->next) {
             cnt ++ ;
@@ -225,11 +225,11 @@ namespace be::mg {
     }
 
 
-    JSValue MgModule::getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Mg::getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_NewString(ctx,mgr.dns4.url) ;
     }
 
-    JSValue MgModule::parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Mg::parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0,url,"arg url must be a string")
 
@@ -245,7 +245,7 @@ namespace be::mg {
         return obj ;
     }
 
-    JSValue MgModule::setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Mg::setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0, log, "arg loglevel must be a string")
 

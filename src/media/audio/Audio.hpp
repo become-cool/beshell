@@ -4,9 +4,9 @@
 #include "NativeModule.hpp"
 
 namespace be::media{
-    class AudioModule: public be::NativeModule {
+    class Audio: public be::NativeModule {
     public:
         static const char * const name ;
-        AudioModule(JSContext * ctx, const char * name) ;
+        Audio(JSContext * ctx, const char * name) ;
     } ;
 }

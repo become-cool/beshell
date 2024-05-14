@@ -1,7 +1,7 @@
 #include "ModuleLoader.hpp"
-#include "module/GPIOModule.hpp"
-#include "module/ProcessModule.hpp"
-#include "module/PathModule.hpp"
+#include "module/GPIO.hpp"
+#include "module/Process.hpp"
+#include "module/Path.hpp"
 #include "driver/DriverModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
@@ -117,10 +117,10 @@ namespace be {
 
     ModuleLoader::ModuleLoader(BeShell * beshell) {
         add<JSLoader>(beshell, "loader") ;
-        add<ProcessModule>(beshell, "process") ;
+        add<Process>(beshell, "process") ;
 #ifdef ESP_PLATFORM
         add<driver::DriverModule>(beshell, "driver") ;
-        add<GPIOModule>(beshell, "gpio") ;
+        add<GPIO>(beshell, "gpio") ;
 #endif
     }
     

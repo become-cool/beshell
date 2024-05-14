@@ -5,10 +5,10 @@
 
 namespace be {
 
-    class BTModule: public be::NativeModule {
+    class BT: public be::NativeModule {
     public:
         static const char * const name ;
-        BTModule(JSContext * ctx, const char * name) ;
+        BT(JSContext * ctx, const char * name) ;
 
         static JSValue jsFunc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;

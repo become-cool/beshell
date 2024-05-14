@@ -7,7 +7,7 @@
 #include "js/json.c"
 #include "ModuleLoader.hpp"
 #include "EventEmitter.hpp"
-#include "module/ProcessModule.hpp"
+#include "module/Process.hpp"
 #include <cassert>
 #include <iostream>
 #include <iomanip>

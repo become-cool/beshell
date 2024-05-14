@@ -10,13 +10,13 @@
 
 
 namespace be::mg {
-    class MgModule: public be::NativeModule {
+    class Mg: public be::NativeModule {
     private :
         static struct mg_mgr mgr ;
     public:
         static const char * name ;
 
-        MgModule(JSContext * ctx, const char * name) ;
+        Mg(JSContext * ctx, const char * name) ;
 
         static std::string ca_path ;
         static std::string cert_path ;

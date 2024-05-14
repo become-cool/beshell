@@ -1,4 +1,4 @@
-#include "GPIOModule.hpp"
+#include "GPIO.hpp"
 #include "driver/adc.h"
 #include <map>
 #include <vector>
@@ -26,7 +26,7 @@ namespace be {
 
     static map< uint8_t, pair< vector<JSValue>, vector<JSValue> > > watching_callbacks ;
 
-    GPIOModule::GPIOModule(JSContext * ctx, const char * name)
+    GPIO::GPIO(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
         exportFunction("setMode",setMode,2) ;
@@ -45,7 +45,7 @@ namespace be {
         EXPORT_FUNCTION(test) ;
     }
 
-    void GPIOModule::import(JSContext *ctx) {
+    void GPIO::import(JSContext *ctx) {
         JSValue DEF_JS_FUNC(jsBlink, R"(
 function (gpio,time) {
     this.setMode(gpio,"output")
@@ -66,7 +66,7 @@ function (gpio,time) {
      * 
      * @return bool
      */
-    JSValue GPIOModule::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         const char * mode = JS_ToCString(ctx, argv[1]) ;
@@ -128,7 +128,7 @@ function (gpio,time) {
      * @param mode:string
      * @return undefined
      */
-    JSValue GPIOModule::pull(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::pull(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_CSTRING(1, mode)
@@ -166,7 +166,7 @@ function (gpio,time) {
      * @param value:number 输出电平 0|1 
      * @return undefined
      */
-    JSValue GPIOModule::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
         ARGV_TO_UINT8(1, value)
@@ -179,16 +179,16 @@ function (gpio,time) {
      * @param pin:number mcu可用的gpio编号
      * @return 0|1
      */
-    JSValue GPIOModule::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_UINT8(0, pin)
         gpio_get_level((gpio_num_t)pin);
         return JS_NewUint32(ctx, gpio_get_level((gpio_num_t)pin)) ;
     }
-    JSValue GPIOModule::readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
-    JSValue GPIOModule::writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
     
@@ -201,7 +201,7 @@ function (gpio,time) {
      * @param bits:number 位宽 (9-12)
      * @return bool
      */
-    JSValue GPIOModule::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, adc)
         ARGV_TO_UINT8(1, bits)
@@ -254,7 +254,7 @@ function (gpio,time) {
      * param atten:number adc通道 (1|2)
      * @return bool
      */
-    JSValue GPIOModule::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(2)
         ARGV_TO_UINT8(0, pin)
@@ -280,10 +280,10 @@ function (gpio,time) {
         return (ret==ESP_OK)? JS_TRUE: JS_FALSE ;
     }
 
-    JSValue GPIOModule::writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
-    JSValue GPIOModule::readPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::readPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
 
@@ -323,7 +323,7 @@ function (gpio,time) {
      * @param callback:function 回调函数，callback 的原型为 `function(pin, value)`
      * @return bool
      */
-    JSValue GPIOModule::watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(3)
         ARGV_TO_UINT8(0, pin)
         string ARGV_TO_STRING(1, edge)
@@ -374,15 +374,15 @@ function (gpio,time) {
             watching_callbacks[pin].second.push_back( JS_DupValue(ctx,argv[2]) ) ;
         }
 
-        JSEngine::fromJSContext(ctx)->addLoopFunction(GPIOModule::loop, nullptr, true) ;
+        JSEngine::fromJSContext(ctx)->addLoopFunction(GPIO::loop, nullptr, true) ;
 
         return JS_UNDEFINED ;
     }
-    JSValue GPIOModule::unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
 
-    void GPIOModule::loop(JSContext * ctx, void * arg) {
+    void GPIO::loop(JSContext * ctx, void * arg) {
 
         if(!pending_event) {
             return ;
@@ -414,7 +414,7 @@ function (gpio,time) {
         }
     }
     
-    JSValue GPIOModule::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_NewInt32(ctx, gpio_state[7]) ;
     }
 }

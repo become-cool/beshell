@@ -1,4 +1,4 @@
-#include "SerialModule.hpp"
+#include "Serial.hpp"
 #include "UART.hpp"
 #include "I2C.hpp"
 #include "SPI.hpp"
@@ -8,9 +8,9 @@ using namespace std ;
 
 namespace be {
 
-    const char * SerialModule::name = "serial" ;
+    const char * Serial::name = "serial" ;
 
-    SerialModule::SerialModule(JSContext * ctx, const char * name)
+    Serial::Serial(JSContext * ctx, const char * name)
         : NativeModule(ctx,name,0)
     {
         exportName("uart0") ;
@@ -44,10 +44,10 @@ namespace be {
         exportName("i2s0") ;
     }
     
-    SerialModule::~SerialModule() {
+    Serial::~Serial() {
     }
 
-    void SerialModule::import(JSContext *ctx) {
+    void Serial::import(JSContext *ctx) {
         assert(ctx) ;
         assert(m) ;
 
