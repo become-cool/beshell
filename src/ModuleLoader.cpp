@@ -169,44 +169,42 @@ namespace be {
         }        
     }
 
-    std::string ModuleLoader::resovleFS(FS * fs, const char * module_name, const char * base_dir) {
-
-        assert(fs) ;
+    std::string ModuleLoader::resovleFS(const char * module_name, const char * base_dir) {
 
         std::string fullpath = base_dir? base_dir: "" ;
         fullpath+= "/" ;
         fullpath+= module_name ;
 
         // to vfs path
-        fullpath = fs->toVFSPath(fullpath.c_str()) ;
+        fullpath = FS::toVFSPath(fullpath.c_str()) ;
         path_normalize(fullpath) ;
 
-        if(fs->isFile(fullpath.c_str())) {
+        if(FS::isFile(fullpath.c_str())) {
             return fullpath ;
         }
 
-        if(fs->isDir(fullpath.c_str())) {
+        if(FS::isDir(fullpath.c_str())) {
             // @todo package
 
             // index.js
             fullpath+= "/index.js" ;
-            if(fs->isFile(fullpath.c_str())) {
+            if(FS::isFile(fullpath.c_str())) {
                 return fullpath ;
             }
         }
         
         std::string trypath = fullpath + ".js" ;
-        if(fs->isFile(trypath.c_str())) {
+        if(FS::isFile(trypath.c_str())) {
             return trypath ;
         }
 
         trypath = fullpath + ".bin" ;
-        if(fs->isFile(trypath.c_str())) {
+        if(FS::isFile(trypath.c_str())) {
             return trypath ;
         }
         
         trypath = trypath + ".js.bin" ;
-        if(fs->isFile(trypath.c_str())) {
+        if(FS::isFile(trypath.c_str())) {
             return trypath ;
         }
 
@@ -236,28 +234,26 @@ namespace be {
 
         // resolve file
         // -------------
-        JSEngine * engine= JSEngine::fromJSContext(ctx) ;
-        assert(engine) ;
     
         std::string fullpath ;
         // 绝对路
         if(module_name[0]=='/') {
-            fullpath = resovleFS(engine->beshell->fs, module_name, NULL) ;
+            fullpath = resovleFS(module_name, NULL) ;
         }
 
         // 相对路径
         else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
             char * base_dir = strdup(module_base_name) ;
             path_dirname(module_base_name, base_dir) ;
-            fullpath = resovleFS(engine->beshell->fs, module_name, base_dir) ;
+            fullpath = resovleFS(module_name, base_dir) ;
             free(base_dir) ;
         }
 
         // 系统默认目录
         else {
-            fullpath = resovleFS(engine->beshell->fs, module_name, "/lib/local") ;
+            fullpath = resovleFS(module_name, "/lib/local") ;
             if(!fullpath.length()) {
-                fullpath = resovleFS(engine->beshell->fs, module_name, "/opt") ;
+                fullpath = resovleFS(module_name, "/opt") ;
             }
         }
         

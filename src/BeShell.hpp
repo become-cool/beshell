@@ -42,7 +42,6 @@ namespace be {
         std::vector<std::pair<LoopFunction,void *>> loopFunctions ; 
 
     public:
-        FS * fs = nullptr ;
         Telnet * telnet = nullptr ;
         REPL * repl = nullptr ;
 #ifdef MODULE_LV
@@ -61,7 +60,6 @@ namespace be {
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
 
         void useBasic() ;
-        void useFS(const char * mountPath=nullptr, FSPartition * partition=nullptr) ;
         void useREPL() ;
         
         void useSerial() ;

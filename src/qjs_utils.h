@@ -154,7 +154,7 @@ extern "C" {
     var ;                                                   \
     {                                                       \
         const char * cstr = JS_ToCString(ctx, argv[i]) ;    \
-        var = be::FS::toVFSPath(ctx, cstr) ;                \
+        var = be::FS::toVFSPath(cstr) ;                     \
         JS_FreeCString(ctx, cstr) ;                         \
     }
 
