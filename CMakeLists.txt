@@ -140,8 +140,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-discarded-qualifiers")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-conversion")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-arith")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-cast-function-type")
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -fno-stack-protector -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -mlongcalls -nostdlib -Wpointer-arith -Wno-error=unused-value -Wno-error=unused-label -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-error=char-subscripts -Wno-error=maybe-uninitialized -Wno-unused-parameter -Wno-sign-compare -Wno-error=misleading-indentation -Wno-error=stringop-truncation)
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-cast-function-type)
 
 # for c++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers")
@@ -169,6 +171,9 @@ if (COMMAND component_compile_options)
     component_compile_options(-Wno-error=switch)
     component_compile_options(-Wno-switch)
     component_compile_options(-Wno-missing-field-initializers)
+    component_compile_options(-Wno-pointer-arith)
+
+    
 endif ()
 
 # string(REPLACE "-fno-rtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
