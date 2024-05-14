@@ -1,4 +1,4 @@
-#include "LVModule.hpp"
+#include "LV.hpp"
 #include "qjs_utils.h"
 #include "widget/Label.hpp"
 #include <map>
@@ -9,7 +9,7 @@ namespace be::lv {
     
     static map<string, lv_font_t *> loadedFonts ;
     
-    JSValue LVModule::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue LV::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2) 
         ARGV_TO_CSTRING(0, name) 
         ARGV_TO_CSTRING(1, cpath)

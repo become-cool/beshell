@@ -12,14 +12,6 @@
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
 
-
-#ifdef ESP_PLATFORM
-#define MODULE_SERIAL
-#define MODULE_LV
-#endif
-
-
-
 namespace be {
     
     class BeShell ;
@@ -37,13 +29,10 @@ namespace be {
         std::vector<std::pair<LoopFunction,void *>> loopFunctions ; 
 
     public:
-        Telnet * telnet = nullptr ;
-        REPL * repl = nullptr ;
-#ifdef MODULE_LV
-        lv::LV * lv = nullptr ;
-#endif
+        JSEngine * engine ;
+        Telnet * telnet ;
+        REPL * repl ;
 
-        JSEngine * engine = nullptr ;
 
         BeShell() ;
         ~BeShell() ;
@@ -53,13 +42,7 @@ namespace be {
         void main() ;
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
-
-        // void useBasic() ;
-        // void useREPL() ;
         
-#ifdef MODULE_LV
-        void useLV() ;
-#endif
 #ifdef ESP_PLATFORM
         void useDeviceJSON(const char * path="/config/device.json") ;
 #endif

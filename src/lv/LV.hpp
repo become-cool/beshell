@@ -1,31 +1,39 @@
 #pragma once
 
+#include "BeShell.hpp"
+#include "NativeModule.hpp"
+#include "driver/display/DisplayModule.hpp"
 #include "deps/lvgl/lvgl.h"
-#include "esp_timer.h"
-#include <map>
-#include <string>
 
 namespace be {
-    class BeShell ;
-    class FS ;
 namespace lv {
 
-
-    class LV {
+    class LV: public be::NativeModule {
     private:
-        esp_timer_handle_t tickTimer;
-        void initTick() ;
-
-        // be::FS & fs ;
-        lv_fs_drv_t fs_drv;
-        void initFS(const be::BeShell & beshell) ;
+        static esp_timer_handle_t tickTimer;
+        static void initTick() ;
+    public:
+        static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
 
     public:
-        LV() ;
-        void setup(const be::BeShell & beshell) ;
-        void loop() ;
+
+        static const char * const name ;
         
-        static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
+        LV(JSContext * ctx, const char * name) ;
+
+        // void import() ;
+        static void loop(const BeShell &, void *) ;
+        static void use(be::BeShell * beshell) ;
+
+        static JSValue screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
     } ;
 
     void addImageDsc(const char * name, const lv_image_dsc_t  *) ;

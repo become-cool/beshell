@@ -64,7 +64,6 @@ namespace be::driver::display {
         return JS_UNDEFINED ;
     }
 
-#ifdef MODULE_LV
     typedef struct {
         shared_ptr<be::NativeClass> display ;
     } disp_drv_opa_t ;
@@ -121,6 +120,4 @@ namespace be::driver::display {
 
         return true ;
     }
-
-#endif
 }
