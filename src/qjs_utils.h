@@ -383,7 +383,7 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
                 JSValue item = JS_GetPropertyUint32(ctx, jsobj, i) ; \
                 code                        \
                 JS_FreeValue(ctx,item) ;    \
-            }                               \ 
+            }                               \
             JS_FreeValue(ctx,jslen) ;       \
         }                                   \
     }
