@@ -11,11 +11,6 @@
 #include "freertos/task.h"
 #include "esp_vfs_fat.h"
 #include "esp_event_loop.h"
-
-#include "lv/LV.hpp"
-#include "module/serial/Serial.hpp"
-#include "js/device.c"
-#include "module/DeviceModule.hpp"
 #endif
 
 using namespace std ;
@@ -54,37 +49,15 @@ namespace be {
     }
 
     void BeShell::setup() {
-
         telnet->setup() ;
-
         engine->setup() ;
-
-#ifdef ESP_PLATFORM
-        if(bUseDeviceJSON) {
-            JSEngineEvalEmbeded(engine->ctx, device)
-        }
-#endif
     }
-
-#ifdef ESP_PLATFORM
-    void BeShell::useDeviceJSON(const char * path) {
-        useModule<DeviceModule>() ;
-        DeviceModule::setDeviceJsonPath(path) ;
-        bUseDeviceJSON = true ;
-    }
-#endif
 
     void BeShell::loop() {
 
         telnet->loop() ;
 
         engine->loop() ;
-
-#ifdef MODULE_LV
-        if(lv) {
-            lv->loop() ;
-        }
-#endif
 
         for(auto pair:loopFunctions) {
             pair.first(*this, pair.second) ;

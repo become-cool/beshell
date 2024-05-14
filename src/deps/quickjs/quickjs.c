@@ -53700,3 +53700,18 @@ void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque)
 {
     m->user_opaque = opaque;
 }
+
+
+
+
+JSModuleDef * JS_FindModuleWithNS(JSContext *ctx, JSValue ns) {
+    struct list_head *el;
+    JSModuleDef *m;
+    /* first look at the loaded modules */
+    list_for_each(el, &ctx->loaded_modules) {
+        m = list_entry(el, JSModuleDef, link);
+        if (JS_VALUE_GET_OBJ(m->module_ns) == JS_VALUE_GET_OBJ(ns))
+            return m;
+    }
+    return NULL;
+}

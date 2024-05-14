@@ -27,6 +27,7 @@ namespace be {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
             exportFunction("importSync",importSync) ;
+            exportFunction("exportValue",exportValue) ;
         }
         
         static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -112,6 +113,22 @@ namespace be {
             free(dir) ;
 
             return val ;
+        }
+        static JSValue exportValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            ASSERT_ARGC(3)
+            JSModuleDef * mdef = JS_FindModuleWithNS(ctx,argv[0]) ;
+            if(!mdef) {
+                JSTHROW("Invalid module") ;
+            }
+            const char * valueName = JS_ToCString(ctx, argv[1]) ;
+
+            if( JS_SetModuleExport(ctx, mdef, valueName, JS_DupValue(ctx, argv[2])) !=0 ){
+                JS_FreeCString(ctx, valueName) ;
+                JSTHROW("Cannot export value: %s", valueName) ;
+            }
+                
+            JS_FreeCString(ctx, valueName) ;
+            return JS_UNDEFINED ;
         }
     } ;
 

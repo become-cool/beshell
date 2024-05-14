@@ -25,7 +25,7 @@
 #include "repl/REPL.hpp"
 
 // module
-#include "module/DeviceModule.hpp"
+#include "module/DeviceTree.hpp"
 #include "module/GPIO.hpp"
 #include "module/NVS.hpp"
 #include "module/Path.hpp"

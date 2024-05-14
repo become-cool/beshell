@@ -1,7 +1,7 @@
-import {deviceJsonPath, device} from 'device'
+import * as dt from 'dt'
 import * as serial from 'serial'
 import * as driver from 'driver'
-import {importSync} from 'loader'
+import {importSync, exportValue} from 'loader'
 
 function setupSerialBus(type, num, conf) {
     let varname = type+num
@@ -17,7 +17,7 @@ function setupSerialBus(type, num, conf) {
     }
 }
 
-(function (){
+function load (deviceJsonPath){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
         console.log(deviceJsonPath, "not exists or invalid.")
@@ -95,4 +95,6 @@ function setupSerialBus(type, num, conf) {
             }
         }
     }
-}) ()
+}
+
+exportValue(dt, 'load', load)

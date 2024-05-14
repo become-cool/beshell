@@ -30,6 +30,8 @@ namespace be {
         exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("readEFUSE", readEFUSE);
 
+        // JS_ComputeMemoryUsage
+
         exportName("versions") ;
         exportName("platform") ;
     }

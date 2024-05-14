@@ -1055,6 +1055,9 @@ void JS_SetRuntimeOpaque2(JSRuntime *rt, void *opaque) ;
 void * JS_GetModuleDefOpaque(JSModuleDef *m) ;
 void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque) ;
 
+
+JSModuleDef * JS_FindModuleWithNS(JSContext *ctx, JSValue ns) ;
+
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif

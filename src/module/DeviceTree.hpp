@@ -4,14 +4,14 @@
 #include "NativeModule.hpp"
 
 namespace be{
-    class DeviceModule: public be::NativeModule {
+    class DeviceTree: public be::NativeModule {
 
     private:
         static const char * deviceJsonPath ;
 
     public:
         static const char * name ;
-        DeviceModule(JSContext * ctx, const char * name) ;
+        DeviceTree(JSContext * ctx, const char * name) ;
 
         void import(JSContext *ctx) ;
 

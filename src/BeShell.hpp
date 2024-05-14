@@ -24,7 +24,6 @@ namespace be {
         uint8_t boot_level = 5 ;
         bool requst_reset = false ;
         bool nowifi = false ;
-        bool bUseDeviceJSON = false ;
 
         std::vector<std::pair<LoopFunction,void *>> loopFunctions ; 
 
@@ -43,10 +42,6 @@ namespace be {
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
         
-#ifdef ESP_PLATFORM
-        void useDeviceJSON(const char * path="/config/device.json") ;
-#endif
-
         template <typename ModuleClass>
         void use(const char * name=nullptr) {
             useModule<ModuleClass>(name) ;

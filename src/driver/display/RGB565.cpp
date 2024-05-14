@@ -11,6 +11,8 @@ using namespace std ;
 
 namespace be::driver::display {
 
+    // https://docs.espressif.com/projects/espressif-esp-faq/zh_CN/latest/software-framework/peripherals/lcd.html#id2
+
 
 // typedef struct {
 //     lcd_clock_source_t clk_src;   /*!< Clock source for the RGB LCD peripheral */
