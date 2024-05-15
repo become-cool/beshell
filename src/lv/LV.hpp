@@ -2,7 +2,6 @@
 
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
-#include "driver/display/DisplayModule.hpp"
 #include "deps/lvgl/lvgl.h"
 
 namespace be {
@@ -12,6 +11,7 @@ namespace lv {
     private:
         static esp_timer_handle_t tickTimer;
         static void initTick() ;
+        static bool used ;
     public:
         static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
 

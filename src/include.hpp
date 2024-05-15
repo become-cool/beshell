@@ -52,4 +52,13 @@
 
 
 // driver
-#include "driver/DriverModule.hpp"
+#include "driver/input/GT911.hpp"
+#include "driver/sensor/BMP280.hpp"
+#include "driver/sensor/AHT20.hpp"
+#include "driver/sensor/WH4530A.hpp"
+#include "driver/sensor/DS18B20.hpp"
+#include "driver/sensor/VL53L0X.hpp"
+#include "driver/io/PCA9557.hpp"
+#include "driver/sys/DS1307.hpp"
+#include "driver/sys/SDCard.hpp"
+#include "driver/disp/ST7701.hpp"

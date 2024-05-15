@@ -8,7 +8,7 @@
 
 using namespace std ;
 
-namespace be::driver::display {
+namespace be::driver::disp {
 
     DEFINE_NCLASS_META(ST7701, RGB565)
 

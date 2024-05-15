@@ -2,16 +2,29 @@
 #include <algorithm>
 #include "Display.hpp"
 #include "qjs_utils.h"
+#include "esp_heap_caps.h"
 
 using namespace std ;
 
 
-namespace be::driver::display {
+namespace be::driver::disp {
 
     DEFINE_NCLASS_META(Display, NativeClass)
     std::vector<JSCFunctionListEntry> Display::methods = {
-        JS_CFUNC_DEF("drawRect", 0, Display::jsDrawRect),
+        JS_CFUNC_DEF("drawRect", 0, Display::drawRect),
     } ;
+    std::vector<JSCFunctionListEntry> Display::staticMethods = {
+        JS_CFUNC_DEF("rgb", 0, Display::rgb),
+        JS_CFUNC_DEF("rgb565", 0, Display::rgb565),
+        JS_CFUNC_DEF("toRGB", 0, Display::toRGB),
+        JS_CFUNC_DEF("toRGB565", 0, Display::toRGB565),
+    } ;
+
+    
+        // exportFunction("rgb", jsFromRGB) ;
+        // exportFunction("rgb565", jsFromRGB565) ;
+        // exportFunction("toRGB", jsToRGB) ;
+        // exportFunction("toRGB565", jsToRGB565) ;
 
     Display::Display(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : NativeClass(ctx, build(ctx,_jsobj))
@@ -27,11 +40,7 @@ namespace be::driver::display {
         return _height ;
     }
 
-    // void Display::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
-    //     cout << "not implements" << endl ;
-    // }
-
-    JSValue Display::jsDrawRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Display::drawRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         Display * disp = (Display *)fromJS(this_val) ;
         if(!disp) {
             JSTHROW("not a valid object")
@@ -119,5 +128,49 @@ namespace be::driver::display {
         lv_display_set_driver_data(lv_display,opa) ;
 
         return true ;
+    }
+    
+    uint16_t fromRGB(uint8_t r,uint8_t g,uint8_t b) {
+        r = r*((float)31/255) + 0.5 ;
+        g = g*((float)63/255) + 0.5 ;
+        b = b*((float)31/255) + 0.5 ;
+        return fromRGB565(r,g,b) ;
+    }
+    uint16_t fromRGB565(uint8_t r,uint8_t g,uint8_t b) {
+        return ((r&31)<<11) | ((g&63)<<5) | (b&31) ;
+    }
+
+    void toRGB(uint16_t value, uint8_t * r,uint8_t * g,uint8_t * b) {
+        toRGB565(value,r,g,b) ;
+        *r = (uint8_t) (((float)*r/31) * 255 + 0.5) ;
+        *g = (uint8_t) (((float)*g/63) * 255 + 0.5) ;
+        *b = (uint8_t) (((float)*b/31) * 255 + 0.5) ;
+    }
+    void toRGB565(uint16_t value, uint8_t * r,uint8_t * g,uint8_t * b) {
+        *r = (value>>11) & 31 ;
+        *g = (value>>5) & 63 ;
+        *b = value & 31 ;
+    }
+
+    JSValue Display::rgb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(3)
+        ARGV_TO_UINT8(0,r)
+        ARGV_TO_UINT8(1,g)
+        ARGV_TO_UINT8(2,b)
+        return JS_NewUint32(ctx, be::driver::disp::fromRGB(r,g,b)) ;
+    }
+    JSValue Display::rgb565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(3)
+        ARGV_TO_UINT8(0,r)
+        ARGV_TO_UINT8(1,g)
+        ARGV_TO_UINT8(2,b)
+        return JS_NewUint32(ctx, be::driver::disp::fromRGB565(r,g,b)) ;
+    }
+
+    JSValue Display::toRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
+    }
+    JSValue Display::toRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
     }
 }

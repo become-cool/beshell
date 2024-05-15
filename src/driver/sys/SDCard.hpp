@@ -2,7 +2,7 @@
 
 #include <NativeClass.hpp>
 
-namespace be::driver {
+namespace be::driver::sys {
     class SDCard: public be::NativeClass {
         DECLARE_NCLASS_META
     private:

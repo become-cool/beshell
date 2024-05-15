@@ -8,9 +8,9 @@
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
 
-namespace be::driver::display {
+namespace be::driver::disp {
 
-    class RGB565: public Display {
+    class RGB565: public Display{
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;

@@ -12,7 +12,7 @@
 
 using namespace std ;
 
-namespace be::driver {
+namespace be::driver::sys {
     DEFINE_NCLASS_META(SDCard, NativeClass)
     std::vector<JSCFunctionListEntry> SDCard::methods = {
         JS_CFUNC_DEF("setup", 0, SDCard::setup),

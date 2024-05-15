@@ -9,7 +9,7 @@
 
 using namespace std ;
 
-namespace be::driver::display {
+namespace be::driver::disp {
 
     // https://docs.espressif.com/projects/espressif-esp-faq/zh_CN/latest/software-framework/peripherals/lcd.html#id2
 

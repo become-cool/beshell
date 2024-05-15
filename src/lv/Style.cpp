@@ -1,5 +1,5 @@
 #include "Style.hpp"
-#include "driver/display/DisplayModule.hpp"
+#include "driver/disp/Display.hpp"
 #include "const.hpp"
 
 using namespace std ;
@@ -143,7 +143,7 @@ namespace be::lv {
         case LV_STYLE_LINE_COLOR: 
         case LV_STYLE_ARC_COLOR: 
         case LV_STYLE_TEXT_COLOR:
-            return JS_NewUint32(ctx, be::driver::display::fromRGB(value.color.red,value.color.green,value.color.blue)) ;
+            return JS_NewUint32(ctx, be::driver::disp::fromRGB(value.color.red,value.color.green,value.color.blue)) ;
 
         default:
             return JS_NewString(ctx, "unknow type") ;
@@ -275,7 +275,7 @@ namespace be::lv {
             if(JS_ToUint32(ctx, &cval, jsval)!=0) {
                 return false ;
             }
-            be::driver::display::toRGB((uint16_t)cval, &(value->color.red), &(value->color.green), &(value->color.blue)) ;
+            be::driver::disp::toRGB((uint16_t)cval, &(value->color.red), &(value->color.green), &(value->color.blue)) ;
             return true ;
         }
 

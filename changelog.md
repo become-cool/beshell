@@ -11,6 +11,7 @@ Fixed:
 
 Refactored:
 
+* 全面重构了 BeShell 的接口
 * I2CDevice::begin() rename to I2CDevice::setup()
 
 

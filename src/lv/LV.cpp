@@ -4,7 +4,7 @@
 #include <cassert>
 #include "Style.hpp"
 #include "driver/input/InDevPointer.hpp"
-#include "driver/display/Display.hpp"
+#include "driver/disp/Display.hpp"
 
 using namespace std ;
 
@@ -12,6 +12,7 @@ namespace be::lv {
 
     const char * const LV::name = "lv" ;
     esp_timer_handle_t LV::tickTimer = nullptr ;
+    bool LV::used = false ;
     
     std::map<std::string, const lv_image_dsc_t  *> LV::embededImages ;
 
@@ -95,10 +96,15 @@ namespace be::lv {
     }
 
     void LV::use(be::BeShell * beshell) {
-        beshell->useModule<driver::display::DisplayModule>() ;
+        if(used) {
+            return ;
+        }
 
         initTick() ;
         beshell->addLoopFunction(loop) ;
+        lv_init() ;
+
+        used = true ;
     }
 
 
@@ -165,7 +171,7 @@ namespace be::lv {
      */
     JSValue LV::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
-        JSVALUE_TO_NCLASS(be::driver::display::Display, argv[0], display)
+        JSVALUE_TO_NCLASS(be::driver::disp::Display, argv[0], display)
         return JS_NewBool(ctx, display->registerToLV()) ;
     }
 
