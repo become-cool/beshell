@@ -69,7 +69,7 @@ function load (deviceJsonPath){
                 }
             }
             let varname = devConf.name || driverClass.name
-            device[varname] = dev
+            dt.device[varname] = dev
         }catch(e) {
             console.error(devConf.driver,'device init failed.')
             console.error(e)

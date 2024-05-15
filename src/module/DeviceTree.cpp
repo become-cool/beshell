@@ -11,15 +11,13 @@ namespace be{
     DeviceTree::DeviceTree(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
-        exportName("deviceJsonPath") ;
         exportName("device") ;
         exportName("load") ;
     }
 
     void DeviceTree::import(JSContext *ctx) {
-        exportValue("deviceJsonPath", JS_NewString(ctx, deviceJsonPath)) ;
         exportValue("device", JS_NewObject(ctx)) ;
-
+        
         JSEngineEvalEmbeded(ctx, device)
     }
 
