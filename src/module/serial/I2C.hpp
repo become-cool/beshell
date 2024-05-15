@@ -49,7 +49,12 @@ namespace be {
         #endif
 
         static I2C * i2c0 ;
+        #if SOC_I2C_NUM > 1
         static I2C * i2c1 ;
+        #endif
+        #if SOC_LP_I2C_NUM > 0
+        static I2C * i2clp0 ;
+        #endif
 
         std::map<int, std::pair<int, void *>> slaveRegisters ;
 

@@ -20,7 +20,12 @@ namespace be {
     DEFINE_NCLASS_META(I2C, NativeClass)
 
     I2C * I2C::i2c0 = nullptr ;
+    #if SOC_I2C_NUM > 1
     I2C * I2C::i2c1 = nullptr ;
+    #endif
+    #if SOC_LP_I2C_NUM > 0
+    I2C * I2C::i2clp0 = nullptr ;
+    #endif
 
     std::vector<JSCFunctionListEntry> I2C::methods = {
         JS_CFUNC_DEF("setup", 1, I2C::setup),
@@ -79,12 +84,20 @@ namespace be {
             }
             return i2c0 ;
         }
-        #ifdef I2C_NUM_1
+        #if SOC_I2C_NUM > 1
         else if(bus==I2C_NUM_1) {
             if(!i2c1) {
                 i2c1 = new I2C(ctx, I2C_NUM_1) ;
             }
             return i2c1 ;
+        }
+        #endif
+        #if SOC_LP_I2C_NUM > 0
+        else if(bus==LP_I2C_NUM_0) {
+            if(!i2clp0) {
+                i2clp0 = new I2C(ctx, LP_I2C_NUM_0) ;
+            }
+            return i2clp0 ;
         }
         #endif
         return nullptr ;

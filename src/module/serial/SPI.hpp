@@ -15,9 +15,16 @@ namespace be {
     private:
         spi_host_device_t busnum ;
 
-        static SPI * spi0 ;
         static SPI * spi1 ;
+        #if SOC_SPI_PERIPH_NUM > 2
         static SPI * spi2 ;
+        #endif
+        #if SOC_SPI_PERIPH_NUM > 3
+        static SPI * spi3 ;
+        #endif
+        #if SOC_SPI_PERIPH_NUM > 4
+        static SPI * spi4 ;
+        #endif
 
         std::map<gpio_num_t, spi_device_handle_t> devices ;
 

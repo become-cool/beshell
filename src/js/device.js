@@ -20,8 +20,7 @@ function setupSerialBus(type, num, conf) {
 function load (deviceJsonPath){
     let deviceConf = JSON.loadSync(deviceJsonPath,null)
     if(!deviceConf) {
-        console.log(deviceJsonPath, "not exists or invalid.")
-        return ;
+        throw new Error(deviceJsonPath + " not exists or invalid.")
     }
     console.log("load device config from:", deviceJsonPath)
     for(let prepheral of ['spi','i2c','uart','i2s']) {

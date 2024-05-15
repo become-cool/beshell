@@ -12,7 +12,7 @@ namespace be {
 
         static I2S * i2s0 ;
 
-        #ifdef I2S_NUM_1
+        #if SOC_I2S_NUM > 1
         static I2S * i2s1 ;
         #endif
         
