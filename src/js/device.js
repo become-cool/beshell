@@ -30,6 +30,7 @@ function load (deviceJsonPath){
     }
 
     let lvdevs = []
+    let devId = {}
     
     // dev
     for(let devConf of deviceConf.dev||[]){
@@ -67,9 +68,17 @@ function load (deviceJsonPath){
                     console.error("unknown lv type", devConf.lv.type)
                 }
             }
-            let varname = devConf.name || driverClass.name
+            if(!devId[driverClass.name]) {
+                devId[driverClass.name] = 0
+            } else {
+                devId[driverClass.name] ++
+            }
+            let varname = driverClass.name + devId[driverClass.name]
             dt.device[varname] = dev
-        }catch(e) {
+            if(devConf.name) {
+                dt.device[devConf.name] = dev
+            }
+        }catch(e){
             console.error(devConf.driver,'device init failed.')
             console.error(e)
         }
