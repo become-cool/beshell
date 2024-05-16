@@ -10,7 +10,7 @@
 using namespace std;
 using namespace be;
 
-namespace be::driver {
+namespace be::driver::io {
     DEFINE_NCLASS_META(PCA9557, NativeClass)
 
     std::vector<JSCFunctionListEntry> PCA9557::methods = {

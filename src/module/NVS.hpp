@@ -1,10 +1,12 @@
 #pragma once
 
 #include <stdint.h>
-#include "BeShell.hpp"
 #include "NativeModule.hpp"
 
 namespace be {
+
+    class BeShell ;
+
     class NVS: public NativeModule {
     private:
     protected:

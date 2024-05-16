@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BeShell.hpp"
 #include "NativeModule.hpp"
 
 namespace be::sqlite{

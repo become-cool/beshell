@@ -1,9 +1,11 @@
 #pragma once
 
-#include "BeShell.hpp"
 #include "NativeModule.hpp"
 
 namespace be {
+
+    class BeShell ;
+
     class WiFi: public be::NativeModule {
     public:
         static const char * const name ;

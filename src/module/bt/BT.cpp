@@ -8,7 +8,6 @@ namespace be {
         : NativeModule(ctx, name, 0)
     {
         // exportClass<ClassName>() ;
-        exportFunction("func",jsFunc,0) ;
     }
 
     // void BT::import(JSContext *ctx) {

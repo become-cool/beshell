@@ -1,5 +1,5 @@
 #include "WiFi.hpp"
-
+#include "../BeShell.hpp"
 #include <lwip/apps/sntp.h>
 #include <esp_err.h>
 #include <esp_event_loop.h>
