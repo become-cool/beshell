@@ -1,6 +1,7 @@
 import * as dt from 'dt'
 import * as serial from 'serial'
 import * as driver from 'driver'
+import * as gpio from 'gpio'
 import {importSync, exportValue} from 'loader'
 
 function setupSerialBus(type, num, conf) {
@@ -23,6 +24,24 @@ function load (deviceJsonPath){
         throw new Error(deviceJsonPath + " not exists or invalid.")
     }
     console.log("load device config from:", deviceJsonPath)
+
+    // gpio
+    if(deviceConf.gpio) {
+        for(let pin in deviceConf.gpio) {
+            let gpioConf = deviceConf.gpio[pin]
+            if(gpioConf.mode) {
+                gpio.setMode(pin, gpioConf.mode)
+            }
+            if(gpioConf.pull){
+                gpio.pull(pin, gpioConf.pull)
+            }
+            if(gpioConf.level){
+                gpio.write(pin, gpioConf.level?1:0)
+            }
+        }
+    }
+
+    // serial
     for(let prepheral of ['spi','i2c','uart','i2s']) {
         for(let num in deviceConf[prepheral]||{}) {
             setupSerialBus(prepheral,num,deviceConf[prepheral][num])
@@ -73,7 +92,7 @@ function load (deviceJsonPath){
             } else {
                 devId[driverClass.name] ++
             }
-            let varname = driverClass.name + devId[driverClass.name]
+            let varname = driverClass.name.toLowerCase() + "_" + devId[driverClass.name]
             dt.device[varname] = dev
             if(devConf.name) {
                 dt.device[devConf.name] = dev
