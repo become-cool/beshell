@@ -52,10 +52,9 @@ namespace be::driver::sensor {
         return obj->jsobj ;
     }
 
-    int VL53L0X::setup(be::I2C * i2c, uint8_t addr) {
-        int ret = I2CDevice::setup(i2c,addr) ;
-        if( ret<0 ) {
-            return ret ;
+    int VL53L0X::setup() {
+        if(addr==0) {
+            return -1 ;
         }
 
         if( dataInit()<=0 ){
@@ -64,9 +63,7 @@ namespace be::driver::sensor {
         
         uint8_t ver, id ;
         i2c->read<uint8_t,uint8_t>(addr, VL53L0X_REG_IDENTIFICATION_REVISION_ID, ver) ;
-        dn(ver)
         i2c->read<uint8_t,uint8_t>(addr, VL53L0X_REG_IDENTIFICATION_MODEL_ID, id) ;
-        dn(id)
 
         return 0 ;
     }

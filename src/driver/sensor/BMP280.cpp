@@ -34,12 +34,10 @@ namespace be::driver::sensor {
             return -7 ;                                         \
         }
 
-    int BMP280::setup(I2C * _i2c, uint8_t _addr) {
-        int ret = I2CDevice::setup(_i2c,_addr) ;
-        if( ret<0 ) {
-            return ret ;
+    int BMP280::setup() {
+        if(addr == 0) {
+            return -1 ;
         }
-
         uint8_t id = 0 ;
         if( !i2c->read<uint8_t,uint8_t>(addr, 0xd0, id) ){
             return -12 ;

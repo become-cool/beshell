@@ -7,7 +7,6 @@ namespace be::driver::sensor {
     DEFINE_NCLASS_META(MLX90614, I2CDevice)
 
     std::vector<JSCFunctionListEntry> MLX90614::methods = {
-            JS_CFUNC_DEF("setup", 0, be::driver::I2CDevice::setup),
             JS_CFUNC_DEF("read", 0, MLX90614::read),
     };
 
