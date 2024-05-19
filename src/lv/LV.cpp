@@ -7,6 +7,7 @@
 #include "driver/disp/Display.hpp"
 
 using namespace std ;
+using namespace be::driver::disp ;
 
 namespace be::lv {
 
@@ -28,6 +29,11 @@ namespace be::lv {
         EXPORT_FUNCTION(disableAllInDev) ;
         EXPORT_FUNCTION(enableAllInDev) ;
         
+        exportFunction("rgb", Display::rgb) ;
+        exportFunction("rgb565", Display::rgb565) ;
+        exportFunction("toRGB", Display::toRGB) ;
+        exportFunction("toRGB565", Display::toRGB565) ;
+
         exportClass<Animation>() ;
         exportClass<Style>() ;
         exportClass<Row>() ;

@@ -20,12 +20,6 @@ namespace be::driver::disp {
         JS_CFUNC_DEF("toRGB565", 0, Display::toRGB565),
     } ;
 
-    
-        // exportFunction("rgb", jsFromRGB) ;
-        // exportFunction("rgb565", jsFromRGB565) ;
-        // exportFunction("toRGB", jsToRGB) ;
-        // exportFunction("toRGB565", jsToRGB565) ;
-
     Display::Display(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : NativeClass(ctx, build(ctx,_jsobj))
         , _width(width)
@@ -130,13 +124,13 @@ namespace be::driver::disp {
         return true ;
     }
     
-    uint16_t fromRGB(uint8_t r,uint8_t g,uint8_t b) {
+    uint16_t rgb(uint8_t r,uint8_t g,uint8_t b) {
         r = r*((float)31/255) + 0.5 ;
         g = g*((float)63/255) + 0.5 ;
         b = b*((float)31/255) + 0.5 ;
-        return fromRGB565(r,g,b) ;
+        return rgb565(r,g,b) ;
     }
-    uint16_t fromRGB565(uint8_t r,uint8_t g,uint8_t b) {
+    uint16_t rgb565(uint8_t r,uint8_t g,uint8_t b) {
         return ((r&31)<<11) | ((g&63)<<5) | (b&31) ;
     }
 
@@ -157,14 +151,14 @@ namespace be::driver::disp {
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)
-        return JS_NewUint32(ctx, be::driver::disp::fromRGB(r,g,b)) ;
+        return JS_NewUint32(ctx, be::driver::disp::rgb(r,g,b)) ;
     }
     JSValue Display::rgb565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(3)
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)
-        return JS_NewUint32(ctx, be::driver::disp::fromRGB565(r,g,b)) ;
+        return JS_NewUint32(ctx, be::driver::disp::rgb565(r,g,b)) ;
     }
 
     JSValue Display::toRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
