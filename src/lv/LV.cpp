@@ -309,6 +309,14 @@ namespace be::lv {
         ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
 
+        int gesture_limit = 20 ;
+        int gesture_min_velocity = 3 ;
+        if(argc>1) {
+            GET_UINT32_PROP_OPT(argv[1], "gesture_limit", gesture_limit, 20 )
+            GET_UINT32_PROP_OPT(argv[1], "gesture_min_velocity", gesture_min_velocity, 3 )
+            dn2(gesture_min_velocity, gesture_limit)
+        }
+
         // @todo
         // unregister 的时候回收 indev_pointer_data_t
         auto data = new indev_pointer_data_t() ;
@@ -322,7 +330,9 @@ namespace be::lv {
         lv_indev_set_user_data(lvindev, (void *)data) ;
         lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(lvindev, pointer_read);
-        ((_lv_indev_t*)lvindev)->gesture_limit = 30 ;
+        dn(((_lv_indev_t*)lvindev)->gesture_min_velocity)
+        ((_lv_indev_t*)lvindev)->gesture_limit = gesture_limit ;
+        ((_lv_indev_t*)lvindev)->gesture_min_velocity = gesture_min_velocity ;
 
         return JS_UNDEFINED ;
     }

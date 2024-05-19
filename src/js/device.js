@@ -104,21 +104,23 @@ function load (deviceJsonPath){
     }
 
     // lv
-    try{
-        var lv = importSync('lv')
-    }catch(e){}
-    if(lv) {
-        for(let [dev,devConf] of lvdevs) {
-            try {
-                if(devConf.lv.type=='input') {
-                    lv.registerInputDevice(dev, devConf.lv.option)
-                } else if (devConf.lv.type=='display') {
-                    lv.registerDisplay(dev, devConf.lv.option)
-                } else {
-                    console.error("unknown lv type", devConf.lv.type)
+    if(lvdevs.length>0) {
+        try{
+            var lv = importSync('lv')
+        }catch(e){}
+        if(lv) {
+            for(let [dev,devConf] of lvdevs) {
+                try {
+                    if(devConf.lv.type=='input') {
+                        lv.registerInputDevice(dev, devConf.lv)
+                    } else if (devConf.lv.type=='display') {
+                        lv.registerDisplay(dev, devConf.lv)
+                    } else {
+                        console.error("unknown lv type", devConf.lv.type)
+                    }
+                }catch(e){
+                    console.error(e)
                 }
-            }catch(e){
-                console.error(e)
             }
         }
     }
