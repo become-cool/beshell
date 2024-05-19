@@ -14,8 +14,8 @@ namespace be::driver::disp {
         JS_CFUNC_DEF("drawRect", 0, Display::drawRect),
     } ;
     std::vector<JSCFunctionListEntry> Display::staticMethods = {
-        JS_CFUNC_DEF("rgb", 0, Display::rgb),
-        JS_CFUNC_DEF("rgb565", 0, Display::rgb565),
+        JS_CFUNC_DEF("RGB", 0, Display::RGB),
+        JS_CFUNC_DEF("RGB565", 0, Display::RGB565),
         JS_CFUNC_DEF("toRGB", 0, Display::toRGB),
         JS_CFUNC_DEF("toRGB565", 0, Display::toRGB565),
     } ;
@@ -124,13 +124,13 @@ namespace be::driver::disp {
         return true ;
     }
     
-    uint16_t rgb(uint8_t r,uint8_t g,uint8_t b) {
+    uint16_t RGB(uint8_t r,uint8_t g,uint8_t b) {
         r = r*((float)31/255) + 0.5 ;
         g = g*((float)63/255) + 0.5 ;
         b = b*((float)31/255) + 0.5 ;
-        return rgb565(r,g,b) ;
+        return RGB565(r,g,b) ;
     }
-    uint16_t rgb565(uint8_t r,uint8_t g,uint8_t b) {
+    uint16_t RGB565(uint8_t r,uint8_t g,uint8_t b) {
         return ((r&31)<<11) | ((g&63)<<5) | (b&31) ;
     }
 
@@ -146,19 +146,19 @@ namespace be::driver::disp {
         *b = value & 31 ;
     }
 
-    JSValue Display::rgb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Display::RGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(3)
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)
-        return JS_NewUint32(ctx, be::driver::disp::rgb(r,g,b)) ;
+        return JS_NewUint32(ctx, be::driver::disp::RGB(r,g,b)) ;
     }
-    JSValue Display::rgb565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Display::RGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(3)
         ARGV_TO_UINT8(0,r)
         ARGV_TO_UINT8(1,g)
         ARGV_TO_UINT8(2,b)
-        return JS_NewUint32(ctx, be::driver::disp::rgb565(r,g,b)) ;
+        return JS_NewUint32(ctx, be::driver::disp::RGB565(r,g,b)) ;
     }
 
     JSValue Display::toRGB(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
