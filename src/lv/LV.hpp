@@ -34,7 +34,7 @@ namespace lv {
         static JSValue disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue loadFont(std::string name, lv_font_t * font) ;
+        static void loadFont(std::string name, lv_font_t * font) ;
 
     } ;
 

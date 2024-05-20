@@ -9,8 +9,7 @@ namespace be::lv {
     
     static map<string, lv_font_t *> loadedFonts ;
     
-
-    void loadFont(std::string name, lv_font_t * font) {
+    void LV::loadFont(std::string name, lv_font_t * font) {
         loadedFonts[name] = font ;
     }
 

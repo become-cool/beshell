@@ -45,7 +45,7 @@
     #define LV_MEM_SIZE (64 * 1024U)          /*[bytes]*/
 
     /*Size of the memory expand for `lv_malloc()` in bytes*/
-    #define LV_MEM_POOL_EXPAND_SIZE 0
+    #define LV_MEM_POOL_EXPAND_SIZE (5 * 1024U)
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
