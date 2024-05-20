@@ -9,6 +9,11 @@ namespace be::lv {
     
     static map<string, lv_font_t *> loadedFonts ;
     
+
+    void loadFont(std::string name, lv_font_t * font) {
+        loadedFonts[name] = font ;
+    }
+
     JSValue LV::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2) 
         ARGV_TO_CSTRING(0, name) 

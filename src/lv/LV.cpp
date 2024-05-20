@@ -384,5 +384,4 @@ namespace be::lv {
     void addImageDsc(const char * name, const lv_image_dsc_t  * imgDsc) {
         LV::embededImages[name] = imgDsc ;
     }
-
 }

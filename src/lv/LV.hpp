@@ -34,6 +34,8 @@ namespace lv {
         static JSValue disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static JSValue loadFont(std::string name, lv_font_t * font) ;
+
     } ;
 
     void addImageDsc(const char * name, const lv_image_dsc_t  *) ;
