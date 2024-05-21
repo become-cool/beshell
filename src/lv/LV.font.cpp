@@ -116,6 +116,9 @@ namespace be::lv {
             font = (lv_font_t *)&lv_font_montserrat_##s;    \
         }
     JSValue Label::setFont(JSContext *ctx, JSValueConst this_val, JSValueConst val) {
+        if(!LV::useFont) {
+            return JS_FALSE ;
+        }
         THIS_NCLASS(Label,thisobj)
 
         const char * fontname = JS_ToCString(ctx,val) ;

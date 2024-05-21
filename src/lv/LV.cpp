@@ -14,6 +14,8 @@ namespace be::lv {
     const char * const LV::name = "lv" ;
     esp_timer_handle_t LV::tickTimer = nullptr ;
     bool LV::used = false ;
+    bool LV::useFont = true ;
+    bool LV::useImg = true ;
     
     std::map<std::string, const lv_image_dsc_t  *> LV::embededImages ;
 
@@ -26,6 +28,8 @@ namespace be::lv {
         EXPORT_FUNCTION(registerDisplay) ;
         EXPORT_FUNCTION(registerInputDevice) ;
         EXPORT_FUNCTION(loadFont) ;
+        EXPORT_FUNCTION(unuseFont) ;
+        EXPORT_FUNCTION(unuseImg) ;
         EXPORT_FUNCTION(disableAllInDev) ;
         EXPORT_FUNCTION(enableAllInDev) ;
         
@@ -314,7 +318,6 @@ namespace be::lv {
         if(argc>1) {
             GET_UINT32_PROP_OPT(argv[1], "gesture_limit", gesture_limit, 20 )
             GET_UINT32_PROP_OPT(argv[1], "gesture_min_velocity", gesture_min_velocity, 3 )
-            dn2(gesture_min_velocity, gesture_limit)
         }
 
         // @todo
@@ -330,7 +333,6 @@ namespace be::lv {
         lv_indev_set_user_data(lvindev, (void *)data) ;
         lv_indev_set_type(lvindev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(lvindev, pointer_read);
-        dn(((_lv_indev_t*)lvindev)->gesture_min_velocity)
         ((_lv_indev_t*)lvindev)->gesture_limit = gesture_limit ;
         ((_lv_indev_t*)lvindev)->gesture_min_velocity = gesture_min_velocity ;
 
@@ -381,7 +383,26 @@ namespace be::lv {
         return JS_UNDEFINED ;
     }
 
-    void addImageDsc(const char * name, const lv_image_dsc_t  * imgDsc) {
+    JSValue LV::unuseFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        LV::useFont = false ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue LV::unuseImg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        string ARGV_TO_STRING_OPT(0, name, "*")
+
+        if(name=="*") {
+            LV::useImg = false ;
+        } else {
+            LV::embededImages.erase(name) ;
+        }
+
+        return JS_UNDEFINED ;
+    }
+
+    void LV::addImageDsc(const char * name, const lv_image_dsc_t  * imgDsc) {
         LV::embededImages[name] = imgDsc ;
     }
+    
 }
