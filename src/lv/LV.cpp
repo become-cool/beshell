@@ -14,6 +14,7 @@ namespace be::lv {
     const char * const LV::name = "lv" ;
     esp_timer_handle_t LV::tickTimer = nullptr ;
     bool LV::used = false ;
+    bool LV::dispReady = false ;
     bool LV::useFont = true ;
     bool LV::useImg = true ;
     
@@ -102,7 +103,9 @@ namespace be::lv {
     }
     
     void LV::loop(const BeShell &, void *) {
-        lv_task_handler() ;
+        if(dispReady) {
+            lv_task_handler() ;
+        }
     }
 
     void LV::use(be::BeShell * beshell) {
@@ -182,7 +185,12 @@ namespace be::lv {
     JSValue LV::registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         JSVALUE_TO_NCLASS(be::driver::disp::Display, argv[0], display)
-        return JS_NewBool(ctx, display->registerToLV()) ;
+        if(display->registerToLV()) {
+            dispReady = true ;
+            return JS_TRUE ;
+        } else {
+            return JS_FALSE ;
+        }
     }
 
     typedef struct {

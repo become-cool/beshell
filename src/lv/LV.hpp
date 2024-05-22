@@ -12,6 +12,7 @@ namespace lv {
         static esp_timer_handle_t tickTimer;
         static void initTick() ;
         static bool used ;
+        static bool dispReady ;
     public:
         static bool useFont ;
         static bool useImg ;
