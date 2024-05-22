@@ -4,7 +4,7 @@
 #include "driver/gpio.h"
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
-#if ESP_IDF_VERSION_MAJOR >= 5
+// #if ESP_IDF_VERSION_MAJOR >= 5
 
 namespace be::driver::disp {
 
@@ -33,5 +33,5 @@ namespace be::driver::disp {
 
 }
 
-#endif
+// #endif
 #endif
