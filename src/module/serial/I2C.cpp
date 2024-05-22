@@ -193,9 +193,11 @@ namespace be {
             printf("i2c set timeout(%d) failed: %d\n", timeout, res) ;
         }
 
+        #if SOC_I2C_SUPPORT_SLAVE
         if(mode==I2C_MODE_SLAVE && that->slaveTask == nullptr) {
             xTaskCreatePinnedToCore(task_i2c_slave, "task-i2c-slave", 1024*2, that, 10, &that->slaveTask, 1);
         }
+        #endif
 
         return JS_TRUE ;
     }
@@ -208,10 +210,12 @@ namespace be {
             that->slaverRegisterLength = 0 ;
         }
 
+        #if SOC_I2C_SUPPORT_SLAVE
         if(that->slaveTask) {
             vTaskDelete(that->slaveTask);
             that->slaveTask = nullptr ;
         }
+        #endif
 
         return i2c_driver_delete(that->busnum)==ESP_OK? JS_TRUE: JS_FALSE ;
     }

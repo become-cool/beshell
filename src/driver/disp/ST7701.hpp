@@ -4,6 +4,8 @@
 #include "driver/gpio.h"
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
+#if ESP_IDF_VERSION_MAJOR >= 5
+
 namespace be::driver::disp {
 
     class ST7701: public RGB565 {
@@ -31,4 +33,5 @@ namespace be::driver::disp {
 
 }
 
+#endif
 #endif

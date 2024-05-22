@@ -6,6 +6,7 @@
 // #include "qjs_utils.h"
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
+#if ESP_IDF_VERSION_MAJOR >= 5
 
 using namespace std ;
 
@@ -237,4 +238,5 @@ namespace be::driver::disp {
     
 }
 
+#endif
 #endif

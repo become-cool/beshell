@@ -43,7 +43,10 @@ namespace be::driver::sensor {
 
         GET_INT32_PROP(argv[0], "pin", that->pin, )
 
+#if ESP_IDF_VERSION_MAJOR >= 5
         esp_rom_gpio_pad_select_gpio(that->pin);
+#endif
+
         that->init() ;
 
         return JS_UNDEFINED ;

@@ -3,10 +3,6 @@
 #include <vector>
 #include "include.hpp"
 
-#ifdef ESP_PLATFORM
-#include "lv/LV.hpp"
-#endif
-
 
 #define BESHELL_VERSION "0.3.1"
 #define ESPIDF_VERSION IDF_VER
