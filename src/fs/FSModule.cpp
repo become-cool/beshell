@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "../deps/littlefs/src/esp_littlefs.h"
 
 using namespace std ;
 
@@ -495,58 +496,30 @@ namespace be {
 
         size_t total = 0 ;
         size_t used = 0 ;
-        // size_t free_ = 0 ;
+        size_t free_ = 0 ;
 
-// #ifdef ESP_PLATFORM
-//         if(strcmp(jslabel,"/home")==0){
-//             // littlefs
-//             if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {
-//                 JS_FreeCString(ctx, jslabel) ;
-//                 JSTHROW("esp_littlefs_info() bad")
-//             }
+#ifdef ESP_PLATFORM
+#if ESP_IDF_VERSION_MAJOR >= 5
+        esp_err_t err = esp_littlefs_info(jslabel, &total, &free_) ;
+        if( err != ESP_OK ) {
+            JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
+            JS_FreeCString(ctx, jslabel) ;
+            return JS_EXCEPTION ;
+        }
+        used = total - free_ ;
+#else
+        total = 0 ;
+        used = 0 ;
+        free_ = 0 ;
+#endif
 
-//             // fatfs
-//             // size_t free_ = 0 ;
-//             // esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-//             // if( err != ESP_OK ) {
-//             //     JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-//             //     JS_FreeCString(ctx, jslabel) ;
-//             //     return JS_EXCEPTION ;
-//             // }
-//             // used = total - free_ ;
-//         }
-//         // else if(strcmp(jslabel,"/")==0) {
-//         //     vfs_rawfs_t * rootfs = be_rawfs_root() ;
-//         //     if(fs) {
-//         //         used = rootfs->size ;
-//         //         total = rootfs->partition_size ;
-//         //     }
-//         // }
-//         else {
-// #if ESP_IDF_VERSION_MAJOR >= 5
-//             esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-//             if( err != ESP_OK ) {
-//                 JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-//                 JS_FreeCString(ctx, jslabel) ;
-//                 return JS_EXCEPTION ;
-//             }
-//             used = total - free_ ;
-// #else
-//             total = 0 ;
-//             used = 0 ;
-//             free_ = 0 ;
-// #endif
-//         }
-
-
-
-// #endif
+#endif
         JS_FreeCString(ctx, jslabel) ;
 
         JSValue obj = JS_NewObject(ctx) ;
         JS_SetPropertyStr(ctx, obj, "total", JS_NewUint32(ctx, total));
         JS_SetPropertyStr(ctx, obj, "used", JS_NewUint32(ctx, used));
-        // JS_SetPropertyStr(ctx, obj, "free", JS_NewUint32(ctx, free_));
+        JS_SetPropertyStr(ctx, obj, "free", JS_NewUint32(ctx, free_));
 
         return obj ;
     }
