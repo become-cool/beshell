@@ -13,9 +13,10 @@ namespace be {
         virtual ~FSPartition() {}
         virtual bool mount(const char * mountPoint) = 0 ;
         virtual void unmount() = 0 ;
-        virtual void usage(size_t * total, size_t * used) {
-            *total = 0 ;
-            *used = 0 ;
+        virtual bool usage(size_t & total, size_t & used) {
+            total = 0 ;
+            used = 0 ;
+            return false ;
         };
 
         static void findPartitionByLabel() ;

@@ -23,7 +23,6 @@ namespace be::driver {
             MOVED=4,
         };
         int enabledEvents = 0 ;
-        bool _usedForLVGL = false ;
 
         Event daemonLastStatus = RELEASED ;
         RingbufHandle_t ringbuf = nullptr ;
@@ -47,6 +46,8 @@ namespace be::driver {
         inline int lastX() { return lastX0 ; } ;
         inline int lastY() { return lastY0 ; } ;
 
+        bool _usedForLVGL = false ;
+        
         void startDaemon() ;
         void stopDaemon() ;
         

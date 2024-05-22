@@ -67,62 +67,34 @@ namespace be::driver::disp {
         return JS_UNDEFINED ;
     }
 
-    typedef struct {
-        shared_ptr<be::NativeClass> display ;
-    } disp_drv_opa_t ;
-
-    void disp_flush_cb(lv_display_t * lvdisp, const lv_area_t * area, unsigned char * color_p) {
-        disp_drv_opa_t* opa = (disp_drv_opa_t*)lv_display_get_driver_data(lvdisp) ;
-        if(opa) {
-            ((Display*)(opa->display.get()))->drawRect(area->x1,area->y1,area->x2,area->y2, (color_t*)color_p) ;
-        }
-        lv_display_flush_ready(lvdisp);
-    }
-
     bool Display::createBuff() {
-        uint16_t fact = (_height+5)/10;
-        if(!buff1) {
-            buff1 = heap_caps_malloc(_width * fact * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);  // MALLOC_CAP_SPIRAM
-            if(!buff1) {
+        _buffSize = sizeof(color_t) * _width * (_height+5)/10;
+        if(!this->_buff1) {
+            this->_buff1 = heap_caps_malloc(_buffSize, MALLOC_CAP_SPIRAM);  // MALLOC_CAP_SPIRAM
+            if(!this->_buff1) {
                 return false ;
             }
         }
-        if(!buff2) {
-            buff2 = heap_caps_malloc(_width * fact * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
-            if(!buff2) {
-                free(buff1) ;
+        if(!this->_buff2) {
+            this->_buff2 = heap_caps_malloc(_buffSize, MALLOC_CAP_SPIRAM);
+            if(!this->_buff2) {
+                free(this->_buff1) ;
                 return false ;
             }
         }
-        
-        lv_display_set_buffers(lv_display, buff1, buff2, _width*fact*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_PARTIAL);
         return true ;
     }
-
-    bool Display::registerToLV() {
-
-        if(lv_display) {
-            return true ;
-        }
-
-        lv_display = lv_display_create(_width, _height) ;
-        if(!createBuff()) {
-            return false ;
-        }
-
-        lv_display_set_antialiasing(lv_display, true) ;
-
-        lv_display_set_flush_cb(lv_display, disp_flush_cb);
-        
-        // @todo
-        // unregister 时销毁这个 shared_ptr 指针
-        disp_drv_opa_t * opa = new disp_drv_opa_t ;
-        opa->display = this->self ;
-
-        lv_display_set_driver_data(lv_display,opa) ;
-
-        return true ;
+    
+    void * Display::buff1() const {
+        return this->_buff1 ;
     }
+    void * Display::buff2() const {
+        return this->_buff2 ;
+    }
+    size_t Display::buffSize() const {
+        return _buffSize ;
+    }
+
     
     uint16_t RGB(uint8_t r,uint8_t g,uint8_t b) {
         r = r*((float)31/255) + 0.5 ;

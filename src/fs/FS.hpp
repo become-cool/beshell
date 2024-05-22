@@ -42,7 +42,7 @@ namespace be {
         static JSValue existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

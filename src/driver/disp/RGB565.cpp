@@ -202,8 +202,8 @@ namespace be::driver::disp {
     }
 
     bool RGB565::createBuff() {
-        ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &buff1, &buff2));
-        lv_display_set_buffers(lv_display, buff1, buff2, _width*_height*sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_FULL);
+        _buffSize = _width*_height*sizeof(color_t) ;
+        ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &_buff1, &_buff2));
         return true ;
     }
     JSValue RGB565::reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
