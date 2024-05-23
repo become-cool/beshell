@@ -33,7 +33,7 @@ namespace be::driver::sensor {
     };
 
     WH4530A::WH4530A(JSContext *ctx, JSValue _jsobj)
-            : I2CDevice(ctx, build(ctx, _jsobj)) {
+            : I2CDevice(ctx, build(ctx, _jsobj), 0x38) {
     }
 
     JSValue WH4530A::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -42,10 +42,9 @@ namespace be::driver::sensor {
         return obj->jsobj;
     }
 
-    int WH4530A::setup(be::I2C * i2c, uint8_t _addr) {
-        int ret = I2CDevice::setup(i2c,0x38) ;
-        if( ret<0 ) {
-            return ret ;
+    int WH4530A::setup() {
+        if(addr==0){
+            return -1 ;
         }
 
         i2c->write<uint8_t,uint8_t>(addr, WH450A_SYSM_CTRL,      0x80);             // soft reset

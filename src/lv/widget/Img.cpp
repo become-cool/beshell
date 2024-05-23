@@ -79,6 +79,9 @@ namespace be::lv {
         return value? JS_NewString(ctx, path.c_str()): JS_NULL ;
     }
     JSValue Img::setSrc(JSContext *ctx, JSValueConst this_val, JSValueConst value){
+        if(!LV::useImg) {
+            return JS_FALSE ;
+        }
         JSEngine * engine = JSEngine::fromJSContext(ctx) ;
         if(!engine || !engine->beshell || !engine->beshell) {
             JSTHROW("sth wrong")
@@ -91,9 +94,9 @@ namespace be::lv {
             const char * res = src+4 ;
 
             if(LV::embededImages.count(res)<1) {
-                JS_ThrowReferenceError(ctx, "unknow res name: %s",res) ;
+                printf("unknow res name: %s\n",res) ;
                 JS_FreeCString(ctx, src) ;
-                return JS_EXCEPTION ;
+                return JS_UNDEFINED ;
             }
             
             lv_image_set_src(thisobj->lvobj(), LV::embededImages[res]) ;

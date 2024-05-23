@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "../deps/littlefs/src/esp_littlefs.h"
 
 using namespace std ;
 
@@ -29,7 +30,7 @@ namespace be {
         EXPORT_FUNCTION(listDirSync) ;
         EXPORT_FUNCTION(rmSync) ;
         EXPORT_FUNCTION(renameSync) ;
-        EXPORT_FUNCTION(info) ;
+        EXPORT_FUNCTION(usage) ;
         EXPORT_FUNCTION(statSync) ;
         EXPORT_FUNCTION(existsSync) ;
         EXPORT_FUNCTION(isFileSync) ;
@@ -488,65 +489,29 @@ namespace be {
      * @param path {string} 分区路径
      * @return object
      */
-    JSValue FS:: info(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue FS:: usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)
-        ARGV_TO_CSTRING(0, jslabel)
+        string ARGV_TO_PATH(0, path)
+
+        if( partitions.count(path) < 1 ){
+            JSTHROW("path is not a partition mount point: %s", path.c_str()) ;
+        }
 
         size_t total = 0 ;
         size_t used = 0 ;
-        // size_t free_ = 0 ;
 
-// #ifdef ESP_PLATFORM
-//         if(strcmp(jslabel,"/home")==0){
-//             // littlefs
-//             if( esp_littlefs_info(PARTITION_LABEL_HOME, &total, &used) != ESP_OK ) {
-//                 JS_FreeCString(ctx, jslabel) ;
-//                 JSTHROW("esp_littlefs_info() bad")
-//             }
+        if( !partitions[path]->usage(total, used) ){
+            JSTHROW("Failed to get usage of partition %s", path.c_str()) ;
+        }
 
-//             // fatfs
-//             // size_t free_ = 0 ;
-//             // esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-//             // if( err != ESP_OK ) {
-//             //     JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-//             //     JS_FreeCString(ctx, jslabel) ;
-//             //     return JS_EXCEPTION ;
-//             // }
-//             // used = total - free_ ;
-//         }
-//         // else if(strcmp(jslabel,"/")==0) {
-//         //     vfs_rawfs_t * rootfs = be_rawfs_root() ;
-//         //     if(fs) {
-//         //         used = rootfs->size ;
-//         //         total = rootfs->partition_size ;
-//         //     }
-//         // }
-//         else {
-// #if ESP_IDF_VERSION_MAJOR >= 5
-//             esp_err_t err = esp_vfs_fat_info(jslabel, &total, &free_) ;
-//             if( err != ESP_OK ) {
-//                 JS_ThrowReferenceError(ctx, "unknow mount point: %s, (%d)", jslabel, err) ;
-//                 JS_FreeCString(ctx, jslabel) ;
-//                 return JS_EXCEPTION ;
-//             }
-//             used = total - free_ ;
-// #else
-//             total = 0 ;
-//             used = 0 ;
-//             free_ = 0 ;
-// #endif
-//         }
+        size_t free_ = total - used ;
 
-
-
-// #endif
-        JS_FreeCString(ctx, jslabel) ;
 
         JSValue obj = JS_NewObject(ctx) ;
         JS_SetPropertyStr(ctx, obj, "total", JS_NewUint32(ctx, total));
         JS_SetPropertyStr(ctx, obj, "used", JS_NewUint32(ctx, used));
-        // JS_SetPropertyStr(ctx, obj, "free", JS_NewUint32(ctx, free_));
+        JS_SetPropertyStr(ctx, obj, "free", JS_NewUint32(ctx, free_));
 
         return obj ;
     }

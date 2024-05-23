@@ -143,7 +143,7 @@ namespace be::lv {
         case LV_STYLE_LINE_COLOR: 
         case LV_STYLE_ARC_COLOR: 
         case LV_STYLE_TEXT_COLOR:
-            return JS_NewUint32(ctx, be::driver::disp::fromRGB(value.color.red,value.color.green,value.color.blue)) ;
+            return JS_NewUint32(ctx, be::driver::disp::RGB(value.color.red,value.color.green,value.color.blue)) ;
 
         default:
             return JS_NewString(ctx, "unknow type") ;

@@ -30,7 +30,7 @@ namespace be::driver::sensor {
         BMP280(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        int setup(be::I2C *, uint8_t addr) ;
+        int setup() ;
         int readTemperature(double & value) ;
         int readPressure(double & value) ;
 

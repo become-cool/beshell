@@ -75,7 +75,11 @@ namespace be {
             .parity = UART_PARITY_DISABLE,
             .stop_bits = UART_STOP_BITS_1,
             .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+#if ESP_IDF_VERSION_MAJOR >= 5
             .source_clk = UART_SCLK_DEFAULT,
+#else
+            .source_clk = UART_SCLK_APB,
+#endif
         };
         uart_param_config(UART_NUM, &uart_config);
 

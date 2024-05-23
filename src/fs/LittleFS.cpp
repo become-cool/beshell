@@ -32,7 +32,7 @@ namespace be {
         cout << "not implements" <<endl ;
     }
     
-    void LittleFS::usage(size_t * total, size_t * used) {
-        esp_littlefs_info(label, total, used) ;
+    bool LittleFS::usage(size_t & total, size_t & used) {
+        return esp_littlefs_info(label, &total, &used) == ESP_OK ;
     };
 }

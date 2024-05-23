@@ -58,6 +58,11 @@ namespace be {
 
         std::map<int, std::pair<int, void *>> slaveRegisters ;
 
+        uint8_t * slaverRegisters = nullptr ;
+        size_t slaverRegisterLength = 0 ;
+        size_t slaverRegisterSize = 1 ;
+        size_t slaverRegisterAddrSize = 1 ;
+
     public:
         I2C(JSContext * ctx, i2c_port_t busnum) ;
         ~I2C() ;
@@ -297,6 +302,9 @@ namespace be {
         #if SOC_I2C_SUPPORT_SLAVE
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue slaveWriteReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue slaveWriteBuff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue slaveReadBuff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         #endif
 
     } ;

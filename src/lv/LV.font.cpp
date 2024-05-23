@@ -9,23 +9,30 @@ namespace be::lv {
     
     static map<string, lv_font_t *> loadedFonts ;
     
+    void LV::loadFont(std::string name, lv_font_t * font) {
+        loadedFonts[name] = font ;
+    }
+
     JSValue LV::loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2) 
         ARGV_TO_CSTRING(0, name) 
         ARGV_TO_CSTRING(1, cpath)
 
         string path = string("C:") + FS::toVFSPath(cpath) ;
-        JS_FreeCString(ctx, cpath) ;
+        bool suc = false ;
 
         lv_font_t * font = lv_binfont_create(path.c_str());
         if(font) {
             loadedFonts[name] = font ;
-            JS_FreeCString(ctx, name) ;
-            return JS_UNDEFINED ;
         } else {
-            JS_FreeCString(ctx, name) ;
-            return JSTHROW("load font failed") ;
+            printf("Failed to load font %s\n, path: %s\n", name, cpath) ;
         }
+
+
+        JS_FreeCString(ctx, name) ;
+        JS_FreeCString(ctx, cpath) ;
+
+        return suc? JS_TRUE: JS_FALSE ;
     }
 
     #define GET_FONT_MONTSERRAT(s)                  \
@@ -109,6 +116,9 @@ namespace be::lv {
             font = (lv_font_t *)&lv_font_montserrat_##s;    \
         }
     JSValue Label::setFont(JSContext *ctx, JSValueConst this_val, JSValueConst val) {
+        if(!LV::useFont) {
+            return JS_FALSE ;
+        }
         THIS_NCLASS(Label,thisobj)
 
         const char * fontname = JS_ToCString(ctx,val) ;
@@ -183,14 +193,14 @@ namespace be::lv {
             font = loadedFonts[fontname] ;
         }
     
-        JSValue ret = JS_UNDEFINED ;
+        JSValue ret = JS_FALSE ;
 
         if(!font) {
-            JS_ThrowReferenceError(ctx, "unknow font name: %s", fontname) ;
-            ret = JS_EXCEPTION ;
+            printf("unknow font name: %s\n", fontname) ;
         }
         else {
             lv_obj_set_style_text_font(thisobj->lvobj(), font, LV_PART_MAIN | LV_STATE_DEFAULT ) ;
+            ret = JS_TRUE ;
         }
 
         JS_FreeCString(ctx, fontname) ;

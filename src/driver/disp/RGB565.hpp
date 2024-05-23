@@ -3,6 +3,8 @@
 #include "Display.hpp"
 
 #ifdef CONFIG_IDF_TARGET_ESP32S3
+// #if ESP_IDF_VERSION_MAJOR >= 5
+
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
@@ -36,4 +38,5 @@ namespace be::driver::disp {
 
 }
 
+// #endif
 #endif

@@ -14,9 +14,9 @@ namespace be::driver {
         uint8_t addr = 0 ;
 
     public:
-        I2CDevice(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
+        I2CDevice(JSContext * ctx, JSValue _jsobj=JS_NULL, uint8_t addr=0) ;
 
-        virtual int setup(be::I2C *, uint8_t addr) ;
+        virtual int setup() ;
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     } ;
