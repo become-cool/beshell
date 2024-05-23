@@ -32,7 +32,7 @@ namespace be {
         BeShell() ;
         ~BeShell() ;
         void setup();
-        inline void loop() ;
+        void loop() ;
         void run() ;
         void main() ;
 
