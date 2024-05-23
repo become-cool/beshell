@@ -3,6 +3,7 @@
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
 #include "deps/lvgl/lvgl.h"
+#include "esp_timer.h"
 
 namespace be {
 namespace lv {
