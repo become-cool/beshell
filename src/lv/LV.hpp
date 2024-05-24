@@ -1,32 +1,47 @@
 #pragma once
 
-#include "lvgl.h"
+#include "BeShell.hpp"
+#include "NativeModule.hpp"
+#include "deps/lvgl/lvgl.h"
 #include "esp_timer.h"
-#include <map>
-#include <string>
 
 namespace be {
-    class BeShell ;
-    class FS ;
 namespace lv {
 
-
-    class LV {
+    class LV: public be::NativeModule {
     private:
-        esp_timer_handle_t tickTimer;
-        void initTick() ;
-
-        // be::FS & fs ;
-        lv_fs_drv_t fs_drv;
-        void initFS(const be::BeShell & beshell) ;
+        static esp_timer_handle_t tickTimer;
+        static void initTick() ;
+        static bool used ;
+        static bool dispReady ;
+    public:
+        static bool useFont ;
+        static bool useImg ;
+        static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
 
     public:
-        LV() ;
-        void setup(const be::BeShell & beshell) ;
-        void loop() ;
-        
-        static std::map<std::string, const lv_image_dsc_t  *> embededImages ;
-    } ;
 
-    void addImageDsc(const char * name, const lv_image_dsc_t  *) ;
+        static const char * const name ;
+        
+        LV(JSContext * ctx, const char * name) ;
+
+        // void import() ;
+        static void loop(const BeShell &, void *) ;
+        static void use(be::BeShell * beshell) ;
+
+        static JSValue screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue registerDisplay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static JSValue loadFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unuseFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unuseImg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue disableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue enableAllInDev(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static void loadFont(std::string name, lv_font_t * font) ;
+        static void addImageDsc(const char * name, const lv_image_dsc_t *) ;
+    } ;
 }}

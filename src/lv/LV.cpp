@@ -1,22 +1,93 @@
 #include "LV.hpp"
-#include "fs/FS.hpp"
-#include <dirent.h>
-#include "BeShell.hpp"
-#include "debug.h"
-using namespace std;
+#include "Animation.hpp"
+#include "all-widgets.hpp"
+#include <cassert>
+#include "Style.hpp"
 
+using namespace std ;
+using namespace be::driver::disp ;
 
 namespace be::lv {
 
+    const char * const LV::name = "lv" ;
+    esp_timer_handle_t LV::tickTimer = nullptr ;
+    bool LV::used = false ;
+    bool LV::dispReady = false ;
+    bool LV::useFont = true ;
+    bool LV::useImg = true ;
+    
     std::map<std::string, const lv_image_dsc_t  *> LV::embededImages ;
 
-    LV::LV() {}
+    LV::LV(JSContext * ctx, const char * name)
+        : NativeModule(ctx, name, 0)
+    {
+        EXPORT_FUNCTION(screen) ;
+        EXPORT_FUNCTION(load) ;
+        EXPORT_FUNCTION(pct) ;
+        EXPORT_FUNCTION(registerDisplay) ;
+        EXPORT_FUNCTION(registerInputDevice) ;
+        EXPORT_FUNCTION(loadFont) ;
+        EXPORT_FUNCTION(unuseFont) ;
+        EXPORT_FUNCTION(unuseImg) ;
+        EXPORT_FUNCTION(disableAllInDev) ;
+        EXPORT_FUNCTION(enableAllInDev) ;
+        
+        exportFunction("RGB", Display::RGB) ;
+        exportFunction("RGB565", Display::RGB565) ;
+        exportFunction("toRGB", Display::toRGB) ;
+        exportFunction("toRGB565", Display::toRGB565) ;
+
+        exportClass<Animation>() ;
+        exportClass<Style>() ;
+        exportClass<Row>() ;
+        exportClass<Column>() ;
+        exportClass<Rect>() ;
+
+
+// AUTO GENERATE CODE START [EXPORT WIDGETS] --------
+        exportClass<Obj>() ;
+        exportClass<AnimImg>() ;
+        exportClass<Btn>() ;
+        exportClass<Canvas>() ;
+        exportClass<Dropdown>() ;
+        exportClass<Keyboard>() ;
+        exportClass<Line>() ;
+        exportClass<MsgBox>() ;
+        exportClass<Scale>() ;
+        exportClass<SpinBox>() ;
+        exportClass<Table>() ;
+        exportClass<TileView>() ;
+        exportClass<Arc>() ;
+        exportClass<BtnMatrix>() ;
+        exportClass<Chart>() ;
+        exportClass<Img>() ;
+        exportClass<Label>() ;
+        exportClass<List>() ;
+        exportClass<Slider>() ;
+        exportClass<Spinner>() ;
+        exportClass<TabView>() ;
+        exportClass<Win>() ;
+        exportClass<Bar>() ;
+        exportClass<Calendar>() ;
+        exportClass<Checkbox>() ;
+        exportClass<ImgBtn>() ;
+        exportClass<Led>() ;
+        exportClass<Menu>() ;
+        exportClass<Roller>() ;
+        exportClass<Span>() ;
+        exportClass<Switch>() ;
+        exportClass<TextArea>() ;
+        exportClass<Gif>() ;
+// AUTO GENERATE CODE END [EXPORT WIDGETS] --------
+    }
+
+    // void LV::import() {
+    // }
 
     static void lv_tick_inc_cb(void *data) {
-        uint32_t tick_inc_period_ms = *((uint32_t *) data);
-        lv_tick_inc(tick_inc_period_ms);
+        lv_tick_inc(*((uint32_t *) data));
     }
-    
+
     void LV::initTick() {
         static const uint32_t tick_inc_period_ms = 20;
         const esp_timer_create_args_t periodic_timer_args = {
@@ -28,126 +99,97 @@ namespace be::lv {
         ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &tickTimer));
         ESP_ERROR_CHECK(esp_timer_start_periodic(tickTimer, tick_inc_period_ms * 1000));
     }
-
-    static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
-        FILE * f = NULL;
-        if(mode == LV_FS_MODE_WR) {
-            f = fopen(path, "wb");
-        }
-        else if(mode == LV_FS_MODE_RD) {
-            f = fopen(path, "rb");
-        }
-        else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) {
-            f = fopen(path, "rb+");
-        }
-        return f;
-    }
-    static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p) {
-        lv_fs_res_t res = LV_FS_RES_OK;
-        if (EOF == fclose((FILE *) file_p)) {
-            res = LV_FS_RES_NOT_EX;
-        }
-        return res;
-    }
     
-    static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br) {
-        (void) drv;
-        *br = fread(buf, 1, btr, (FILE *) file_p);
-        return LV_FS_RES_OK;
-    }
-
-    static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw) {
-        (void) drv;
-        *bw = fwrite(buf, 1, btw, (FILE *) file_p);
-        return LV_FS_RES_OK;
-    }
-
-    static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence) {
-        (void) drv;
-        int ret_val = fseek((FILE *) file_p, pos, whence);
-        if (0 != ret_val) {
-            return LV_FS_RES_UNKNOWN;
+    void LV::loop(const BeShell &, void *) {
+        if(dispReady) {
+            lv_task_handler() ;
         }
-        return LV_FS_RES_OK;
     }
 
-    static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p) {
-        (void) drv;
-        *pos_p = ftell((FILE *) file_p);
-        return LV_FS_RES_OK;
-    }
-
-    static lv_fs_res_t fs_size (lv_fs_drv_t * drv, void * file_p, uint32_t * size_p) {
-        (void) drv;		/*Unused*/
-        FILE * fp = (FILE*)file_p;        /*Just avoid the confusing casings*/
-
-        uint32_t cur = ftell(fp);
-
-        fseek(fp, 0L, SEEK_END);
-        *size_p = ftell(fp);
-
-        /*Restore file pointer*/
-        fseek(fp, cur, SEEK_SET);
-
-        return LV_FS_RES_OK;
-    }
-
-    static void * fs_dir_open(lv_fs_drv_t * drv, const char *path) {
-        (void) drv;
-        DIR * dir = NULL;
-
-        dir = opendir(path);
-        if (NULL == dir) {
-            return nullptr;
+    void LV::use(be::BeShell * beshell) {
+        if(used) {
+            return ;
         }
 
-        return dir;
-    }
-    
-    static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * rddir_p, char *fn) {
-        readdir((DIR *) rddir_p);
-        return LV_FS_RES_OK;
-    }
-
-    static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * rddir_p) {
-        (void) drv;
-        int ret_val = closedir((DIR*)rddir_p);
-        if (0 != ret_val) {
-            return LV_FS_RES_UNKNOWN;
-        }
-        return LV_FS_RES_OK;
-    }
-
-    void LV::initFS(const BeShell & beshell) {
-        // lv_fs_drv_init(&fs_drv);
-
-        // fs_drv.letter = 'C';
-        // fs_drv.open_cb = fs_open;
-        // fs_drv.close_cb = fs_close;
-        // fs_drv.read_cb = fs_read;
-        // fs_drv.write_cb = fs_write;
-        // fs_drv.seek_cb = fs_seek;
-        // fs_drv.tell_cb = fs_tell;
-        // // fs_drv.size_cb = fs_size;
-
-        // fs_drv.dir_close_cb = fs_dir_close;
-        // fs_drv.dir_open_cb = fs_dir_open;
-        // fs_drv.dir_read_cb = fs_dir_read;
-
-        // lv_fs_drv_register(&fs_drv);
-    }
-
-    void LV::setup(const BeShell & beshell) {
         initTick() ;
-        initFS(beshell) ;
+        beshell->addLoopFunction(loop) ;
         lv_init() ;
-    }
-    void LV::loop() {
-        lv_task_handler() ;
+
+        used = true ;
     }
 
-    void addImageDsc(const char * name, const lv_image_dsc_t  * imgDsc) {
+
+    /**
+     * 返回当前激活的 `屏幕对象`
+     * 
+     * `屏幕对象` 是指当前显示在屏幕上的对象，是所有可见组件的根节点，自身没有父节对象。
+     * 
+     * @module lv
+     * @function screen
+     * @return Obj[widget/Obj] 当前激活的屏幕对象
+     */
+    JSValue LV::screen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        lv_obj_t * lvobj = lv_screen_active() ;
+        if(!lvobj) {
+            return JS_NULL ;
+        }
+        return JS_DupValue(ctx,Obj::wrap(ctx,lvobj)->jsobj) ;
+    }
+
+    
+    /**
+     * 将参数指定的对象作为 `屏幕对象` 加载到当前显示器上
+     * 
+     * 加载成功后，传入对象的父对象会被设置为 null
+     * 
+     * @module lv
+     * @function load
+     * @param obj:Obj[widget/Obj] 要加载的屏幕对象
+     * @return undefined
+     */
+    JSValue LV::load(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        JSVALUE_TO_NCLASS(Obj, argv[0], obj)
+        lv_screen_load(obj->lvobj()) ;
+        return JS_UNDEFINED ;
+    }
+    
+    /**
+     * 将 0-100 范围的整数转换为能够表示百分比的 16位整数值
+     * 
+     * 改数值是 lvgl 内部使用的格式
+     * 
+     * @module lv
+     * @function pct
+     * @param value:number 0-100范围的整数
+     * @return number
+     */
+    JSValue LV::pct(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        ARGV_TO_UINT16(0,val)
+        return JS_NewUint32(ctx,LV_PCT(val)) ;
+    }
+
+    JSValue LV::unuseFont(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        LV::useFont = false ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue LV::unuseImg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        string ARGV_TO_STRING_OPT(0, name, "*")
+
+        if(name=="*") {
+            LV::useImg = false ;
+        } else {
+            LV::embededImages.erase(name) ;
+        }
+
+        return JS_UNDEFINED ;
+    }
+
+    void LV::addImageDsc(const char * name, const lv_image_dsc_t  * imgDsc) {
         LV::embededImages[name] = imgDsc ;
     }
-
+    
 }

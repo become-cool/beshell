@@ -5,7 +5,10 @@ using namespace std ;
 namespace be {
 
     I2S * I2S::i2s0 = nullptr ;
+    
+    #if SOC_I2S_NUM > 1
     I2S * I2S::i2s1 = nullptr ;
+    #endif
 
     DEFINE_NCLASS_META(I2S, NativeClass)
     std::vector<JSCFunctionListEntry> I2S::methods = {
@@ -99,7 +102,9 @@ namespace be {
         }
     I2S * I2S::flyweight(JSContext * ctx, i2s_port_t bus) {
         DEFINE_BUS(I2S_NUM_0, i2s0)
+        #if SOC_I2S_NUM>1
         else DEFINE_BUS(I2S_NUM_1, i2s1)
+        #endif
         return nullptr ;
     }
 }

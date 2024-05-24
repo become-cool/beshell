@@ -12,6 +12,7 @@ using namespace std ;
         JS_CFUNC_DEF("readPointCount", 0, InDevPointer::readPointCount),
         JS_CFUNC_DEF("lastX", 0, InDevPointer::lastX),
         JS_CFUNC_DEF("lastY", 0, InDevPointer::lastY),
+        JS_CFUNC_DEF("startDaemon", 0, InDevPointer::startDaemon),
     } ;
 
     InDevPointer::InDevPointer(JSContext * ctx, JSValue jsobj)
@@ -47,10 +48,18 @@ using namespace std ;
     }
 
     void InDevPointer::read() {
-        int pcnt = readPointCount() ;
-        if( pcnt>0 ) {
-            readPos(0, lastX0, lastY0);
+
+        int pcnt = 0 ;
+
+        if(daemonRunning) {
+
+        } else {
+            pcnt = readPointCount() ;
+            if( pcnt>0 ) {
+                readPos(0, lastX0, lastY0);
+            }
         }
+
         if(enabledEvents>0 && pcnt!=_pointCount) {
             if( pcnt>0 && enabledEvents&PRESSED ) {
                 JSValue jsname = JS_NewString(ctx,"pressed") ;
@@ -84,6 +93,47 @@ using namespace std ;
             enabledEvents&= ~PRESSED ;
         } else if(strcmp(eventName,"moved")==0){
             enabledEvents&= ~MOVED ;
+        }
+    }
+
+    // @todo
+    // 后台进程，定时读取点坐标，并发送事件 (未完成)
+    JSValue InDevPointer::startDaemon(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(InDevPointer, that)
+        that->startDaemon() ;
+        return JS_UNDEFINED ;
+    }
+
+    void InDevPointer::startDaemon() {
+        if(daemonRunning) {
+            return ;
+        }
+        ringbuf = xRingbufferCreate(10,RINGBUF_TYPE_NOSPLIT) ;
+        xTaskCreatePinnedToCore((TaskFunction_t)task_daemon, "task_daemon_indev", 1024*2, (void *)this, 5, &taskDaemonHandle, 1) ;
+    }
+    void InDevPointer::stopDaemon() {
+        if(!daemonRunning) {
+            return ;
+        }
+        if(taskDaemonHandle) {
+            vTaskDelete(taskDaemonHandle) ;
+            taskDaemonHandle = nullptr ;
+        }
+        if(ringbuf) {
+            vRingbufferDelete(ringbuf) ;
+            ringbuf = nullptr ;
+        }
+        daemonRunning = false ;
+    }
+    void InDevPointer::task_daemon(InDevPointer * indev) {
+        while(1) {
+
+            Event status = indev->readPointCount()>0? PRESSED: RELEASED;
+            if( indev->daemonLastStatus != status ){
+                dn(status)
+            }
+
+            vTaskDelay(10/portTICK_PERIOD_MS) ;
         }
     }
 }

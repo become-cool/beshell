@@ -1,5 +1,8 @@
 #include "TimerStepper.hpp"
 #include <cmath>
+#include <esp_system.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #define MAX_FREQ 3500                   // 最大频率
 #define DEFUALT_ACCEL 2000             // 默认电机加速度

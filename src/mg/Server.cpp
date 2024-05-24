@@ -1,11 +1,11 @@
 #include "Server.hpp"
-#include "MgModule.hpp"
-#include "module/WiFiModule.hpp"
+#include "Mg.hpp"
+#include "module/WiFi.hpp"
 
 
 #ifdef ESP_PLATFORM
 #define CHECK_WIFI_INITED           \
-    if(!WiFiModule::hasInited()) {        \
+    if(!WiFi::hasInited()) {        \
         JSTHROW("wifi not init")    \
     }
 #else
@@ -105,8 +105,8 @@ namespace be::mg {
 
         if(ev==MG_EV_ACCEPT && SERVER->ssl) {
             struct mg_tls_opts opts = {
-                .cert = MgModule::cert_path.c_str(),    // Certificate file
-                .certkey = MgModule::certkey_path.c_str(),  // Private key file
+                .cert = Mg::cert_path.c_str(),    // Certificate file
+                .certkey = Mg::certkey_path.c_str(),  // Private key file
             };
             mg_tls_init(conn, &opts);
             printf("mg_tls_init()\n") ;
@@ -128,7 +128,7 @@ namespace be::mg {
         // }
 
         if(!JS_IsFunction(SERVER->ctx, SERVER->callback)) {
-            printf("callback is not a function, event:%s\n", MgModule::eventName(ev)) ;
+            printf("callback is not a function, event:%s\n", Mg::eventName(ev)) ;
             return ;
         }
 
@@ -176,7 +176,7 @@ namespace be::mg {
                     Response * rspn = (Response *)conn->userdata ;
                     HTTPRequest * req = new HTTPRequest(SERVER->ctx,(struct mg_http_message *)ev_data);
 
-                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, MgModule::eventName(ev)), req->jsobj, rspn->jsobj)
+                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, Mg::eventName(ev)), req->jsobj, rspn->jsobj)
                     JSValue ret = JS_Call(SERVER->ctx, SERVER->callback, JS_UNDEFINED, 3, cbargv) ;
 
                     delete req ;
@@ -213,7 +213,7 @@ namespace be::mg {
                         JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewArrayBuffer(SERVER->ctx,(uint8_t*)msg->data.ptr, msg->data.len,NULL,NULL,false)) ;
                     }
 
-                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, MgModule::eventName(ev)), jsmsg, rspn->jsobj)
+                    MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, Mg::eventName(ev)), jsmsg, rspn->jsobj)
                     JSValue ret = JS_Call(SERVER->ctx, SERVER->callback, JS_UNDEFINED, 3, cbargv) ;
 
                     if( JS_IsException(ret) ){
@@ -278,11 +278,11 @@ namespace be::mg {
             callback = argv[1] ;
         }
 
-        if(!MgModule::isListening(addr.c_str())) {
+        if(!Mg::isListening(addr.c_str())) {
             JSTHROW("addr %s has listened", addr)
         }
 
-        struct mg_connection * conn = mg_http_listen(&MgModule::mgr, addr.c_str(), eventHandler, NULL) ;
+        struct mg_connection * conn = mg_http_listen(&Mg::mgr, addr.c_str(), eventHandler, NULL) ;
         if(conn==NULL) {
             JSTHROW("could not listen addr: %s", addr) ;
         }

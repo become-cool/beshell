@@ -7,7 +7,7 @@
 #include "js/json.c"
 #include "ModuleLoader.hpp"
 #include "EventEmitter.hpp"
-#include "module/ProcessModule.hpp"
+#include "module/Process.hpp"
 #include <cassert>
 #include <iostream>
 #include <iomanip>
@@ -134,8 +134,8 @@ namespace be {
         timer.loop(ctx) ;
         js_std_loop(ctx) ;
 
-        for(auto pair:loopFunctions) {
-            pair.first(ctx, pair.second) ;
+        for(auto _pair:loopFunctions) {
+            _pair.first(ctx, _pair.second) ;
         }
 
         for(auto obj:loopables) {
@@ -212,10 +212,14 @@ namespace be {
 
     JSValue JSEngine::evalScript(const char * filepath, int flags) {
         assert(beshell) ;
+<<<<<<< HEAD
         // if( !beshell->fs ) {
         //     JSTHROW("call useFS() first()")
         // }
 
+=======
+        
+>>>>>>> dev
         int readed ;
         unique_ptr<char> content = FS::readFileSync(filepath,&readed) ;
         if(readed<0) {
@@ -235,13 +239,13 @@ namespace be {
 
     void JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat) {
         if(ignoreRepeat) {
-            for(auto pair:loopFunctions) {
-                if(func==pair.first) {
+            for(auto _pair:loopFunctions) {
+                if(func==_pair.first) {
                     return ;
                 }
             }
         }
-        loopFunctions.push_back( pair(func,opaque) ) ;
+        loopFunctions.push_back( std::pair<EngineLoopFunction,void *>(func,opaque) ) ;
     }
 
     void JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat) {

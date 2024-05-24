@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include "telnet/Telnet.hpp"
 #include "JSTimer.hpp"
 #include "ModuleLoader.hpp"
@@ -60,7 +60,7 @@ namespace be {
 
 #define JSEngineEvalEmbeded(ctx, filename)                  \
     {                                                       \
-        JSValue res = JS_Eval(ctx, (const char *)embeded_js_src_##filename, strlen((char *)embeded_js_src_##filename), #filename ".js", JS_EVAL_TYPE_MODULE); \
+        JSValue res = JS_Eval(ctx, (const char *)embeded_js_src_##filename, strlen((char *)embeded_js_src_##filename), "embeded://"#filename ".js", JS_EVAL_TYPE_MODULE); \
         if (JS_IsException(res)) {                          \
             JSValue exception_val = JS_GetException(ctx);   \
             const char * cstr = JS_ToCString(ctx, exception_val) ; \

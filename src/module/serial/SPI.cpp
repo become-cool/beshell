@@ -4,9 +4,16 @@ using namespace std ;
 
 namespace be {
     
-    SPI * SPI::spi0 = nullptr ;
-    SPI * SPI::spi1 = nullptr ;
+    SPI * SPI::spi1 = nullptr ;    
+    #if SOC_SPI_PERIPH_NUM > 2
     SPI * SPI::spi2 = nullptr ;
+    #endif
+    #if SOC_SPI_PERIPH_NUM > 3
+    SPI * SPI::spi3 = nullptr ;
+    #endif
+    #if SOC_SPI_PERIPH_NUM > 4
+    SPI * SPI::spi4 = nullptr ;
+    #endif
 
     DEFINE_NCLASS_META(SPI, NativeClass)
     std::vector<JSCFunctionListEntry> SPI::methods = {
@@ -42,9 +49,16 @@ namespace be {
             return var ;                        \
         }
     SPI * SPI::flyweight(JSContext * ctx, spi_host_device_t bus) {
-        DEFINE_BUS(SPI1_HOST, spi0)
-        else DEFINE_BUS(SPI2_HOST, spi1)
-        else DEFINE_BUS(SPI3_HOST, spi2)
+        DEFINE_BUS(SPI1_HOST, spi1)
+        #if SOC_SPI_PERIPH_NUM > 2
+        else DEFINE_BUS(SPI2_HOST, spi2)
+        #endif
+        #if SOC_SPI_PERIPH_NUM > 3
+        else DEFINE_BUS(SPI3_HOST, spi3)
+        #endif
+        #if SOC_SPI_PERIPH_NUM > 4
+        else DEFINE_BUS(SPI4_HOST, spi4)
+        #endif
         return nullptr ;
     }
 

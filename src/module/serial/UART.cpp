@@ -1,5 +1,6 @@
 #include "UART.hpp"
 #include <JSEngine.hpp>
+#include <driver/gpio.h>
 
 using namespace std ;
 
@@ -8,8 +9,21 @@ using namespace std ;
 namespace be{
     
     UART * UART::uart0 = nullptr ;
+    #if SOC_UART_HP_NUM>1
     UART * UART::uart1 = nullptr ;
+    #endif
+    #if SOC_UART_HP_NUM>2
     UART * UART::uart2 = nullptr ;
+    #endif
+    #if SOC_UART_HP_NUM>3
+    UART * UART::uart3 = nullptr ;
+    #endif
+    #if SOC_UART_HP_NUM>4
+    UART * UART::uart4 = nullptr ;
+    #endif
+    #if SOC_UART_LP_NUM>0
+    UART * UART::uartlp0 = nullptr ;
+    #endif
     
     DEFINE_NCLASS_META(UART, NativeClass)
     std::vector<JSCFunctionListEntry> UART::methods = {
@@ -33,8 +47,21 @@ namespace be{
         }
     UART * UART::flyweight(JSContext * ctx, uart_port_t bus) {
         DEFINE_BUS(UART_NUM_0, uart0)
+        #if SOC_UART_HP_NUM>1
         else DEFINE_BUS(UART_NUM_1, uart1)
+        #endif
+        #if SOC_UART_HP_NUM>2
         else DEFINE_BUS(UART_NUM_2, uart2)
+        #endif
+        #if SOC_UART_HP_NUM>3
+        else DEFINE_BUS(UART_NUM_3, uart3)
+        #endif
+        #if SOC_UART_HP_NUM>4
+        else DEFINE_BUS(UART_NUM_3, uart4)
+        #endif
+        #if SOC_UART_LP_NUM>0
+        else DEFINE_BUS(LP_UART_NUM_0, uartlp0)
+        #endif
         return nullptr ;
     }
 
@@ -43,16 +70,28 @@ namespace be{
     }
 
     /**
-     * @param tx:number pin 
-     * @param rx:number pin
-     * @param baudrate:number=115200
+     * 
+     * options 格式：
+     * ```javascript
+     * {
+     *    tx:number,
+     *    rx:number,
+     *    baudrate:number=115200
+     * }
+     * ```
+     * 
+     * @param options:object uart options
+     * @return undefined
      */
     JSValue UART::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-        ASSERT_ARGC(2)
-        ARGV_TO_UINT8(0, tx)
-        ARGV_TO_UINT8(1, rx)
-        ARGV_TO_UINT32_OPT(2, baudrate, 115200)
+
+        ASSERT_ARGC(1)
+
+        gpio_num_t GET_INT32_PROP(argv[0], "tx", tx, )
+        gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, )
+        int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
+
         
         esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
         if(ret!=0) {

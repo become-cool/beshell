@@ -1,4 +1,5 @@
 #pragma once
+#include "NativeModule.hpp"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -6,28 +7,53 @@
 #include <string>
 #include <memory>
 #include <map>
-#include <quickjs/quickjs.h>
-
-
+#include "deps/quickjs/quickjs.h"
 #include "FSPartition.hpp"
 
-using namespace std ;
 
 namespace be {
-    class FS {
+    class FS: public NativeModule {
     private:
 
 #ifdef ESP_PLATFORM
-        static map<std::string, FSPartition *> partitions;
+        static std::map<std::string, FSPartition *> partitions;
         static std::string pwd ;
 #endif
         static std::string prefix ;
         static bool inited ;
 
+    protected:
     public:
-        FS() ;
-        ~FS() ;
+    
+        static const char * name ;
+
+        // for JS
+        FS(JSContext * ctx, const char * name,uint8_t flagGlobal=1);
         
+        static JSValue mkdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue rmdirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue unlinkSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue writeFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue listDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue rmSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue renameSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue statSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue existsSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isFileSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isDirSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static JSValue open(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        
+        // for c++
         static void setPrefix(const char * path) ;
         static std::string toVFSPath(const char * path) ;
         static std::string & toVFSPath(std::string & path) ;
@@ -35,6 +61,7 @@ namespace be {
         static std::string trimVFSPath(const std::string & path) ;
 
         static void mount(const char * mountPoint, FSPartition * partition) ;
+        static void unmountAll() ;
 
         static bool setCwd(const std::string &) ;
         static std::string cwd() ;

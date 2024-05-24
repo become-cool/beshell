@@ -1,6 +1,6 @@
 #include "Client.hpp"
 #include "HTTPRequest.hpp"
-#include "MgModule.hpp"
+#include "Mg.hpp"
 
 using namespace std ;
 
@@ -55,7 +55,7 @@ namespace be::mg {
 
         THIS_NCLASS(Client,client)
 
-        struct mg_tls_opts opts = {.ca = MgModule::ca_path.c_str(), .srvname = mg_str(host) };
+        struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str(), .srvname = mg_str(host) };
         mg_tls_init(client->conn, &opts);
         
         JS_FreeCString(ctx, host) ;
@@ -112,7 +112,7 @@ namespace be::mg {
                 req->shared() ; 
                 JS_FreeValue(client->ctx, req->jsobj) ;
 
-                JSValue evname = JS_NewString(client->ctx, MgModule::eventName(ev)) ;
+                JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
 
                 MAKE_ARGV2(argv, evname, req->jsobj)
                 JS_Call(client->ctx, client->callback, JS_UNDEFINED, 2, argv) ;
@@ -137,7 +137,7 @@ namespace be::mg {
                 break ;
 
             default:
-                JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, MgModule::eventName(ev)))
+                JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, Mg::eventName(ev)))
                 break ;
         }
 
@@ -151,7 +151,7 @@ namespace be::mg {
         }
         ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
 
-        struct mg_connection * conn = mg_http_connect(&MgModule::mgr, url, Client::eventHandler, nullptr) ;
+        struct mg_connection * conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, nullptr) ;
         if(conn==NULL) {
             JS_ThrowReferenceError(ctx, "could not listen addr: %s", url) ;
             JS_FreeCString(ctx, url) ;

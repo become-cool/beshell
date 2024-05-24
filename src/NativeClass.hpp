@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quickjs/quickjs-libc.h"
+#include "deps/quickjs/quickjs-libc.h"
 #include <map>
 #include <vector>
 #include <cassert>

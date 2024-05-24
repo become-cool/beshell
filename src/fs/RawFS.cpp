@@ -383,8 +383,9 @@ namespace be {
     void RawFS::unmount() {
         cout << "not implements" <<endl ;
     }
-    void RawFS::usage(size_t * total, size_t * used) {
-        *total = 0 ;
-        *used = 0 ;
+    bool RawFS::usage(size_t & total, size_t & used) {
+        total = 0 ;
+        used = total ;
+        return true ;
     };
 }

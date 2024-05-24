@@ -3,7 +3,7 @@
 #include <NativeClass.hpp>
 #include <iostream>
 
-#include "sqlite3/sqlite3.h"
+#include "deps/sqlite3/sqlite3.h"
 
 namespace be::sqlite{
     class DB: public be::NativeClass {

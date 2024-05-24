@@ -1,7 +1,6 @@
 #pragma once
 
 #include "InDevPointer.hpp"
-#include "driver/DriverModule.hpp"
 #include "module/serial/I2C.hpp"
 
 namespace be::driver {

@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include "NativeModule.hpp"
-#include "fs/FSModule.hpp"
 #include "fs/FS.hpp"
 
 namespace be {
@@ -47,6 +46,5 @@ namespace be {
         static std::string resovleFS(const char * module_name, const char * base_dir) ;
         static char * normalize(JSContext *ctx, const char *module_base_name, const char * module_name, void *opaque) ;
         static JSModuleDef * load(JSContext *ctx, const char *path, void *opaque) ;
-
     } ;
 }

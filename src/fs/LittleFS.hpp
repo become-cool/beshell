@@ -13,6 +13,6 @@ namespace be {
 
         bool mount(const char * mountPoint) ;
         void unmount() ;
-        void usage(size_t * total, size_t * used) ;
+        bool usage(size_t & total, size_t & used) ;
     } ;
 }

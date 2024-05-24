@@ -1,7 +1,7 @@
 #include "ModuleLoader.hpp"
-#include "module/GPIOModule.hpp"
-#include "module/ProcessModule.hpp"
-#include "module/PathModule.hpp"
+#include "module/GPIO.hpp"
+#include "module/Process.hpp"
+#include "module/Path.hpp"
 #include "driver/DriverModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
@@ -27,6 +27,7 @@ namespace be {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
             exportFunction("importSync",importSync) ;
+            exportFunction("exportValue",exportValue) ;
         }
         
         static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -113,14 +114,30 @@ namespace be {
 
             return val ;
         }
+        static JSValue exportValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            ASSERT_ARGC(3)
+            JSModuleDef * mdef = JS_FindModuleWithNS(ctx,argv[0]) ;
+            if(!mdef) {
+                JSTHROW("Invalid module") ;
+            }
+            const char * valueName = JS_ToCString(ctx, argv[1]) ;
+
+            if( JS_SetModuleExport(ctx, mdef, valueName, JS_DupValue(ctx, argv[2])) !=0 ){
+                JS_FreeCString(ctx, valueName) ;
+                JSTHROW("Cannot export value: %s", valueName) ;
+            }
+                
+            JS_FreeCString(ctx, valueName) ;
+            return JS_UNDEFINED ;
+        }
     } ;
 
     ModuleLoader::ModuleLoader(BeShell * beshell) {
         add<JSLoader>(beshell, "loader") ;
-        add<ProcessModule>(beshell, "process") ;
+        add<Process>(beshell, "process") ;
 #ifdef ESP_PLATFORM
         add<driver::DriverModule>(beshell, "driver") ;
-        add<GPIOModule>(beshell, "gpio") ;
+        add<GPIO>(beshell, "gpio") ;
 #endif
     }
     

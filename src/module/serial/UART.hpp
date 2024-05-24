@@ -15,8 +15,21 @@ namespace be{
         uart_port_t m_uartNum ;
         
         static UART * uart0 ;
+        #if SOC_UART_HP_NUM>1
         static UART * uart1 ;
+        #endif
+        #if SOC_UART_HP_NUM>2
         static UART * uart2 ;
+        #endif
+        #if SOC_UART_HP_NUM>3
+        static UART * uart3 ;
+        #endif
+        #if SOC_UART_HP_NUM>4
+        static UART * uart4 ;
+        #endif
+        #if SOC_UART_LP_NUM>0
+        static UART * uartlp0 ;
+        #endif
 
         TaskHandle_t taskListenerHandle = nullptr ;
         JSValue listener = JS_NULL ;

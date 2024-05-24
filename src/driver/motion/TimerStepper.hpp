@@ -3,9 +3,7 @@
 #include <EventEmitter.hpp>
 #include <JSEngine.hpp>
 #include <driver/gpio.h>
-#include <esp_system.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include <esp_timer.h>
 
 namespace be::driver::motion {
     class TimerStepper: public be::EventEmitter, public be::ILoopable {
