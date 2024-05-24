@@ -50,6 +50,8 @@
 #include "module/sqlite3/SQLite3.hpp"
 #include "module/sqlite3/DB.hpp"
 
+//lvgl
+#include "lv/LV.hpp"
 
 // driver
 #include "driver/input/GT911.hpp"
