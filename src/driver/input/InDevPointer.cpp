@@ -3,7 +3,7 @@
 
 using namespace std ;
 
-    namespace be::driver {
+    namespace be::driver::input {
 
     DEFINE_NCLASS_META(InDevPointer, EventEmitter)
     

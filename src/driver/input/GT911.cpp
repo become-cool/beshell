@@ -17,7 +17,7 @@ using namespace std ;
 #define GT_TP5_REG 		(0x8170)   
 
 
-namespace be::driver {
+namespace be::driver::input {
 
     DEFINE_NCLASS_META(GT911, InDevPointer)
 

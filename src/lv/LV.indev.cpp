@@ -7,7 +7,7 @@ using namespace std ;
 namespace be::lv {
     
     typedef struct {
-        shared_ptr<be::driver::InDevPointer> ptr ;
+        shared_ptr<be::driver::input::InDevPointer> ptr ;
         uint16_t x;
         uint16_t y;
         bool enabled;
@@ -132,7 +132,7 @@ namespace be::lv {
      */
     JSValue LV::registerInputDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
-        JSVALUE_TO_NCLASS(be::driver::InDevPointer, argv[0], indev)
+        JSVALUE_TO_NCLASS(be::driver::input::InDevPointer, argv[0], indev)
 
         if(indev->_usedForLVGL) {
             JSTHROW("Input device has already been registered as lv input device")
@@ -152,7 +152,7 @@ namespace be::lv {
         data->y = 0 ;
         data->enabled = true ;
 
-        data->ptr = static_pointer_cast<be::driver::InDevPointer>(indev->shared());
+        data->ptr = static_pointer_cast<be::driver::input::InDevPointer>(indev->shared());
 
         lv_indev_t * lvindev = lv_indev_create();
         lv_indev_set_user_data(lvindev, (void *)data) ;

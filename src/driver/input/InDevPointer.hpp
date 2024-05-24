@@ -7,7 +7,7 @@
 
 #define INDEVPOINTER_MAX_NUM 10
 
-namespace be::driver {
+namespace be::driver::input {
     class InDevPointer: public be::EventEmitter {
         DECLARE_NCLASS_META
     private:

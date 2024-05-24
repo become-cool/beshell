@@ -212,14 +212,7 @@ namespace be {
 
     JSValue JSEngine::evalScript(const char * filepath, int flags) {
         assert(beshell) ;
-<<<<<<< HEAD
-        // if( !beshell->fs ) {
-        //     JSTHROW("call useFS() first()")
-        // }
-
-=======
         
->>>>>>> dev
         int readed ;
         unique_ptr<char> content = FS::readFileSync(filepath,&readed) ;
         if(readed<0) {
