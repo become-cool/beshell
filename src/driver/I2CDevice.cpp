@@ -28,7 +28,7 @@ namespace be::driver {
         }
         
         that->i2c = i2c ;
-        if(addr>-1) {
+        if(addr>0) {
             that->addr = addr ;
         }
 

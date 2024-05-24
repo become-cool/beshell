@@ -91,7 +91,6 @@ namespace be::driver::io {
         // Wire.beginTransmission(TM1650_DISPLAY_BASE);
         // exists = (Wire.endTransmission() == 0);
         exists = i2c->ping(TM1650_DISPLAY_BASE) ;
-        dn(exists)
 
         clear();
         on();

@@ -2,6 +2,7 @@
 
 #include <NativeClass.hpp>
 #include "driver/i2c.h"
+#include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -36,6 +37,8 @@ namespace be {
 
     private:
         i2c_port_t busnum ;
+        gpio_num_t _sda = GPIO_NUM_NC ;
+        gpio_num_t _scl = GPIO_NUM_NC ;
         SemaphoreHandle_t sema ;
 
         i2c_mode_t mode = I2C_MODE_MASTER ;
@@ -70,6 +73,9 @@ namespace be {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static I2C * flyweight(JSContext *, i2c_port_t) ;
+
+        gpio_num_t sda() ;
+        gpio_num_t scl() ;
 
         inline void take() ;
         inline void give() ;
@@ -307,6 +313,20 @@ namespace be {
         static JSValue slaveReadBuff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         #endif
 
+        // arduino like api
+    public:
+        void begin(uint32_t freq=100000) ;
+        void end() ;
+        void beginTransmission(uint8_t addr);
+        size_t write(uint8_t data);
+        int endTransmission(bool stop=true);
+        uint8_t requestFrom(uint8_t addr, size_t len, uint8_t stop=true)  ;
+        int read() ;
+        int available() ;
+    private:
+        i2c_cmd_handle_t cmd = nullptr ;
+        size_t tx_wrote_bytes = 0 ;
     } ;
-
 }
+
+class TwoWire : public be::I2C {} ;

@@ -110,15 +110,15 @@ namespace be {
         THIS_NCLASS(I2C, that)
         ASSERT_ARGC(1)
 
-        gpio_num_t GET_INT32_PROP(argv[0], "sda", sda, )
-        gpio_num_t GET_INT32_PROP(argv[0], "scl", scl, )
+        GET_INT32_PROP(argv[0], "sda", that->_sda, )
+        GET_INT32_PROP(argv[0], "scl", that->_scl, )
         i2c_mode_t GET_UINT32_PROP_OPT(argv[0], "mode", mode, I2C_MODE_MASTER)
         int GET_INT32_PROP_OPT(argv[0], "timeout", timeout, 10)
 
         i2c_config_t i2c_config = {
             .mode = mode,
-            .sda_io_num = sda,
-            .scl_io_num = scl,
+            .sda_io_num = that->_sda,
+            .scl_io_num = that->_scl,
             .sda_pullup_en = GPIO_PULLUP_ENABLE,
             .scl_pullup_en = GPIO_PULLUP_ENABLE,
             .clk_flags = 0
@@ -548,4 +548,53 @@ namespace be {
         return JS_NewArrayBufferCopy(ctx, that->slaverRegisters+offset, length) ;
     }
     #endif
+
+    gpio_num_t I2C::sda() {
+        return _sda ;
+    }
+    gpio_num_t I2C::scl() {
+        return _scl ;
+    }
+
+    
+    // -------------------
+    // arduino like api
+    void I2C::begin(uint32_t freq) {
+    }
+    void I2C::end() {
+    }
+    void I2C::beginTransmission(uint8_t addr) {
+        if(cmd) {
+            return ;
+        }
+        cmd = i2c_cmd_link_create();
+        i2c_master_start(cmd);
+        i2c_master_write_byte(cmd, (addr << 1) | I2C_MASTER_WRITE, 0x1);
+        tx_wrote_bytes = 0 ;
+    }
+    size_t I2C::write(uint8_t data) {
+        i2c_master_write(cmd, &data, 1, true) ;
+        return ++tx_wrote_bytes ;
+    }
+    int I2C::endTransmission(bool stop) {
+        if(!cmd) {
+            return -1 ;
+        }
+        i2c_master_stop(cmd);
+        esp_err_t res=i2c_master_cmd_begin(busnum, cmd, 10/portTICK_PERIOD_MS) ;
+        i2c_cmd_link_delete(cmd);
+        cmd = nullptr ;
+        return (uint8_t)res ;
+    }
+    uint8_t I2C::requestFrom(uint8_t addr, size_t len, uint8_t stop) {
+        return 0 ;
+    }
+    int I2C::read() {
+        return 0 ;
+    }
+    int I2C::available() {
+        return 0 ;
+    }
+
 }
+
