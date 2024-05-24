@@ -133,7 +133,6 @@ namespace be{
         if(!buff) {
             JSTHROW("out of memory?")
         }
-        dn2(len, timeout)
         int readlen = uart_read_bytes(uart->m_uartNum, buff, len, timeout / portTICK_PERIOD_MS);
         return JS_NewArrayBuffer(ctx, buff, readlen, freeArrayBuffer, NULL, false) ;
     }
