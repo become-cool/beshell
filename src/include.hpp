@@ -51,7 +51,9 @@
 #include "module/sqlite3/DB.hpp"
 
 //lvgl
+#ifndef UNUSE_LVGL
 #include "lv/LV.hpp"
+#endif
 
 // driver
 #include "driver/input/GT911.hpp"
