@@ -62,15 +62,15 @@ namespace be {
         for(auto pair:loopFunctions) {
             pair.first(*this, pair.second) ;
         }
+
+#ifdef ESP_PLATFORM
+        vTaskDelay(1) ;
+#endif
     }
 
     void BeShell::run() {
         while(1) {
             loop() ;
-
-#ifdef ESP_PLATFORM
-            vTaskDelay(1) ;
-#endif
         }
     }
 
