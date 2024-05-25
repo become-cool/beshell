@@ -53,7 +53,7 @@ namespace be {
 
         // output banner
         cout << R"(
-____      ____                                     ____                       
+ ____      ____                                     ____                       
 |    ~.   |                       ..''''|         ||           |       |       
 |____.'_  |______              .''      |_________||______     |       |       
 |       ~.|                 ..'         |         ||           |       |       
@@ -65,8 +65,7 @@ ____      ____                                     ____
                 << " ; esp-idf: " << ESPIDF_VERSION 
                 << "\r\n" ;
         cout    << "build: " << __DATE__ << " " << __TIME__ << "\r\n" ;
-        cout    << "type JavaScript code to run, or 'help' for more information\r\n" ;
-
+        cout    << "type JavaScript code to run, or 'help' for more information\r\n\r\n" ;
     }
 
     void BeShell::loop() {

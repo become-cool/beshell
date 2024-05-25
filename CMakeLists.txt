@@ -95,6 +95,7 @@ idf_component_register(
             vfs
             fatfs
             spi_flash
+            wear_levelling
             esp_timer
             nvs_flash
             esp_wifi

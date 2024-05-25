@@ -11,6 +11,7 @@
 //fs
 #include "fs/FSPartition.hpp"
 #include "fs/LittleFS.hpp"
+#include "fs/FatFS.hpp"
 #include "fs/RawFS.hpp"
 #include "fs/FS.hpp"
 
