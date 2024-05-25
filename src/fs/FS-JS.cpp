@@ -326,19 +326,8 @@ namespace be {
 
 
 #ifdef ESP_PLATFORM
+        // @todo 
         // esp32 vfs 读取目录时，忽略了挂载点，将已知挂载点补充上
-        if(strcmp(path.c_str(),"/fs/")==0 || strcmp(path.c_str(),"/fs")==0) {
-            if(detail) {
-                JSValue item = JS_NewObject(ctx) ;
-                JS_SetPropertyStr(ctx, item, "name", JS_NewString(ctx, "home") ) ;
-                JS_SetPropertyStr(ctx, item, "type", JS_NewString(ctx, "dir") ) ;
-                JS_SetPropertyUint32(ctx, ret, idx++, item) ;
-            }
-            else {
-                JS_SetPropertyUint32(ctx, ret, idx++, JS_NewString(ctx, "home")) ;
-
-            }
-        }
 #endif
 
         closedir(dir);
