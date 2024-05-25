@@ -109,6 +109,7 @@ idf_component_register(
 
 # for lvgl
 add_definitions(-DLV_CONF_INCLUDE_SIMPLE)
+add_definitions(-DUSE_LVGL)
 
 
 # # for mongoose tls/ssl

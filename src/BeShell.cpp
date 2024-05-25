@@ -59,6 +59,7 @@ namespace be {
 |       ~.|                 ..'         |         ||           |       |       
 |_______.'|___________....''            |         ||___________|_______|_______
  (c) 2020-2024 https://become.cool
+
 )" ;
         cout    << "version BeShell: " << BESHELL_VERSION 
                 << "; quickjs: " << QUICKJS_VERSION

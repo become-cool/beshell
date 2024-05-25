@@ -52,8 +52,10 @@
 #include "module/sqlite3/DB.hpp"
 
 //lvgl
+#ifdef USE_LVGL
 #ifndef UNUSE_LVGL
 #include "lv/LV.hpp"
+#endif
 #endif
 
 // driver

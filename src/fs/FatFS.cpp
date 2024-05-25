@@ -28,7 +28,7 @@ namespace be {
                 .allocation_unit_size = 4096,
         };
 
-        esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl(mountPoint, label, &mount_config, &wl_handle);
+        esp_err_t err = esp_vfs_fat_spiflash_mount(mountPoint, label, &mount_config, &wl_handle);
         if (err != ESP_OK) {
             return false;
         }
@@ -40,7 +40,7 @@ namespace be {
         if(wl_handle==0) {
             return ;
         }
-        esp_vfs_fat_spiflash_unmount_rw_wl(mountPoint, wl_handle) ;
+        esp_vfs_fat_spiflash_unmount(mountPoint, wl_handle) ;
         mountPoint = nullptr ;
         wl_handle = 0 ;
     }
