@@ -17,7 +17,6 @@ using namespace std ;
 
 namespace be {
 
-
     BeShell::BeShell()
         : boot_level(5)
         , engine(new JSEngine(this))
@@ -51,6 +50,23 @@ namespace be {
     void BeShell::setup() {
         telnet->setup() ;
         engine->setup() ;
+
+        // output banner
+        cout << R"(
+____      ____                                     ____                       
+|    ~.   |                       ..''''|         ||           |       |       
+|____.'_  |______              .''      |_________||______     |       |       
+|       ~.|                 ..'         |         ||           |       |       
+|_______.'|___________....''            |         ||___________|_______|_______
+ (c) 2020-2024 https://become.cool
+)" ;
+        cout    << "version BeShell: " << BESHELL_VERSION 
+                << "; quickjs: " << QUICKJS_VERSION
+                << " ; esp-idf: " << ESPIDF_VERSION 
+                << "\r\n" ;
+        cout    << "build: " << __DATE__ << " " << __TIME__ << "\r\n" ;
+        cout    << "type JavaScript code to run, or 'help' for more information\r\n" ;
+
     }
 
     void BeShell::loop() {

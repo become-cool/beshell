@@ -51,6 +51,11 @@ namespace be {
 #endif
 #endif
         JS_SetPropertyStr(ctx, versions, "quickjs", JS_NewString(ctx, QUICKJS_VERSION));
+
+        char buff[32] ;
+        sprintf(buff, "%s %s", __DATE__, __TIME__) ;
+        JS_SetPropertyStr(ctx, versions, "build", JS_NewString(ctx, buff));
+
         exportValue("versions", versions) ;
 
 #ifdef ESP_PLATFORM

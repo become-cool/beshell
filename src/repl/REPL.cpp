@@ -334,7 +334,7 @@ namespace be {
             if(JS_IsException(ret)) {
                 beshell->engine->dumpError(-1,ch) ;
             } else {
-                string output = "imported module as global var: " ;
+                string output = "imported module as global var " ;
                 output+= moduleName ;
                 output+= "\n" ;
                 ch->send(output) ;
