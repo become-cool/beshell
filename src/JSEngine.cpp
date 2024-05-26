@@ -210,7 +210,7 @@ namespace be {
         return JS_Eval(ctx, code, code_len, filename, flags) ;   // JS_EVAL_FLAG_STRIP
     }
 
-    JSValue JSEngine::evalScript(const char * filepath, int flags) {
+    JSValue JSEngine::evalScript(const char * filepath, int flags, bool dumpException) {
         assert(beshell) ;
         
         int readed ;
@@ -221,7 +221,12 @@ namespace be {
 
         string code(content.get(), readed) ;
 
-        return JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
+        JSValue ret = JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
+        if(dumpException && JS_IsException(ret)) {
+            dumpError() ;
+            ret = JS_UNDEFINED ;
+        }
+        return ret ;
     }
 
     void JSEngine::setGlobalValue(JSContext * ctx, const char * name, JSValue value) {

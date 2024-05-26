@@ -1,5 +1,9 @@
 ## dev
 
+Refactored:
+
+* JSEngine::evalScript() 增加参数指定是否输出异常
+
 
 ## v0.3.1   2024-5-25
 
