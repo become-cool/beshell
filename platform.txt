@@ -1,0 +1,2 @@
+compiler.c.flags=-Wno-unused-value
+compiler.cpp.flags=-Wno-unused-value
