@@ -1,7 +1,8 @@
-## dev
+## v0.3.1   2024-5-26
 
 Refactored:
 
+* 预设的 partitions.cvs 文件中分区名称由 fshome 改为 fsroot
 * JSEngine::evalScript() 增加参数指定是否输出异常
 
 
@@ -23,7 +24,6 @@ Refactored:
 * 全面重构了 BeShell 的接口
 * I2CDevice::begin() rename to I2CDevice::setup()
 * DeviceTree 在 js 中调用
-* 预设的 partitions.cvs 文件中分区名称由 fshome 改为 fsroot
 * 加入了 be::driver:input 名称空间
 
 ### v0.3.0   2024-4-22
