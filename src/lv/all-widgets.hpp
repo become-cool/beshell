@@ -39,3 +39,4 @@
 #include "ext/Row.hpp"
 #include "ext/Column.hpp"
 #include "ext/Rect.hpp"
+#include "ext/ColorPicker.hpp"

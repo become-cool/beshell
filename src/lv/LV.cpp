@@ -42,6 +42,7 @@ namespace be::lv {
         exportClass<Row>() ;
         exportClass<Column>() ;
         exportClass<Rect>() ;
+        exportClass<ColorPicker>() ;
 
 
 // AUTO GENERATE CODE START [EXPORT WIDGETS] --------
