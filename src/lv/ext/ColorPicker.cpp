@@ -200,7 +200,7 @@ namespace be::lv {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
 
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
+        // lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
         
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -214,7 +214,9 @@ namespace be::lv {
 
 
         draw_dsc.bg_color = (lv_color_t) be::driver::disp::RGB(0xff, 0xff, 0xff);
-        dn(draw_dsc.bg_color)
+        // printf("%d\n",(int)draw_dsc.bg_color)
+
+        draw_dsc.bg_opa = 255 ;
 
         lv_draw_rect(layer, &draw_dsc, &coords);
 
