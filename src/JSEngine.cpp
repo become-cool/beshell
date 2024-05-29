@@ -177,7 +177,7 @@ namespace be {
 
     void JSEngine::dumpError(int pkgId, TelnetChannel * ch) {
         JSValue excep = JS_GetException(ctx);
-        if(JS_IsNull(exception_val) || JS_IsUndefined(exception_val)) {
+        if(JS_IsNull(excep) || JS_IsUndefined(excep)) {
             return ;
         }
 
