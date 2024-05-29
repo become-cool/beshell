@@ -141,6 +141,14 @@ namespace be {
         for(auto obj:loopables) {
             obj->loop(ctx) ;
         }
+
+        // uncatched exception
+        JSValue excep = JS_GetException(ctx);
+        if(!JS_IsUndefined(excep) && !JS_IsNull(excep)) {
+            string str = getExceptionStr(excep) ;
+            printf("Ucatched Exception: %s\n", str.c_str()) ;
+        }
+        JS_FreeValue(ctx, excep);
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -168,20 +176,23 @@ namespace be {
     }
 
     void JSEngine::dumpError(int pkgId, TelnetChannel * ch) {
-        string str = getExceptionStr() ;
+        JSValue excep = JS_GetException(ctx);
+        if(JS_IsNull(exception_val) || JS_IsUndefined(exception_val)) {
+            return ;
+        }
+
+        string str = getExceptionStr(excep) ;
         if(ch) {
             ch->send(str.c_str(), str.length(), pkgId, EXCEPTION) ;
         } else if(beshell->telnet) {
             beshell->telnet->output(str.c_str(), str.length(), pkgId, EXCEPTION) ;
         }
+
+        JS_FreeValue(ctx, excep);
     }
     
-    string JSEngine::getExceptionStr() {
+    string JSEngine::getExceptionStr(JSValue exception) {
         JSValue exception_val = JS_GetException(ctx);
-        if(JS_IsNull(exception_val)) {
-            return "" ;
-        }
-
         const char * cstr = JS_ToCString(ctx, exception_val) ;
         std::string str = cstr ;
         JS_FreeCString(ctx, cstr) ;
@@ -198,8 +209,6 @@ namespace be {
             }
             JS_FreeValue(ctx, val);
         }
-        JS_FreeValue(ctx, exception_val);
-
         return str ;
     }
 
@@ -221,9 +230,12 @@ namespace be {
 
         string code(content.get(), readed) ;
 
-        JSValue ret = JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
-        if(dumpException && JS_IsException(ret)) {
-            dumpError() ;
+        JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
+        JSValue ret = JS_GetException(ctx) ;
+        if(dumpException && !JS_IsNull(ret) && !JS_IsUndefined(ret)) {
+            string str = getExceptionStr(ret) ;
+            printf("Exception: %s\n", str.c_str()) ;
+            JS_FreeValue(ctx, ret) ;
             ret = JS_UNDEFINED ;
         }
         return ret ;

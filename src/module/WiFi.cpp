@@ -208,7 +208,7 @@ namespace be {
         exportName("status") ;
         exportName("scan") ;
         exportName("autoReconnect") ;
-
+        exportName("waitIP") ;
 
         exportFunction("peripheralStart",start,0) ;
         exportFunction("peripheralStop",stop,0) ;
