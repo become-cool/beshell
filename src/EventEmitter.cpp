@@ -45,7 +45,7 @@ namespace be {
             this._handlers[event] = []
             if(event!="#EVENT.ADD#"&&event!="#EVENT.REMOVE#") {
                 this.emit("#EVENT.ADD#",event)
-                this.eventAdded(event)
+                this.eventAdded && this.eventAdded(event)
             }
         }
         if(!norepeat || !this.isListening(event, handle)) {
@@ -58,7 +58,6 @@ namespace be {
             this.on(eventName, handle, norepeat)
         }
     }
-    return this
 })", "on()", {})
 
     JSValue DEF_JS_FUNC(jsOnce, R"(function(eventName, handle, norepeat) {
@@ -68,7 +67,6 @@ namespace be {
     }
     wrapper.__origin = this.originHandle(handle)
     this.on(eventName, wrapper, norepeat)
-    return this
 })", "once()", {})
 
     JSValue DEF_JS_FUNC(jsRace, R"(function(events, callback) {
@@ -80,7 +78,6 @@ namespace be {
         callback(evt, ...args)
     }
     this.on("*", h)
-    return this
 })", "race()", {})
 
     JSValue DEF_JS_FUNC(jsOff, R"(function(eventName, handle, all) {
@@ -101,10 +98,9 @@ namespace be {
         delete this._handlers[eventName]
         if(eventName!="#EVENT.ADD#"&&eventName!="#EVENT.REMOVE#") {
             this.emit("#EVENT.REMOVE#",eventName)
-            this.eventRemoved(eventName)
+            this.eventRemoved && this.eventRemoved(eventName)
         }
     }
-    return this
 })", "off()", {})
 
     JSValue DEF_JS_FUNC(jsOriginHandle, R"(function(handle) {
@@ -133,7 +129,6 @@ namespace be {
             handle.apply(this, [eventName, ...args])
         }
     }
-    return this
 })", "emit()", {})
 
     JSValue DEF_JS_FUNC(jsDestroy, R"(function() {

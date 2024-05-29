@@ -4,7 +4,7 @@
 #include "include.hpp"
 
 
-#define BESHELL_VERSION "0.3.1"
+#define BESHELL_VERSION "0.3.3"
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
 

@@ -8,6 +8,7 @@
 #include <lwip/dns.h>
 #include <lwip/sockets.h>
 #include <esp_netif.h>
+#include "../js/wifi.c"
 
 using namespace be ;
 
@@ -46,7 +47,7 @@ bool WiFi::hasInited() {
 
 #define CHECK_WIFI_INITED                                       \
     if(!wifi_inited) {                                          \
-        JSTHROW("wifi not init, please call WiFi.start() first")\
+        JSTHROW("wifi not init, please call wifi.start() first")\
     }
 
 static bool _started = false ;
@@ -169,16 +170,15 @@ static void esp32_wifi_eventHandler(void* arg, esp_event_base_t event_base, int3
         eventType = (int)event_base ;
         return ;
     }
-
-    if( arg && __event_handle_ctx!=NULL && JS_IsFunction(__event_handle_ctx, __event_handle) ) {
+    
+    if( __event_handle_ctx!=NULL && JS_IsFunction(__event_handle_ctx, __event_handle) ) {
         MAKE_ARGV3(argv, JS_NewInt32(__event_handle_ctx, eventType), JS_NewInt32(__event_handle_ctx, event_id), JS_UNDEFINED)
         // dis reason
         if(event_base==WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
             argv[2] = JS_NewInt32(__event_handle_ctx, REASON(event_data)) ;
         }
-
-        ((BeShell*)arg)->engine->timer.setTimer(__event_handle_ctx, __event_handle, 0, false, JS_UNDEFINED, 3, argv) ;
-        // eventloop_push_with_argv(__event_handle_ctx, __event_handle, JS_UNDEFINED, 3, argv) ;
+        JSEngine::fromJSContext(__event_handle_ctx)->timer.setTimer(__event_handle_ctx, __event_handle, 0, false, JS_UNDEFINED, 3, argv) ;
+        free(argv) ;
     }
 }
 
@@ -189,18 +189,37 @@ namespace be {
     WiFi::WiFi(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
-        // exportClass<ClassName>() ;
-        exportFunction("start",start,0) ;
-        exportFunction("stop",stop,0) ;
+        exportName("on") ;
+        exportName("once") ;
+        exportName("race") ;
+        exportName("off") ;
+        exportName("emit") ;
+        exportName("originHandle") ;
+        exportName("_handlers") ;
+        
+        exportName("start") ;
+        exportName("isReady") ;
+        exportName("stop") ;
+        exportName("startAP") ;
+        exportName("stopAP") ;
+        exportName("connect") ;
+        exportName("disconnect") ;
+        exportName("isConnecting") ;
+        exportName("status") ;
+        exportName("scan") ;
+        exportName("autoReconnect") ;
 
+
+        exportFunction("peripheralStart",start,0) ;
+        exportFunction("peripheralStop",stop,0) ;
         exportFunction("setPS",setPS,0) ;
         exportFunction("setMode",setMode,0) ;
         exportFunction("mode",mode,0) ;
         exportFunction("setAPConfig",setAPConfig,0) ;
         exportFunction("setStaConfig",setStaConfig,0) ;
         exportFunction("config",config,0) ;
-        exportFunction("staConnect",staConnect,0) ;
-        exportFunction("staDisconnect",staDisconnect,0) ;
+        exportFunction("peripheralConnect",staConnect,0) ;
+        exportFunction("peripheralDisconnect",staDisconnect,0) ;
         exportFunction("getIpInfo",getIpInfo,0) ;
         exportFunction("setHostname",setHostname,0) ;
         exportFunction("allSta",allSta,0) ;
@@ -210,7 +229,16 @@ namespace be {
         exportFunction("isScanning",isScanning,0) ;
         exportFunction("scanRecords",scanRecords,0) ;
         exportFunction("staStarted",staStarted,0) ;
+        exportFunction("staConnected",staConnected,0) ;
         exportFunction("apStarted",apStarted,0) ;
+    }
+
+    void WiFi::import(JSContext *ctx) {
+        init() ;
+
+        exportValue("_handlers", JS_NewObject(ctx)) ;
+
+        JSEngineEvalEmbeded(ctx, wifi)
     }
 
     #define ESP_API(code)       \
@@ -220,11 +248,10 @@ namespace be {
             }
 
     void WiFi::init() {
-
         if(wifi_inited) {
             return ;
         }
-        
+
         esp_err_t res ;
         ESP_API(esp_event_loop_create_default())
         ESP_API(esp_netif_init())
@@ -235,18 +262,14 @@ namespace be {
         wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
         ESP_API(esp_wifi_init(&cfg))
 
+        ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_any_id))
+        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)NULL, &instance_got_ip))
+
         wifi_inited = true ;
     }
 
-    void WiFi::use(be::BeShell & beshell) {
-
-        // dp(src_js_wifi_js_start)
-        // size_t size = src_js_wifi_js_end-src_js_wifi_js_start ;
-        // dn(size)
-        
-        esp_err_t res ;
-        ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)&beshell, &instance_any_id))
-        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)&beshell, &instance_got_ip))
+    void WiFi::use(be::BeShell * beshell) {
+        beshell->use<NVS>() ;
     }
 
     JSValue WiFi::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -557,7 +580,7 @@ namespace be {
      * 
      * 返回 0 仅表示api函数调用成功; 非 0 代表对应的错误
      * 
-     * 连接成功或失败回触发回调函数, 回调函数由 wifi.registerEventHandle() 设置
+     * 
      * 
      * @function staConnect
      * @return number
@@ -708,7 +731,14 @@ namespace be {
     /**
      * 注册一个事件函数, 当 wifi 状态变化时, 该函数会被调用
      * 
-     * @function registerEventHandle
+     * 回调函数的参数：
+     * 
+     * ```
+     * callback(eventType:number, eventId:number, reason:number)
+     * ```
+     * 
+     * reason 表示 disconnect 事件的断开原因
+     * 
      * @return undefined
      */
     JSValue WiFi::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -716,6 +746,7 @@ namespace be {
         if( !JS_IsFunction(ctx, argv[0]) ){
             JSTHROW("wifi event handle must be a function")
         }
+        JS_FreeValue(ctx, __event_handle) ;
         __event_handle = JS_DupValue(ctx, argv[0]) ;
         __event_handle_ctx = ctx ;
         return JS_UNDEFINED ;

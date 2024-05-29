@@ -1,3 +1,11 @@
+import {exportValue} from "loader"
+import * as wifi from "wifi"
+
+function sleep(ms) {
+    return new Promise(resolve=>setTimeout(resolve,ms))
+}
+; ["on","off","once","race","emit","originHandle"].map(fname=>exportValue(wifi, fname, EventEmitter.prototype[fname]))
+
 // wifi mode
 // const MODE_NONE = 0
 const MODE_STA = 1
@@ -6,8 +14,8 @@ const MODE_AP = 2
 
 
 // event type
-EVENT_WIFI = 1
-EVENT_IP = 2 
+const EVENT_WIFI = 1
+const EVENT_IP = 2 
 
 // WiFi events
 const WIFI_READY = 0
@@ -61,263 +69,13 @@ let ipEvtNames = {}
 ipEvtNames[STA_GOT_IP] = "ip.got"
 ipEvtNames[STA_LOST_IP] = "ip.lost"
 
-
 // power safe
 const PS_NONE = 0
 // const PS_MIN_MODEM = 1
 // const PS_MAX_MODEM = 2 
 
 
-const wifi = module.exports = new beapi.EventEmitter()
-global.WiFi = wifi
-
-wifi.mode = beapi.wifi.getMode
-wifi.setMode = beapi.wifi.setMode
-
-wifi.staStarted = beapi.wifi.staStarted
-wifi.apStarted = beapi.wifi.apStarted
-
-function contrastStatus(b) {
-    let mode = wifi.mode()
-    let status = 0
-    if(b==beapi.wifi.staStarted()) {
-        status|= MODE_STA
-    }
-    if(b==beapi.wifi.apStarted()) {
-        status|= MODE_AP
-    }
-    return mode==status
-}
-wifi.isReady = function(){
-    return contrastStatus(true)
-}
-wifi.start = function() {
-    return new Promise(function(resolve){
-        beapi.wifi.start()
-        if(wifi.isReady()) {
-            resolve()
-        }
-        else {
-            wifi.once("start", resolve)
-        }
-    })
-}
-wifi.stop = function() {
-    return new Promise(function(resolve){
-        beapi.wifi.stop()
-        if(contrastStatus(false)) {
-            resolve()
-        }
-        else {
-            wifi.once("stop", resolve)
-        }
-    })
-}
-
-let _connecting = false
-wifi.isConnecting = function() {
-    return _connecting
-}
-function waitConnecting() {
-    return new Promise(function(resolve) {
-        wifi.race(["sta.disconnected","sta.connected"], (evt, ...args)=>{
-            resolve( args[0] || 0 )
-        })
-    })
-}
-/*
-function(ssid,password,retry,retryDur)
-or
-function(options)
-*/
-wifi.connect = async function(ssid,password,retry,retryDur) {
-
-    if(_connecting) {
-        await waitConnecting()
-    }
-
-    if( beapi.wifi.staConnected() && beapi.wifi.getConfig(1)?.ssid==ssid ) {
-        return true
-    }
-
-    let mode = wifi.mode()
-    wifi.setMode(mode|MODE_STA)
-
-    await wifi.start()
-    await wifi.disconnect()
-    
-    if(typeof ssid=='object') {
-        retry = ssid.retry
-        retryDur = ssid.retryDur
-        beapi.wifi.setStaConfig(ssid)
-    }
-    else {
-        beapi.wifi.setStaConfig({ssid, password})
-    }
-
-    retry = (parseInt(retry) || 0) 
-    if(retry<=0)
-        retry = 2
-    retryDur = (parseInt(retryDur) || 2000)
-    if(retryDur<=0) {
-        retryDur = 2000
-    }
-
-    while((retry--)>0) {
-        // console.log("connect to ap:",ssid,'...')
-        _connecting = true
-        beapi.wifi.connect()
-        var res = await waitConnecting()
-        _connecting = false
-        // console.log("connect", res?"failed":"sucess", res)
-        if(res!=0 && res!=202) {
-            console.log("retry", retryDur, "ms later ...")
-            await sleep(retryDur)
-        }
-        else {
-            break ;
-        }
-    }
-
-    return 0==res
-}
-
-wifi.disconnect = async function() {
-    if(timerDeamon>=0) {
-        clearTimeout(timerDeamon)
-        timerDeamon = -1
-    }
-    return new Promise(function(resolve) {
-        if(!beapi.wifi.staConnected()) {
-            resolve()
-            return
-        }
-        beapi.wifi.disconnect()
-        wifi.once("sta.disconnected", resolve)
-    })
-}
-
-wifi.startAP = function(ssid, password, callback) {
-    wifi.stopAP(ret=>{
-        if(!ret) {
-            callback(false)
-            return
-        }
-        if(typeof callback=="function") {        
-            wifi.race(["ap.start","ap.stop"], evt=>callback(evt=="ap.start"))
-        }
-        wifi.setMode( wifi.mode() | MODE_AP )
-        beapi.wifi.setAPConfig({ssid, password})
-        wifi.start()
-    })
-}
-wifi.stopAP = function(callback) {
-    if(!wifi.apStarted()) {
-        callback && callback(true)
-        return
-    }
-    if(typeof callback=="function") {        
-        wifi.race(["ap.start","ap.stop"], evt=>callback(evt=="ap.stop"))
-    }
-    wifi.setMode( wifi.mode() & (~MODE_AP) )
-}
-
-wifi.status = function(netif) {
-    if(!netif || netif=="apsta") {
-        return {
-            sta: wifi.status("sta"), 
-            ap: wifi.status("ap")
-        }
-    }
-    else if(netif=='sta') {
-        let sta = beapi.wifi.getIpInfo(MODE_STA)
-        sta.started = beapi.wifi.staStarted()
-        sta.connected = beapi.wifi.staConnected()
-
-        let config = beapi.wifi.getConfig(MODE_STA)
-        sta.ssid = config.ssid
-        sta.password = config.password
-        sta.authmode = config.authmode
-        
-        return sta
-    }
-    else if(netif=='ap') {
-
-        let ap = beapi.wifi.getIpInfo(MODE_AP)
-        ap.started = beapi.wifi.apStarted()
-    
-        config = beapi.wifi.getConfig(MODE_AP)
-        ap.ssid = config.ssid
-        ap.password = config.password
-
-        return ap
-    }
-    else {
-        throw new Error("unknow netif: "+netif)
-    }
-}
-
-function autoAP() {
-    if( !(wifi.mode()&MODE_AP) ) {
-        return
-    }
-    let config = beapi.wifi.getConfig(MODE_AP)
-    if(!config||!config.ssid) {
-        return
-    }
-    let res = config.ssid.match(/^ESP_([0-9A-F]{6})$/)
-    if(!res) {
-        return
-    }
-    let ssid = 'BECOME-'+res[1].slice(-4)
-    beapi.wifi.setAPConfig({ssid, password: config.password})
-}
-let timerDeamon = -1
-function deamon() {
-    console.log("start wifi sta deamon")
-    timerDeamon = setInterval(()=>{
-        if( beapi.wifi.staConnected() || !(wifi.mode()&MODE_STA) || _connecting || !beapi.wifi.staStarted()){
-            return
-        }
-        let staconf = beapi.wifi.getConfig(1)
-        if( !staconf.ssid) {
-            return
-        }
-        wifi.connect(staconf.ssid, staconf.password)
-    },10000)
-}
-wifi.autostart = async function() {
-    console.log("auto start wifi")
-    autoAP()
-    await wifi.start()
-    
-    let staconf = beapi.wifi.getConfig(1)
-    if(wifi.mode()&MODE_STA && staconf.ssid) {
-        await wifi.connect({
-            ssid:staconf.ssid,
-            password:staconf.password,
-            authmode:staconf.authmode,
-        }, 5, 2000)
-        deamon()
-    }
-}
-
-wifi.scan = function() {
-    return new Promise(function(resolve, reject) {
-        if( !(wifi.mode() & MODE_STA) ) {
-            beapi.wifi.setMode(wifi.mode()|MODE_STA)
-        }
-        if(!beapi.wifi.isScanning()) {
-            if(!beapi.wifi.scanStart()) {
-                reject()
-                return
-            }
-        }
-        wifi.once("scan.done",resolve)
-    })
-}
-
-beapi.wifi.registerEventHandle(function(eventType, eventId, data){
+wifi.registerEventHandle(function(eventType, eventId, data){
 
     let eventName = null
     let eventArgv = []
@@ -336,7 +94,7 @@ beapi.wifi.registerEventHandle(function(eventType, eventId, data){
         eventName = ipEvtNames[eventId]
     }
 
-    // console.log(eventType,eventId,eventName)
+    // console.log("..>",eventType,eventId,eventName)
     if(eventName) {
         wifi.emit(eventName, ...eventArgv)
     }
@@ -355,7 +113,213 @@ beapi.wifi.registerEventHandle(function(eventType, eventId, data){
     }
 })
 
-// 禁止 wifi 睡眠 (增加耗电)
-if(beapi.wifi.hasInited()) {
-    beapi.wifi.setPS(PS_NONE)
+function contrastStatus(b) {
+    let mode = wifi.mode()
+    let status = 0
+    if(b==wifi.staStarted()) {
+        status|= MODE_STA
+    }
+    if(b==wifi.apStarted()) {
+        status|= MODE_AP
+    }
+    return mode==status
 }
+
+function isReady(){
+    return contrastStatus(true)
+}
+function start() {
+    return new Promise(function(resolve){
+        wifi.peripheralStart()
+        if(isReady()) {
+            resolve()
+        }
+        else {
+            wifi.once("start", resolve)
+        }
+    })
+}
+function stop() {
+    return new Promise(function(resolve){
+        wifi.peripheralStop()
+        if(contrastStatus(false)) {
+            resolve()
+        }
+        else {
+            wifi.once("stop", resolve)
+        }
+    })
+}
+
+
+let _connecting = false
+function isConnecting() {
+    return _connecting
+}
+function waitConnecting() {
+    return new Promise(function(resolve) {
+        wifi.race(["sta.disconnected","sta.connected"], (evt, ...args)=>{
+            resolve( args[0] || 0 )
+        })
+    })
+}
+
+async function connect(ssid,password,retry,retryDur) {
+
+    if(_connecting) {
+        await waitConnecting()
+    }
+
+    if( wifi.staConnected() && wifi.config(1)?.ssid==ssid ) {
+        return true
+    }
+
+    let mode = wifi.mode()
+    wifi.setMode(mode|MODE_STA)
+
+    await wifi.start()
+    await wifi.disconnect()
+    
+    if(typeof ssid=='object') {
+        retry = ssid.retry
+        retryDur = ssid.retryDur
+        wifi.setStaConfig(ssid)
+    }
+    else {
+        wifi.setStaConfig({ssid, password})
+    }
+
+    retry = (parseInt(retry) || 0) 
+    if(retry<=0)
+        retry = 2
+    retryDur = (parseInt(retryDur) || 2000)
+    if(retryDur<=0) {
+        retryDur = 2000
+    }
+
+    while((retry--)>0) {
+        // console.log("connect to ap:",ssid,'...')
+        _connecting = true
+        wifi.peripheralConnect()
+        var res = await waitConnecting()
+        _connecting = false
+        // console.log("connect", res?"failed":"sucess", res)
+        if(res!=0 && res!=202) {
+            console.log("retry", retryDur, "ms later ...")
+            await sleep(retryDur)
+        }
+        else {
+            break ;
+        }
+    }
+    
+    return 0==res
+}
+
+async function disconnect() {
+    if(timerDeamon>=0) {
+        clearTimeout(timerDeamon)
+        timerDeamon = -1
+    }
+    return new Promise(function(resolve) {
+        if(!wifi.staConnected()) {
+            resolve()
+            return
+        }
+        wifi.peripheralDisconnect()
+        wifi.once("sta.disconnected", resolve)
+    })
+}
+
+let timerDeamon = -1
+function autoReconnect() {
+    console.log("start wifi sta deamon")
+    timerDeamon = setInterval(()=>{
+        if( wifi.staConnected() || !(wifi.mode()&MODE_STA) || _connecting || !wifi.staStarted()){
+            return
+        }
+        let staconf = wifi.config(1)
+        if( !staconf.ssid) {
+            return
+        }
+        wifi.connect(staconf.ssid, staconf.password)
+    },10000)
+}
+
+function startAP(ssid, password) {
+    return new Promise(resolve=>{
+        wifi.stopAP().then(ret=>{
+            if(!ret) {
+                resolve(false)
+                return
+            }
+            wifi.race(["ap.start","ap.stop"], evt=>resolve(evt=="ap.start"))
+            wifi.setMode( wifi.mode() | MODE_AP )
+            wifi.setAPConfig({ssid, password})
+            wifi.start()
+        })
+    })
+    
+}
+function stopAP() {
+    return new Promise(resolve=>{
+        if(!wifi.apStarted()) {
+            resolve(true)
+            return
+        }
+        wifi.race(["ap.start","ap.stop"], evt=>resolve(evt=="ap.stop"))
+        wifi.setMode( wifi.mode() & (~MODE_AP) )
+    })
+}
+
+function status(netif) {
+    if(!netif || netif=="apsta") {
+        return {
+            sta: wifi.status("sta"), 
+            ap: wifi.status("ap")
+        }
+    }
+    else if(netif=='sta') {
+        let sta = wifi.getIpInfo(MODE_STA)
+        sta.started = wifi.staStarted()
+        sta.connected = wifi.staConnected()
+
+        let config = wifi.config(MODE_STA)
+        sta.ssid = config.ssid
+        sta.password = config.password
+        sta.authmode = config.authmode
+        
+        return sta
+    }
+    else if(netif=='ap') {
+
+        let ap = wifi.getIpInfo(MODE_AP)
+        ap.started = wifi.apStarted()
+    
+        let config = wifi.config(MODE_AP)
+        ap.ssid = config.ssid
+        ap.password = config.password
+
+        return ap
+    }
+    else {
+        throw new Error("unknow netif: "+netif)
+    }
+}
+
+function scan() {
+    return new Promise(function(resolve, reject) {
+        if( !(wifi.mode() & MODE_STA) ) {
+            wifi.setMode(wifi.mode()|MODE_STA)
+        }
+        if(!wifi.isScanning()) {
+            if(!wifi.scanStart()) {
+                reject()
+                return
+            }
+        }
+        wifi.once("scan.done",()=>{ resolve(wifi.scanRecords()) })
+    })
+}
+
+[isReady,start,stop, connect, disconnect, isConnecting, startAP, stopAP, status, autoReconnect, scan].map(func=>exportValue(wifi, func.name, func))

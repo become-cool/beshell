@@ -1,4 +1,14 @@
-## v0.3.1   2024-5-26
+## dev
+
+
+Added:
+
+Refactored:
+
+* EventEmitter 的主要方法不再返回 this
+* 完善 WiFi 模块的 API
+
+## v0.3.2   2024-5-26
 
 Refactored:
 

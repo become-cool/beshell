@@ -13,9 +13,9 @@ namespace be {
         WiFi(JSContext * ctx, const char * name) ;
 
         static bool hasInited() ;
-        // void import(JSContext *ctx) ;
+        void import(JSContext *ctx) ;
 
-        static void use(be::BeShell & beshell) ;
+        static void use(be::BeShell * beshell) ;
 
         static void init() ;
 
