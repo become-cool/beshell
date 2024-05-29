@@ -141,14 +141,6 @@ namespace be {
         for(auto obj:loopables) {
             obj->loop(ctx) ;
         }
-
-        // uncatched exception
-        JSValue excep = JS_GetException(ctx);
-        if(!JS_IsUndefined(excep) && !JS_IsNull(excep)) {
-            string str = getExceptionStr(excep) ;
-            printf("Ucatched Exception: %s\n", str.c_str()) ;
-        }
-        JS_FreeValue(ctx, excep);
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -191,8 +183,7 @@ namespace be {
         JS_FreeValue(ctx, excep);
     }
     
-    string JSEngine::getExceptionStr(JSValue exception) {
-        JSValue exception_val = JS_GetException(ctx);
+    string JSEngine::getExceptionStr(JSValue exception_val) {
         const char * cstr = JS_ToCString(ctx, exception_val) ;
         std::string str = cstr ;
         JS_FreeCString(ctx, cstr) ;
@@ -234,7 +225,7 @@ namespace be {
         JSValue ret = JS_GetException(ctx) ;
         if(dumpException && !JS_IsNull(ret) && !JS_IsUndefined(ret)) {
             string str = getExceptionStr(ret) ;
-            printf("Exception: %s\n", str.c_str()) ;
+            printf("%s\n", str.c_str()) ;
             JS_FreeValue(ctx, ret) ;
             ret = JS_UNDEFINED ;
         }
