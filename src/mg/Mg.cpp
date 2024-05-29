@@ -52,7 +52,8 @@ namespace be::mg {
     }
 
     void Mg::use(be::BeShell * beshell) {
-        // beshell.useModule<Mg>("mg") ;
+        beshell->use<WiFi>() ;
+
         beshell->addLoopFunction(loop, nullptr) ;
 
         ca_path = FS::toVFSPath("/var/ca.pem") ;
