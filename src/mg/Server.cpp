@@ -158,10 +158,9 @@ namespace be::mg {
                         free(cbargv) ;
                         if(JS_IsException(ret)) {
                             js_std_dump_error(SERVER->ctx) ;
+                            JS_FreeValue(SERVER->ctx, ret) ;
                         }
 
-                        JS_SetOpaque(rspn->jsobj, NULL) ;
-                        JS_FreeValue(SERVER->ctx, rspn->jsobj) ;
                         delete rspn ;
                         conn->userdata = NULL ;
                     }
