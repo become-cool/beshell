@@ -1,3 +1,39 @@
+/**
+ * > 本页只介绍模块的 JavaScript API，如何在 ESP32 设备上运行 JavaScript 文件，请参考：[https://beshell.become.cool/guide/run-js-script.html](https://beshell.become.cool/guide/run-js-script.html)
+ * 
+ * 系统在初次 `import` WiFi 模块时，会自动初始化所有相关的硬件资源。
+ *
+ * 
+ * ## 做为 WiFi 热点
+ * 
+ * ```javascript
+ * import * as wifi from 'wifi'
+ * 
+ * // 启动热点
+ * wifi.startAP('BeShell', '12345678')
+ * 
+ * // 停止热点
+ * wifi.stopAP()
+ * 
+ * ```
+ * 
+ * 
+ * ## 做为 WiFi 客户端
+ * 
+ * ```javascript
+ * import * as wifi from 'wifi'
+ * 
+ * // 连接到热点
+ * wifi.connect('BeShell', '12345678')
+ * 
+ * // 断开连接
+ * wifi.disconnect('BeShell', '12345678')
+ * 
+ * ```
+ * 
+ * @module wifi
+ */
+
 #include "WiFi.hpp"
 #include "../BeShell.hpp"
 #include <lwip/apps/sntp.h>
@@ -218,8 +254,8 @@ namespace be {
         exportFunction("setAPConfig",setAPConfig,0) ;
         exportFunction("setStaConfig",setStaConfig,0) ;
         exportFunction("config",config,0) ;
-        exportFunction("peripheralConnect",staConnect,0) ;
-        exportFunction("peripheralDisconnect",staDisconnect,0) ;
+        exportFunction("peripheralConnect",peripheralConnect,0) ;
+        exportFunction("peripheralDisconnect",peripheralDisconnect,0) ;
         exportFunction("getIpInfo",getIpInfo,0) ;
         exportFunction("setHostname",setHostname,0) ;
         exportFunction("allSta",allSta,0) ;
@@ -272,12 +308,31 @@ namespace be {
         beshell->use<NVS>() ;
     }
 
+    /**
+     * 启动 WiFi 硬件，所有 wifi 模块里的 api 都需要在 `start()` 之后才能调用。
+     * 
+     * `startAP` 和 `connect` 会自动调用 `start()` ，因此一般情况下，可以直接使用 startAP 或 connect 。
+     * 
+     * 返回 0 表示成功, 返回非 0 表示错误代码
+     * 
+     * @function start
+     * @return number
+     */
     JSValue WiFi::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         init() ;
         esp_err_t err = esp_wifi_start() ;
         _started = err == ESP_OK ;
         return JS_NewInt32(ctx, err);
     }
+
+    /**
+     * 停止 WiFi 硬件。
+     * 
+     * 返回 0 表示成功, 返回非 0 表示错误代码
+     * 
+     * @function stop
+     * @return number
+     */
     JSValue WiFi::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         esp_err_t err = esp_wifi_stop() ;
@@ -286,6 +341,150 @@ namespace be {
     }
     
     /**
+     * 返回是否已经 start()
+     * 
+     * @function isReady
+     * @return bool
+     */
+
+    /**
+     * 启动 WiFi 热点
+     * 
+     * > 该函数会自动调用 `start()` 启动 WiFi 模块。
+     * 
+     * 异步返回 Promise\<bool\> 表示成功或者失败
+     * 
+     * @function startAP
+     * @param ssid:string WiFi 热点名称
+     * @param password:string WiFi 热点密码
+     * 
+     * @return Promise\<bool\>
+     */
+
+    /**
+     * 停止 WiFi 热点
+     * 
+     * 异步返回 Promise\<bool\> 表示成功或者失败
+     * 
+     * @function stopAP
+     * @return Promise\<bool\>
+     */
+
+    /**
+     * 做为 WiFi STA 连接到热点
+     * 
+     * > 该函数会自动调用 `start()` 启动 WiFi 模块。
+     * 
+     * 异步返回 Promise\<bool\> 表示成功或者失败
+     * 
+     * @function connect
+     * @param ssid:string WiFi 热点名称
+     * @param password:string WiFi 热点密码
+     * @param retry:number=3 连接失败重试次数
+     * @param retryDuration:number=2000 连接重试间隔时间，单位 ms
+     * 
+     * @return Promise\<bool\>
+     */
+
+    /**
+     * 断开 WiFi STA 的连接
+     * 
+     * 异步返回 Promise\<bool\> 表示成功或者失败
+     * 
+     * 未连接状态下，直接返回 Promise\<true\>
+     * 
+     * @function disconnect
+     * @return Promise\<bool\>
+     */
+
+    /**
+     * 返回是否正在连接中
+     * 
+     * @function isConnecting
+     * @return bool
+     */
+
+
+    /**
+     * 返回 AP/STA 详细状态
+     * 
+     * 返回对象的格式：
+     * 
+     * ::: code-tabs
+     *
+     * \@tab apsta
+     * 
+     * ```javascript
+     * {
+     *     "ap": {
+     *         "ssid": string,
+     *         "password": string,
+     *         "started": bool,
+     *         "ip":string,
+     *         "netmask":string,
+     *         "gw":string
+     *      } ,
+     *     "sta": {
+     *         "ssid": string,
+     *         "password": string,
+     *         "started": bool,
+     *         "connected": bool,
+     *         "authmode":number,
+     *         "ip":string,
+     *         "netmask":string,
+     *         "gw":string
+     *      } ,
+     * }
+     * ```
+     * 
+     * \@tab ap
+     * 
+     * ```javascript
+     * "ap": {
+     *     "ssid": string,
+     *     "password": string,
+     *     "started": bool,
+     *     "ip":string,
+     *     "netmask":string,
+     *     "gw":string
+     * } ,
+     * ```
+     * 
+     * \@tab sta
+     * 
+     * ```javascript
+     * "sta": {
+     *     "ssid": string,
+     *     "password": string,
+     *     "started": bool,
+     *     "connected": bool,
+     *     "authmode":number,
+     *     "ip":string,
+     *     "netmask":string,
+     *     "gw":string
+     * } ,
+     * ```
+     * :::
+     * 
+     * @function status
+     * @param type:string="apsta" 可选值："apsta"、"ap"、"sta"
+     * @return object
+     */
+
+
+    /**
+     * 等待从 DHCP 获取 IP 地址
+     * 
+     * 异步返回 Promise\<object|false\> ，如果失败范围 false，成功则返回包括 ip 的 sta status 对象。
+     * 
+     * 参考 `status()` 函数的返回值。
+     * 
+     * @function waitIP
+     * @return Promise\<object|false\>
+     */
+
+
+    /**
      * 设置 wifi 的节能模式 (PowerSafe)
      * 
      * 参数 mode :
@@ -293,6 +492,10 @@ namespace be {
      * * 0 关闭节能模式
      * * 1 最小
      * * 2 最大
+     * 
+     * 关闭节能模式，可以避免 WiFi 休眠，提供通讯的效率和稳定性，但会增加功耗
+     * 
+     * 返回 0 表示 api 调用成功, 返回非 0 表示错误代码
      * 
      * @function setPS
      * @param mode:0|1|2
@@ -305,7 +508,7 @@ namespace be {
         return JS_NewInt32(ctx, esp_wifi_set_ps((wifi_ps_type_t)ps_mode)) ;
     }
     /**
-     * 设置 wifi 的工作模式
+     * 设置 wifi 的工作模式，`startAP` 和 `connect` 会自动设置工作模式，因此通常不需要直接使用这个 api
      * 
      * 参数 mode :
      * 
@@ -409,7 +612,7 @@ namespace be {
     // } wifi_auth_mode_t;
 
     /**
-     * 设置 wifi AP 模式的参数
+     * 设置 wifi AP 模式的参数, `startAP` 会自动配置 AP 参数，需要对设备更详细的设置时，可以使用这个 api
      * 
      * 参数 mode :
      * ```javascript
@@ -467,7 +670,7 @@ namespace be {
     }
     
     /**
-     * 设置 wifi STA 模式的参数
+     * 设置 wifi STA 模式的连接参数, `connect` 会自动配置连接参数，需要使用更详细的连接参数时使用此 API
      * 
      * 参数 mode :
      * ```javascript
@@ -573,19 +776,7 @@ namespace be {
         return jsconf ;
     }
 
-    /**
-     * WiFi STA 连接到热点
-     * 
-     * ssid, password 等参数需要通过 wifi.setStaConfig() 设置
-     * 
-     * 返回 0 仅表示api函数调用成功; 非 0 代表对应的错误
-     * 
-     * 
-     * 
-     * @function staConnect
-     * @return number
-     */
-    JSValue WiFi::staConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::peripheralConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         if( JS_IsFunction(ctx, __event_handle) ) {
             MAKE_ARGV2(argv, JS_NewInt32(__event_handle_ctx, 1), JS_NewInt32(__event_handle_ctx, WIFI_EVENT_STA_CONNECTING))
@@ -599,10 +790,9 @@ namespace be {
      * 
      * 返回 0 表示成功; 非 0 代表对应的错误
      * 
-     * @function staDisconnect
      * @return number
      */
-    JSValue WiFi::staDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue WiFi::peripheralDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         return JS_NewInt32(ctx, esp_wifi_disconnect()) ;
     }
@@ -752,12 +942,36 @@ namespace be {
         return JS_UNDEFINED ;
     }
 
+
+    /**
+     * 扫描周围的 WiFi 热点，必须在 STA 模式下运行
+     * 
+     * 异步返回 Promise\<object[]\> 
+     * 
+     * 返回对象数组的格式：
+     * 
+     * ```javascript
+     * [
+     *     {
+     *         bssid:string ,
+     *         ssid:string ,
+     *         channel:number ,
+     *         rssi:number ,
+     *         authmode:number ,
+     *     } ,
+     *     ...
+     * ]
+     * ```
+     * 
+     * @function scan
+     * @return Promise\<object[]\>
+     */
+
     /**
      * 开始扫描附近的AP
      * 
      * > wifi STA 模式必须启动
      * 
-     * @function scanStart
      * @return bool
      */
     JSValue WiFi::scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

@@ -27,8 +27,8 @@ namespace be {
         static JSValue setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setStaConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue staConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue staDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue peripheralConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue peripheralDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
