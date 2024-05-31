@@ -1,3 +1,15 @@
+/**
+ * Response 类用于 mg.Server 回调函数的参数 rspn , 不需要创建该类: 
+ * 
+ * * [mg.listenHttp()](../mg/#%E5%87%BD%E6%95%B0-listenhttp)
+ * 
+ * * [mg.Server.setHandler()](Server.html#%E6%96%B9%E6%B3%95-sethandler)
+ * 
+ * 
+ * 
+ * @class Response
+ */
+
 #include "Response.hpp"
 #include "HTTPRequest.hpp"
 #include "mallocf.h"
@@ -34,10 +46,19 @@ namespace be::mg {
         , conn(conn)
     {}
 
+    /**
+     * 回复内容
+     * 
+     * @method reply
+     * @param content:string 回复内容
+     * @param code:number=200 回复状态码, 默认为 200
+     * @param header:string=null 回复头, 格式为 "key: value\r\n"
+     * @return undefined
+     */
     JSValue Response::reply(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
-        NOT_WS_FUNC("mg.HttpResponse.reply")
+        NOT_WS_FUNC("mg.HTTPResponse.reply")
         
         int32_t code = 200 ;
         if(argc>1) {
@@ -70,6 +91,13 @@ namespace be::mg {
     }
 
 
+    /**
+     * 重定向请求
+     * 
+     * @method redirect
+     * @param url:string 重定向链接地址
+     * @return undefined
+     */
     JSValue Response::redirect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
@@ -87,6 +115,12 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 服务器主动关闭访问连接
+     * 
+     * @method close
+     * @return undefined
+     */
     JSValue Response::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Response, rspn)
         rspn->conn->is_closing = 1 ;
@@ -94,10 +128,20 @@ namespace be::mg {
     }
 
 
+    /**
+     * 执行文件服务
+     * 
+     * 该方法用于实现静态文件服务器，用法请参考：[简单 HTTP Web 后端的例子](../../guide/http-server.html#_2-%E7%AE%80%E5%8D%95-http-web-%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BE%8B%E5%AD%90)
+     * 
+     * @method serveDir
+     * @param req:[HTTPRequest](HTTPRequest.md) 请求对象，将事件回调函数传入的 req 直接传递给 serveDir 即可
+     * @param dir:string 文件根目录
+     * @return undefined
+     */
     JSValue Response::serveDir(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
         THIS_NCLASS(Response, rspn)
-        NOT_WS_FUNC("mg.HttpResponse.replay")
+        NOT_WS_FUNC("mg.HTTPResponse.replay")
 
         JSVALUE_TO_NCLASS(HTTPRequest,argv[0],req)
 
@@ -112,10 +156,19 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * http 协议升级
+     * 
+     * 将 http 请求升级为 WebSocket 通讯，用法请参考：[WebSocket 的例子](../../guide/http-server.html#_3-websocket-%E7%9A%84%E4%BE%8B%E5%AD%90)
+     * 
+     * @method httpUpgrade
+     * @param req:[HTTPRequest](HTTPRequest.md) 请求对象，将事件回调函数传入的 req 直接传递给 serveDir 即可
+     * @return undefined
+     */
     JSValue Response::httpUpgrade(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Response, rspn)
         ASSERT_ARGC(1)
-        NOT_WS_FUNC("mg.HttpResponse.upgrade")
+        NOT_WS_FUNC("mg.HTTPResponse.upgrade")
         JSVALUE_TO_NCLASS(HTTPRequest,argv[0],req)
         struct mg_http_message * msg = req->opaque() ;
         if(!msg) {
@@ -126,10 +179,19 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 发送 WebSocket 数据帧
+     * 
+     * 用法请参考：[WebSocket 的例子](../../guide/http-server.html#_3-websocket-%E7%9A%84%E4%BE%8B%E5%AD%90)
+     * 
+     * @method wsSend
+     * @param data:string 数据帧内容
+     * @return undefined
+     */
     JSValue Response::wsSend(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(Response, rspn)
-        MUST_BE_WS_FUNC("mg.HttpResponse.wsSend")
+        MUST_BE_WS_FUNC("mg.HTTPResponse.wsSend")
 
         if( JS_IsString(argv[0]) ){
             ARGV_TO_CSTRING_LEN(0, str, len)

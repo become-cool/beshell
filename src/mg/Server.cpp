@@ -41,6 +41,12 @@ namespace be::mg {
         JS_FreeValue(ctx, callback) ;
     }
 
+    /**
+     * 关闭服务器
+     * 
+     * @method close
+     * @return undefined
+     */
     JSValue Server::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Server,server)
         server->conn->is_closing = true ;
@@ -48,17 +54,45 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 在该服务器对象上启动 telweb
+     * 
+     * @method startTelweb
+     * @return undefined
+     */
     JSValue Server::startTelweb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Server,server)
         server->telweb = true ;
         return JS_UNDEFINED ;
     }
+
+    /**
+     * 在该服务器对象上停止 telweb
+     * 
+     * @method stopTelweb
+     * @return undefined
+     */
     JSValue Server::stopTelweb(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Server,server)
         server->telweb = false ;
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 设置服务器回调函数
+     * 
+     * 回调函数的原型：
+     * 
+     * ```
+     * callback(event:string, request:HTTPRequest, response:Response): void
+     * ```
+     * 
+     * 其中 event 参数参考：[mg 事件](../mg/#%E4%BA%8B%E4%BB%B6)
+     * 
+     * @method setHandler
+     * @param callback:function 回调函数
+     * @return undefined
+     */
     JSValue Server::setHandler(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         if( !JS_IsFunction(ctx, argv[0]) ){
@@ -228,19 +262,6 @@ namespace be::mg {
     }
 
     
-
-    /**
-        参数：
-        options: {
-            addr: string ,
-            ssl: boolean ,
-            callback: (ev:string, req, rspn)=>void
-        }
-
-        参数：
-        addr: string
-        callback: (ev:string, req, rspn)=>void
-    */
     JSValue Server::listenHttp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ASSERT_ARGC(1)

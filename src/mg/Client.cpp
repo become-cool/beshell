@@ -31,6 +31,14 @@ namespace be::mg {
         JS_FreeValue(ctx, callback) ;
     }
     
+
+    /**
+     * 发送数据
+     * 
+     * @method send
+     * @param data:string 数据
+     * @return bool
+     */
     JSValue Client::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(Client,client)
@@ -42,6 +50,12 @@ namespace be::mg {
         return res? JS_TRUE : JS_FALSE;
     }
 
+    /**
+     * 关闭连接
+     * 
+     * @method close
+     * @return undefined
+     */
     JSValue Client::close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Client,client)
         client->conn->is_closing = true ;
@@ -49,6 +63,13 @@ namespace be::mg {
     }
 
 
+    /**
+     * 初始化连接的 TLS 
+     * 
+     * @method initTLS
+     * @param host:string 主机名
+     * @return undefined
+     */
     JSValue Client::initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0, host, "arg host must be a string")

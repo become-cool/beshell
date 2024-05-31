@@ -1,3 +1,33 @@
+/**
+ * BeShell 集成了 [Mongoose 库](https://mongoose.ws)，用来处理网络应用层的协议，包括 HTTP(S)、WebSocket、MQTT、SNTP、SMTP 等。
+ * 
+ * 关于 mg 模块的例子请参考: [在 ESP32 上用 JavaScript 开发 WEB 后端](../../guide/http-server.md)
+ * 
+ * ## 事件
+ * 
+ * ```
+ * error: 发生错误
+ * open: 客户端连接
+ * poll: 轮询事件
+ * resolve: 域名解析完成
+ * connect: 客户端连接建立完成
+ * accept: 客户端连接接受完成
+ * read: 客户端数据接收完成
+ * write: 客户端数据发送完成
+ * close: 客户端连接关闭
+ * http.msg: HTTP 请求/响应消息接收完成
+ * ws.open: WebSocket 握手完成
+ * ws.msg: WebSocket 消息接收完成
+ * ws.ctl: WebSocket 控制消息接收完成
+ * mqtt.cmd: MQTT 低级命令接收完成
+ * mqtt.msg: MQTT PUBLISH 消息接收完成
+ * mqtt.open: MQTT CONNACK 接收完成
+ * sntp.time: SNTP 时间接收完成
+ * ```
+ * 
+ * @module mg
+ */
+
 #include "Mg.hpp"
 #include <cstdint>
 
@@ -198,6 +228,68 @@ namespace be::mg {
     //     return JS_UNDEFINED ;
     // }
 
+    
+    /**
+     * 创建一个处理 http 协议的服务器实例。
+     * 
+     * 此函数的例子参考：[简单 HTTP Web 后端的例子](../../guide/http-server.md#_2-%E7%AE%80%E5%8D%95-http-web-%E5%90%8E%E7%AB%AF%E7%9A%84%E4%BE%8B%E5%AD%90)
+     * 
+     * 第一个参数可以是 [ip:port] 格式的字符串表示服务器地址，例如 `"0.0.0.0:8080"`
+     * 
+     * 第一个参数也可以是一个对象：
+     * 
+     * ```typescript
+     * {
+     *     addr: string ,
+     *     ssl: boolean ,
+     *     callback: (ev:string, req, rspn)=>void
+     * }
+     * ```
+     * 
+     * 回调函数的原型：
+     * 
+     * ```typescript
+     * callback(event:string, request:HTTPRequest, response:Response): void
+     * ```
+     * 
+     * 其中 event 参数参考：[mg 事件](#%E4%BA%8B%E4%BB%B6)
+     * 
+     * 
+     * @function listenHttp
+     * @param addrOrOptions:string|object 该参数可以是 [ip:port] 格式的字符串表示服务器地址，或选项对象
+     * @param callback:function 服务器事件回调函数，该函数接收三个参数：事件名称、请求对象、响应对象
+     * @return [Server](Server.md)
+     */
+
+
+    /**
+     * 创建并执行一个客户端连接
+     * 
+     * 该函数的第一个参数是连接地址，第二个参数是一个回调函数，该函数接收三个参数：事件名称、请求对象。
+     * 
+     * 回调函数的原型:
+     * 
+     * ```typescript
+     * callback(event:string, request:HTTPRequest): void
+     * ```
+     * 
+     * 其中 event 参数参考：[mg 事件](#%E4%BA%8B%E4%BB%B6)
+     * 
+     * @method connect
+     * @param url:string 连接地址，例如 `"http://www.example.com/path"`
+     * @param callback:function 事件回调函数
+     * 
+     * @return [Client](Client.md)
+     */
+
+
+    /**
+     * 返回指定客户端连接的对端地址 [ip:port]
+     * 
+     * @function connPeer
+     * @param idx:number 表示第几个客户端
+     * @return string
+     */
     JSValue Mg::connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)
@@ -217,6 +309,12 @@ namespace be::mg {
         return JS_NewString(ctx, addr) ;
     }
 
+    /**
+     * 连接到服务器的客户端数量
+     * 
+     * @function connCount
+     * @return number
+     */
     JSValue Mg::connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         int cnt = 0 ;
         for(struct mg_connection * conn = mgr.conns ; conn; conn=conn->next) {
@@ -225,11 +323,32 @@ namespace be::mg {
         return JS_NewUint32(ctx, cnt) ;
     }
 
-
+    /**
+     * 返回当前 dns 服务器地址
+     * 
+     * @function getDNS
+     * @return string
+     */
     JSValue Mg::getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_NewString(ctx,mgr.dns4.url) ;
     }
 
+
+    /**
+     * 解析 URL 字符串，返回对象：
+     * 
+     * ```typescript
+     * {
+     *     host: string ,
+     *     port: number ,
+     *     uri: string
+     * }
+     * ```
+     * 
+     * @function parseUrl
+     * @param url:string 要解析的 URL 字符串
+     * @return object
+     */
     JSValue Mg::parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0,url,"arg url must be a string")
@@ -246,6 +365,13 @@ namespace be::mg {
         return obj ;
     }
 
+    /**
+     * 设置 mg 的日志级别
+     * 
+     * @function setLog
+     * @param log:string 日志级别
+     * @return undefined
+     */
     JSValue Mg::setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_E(0, log, "arg loglevel must be a string")
