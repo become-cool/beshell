@@ -1,3 +1,10 @@
+
+/**
+ * > GPIO 模块的例子请参考：[用 JavaScript 控制 GPIO](../guide/gpio.md)
+ * 
+ * @module gpio
+ */
+
 #include "GPIO.hpp"
 #include "driver/adc.h"
 #include <map>
@@ -398,13 +405,11 @@ function (gpio,time) {
                 
                 uint8_t level = (gpio_state[p]>>1) & 0x01 ;
 
-//dn2(gpio_state[p],level)
                 argv[0] = JS_NewInt32(ctx, p) ;
                 argv[1] = JS_NewInt32(ctx, gpio_state[p]) ;
 
 
                 for(auto callback: level? watching_callbacks[p].second : watching_callbacks[p].first) {
-                    // dd
                     JS_Call(ctx, callback, JS_UNDEFINED, 2, argv) ;
                 }
 
@@ -419,3 +424,13 @@ function (gpio,time) {
     }
 }
 
+
+    /**
+     * GPIO 闪烁，执行该函数后，指定的引脚会持续高低电平切换。
+     * 
+     * @function blink
+     * @param pin:number 引脚序号
+     * @param time:number 间隔时间，单位毫秒，闪烁的半周期
+     * 
+     * @return number 定时器id，可使用 `clearTimeout()` 停止闪烁。
+     */
