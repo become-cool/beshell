@@ -1,6 +1,4 @@
 /**
- * > 本页只介绍模块的 JavaScript API，如何在 ESP32 设备上运行 JavaScript 文件，请参考：[https://beshell.become.cool/guide/run-js-script.html](https://beshell.become.cool/guide/run-js-script.html)
- * 
  * 系统在初次 `import` WiFi 模块时，会自动初始化所有相关的硬件资源。
  *
  * 
