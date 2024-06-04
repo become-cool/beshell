@@ -57,7 +57,7 @@ namespace be{
         else DEFINE_BUS(UART_NUM_3, uart3)
         #endif
         #if SOC_UART_HP_NUM>4
-        else DEFINE_BUS(UART_NUM_3, uart4)
+        else DEFINE_BUS(UART_NUM_4, uart4)
         #endif
         #if SOC_UART_LP_NUM>0
         else DEFINE_BUS(LP_UART_NUM_0, uartlp0)

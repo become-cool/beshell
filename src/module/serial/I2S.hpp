@@ -2,6 +2,7 @@
 
 #include <NativeClass.hpp>
 #include "driver/i2s.h"
+#include "./soc_serial.h"
 
 namespace be {
     class I2S: public be::NativeClass {

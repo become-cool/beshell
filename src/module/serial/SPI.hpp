@@ -4,6 +4,7 @@
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include <map>
+#include "./soc_serial.h"
 
 namespace be {
 
@@ -16,13 +17,13 @@ namespace be {
         spi_host_device_t busnum ;
 
         static SPI * spi1 ;
-        #if SOC_SPI_PERIPH_NUM > 2
+        #if SOC_SPI_PERIPH_NUM > 1
         static SPI * spi2 ;
         #endif
-        #if SOC_SPI_PERIPH_NUM > 3
+        #if SOC_SPI_PERIPH_NUM > 2
         static SPI * spi3 ;
         #endif
-        #if SOC_SPI_PERIPH_NUM > 4
+        #if SOC_SPI_PERIPH_NUM > 3
         static SPI * spi4 ;
         #endif
 
