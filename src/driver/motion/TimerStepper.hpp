@@ -17,6 +17,7 @@ namespace be::driver::motion {
         gpio_num_t io_limit_forward = GPIO_NUM_NC ;   // 限位开关
         gpio_num_t io_limit_backward = GPIO_NUM_NC ;   // 限位开关
         gpio_num_t io_en = GPIO_NUM_NC ;
+        uint8_t dir_forward_level = 0 ;
 
         esp_timer_handle_t timer = nullptr;
         esp_timer_handle_t timer_accel = nullptr;  // 用于实现加速度的计时器

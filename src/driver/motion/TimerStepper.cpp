@@ -31,15 +31,16 @@ namespace be::driver::motion {
         JS_CFUNC_DEF("setPos", 0, TimerStepper::setPos),
         JS_CFUNC_DEF("stepPin", 0, TimerStepper::stepPin),
         JS_CFUNC_DEF("dirPin", 0, TimerStepper::dirPin),
-        JS_CFUNC_DEF("limitPin", 0, TimerStepper::limitPin),
+        JS_CFUNC_DEF("limitForwardPin", 0, TimerStepper::limitPin),
+        JS_CFUNC_DEF("limitBackwardPin", 0, TimerStepper::limitPin),
         JS_CFUNC_DEF("passing", 0, TimerStepper::passing),
         JS_CFUNC_DEF("setPassing", 0, TimerStepper::setPassing),
         JS_CFUNC_DEF("clearPassing", 0, TimerStepper::clearPassing),
         JS_CFUNC_DEF("calculateTravelTime", 0, TimerStepper::calculateTravelTime),
         JS_CFUNC_DEF("startTime", 0, TimerStepper::startTime),
         JS_CFUNC_DEF("stopTime", 0, TimerStepper::stopTime),
-        JS_CFUNC_DEF("setDelay", 0, TimerStepper::setDelay),
-        JS_CFUNC_DEF("getDelay", 0, TimerStepper::getDelay),
+        JS_CFUNC_DEF("setDelayTime", 0, TimerStepper::setDelay),
+        JS_CFUNC_DEF("delayTime", 0, TimerStepper::getDelay),
     } ;
 
     TimerStepper::TimerStepper(JSContext * ctx, JSValue jsobj)
@@ -279,15 +280,28 @@ namespace be::driver::motion {
 
     
     /**
+     * 设置步进电机参数
+     * 
+     * > 使用 DeviceTree 时，该参数由 DeviceTree 自动调用
+     * 
+     * `config` 参数的格式：
+     * 
+     * ```typescript
      * {
-     *   pin: {
-     *     step
-     *     dir
-     *     en
-     *     limit_forward
-     *     limit_backward
-     *   }
-     * } 
+     *     pin: {
+     *         step: number,            // 步进电机控制脚
+     *         dir: number,             // 步进电机方向脚
+     *         en: number,              // 步进电机使能脚
+     *         limitForward: number,    // 正限位
+     *         limitBackward: number,   // 反限位
+     *     } ,
+     *     dirForwardLevel: boolean,    // 正向运动时，pin.dir 的电平，默认 0
+     * }
+     * ```
+     * 
+     * @method setup
+     * @param config:object 配置对象
+     * @return undefined
      */
     JSValue TimerStepper::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
@@ -298,11 +312,16 @@ namespace be::driver::motion {
             JSTHROW("property 'pin' must be an object") ;
         }
 
+
         GET_INT32_PROP(optPin, "step", stepper->io_step, )
         GET_INT32_PROP_OPT(optPin, "dir", stepper->io_dir, GPIO_NUM_NC)
         GET_INT32_PROP_OPT(optPin, "en", stepper->io_en, GPIO_NUM_NC)
-        GET_INT32_PROP_OPT(optPin, "limit_forward", stepper->io_limit_forward, GPIO_NUM_NC)
+        GET_INT32_PROP_OPT(optPin, "limitForward", stepper->io_limit_forward, GPIO_NUM_NC)
         GET_INT32_PROP_OPT(optPin, "limit_backward", stepper->io_limit_backward, GPIO_NUM_NC)
+        
+        int32_t dir_forward_level ;
+        GET_INT32_PROP_OPT(argv[0], "dirForwardLevel", dir_forward_level, 0)
+        stepper->dir_forward_level = dir_forward_level? 1: 0 ;
 
         // stepup gpio
         gpio_config_t cfg = {
@@ -433,6 +452,14 @@ namespace be::driver::motion {
 
         return JS_UNDEFINED ;
     }
+
+    /**
+     * 开始运行，直到 stop() 被调用
+     * 
+     * @method runTo
+     * @param forward:bool=true 运动方向，true 为正向，false 为反向
+     * @return undefined
+     */
     JSValue TimerStepper::run(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         if(stepper->is_running) {
@@ -455,6 +482,14 @@ namespace be::driver::motion {
         
         return JS_UNDEFINED ;
     }
+    
+    /**
+     * 运行到指定位置 (步进数)
+     * 
+     * @method runTo
+     * @param pos:number 目标位置，单位步进数(可以是负数)
+     * @return undefined
+     */
     JSValue TimerStepper::runTo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -477,6 +512,14 @@ namespace be::driver::motion {
         return stepper->run() ;
 
     }
+    
+    /**
+     * 运行指定步数
+     * 
+     * @method runSteps
+     * @param step:number 步数，正数为正向运动，负数为反向运动
+     * @return undefined
+     */
     JSValue TimerStepper::runSteps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -493,6 +536,15 @@ namespace be::driver::motion {
         SET_ACCEL(2)
         return stepper->run() ;
     }
+    
+
+    /**
+     * 停止运行
+     * 
+     * @method stop
+     * @param force:boolean=false 是否强制停止，忽视电机的加速度设置
+     * @return undefined
+     */
     JSValue TimerStepper::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
 
@@ -521,6 +573,13 @@ namespace be::driver::motion {
         return JS_UNDEFINED ;
     }
 
+    /**
+     * 设置step脉冲频率，单位 hz , 作为电机速度
+     * 
+     * @method setFreq
+     * @param freq:number 频率，单位 hz
+     * @return undefined
+     */
     JSValue TimerStepper::setFreq(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
         THIS_NCLASS(TimerStepper, stepper)
@@ -528,10 +587,24 @@ namespace be::driver::motion {
         SET_FREQ(freq) ;
         return JS_UNDEFINED ;
     }
+    
+    /**
+     * 返回step脉冲频率，单位 hz 
+     * 
+     * @method freq
+     * @return number
+     */
     JSValue TimerStepper::freq(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewUint32(ctx, stepper->_freq) ;
     }
+    
+    /**
+     * 设置加速度，单位 步进数/s^2
+     * 
+     * @method isRunning
+     * @return undefined
+     */
     JSValue TimerStepper::setAccel(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -543,22 +616,62 @@ namespace be::driver::motion {
         stepper->_accel = accel ;
         return JS_UNDEFINED ;
     }
+    
+    /**
+     * 返回加速度，单位 步进数/s^2
+     * 
+     * @method accel
+     * @return number
+     */
     JSValue TimerStepper::accel(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewUint32(ctx, stepper->_accel) ;
     }
+    
+    /**
+     * 返回电机是否正在运行
+     * 
+     * @method isRunning
+     * @return bool
+     */
     JSValue TimerStepper::isRunning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewBool(ctx, stepper->is_running) ;
     }
+
+    
+    /**
+     * 返回电机是否正在执行停止
+     * 
+     * > 如果设置了加速度，则 stop() 的执行需要一段时间减速到0，在这段时间内，isStopping() 和 isRunning() 都返回 true
+     * 
+     * @method isStopping
+     * @return bool
+     */
     JSValue TimerStepper::isStopping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewBool(ctx, stepper->is_stopping) ;
     }
+    
+    /**
+     * 返回电机运动的当前位置，单位步进数
+     * 
+     * @method pos
+     * @return number
+     */
     JSValue TimerStepper::pos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt64(ctx, stepper->_pos) ;
     }
+
+    
+    /**
+     * 设置电机的当前位置，单位步进数
+     * 
+     * @method setPos
+     * @param pos:number 位置，单位步进数
+     * @return undefined
+     */
     JSValue TimerStepper::setPos(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -566,22 +679,70 @@ namespace be::driver::motion {
         stepper->_pos = pos ;
         return JS_UNDEFINED ;
     }
+
+    
+    /**
+     * 返回步进信号io，未设置返回 -1
+     * 
+     * @method stepPin
+     * @return number
+     */
     JSValue TimerStepper::stepPin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt32(ctx, stepper->io_step) ;
     }
+
+    
+    /**
+     * 返回方向信号io，未设置返回 -1
+     * 
+     * @method limitForwardPin
+     * @return number
+     */
     JSValue TimerStepper::dirPin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt32(ctx, stepper->io_dir) ;
     }
+
+    /**
+     * 返回前进限位引脚io，未设置返回 -1
+     * 
+     * @method limitForwardPin
+     * @return number
+     */
+    /**
+     * 返回后退限位引脚io，未设置返回 -1
+     * 
+     * @method limitBackwordPin
+     * @return number
+     */
     JSValue TimerStepper::limitPin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt32(ctx, stepper->io_limit_forward) ;
     }
+    
+    /**
+     * 返回 `事件途径点`的位置，如果未设置，则返回 null
+     * 
+     * @method passing
+     * @return number | null
+     */
     JSValue TimerStepper::passing(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
-        return JS_NewInt64(ctx, stepper->_passing) ;
+        if(stepper->use_passing) {
+            return JS_NewInt64(ctx, stepper->_passing) ;
+        } else {
+            return JS_NULL ;
+        }
     }
+    
+    /**
+     * 设置一个 `事件途径点`，当电机运行到该点时，会触发事件
+     * 
+     * @method setPassing
+     * @param passing:number 事件途径点位置(步进数)
+     * @return undefined
+     */
     JSValue TimerStepper::setPassing(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -590,11 +751,27 @@ namespace be::driver::motion {
         stepper->use_passing = true ;
         return JS_UNDEFINED ;
     }
+    
+    
+    /**
+     * 清理 `事件途径点`
+     * 
+     * @method clearPassing
+     * @return undefined
+     */
     JSValue TimerStepper::clearPassing(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         stepper->use_passing = false ;
         return JS_UNDEFINED ;
     }
+    
+    /**
+     * 根据电机的当前设置，计算运行指定步进数(行程)所需要的时间，单位毫秒
+     * 
+     * @method calculateTravelTime
+     * @param steps:number 步进数(行程)
+     * @return number
+     */
     JSValue TimerStepper::calculateTravelTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ASSERT_ARGC(1)
@@ -607,20 +784,49 @@ namespace be::driver::motion {
 
         return JS_NewFloat64(ctx, time) ;
     }
+    
+    /**
+     * 返回电机开始的时间
+     * 
+     * @method startTime
+     * @return number
+     */
     JSValue TimerStepper::startTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt64(ctx, stepper->start_time) ;
     }
+
+    /**
+     * 返回电机停止的时间
+     * 
+     * @method stopTime
+     * @return number
+     */
     JSValue TimerStepper::stopTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt64(ctx, stepper->stop_time) ;
     }
+
+    /**
+     * 设置延迟开始的时间
+     * 
+     * @method setDelayTime
+     * @param delay:number 延迟时间，单位ms
+     * @return undefined
+     */
     JSValue TimerStepper::setDelay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         ARGV_TO_UINT32(0, delay) ;
         stepper->run_delay_us = delay ;
         return JS_UNDEFINED ;
     }
+    
+    /**
+     * 返回延迟开始的时间
+     * 
+     * @method delayTime
+     * @return number
+     */
     JSValue TimerStepper::getDelay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(TimerStepper, stepper)
         return JS_NewInt32(ctx, stepper->run_delay_us) ;
