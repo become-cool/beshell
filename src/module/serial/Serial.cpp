@@ -57,16 +57,20 @@ namespace be {
         #endif
 
         // SPI ---------------
-        #if SOC_SPI_PERIPH_NUM>1
+        #if SOC_SPI_PERIPH_NUM>0
         exportName("spi1") ;
         #endif
 
-        #if SOC_SPI_PERIPH_NUM>2
+        #if SOC_SPI_PERIPH_NUM>1
         exportName("spi2") ;
         #endif
 
-        #if SOC_SPI_PERIPH_NUM>3
+        #if SOC_SPI_PERIPH_NUM>2
         exportName("spi3") ;
+        #endif
+
+        #if SOC_SPI_PERIPH_NUM>3
+        exportName("spi4") ;
         #endif
 
     }
