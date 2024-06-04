@@ -3,10 +3,16 @@
 
 Added:
 
+* 完善 WiFi 模块的 API
+* 完善 Mg 模块的 API
+
+Fixed:
+
+* 低于 idf 5.2 无法正确创建串口对象
+
 Refactored:
 
 * EventEmitter 的主要方法不再返回 this
-* 完善 WiFi 模块的 API
 
 ## v0.3.2   2024-5-26
 
