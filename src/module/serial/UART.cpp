@@ -141,19 +141,29 @@ namespace be{
         THIS_NCLASS(UART, uart)
         ASSERT_ARGC(1)
 
+        bool needfree = false ;
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
 
-        // if string
-        if(!buff || !length) {
+        // ArrayBuffer
+        if(buff) {
+            const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
+            return JS_NewInt32(ctx, txBytes) ;
+        }
+
+        // array 
+        else if(JS_IsArray(ctx, argv[0])) {
+            buff = JS_ArrayToBufferUint8(ctx, argv[0], (int *)&length) ;
+            const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
+            free(buff) ;
+            return JS_NewInt32(ctx, txBytes) ;
+        }
+
+        // string
+        else {
             ARGV_TO_CSTRING_LEN(0, buff, length)
             const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
             JS_FreeCString(ctx, (const char *)buff) ;
-            return JS_NewInt32(ctx, txBytes) ;
-        }
-        // if ArrayBuffer
-        else {
-            const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
             return JS_NewInt32(ctx, txBytes) ;
         }
     }

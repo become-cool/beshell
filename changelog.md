@@ -1,5 +1,12 @@
 ## dev
 
+Added:
+
+Fixed:
+
+Refactored:
+
+* uart.write() 可以接受数组参数
 
 ## v0.3.4   2024-6-4
 
