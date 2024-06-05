@@ -154,9 +154,14 @@ namespace be{
         // array 
         else if(JS_IsArray(ctx, argv[0])) {
             buff = JS_ArrayToBufferUint8(ctx, argv[0], (int *)&length) ;
-            const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
-            free(buff) ;
-            return JS_NewInt32(ctx, txBytes) ;
+            if(length && buff) {
+                const int txBytes = uart_write_bytes(uart->m_uartNum, buff, length);
+                free(buff) ;
+                return JS_NewInt32(ctx, txBytes) ;
+            } else {
+                return JS_NewInt32(ctx, 0) ;
+            }
+            
         }
 
         // string
