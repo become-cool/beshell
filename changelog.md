@@ -2,8 +2,15 @@
 
 Added:
 
-* loader.allModuleNames()
+* uart.unsetup()
+* uart.isInstalled()
 
+Fixed:
+
+Refactored:
+
+* uart.write() 可以接受数组参数
+* ArrayBuffer.prototype.toArray() 增加参数 signed
 
 ## v0.3.4   2024-6-4
 
