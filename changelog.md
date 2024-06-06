@@ -1,5 +1,9 @@
 ## dev
 
+Added:
+
+* loader.allModuleNames()
+
 
 ## v0.3.4   2024-6-4
 
