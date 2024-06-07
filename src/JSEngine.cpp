@@ -40,11 +40,7 @@ namespace be {
         if(buff) {
             for(int i=0;i<(int)size;i++) {
                 if(signed_int) {
-<<<<<<< HEAD
-                    JS_SetPropertyInt32(ctx, array, i, JS_NewInt32(ctx, buff[i])) ;
-=======
                     JS_SetPropertyUint32(ctx, array, i, JS_NewInt32(ctx, (int8_t)buff[i])) ;
->>>>>>> master
                 } else {
                     JS_SetPropertyUint32(ctx, array, i, JS_NewUint32(ctx, buff[i])) ;
                 }
