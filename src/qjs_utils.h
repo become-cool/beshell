@@ -31,18 +31,18 @@ extern "C" {
     }
 #define CHECK_ARGC(num) ASSERT_ARGC(num)
 
-#define ARGV_TO_INT_VAR(i, var, api)                \
-	if( api(ctx, &var, argv[i])!=0 ) {              \
+#define ARGV_TO_INT_VAR(i, var, api, ctype)                \
+	if( api(ctx, (ctype*)&var, argv[i])!=0 ) {              \
         JSTHROW("Invalid param type")               \
 	}
-#define  ARGV_TO_UINT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32)
-#define   ARGV_TO_INT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToInt32)
-#define ARGV_TO_UINT16_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32)
-#define ARGV_TO_INT16_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt32)
-#define ARGV_TO_UINT32_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32)
-#define ARGV_TO_INT32_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt32)
-#define ARGV_TO_INT64_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt64)
-#define ARGV_TO_DOUBLE_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToFloat64)
+#define  ARGV_TO_UINT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32, uint32_t)
+#define   ARGV_TO_INT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToInt32, int32_t)
+#define ARGV_TO_UINT16_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32, uint32_t)
+#define ARGV_TO_INT16_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt32, int32_t)
+#define ARGV_TO_UINT32_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32, uint32_t)
+#define ARGV_TO_INT32_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt32, int32_t)
+#define ARGV_TO_INT64_VAR(i,var)    ARGV_TO_INT_VAR(i, var, JS_ToInt64, int64_t)
+#define ARGV_TO_DOUBLE_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToFloat64, double)
 
 
 #define ARGV_TO_INT_VAR_OPT(i, var, api)            \
