@@ -2,6 +2,12 @@
 
 Added:
 
+<<<<<<< HEAD
+=======
+* uart.unsetup()
+* uart.isInstalled()
+
+>>>>>>> master
 Fixed:
 
 Refactored:
