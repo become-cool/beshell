@@ -259,7 +259,7 @@ namespace be {
     JSValue I2C::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
         JSCHECK_MASTER
-        ARGV_TO_UINT8_OPT(0, from, 0)
+        ARGV_TO_UINT8_OPT(0, from, 1)
         ARGV_TO_UINT8_OPT(1, to, 127)
         that->scan(from,to) ;
         return JS_UNDEFINED ;
