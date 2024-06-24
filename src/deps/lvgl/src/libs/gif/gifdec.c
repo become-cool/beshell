@@ -114,9 +114,9 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     f_gif_read(gif_base, &aspect, 1);
     /* Create gd_GIF Structure. */
 #if LV_GIF_CACHE_DECODE_DATA
-    gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height + LZW_CACHE_SIZE);
+    gif = malloc(sizeof(gd_GIF) + 5 * width * height + LZW_CACHE_SIZE);
     #else
-    gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
+    gif = malloc(sizeof(gd_GIF) + 5 * width * height);
     #endif
     if(!gif) goto fail;
     memcpy(gif, gif_base, sizeof(gd_GIF));
@@ -740,7 +740,7 @@ void
 gd_close_gif(gd_GIF * gif)
 {
     f_gif_close(gif);
-    lv_free(gif);
+    free(gif);
 }
 
 static bool f_gif_open(gd_GIF * gif, const void * path, bool is_file)
