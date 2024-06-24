@@ -28,6 +28,7 @@ namespace be {
             exportFunction("__dirname",jsDirname) ;
             exportFunction("importSync",importSync) ;
             exportFunction("exportValue",exportValue) ;
+            exportFunction("allModuleNames",allModuleNames) ;
         }
         
         static JSValue importSync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -130,6 +131,17 @@ namespace be {
             JS_FreeCString(ctx, valueName) ;
             return JS_UNDEFINED ;
         }
+
+        static JSValue allModuleNames(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            JSValue arr = JS_NewArray(ctx) ;
+            ModuleLoader * mloader = & JSEngine::fromJSContext(ctx)->mloader ;
+            int i = 0 ;
+            for (const auto & pair : mloader->modules[ctx]) {
+                JS_SetPropertyUint32(ctx, arr, i++, JS_NewString(ctx, pair.first.c_str())) ;
+            }
+            return arr ;
+        }
+        
     } ;
 
     ModuleLoader::ModuleLoader(BeShell * beshell) {

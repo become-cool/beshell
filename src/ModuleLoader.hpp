@@ -10,6 +10,7 @@ namespace be {
     class BeShell ;
     class JSEngine ;
     class ModuleLoader ;
+    class JSLoader ;
     
 	typedef NativeModule* (*NativeModuleFactoryFunc)(JSContext * ctx, const char * name) ;
 
@@ -35,6 +36,10 @@ namespace be {
                 printf("ModuleLoader::add(): name is null\n") ;
                 return ;
             }
+            if(factories.count(name)>0) {
+                printf("ModuleLoader::add(): module '%s' already registered\n", name) ;
+                return ;
+            }
             factories[name] = factory<M> ;
             M::use(beshell) ;
         }
@@ -46,5 +51,7 @@ namespace be {
         static std::string resovleFS(const char * module_name, const char * base_dir) ;
         static char * normalize(JSContext *ctx, const char *module_base_name, const char * module_name, void *opaque) ;
         static JSModuleDef * load(JSContext *ctx, const char *path, void *opaque) ;
+
+    friend class JSLoader ;
     } ;
 }
