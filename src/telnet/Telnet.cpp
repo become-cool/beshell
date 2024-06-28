@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#define PKG_QUEUE_LEN 64
+
 using namespace std ;
 
 namespace be {
@@ -19,6 +21,8 @@ namespace be {
     {}
 
     void Telnet::setup() {
+        pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
+
 #ifdef ESP_PLATFORM
         channelSeiral.setup() ;
 #endif
@@ -27,12 +31,25 @@ namespace be {
 #endif
     }
     void Telnet::loop() {
+        Package * ptr ;
+        std::unique_ptr<Package> pkg ;
+        if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
+            pkg.reset(ptr) ;
+            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
+            onReceived(pkg->channle,move(pkg)) ;
+        }
+
 #ifdef ESP_PLATFORM
         channelSeiral.loop() ;
 #endif
 #ifdef LINUX_PLATFORM
         channelStdIO.loop() ;
 #endif
+    }
+
+    void Telnet::execPackage(std::unique_ptr<Package> & pkg) {
+        Package * ptr = pkg.release() ;
+        xQueueSend(pkg_queue, &ptr, 0) ;
     }
 
     void Telnet::onReceived(TelnetChannel * ch, std::unique_ptr<Package> pkg){

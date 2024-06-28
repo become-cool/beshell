@@ -8,6 +8,7 @@
 #include "debug.h"
 #include "qjs_utils.h"
 #include <stdio.h>
+#include <cassert>
 #include <sys/fcntl.h>
 #include <sys/types.h>
 
@@ -22,7 +23,6 @@ using namespace std ;
 
 namespace be {
 
-    
     void TelnetSerial::task(void * argv) {
         
         fd_set rfds;
@@ -30,11 +30,15 @@ namespace be {
         int ret;
         uint8_t *buf = (uint8_t *) malloc(RD_BUF_SIZE);
 
+
         // forwarding received package to telnet
         Parser parser([argv](std::unique_ptr<Package> pkg){
+            assert(((TelnetSerial*)argv)->telnet) ;
+
             // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-            Package * ptr = pkg.release() ;
-            xQueueSend(((TelnetSerial*)argv)->pkg_queue, &ptr, 0) ;
+            pkg->head.fields.cmd = 0 ;
+            pkg->channle = (TelnetChannel*)argv ;
+            ((TelnetSerial*)argv)->telnet->execPackage(pkg) ;
         }) ;
 
         while (1) {
@@ -94,18 +98,6 @@ namespace be {
 
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
         xTaskCreatePinnedToCore(&TelnetSerial::task, "be-telnet-seiral", 6*1024, this, tskIDLE_PRIORITY, &taskHandle, 1) ;
-    }
-
-    void TelnetSerial::loop () {
-        Package * ptr ;
-        std::unique_ptr<Package> pkg ;
-        if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
-            pkg.reset(ptr) ;
-            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-            if(telnet){
-                telnet->onReceived(this,move(pkg)) ;
-            }
-        }
     }
 
     void TelnetSerial::sendData (const char * data, size_t datalen) {

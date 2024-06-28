@@ -1,10 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "TelnetChannel.hpp"
 #ifdef ESP_PLATFORM
+#include "freertos/queue.h"
+
 #include "TelnetSerial.hpp"
+#include "TelnetBT.cpp"
 #endif 
 #ifdef LINUX_PLATFORM
 #include "TelnetStdIO.hpp"
@@ -12,6 +16,7 @@
 
 
 namespace be {
+
     class BeShell ;
     class Telnet {
     private:
@@ -24,8 +29,11 @@ namespace be {
 #ifdef LINUX_PLATFORM
         TelnetStdIO channelStdIO ;
 #endif
+        std::vector<TelnetChannel *> channels ;
 
         uint8_t autoIncreasePkgId = 0 ;
+        QueueHandle_t pkg_queue;
+
     public:
         Telnet(BeShell * beshell) ;
 
@@ -35,6 +43,8 @@ namespace be {
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
         void onReceived(TelnetChannel * , std::unique_ptr<Package>) ;
+        void execPackage(std::unique_ptr<Package> &) ;
+
         static std::unique_ptr<std::ostream> createStream(Package & pkg) ;
 
         TelnetChannel * channel(const char * name) ;

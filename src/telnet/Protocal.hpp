@@ -10,6 +10,8 @@
 
 namespace be {
 
+	class TelnetChannel ;
+
 	enum PkgDef {
 		HEAD1 = 5 ,
 		HEAD2 = 18 ,
@@ -74,8 +76,9 @@ namespace be {
 
 		size_t body_len = 0 ;
 		size_t chunk_len = 0 ;
-
 		uint8_t verifysum ;
+
+		TelnetChannel * channle = nullptr ;
 		
 		Package(uint8_t pkgid=0, uint8_t cmd=0, uint8_t * body=nullptr, size_t body_len=0, uint8_t h1=HEAD1, uint8_t h2=HEAD2) ;
 		Package(const Package *) ;

@@ -5,6 +5,7 @@ Added:
 * uart.unsetup()
 * uart.isInstalled()
 * sensor driver TMP117
+* bt telnet
 
 Fixed:
 

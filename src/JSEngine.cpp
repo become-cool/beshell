@@ -193,6 +193,9 @@ namespace be {
     
     string JSEngine::getExceptionStr(JSValue exception_val) {
         const char * cstr = JS_ToCString(ctx, exception_val) ;
+        if(!cstr) {
+            return std::string("") ;
+        }
         std::string str = cstr ;
         JS_FreeCString(ctx, cstr) ;
         // std::string str = console->stringify(ctx, exception_val) ;
