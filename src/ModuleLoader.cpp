@@ -3,6 +3,7 @@
 #include "module/Process.hpp"
 #include "module/Path.hpp"
 #include "driver/DriverModule.hpp"
+#include "telnet/TelnetModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
 #include <cstring>
@@ -147,6 +148,7 @@ namespace be {
     ModuleLoader::ModuleLoader(BeShell * beshell) {
         add<JSLoader>(beshell, "loader") ;
         add<Process>(beshell, "process") ;
+        add<TelnetModule>(beshell, "telnet") ;
 #ifdef ESP_PLATFORM
         add<driver::DriverModule>(beshell, "driver") ;
         add<GPIO>(beshell, "gpio") ;

@@ -17,6 +17,8 @@ namespace be {
         m = JS_NewCModule(ctx, name, importModule);
         JS_SetModuleDefOpaque(m,this) ;
     }
+
+    NativeModule::~NativeModule(){}
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
         assert(ctx) ;

@@ -15,6 +15,7 @@ Refactored:
 * uart.write() 可以接受数组参数
 * ArrayBuffer.prototype.toArray() 增加参数 signed
 * BeShell::setup() 和 BeShell::main() 增加参数 mainScriptPath
+* telnet 做为 NativeModule 的子类，可在 js 中调用
 
 ## v0.3.4   2024-6-4
 

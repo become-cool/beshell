@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "TelnetChannel.hpp"
+
 #ifdef ESP_PLATFORM
 #include "freertos/queue.h"
 
@@ -34,6 +35,7 @@ namespace be {
         QueueHandle_t pkg_queue;
 
     public:
+        static const char * const name ;
         Telnet(BeShell * beshell) ;
 
         void setup() ;

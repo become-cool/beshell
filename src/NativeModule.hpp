@@ -40,6 +40,7 @@ namespace be {
         uint8_t flagGlobal = 0 ;
         
         NativeModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
+        virtual ~NativeModule() ;
 
         static void use(BeShell * beshell) ;
 

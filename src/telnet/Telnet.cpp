@@ -5,20 +5,24 @@
 #include <string.h>
 #include <sys/stat.h>
 
+
+
 #define PKG_QUEUE_LEN 64
 
 using namespace std ;
 
 namespace be {
-    Telnet::Telnet(BeShell * _beshell)
-        : beshell(_beshell)
+
+    Telnet::Telnet(BeShell * beshell)
+        : beshell(beshell)
 #ifdef ESP_PLATFORM
         , channelSeiral(this)
 #endif
 #ifdef LINUX_PLATFORM
         , channelStdIO(this)
 #endif
-    {}
+    {
+    }
 
     void Telnet::setup() {
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
