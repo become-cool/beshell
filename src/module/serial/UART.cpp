@@ -96,6 +96,8 @@ namespace be{
         gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, )
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
 
+        dn3(tx,rx,baudrate)
+
         esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)

@@ -8,7 +8,7 @@
 #include "freertos/queue.h"
 
 #include "TelnetSerial.hpp"
-#include "TelnetBT.cpp"
+#include "TelnetBLE.hpp"
 #endif 
 #ifdef LINUX_PLATFORM
 #include "TelnetStdIO.hpp"
@@ -29,7 +29,6 @@ namespace be {
 #ifdef LINUX_PLATFORM
         TelnetStdIO channelStdIO ;
 #endif
-        std::vector<TelnetChannel *> channels ;
 
         uint8_t autoIncreasePkgId = 0 ;
         QueueHandle_t pkg_queue;
@@ -39,6 +38,7 @@ namespace be {
 
         void setup() ;
         void loop() ;
+        TelnetBLE * bt = nullptr ;
 
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
@@ -48,6 +48,18 @@ namespace be {
         static std::unique_ptr<std::ostream> createStream(Package & pkg) ;
 
         TelnetChannel * channel(const char * name) ;
+
+        template<typename T>
+        void createChannel() {
+            static_assert(std::is_base_of<TelnetChannel, T>::value, "T must be a subclass of TelnetChannel") ;
+#ifdef ESP_PLATFORM
+            if(std::is_base_of<TelnetBLE, T>::value) {
+                if(!bt) {
+                    bt = new T(this) ;
+                }
+            }
+        }
+#endif
 
     protected:
         void openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) ;

@@ -36,7 +36,8 @@ namespace be {
             assert(((TelnetSerial*)argv)->telnet) ;
 
             // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-            pkg->head.fields.cmd = 0 ;
+            // dn(pkg->head.fields.pkgid)
+            // pkg->head.fields.cmd = 0 ;
             pkg->channle = (TelnetChannel*)argv ;
             ((TelnetSerial*)argv)->telnet->execPackage(pkg) ;
         }) ;

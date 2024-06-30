@@ -51,6 +51,7 @@ namespace be {
 
         template <typename C>
         void exportClass() {
+            static_assert(std::is_base_of<be::NativeClass, C>::value, "C must be a subclass of NativeClass") ;
             assert(ctx) ;
             assert(m) ;
             JS_AddModuleExport(ctx, m, C::className) ;

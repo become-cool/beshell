@@ -407,7 +407,7 @@ namespace be {
             JSValue ret = beshell->engine->eval((char *)pkg.body(), content_len,"eval") ;
 
             if(JS_IsException(ret)) {
-                beshell->engine->dumpError(rspnId) ;
+                beshell->engine->dumpError(rspnId,ch) ;
             } else {
                 beshell->engine->print(ret, rspnId, RSPN, ch) ;
             }

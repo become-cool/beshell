@@ -58,7 +58,6 @@ namespace be {
 		uint8_t * _body = nullptr ;
 		bool sharedBody = false ;
 		
-		void mallocBody(uint16_t len, bool endZero=false) ;
 	public:
 
 		union {
@@ -94,6 +93,7 @@ namespace be {
 		
 		size_t calculateSize() ;
 		void pack() ;
+		void mallocBody(uint16_t len, bool endZero=false) ;
 		void reset(uint8_t pkgid=0, uint8_t cmd=0,size_t bodylen=0);
 		void freeBody() ;
 	} ;

@@ -18,7 +18,7 @@
 // telnet/repl
 #include "telnet/Protocal.hpp"
 #include "telnet/TelnetChannel.hpp"
-#include "telnet/TelnetBT.hpp"
+#include "telnet/TelnetBLE.hpp"
 #include "telnet/TelnetSerial.hpp"
 #include "telnet/TelnetStdIO.hpp"
 #include "telnet/TelnetWS.hpp"

@@ -38,10 +38,6 @@ namespace be {
             // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
             onReceived(pkg->channle,move(pkg)) ;
         }
-
-#ifdef ESP_PLATFORM
-        channelSeiral.loop() ;
-#endif
 #ifdef LINUX_PLATFORM
         channelStdIO.loop() ;
 #endif
@@ -191,6 +187,7 @@ namespace be {
         int pathlen = strlen(cpath) + 1 ;
         
         if( pathlen+6 != (int)pkg->body_len ) {
+            dn2(pathlen, pkg->body_len)
             ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
             return ;
         }
@@ -214,7 +211,6 @@ namespace be {
         uint16_t length = (argptr[4]<<8) | argptr[5] ;
 
         if(offset>=(size_t)statbuf.st_size) {
-            dd
             ch->sendError(pkg->head.fields.pkgid, "invalid arg offset") ;
             return ;
         }

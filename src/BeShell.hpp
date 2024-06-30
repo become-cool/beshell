@@ -31,25 +31,35 @@ namespace be {
 
         BeShell() ;
         ~BeShell() ;
-        void setup();
+        void setup(const char * mainScriptPath=nullptr) ;
         void loop() ;
         void run() ;
-        void main() ;
+        void main(const char * mainScriptPath=nullptr) ;
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
         
         template <typename ModuleClass>
-        void use(const char * name=nullptr) {
-            useModule<ModuleClass>(name) ;
+        void use() {
+            static_assert(std::is_base_of<NativeModule, ModuleClass>::value, "ModuleClass must be a subclass of NativeModule") ;
+            engine->mloader.add<ModuleClass>(this, nullptr) ;
         }
+
         template <typename ModuleClass>
         void useModule(const char * name=nullptr) {
+            static_assert(std::is_base_of<NativeModule, ModuleClass>::value, "ModuleClass must be a subclass of NativeModule") ;
             engine->mloader.add<ModuleClass>(this, name) ;
         }
 
         template <typename DriverClass>
         void useDriver() {
+            static_assert(std::is_base_of<NativeModule, DriverClass>::value, "DriverClass must be a subclass of NativeModule") ;
             be::driver::DriverModule::useDriver<DriverClass>(this) ;
+        }
+
+        template <typename TelnetChannelClass>
+        void useTelnet() {
+            static_assert(std::is_base_of<TelnetChannel, TelnetChannelClass>::value, "TelnetChannelClass must be a subclass of TelnetChannel") ;
+            telnet->createChannel<TelnetChannelClass>() ;
         }
     } ;
 

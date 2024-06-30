@@ -6,6 +6,7 @@ Added:
 * uart.isInstalled()
 * sensor driver TMP117
 * bt telnet
+* BeShell::useTelnet()
 
 Fixed:
 
@@ -13,6 +14,7 @@ Refactored:
 
 * uart.write() 可以接受数组参数
 * ArrayBuffer.prototype.toArray() 增加参数 signed
+* BeShell::setup() 和 BeShell::main() 增加参数 mainScriptPath
 
 ## v0.3.4   2024-6-4
 
