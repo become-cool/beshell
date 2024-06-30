@@ -52,7 +52,7 @@ namespace be {
 
         template <typename DriverClass>
         void useDriver() {
-            static_assert(std::is_base_of<NativeModule, DriverClass>::value, "DriverClass must be a subclass of NativeModule") ;
+            static_assert(std::is_base_of<NativeClass, DriverClass>::value, "DriverClass must be a subclass of NativeClass") ;
             be::driver::DriverModule::useDriver<DriverClass>(this) ;
         }
     } ;

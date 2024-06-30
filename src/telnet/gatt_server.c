@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include "sdkconfig.h"
 
-#if CONFIG_BT_ENABLED
+#if CONFIG_BT_ENABLED && CONFIG_BT_BLE_42_FEATURES_SUPPORTED
 
 #include "esp_log.h"
 #include "esp_gap_ble_api.h"
@@ -616,19 +616,35 @@ void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
 #else 
 
 void be_telnet_gatt_server_start(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) {
+#ifndef CONFIG_BT_ENABLED
     printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+#elif !defined(CONFIG_BT_BLE_42_FEATURES_SUPPORTED)
+    printf("BLE 4.2 features are not enabled. Please enable CONFIG_BT_BLE_42_FEATURES_SUPPORTED in sdkconfig.h to use GATT service.") ;
+#endif
 }
 
 void be_telnet_gatt_server_stop() {
+#ifndef CONFIG_BT_ENABLED
     printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+#elif !defined(CONFIG_BT_BLE_42_FEATURES_SUPPORTED)
+    printf("BLE 4.2 features are not enabled. Please enable CONFIG_BT_BLE_42_FEATURES_SUPPORTED in sdkconfig.h to use GATT service.") ;
+#endif
 }
 
 void be_telnet_gatt_server_set_msg_handler(be_telnet_gatt_msg_handler_t handler) {
+#ifndef CONFIG_BT_ENABLED
     printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+#elif !defined(CONFIG_BT_BLE_42_FEATURES_SUPPORTED)
+    printf("BLE 4.2 features are not enabled. Please enable CONFIG_BT_BLE_42_FEATURES_SUPPORTED in sdkconfig.h to use GATT service.") ;
+#endif
 }
 
 void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
+#ifndef CONFIG_BT_ENABLED
     printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+#elif !defined(CONFIG_BT_BLE_42_FEATURES_SUPPORTED)
+    printf("BLE 4.2 features are not enabled. Please enable CONFIG_BT_BLE_42_FEATURES_SUPPORTED in sdkconfig.h to use GATT service.") ;
+#endif
 }
 
 
