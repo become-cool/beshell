@@ -50,18 +50,8 @@ namespace be {
         static std::unique_ptr<std::ostream> createStream(Package & pkg) ;
 
         TelnetChannel * channel(const char * name) ;
-
-        template<typename T>
-        void createChannel() {
-            static_assert(std::is_base_of<TelnetChannel, T>::value, "T must be a subclass of TelnetChannel") ;
-#ifdef ESP_PLATFORM
-            if(std::is_base_of<TelnetBLE, T>::value) {
-                if(!bt) {
-                    bt = new T(this) ;
-                }
-            }
-        }
-#endif
+        
+        void useBLE() ;
 
     protected:
         void openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) ;

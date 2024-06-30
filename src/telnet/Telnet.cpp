@@ -1,6 +1,7 @@
 #include "Telnet.hpp"
 #include "debug.h"
 #include "BeShell.hpp"
+#include "TelnetModule.hpp"
 #include <cassert>
 #include <string.h>
 #include <sys/stat.h>
@@ -252,5 +253,12 @@ namespace be {
 
         // dn(verifysum)
         ch->sendData((const char *)&verifysum,1) ;
+    }
+
+    void Telnet::useBLE() {
+#ifdef ESP_PLATFORM
+        bt = new TelnetBLE(this) ;
+        TelnetModule::useBLE() ;
+#endif
     }
 }

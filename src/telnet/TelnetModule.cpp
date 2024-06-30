@@ -4,6 +4,8 @@ namespace be{
 
     const char * const TelnetModule::name = "telnet" ;
 
+    std::vector<NativeModuleExportorFunc> TelnetModule::exportors ;
+
     TelnetModule::TelnetModule(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
@@ -33,7 +35,6 @@ namespace be{
 
         CHECK_ARGC(1)
 
-        
         bool needfree = false ;
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
@@ -64,13 +65,15 @@ namespace be{
     }
 
     void TelnetModule::import(JSContext *ctx) {
-
+        for(auto func : exportors) {
+            func(ctx, this) ;
+        }
+    }
+        
+    void TelnetModule::exportBT(JSContext *ctx, NativeModule * module) {
         JSValue btapi = JS_NewObject(ctx);
         JS_SetPropertyStr(ctx, btapi, "setup", JS_NewCFunction(ctx, btSetup, "setup", 0));
         JS_SetPropertyStr(ctx, btapi, "send", JS_NewCFunction(ctx, btSend, "send", 0));
-
-        exportValue("bt", btapi) ;
+        module->exportValue("bt", btapi) ;
     }
-
-
 }

@@ -55,12 +55,6 @@ namespace be {
             static_assert(std::is_base_of<NativeModule, DriverClass>::value, "DriverClass must be a subclass of NativeModule") ;
             be::driver::DriverModule::useDriver<DriverClass>(this) ;
         }
-
-        template <typename TelnetChannelClass>
-        void useTelnet() {
-            static_assert(std::is_base_of<TelnetChannel, TelnetChannelClass>::value, "TelnetChannelClass must be a subclass of TelnetChannel") ;
-            telnet->createChannel<TelnetChannelClass>() ;
-        }
     } ;
 
 }

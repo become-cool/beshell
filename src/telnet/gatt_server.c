@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include "sdkconfig.h"
+
+#if CONFIG_BT_ENABLED
+
 #include "esp_log.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
@@ -13,7 +17,6 @@
 #include "esp_system.h"
 #include "esp_bt.h"
 
-#include "sdkconfig.h"
 
 #define GATTS_TAG "GATT_SERVICE"
 
@@ -503,6 +506,32 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
     }
 }
 
+static esp_err_t bt_init() {
+    esp_err_t ret = ESP_OK;
+    ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
+    esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+    ret = esp_bt_controller_init(&bt_cfg);
+    if (ret) {
+        printf("%s initialize controller failed\n", __func__);
+        return ret;
+    }
+    ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
+    if (ret) {
+        printf("%s enable controller failed\n", __func__);
+        return ret;
+    }
+    ret = esp_bluedroid_init();
+    if (ret) {
+        printf("%s init bluetooth failed\n", __func__);
+        return ret;
+    }
+    ret = esp_bluedroid_enable();
+    if (ret) {
+        printf("%s enable bluetooth failed\n", __func__);
+        return ret;
+    }
+    return ret;
+}
 
 void be_telnet_gatt_server_start(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) {
 
@@ -510,6 +539,8 @@ void be_telnet_gatt_server_start(const char * name, uint16_t characteristicID, u
         ESP_LOGI(GATTS_TAG, "GATT service is already running");
         return;
     }
+
+    bt_init() ;
 
     gl_profile.service_id.id.uuid.len = ESP_UUID_LEN_16;
     gl_profile.service_id.id.uuid.uuid.uuid16 = serviceID;
@@ -582,4 +613,23 @@ void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
 }
 
 
+#else 
 
+void be_telnet_gatt_server_start(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) {
+    printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+}
+
+void be_telnet_gatt_server_stop() {
+    printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+}
+
+void be_telnet_gatt_server_set_msg_handler(be_telnet_gatt_msg_handler_t handler) {
+    printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+}
+
+void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
+    printf("GATT service is not enabled. Please enable CONFIG_BT_ENABLED in sdkconfig.h to use GATT service.") ;
+}
+
+
+#endif // CONFIG_BT_ENABLED
