@@ -14,7 +14,7 @@ namespace be {
         void unsetup() ;
         
         void send (Package & pkg) ;
-        void send (const char * data, int datalen=-1, int pkgId=-1, uint8_t cmd=OUTPUT) ;
+        // void send (const char * data, int datalen=-1, int pkgId=-1, uint8_t cmd=OUTPUT) ;
         void sendData (const char * data, size_t datalen) ;
     } ;
 }

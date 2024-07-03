@@ -45,12 +45,12 @@ static be_telnet_gatt_msg_handler_t gatt_msg_handler_cb = NULL;
 
 static bool running = false;
 
-static esp_attr_value_t gatts_demo_char1_val =
-        {
-                .attr_max_len = GATT_SERVICE_CHAR_VAL_LEN_MAX,
-                .attr_len     = sizeof(char1_str),
-                .attr_value   = char1_str,
-        };
+// static esp_attr_value_t gatts_demo_char1_val =
+//         {
+//                 .attr_max_len = GATT_SERVICE_CHAR_VAL_LEN_MAX,
+//                 .attr_len     = sizeof(char1_str),
+//                 .attr_value   = char1_str,
+//         };
 
 static uint8_t adv_config_done = 0;
 #define adv_config_flag      (1 << 0)
@@ -401,7 +401,9 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
                                                             &gl_profile.char_uuid,
                                                             ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
                                                             char_property,
-                                                            &gatts_demo_char1_val, NULL);
+                                                            // &gatts_demo_char1_val,
+                                                            NULL,
+                                                            NULL);
             if (add_char_ret) {
                 ESP_LOGE(GATTS_TAG, "add char failed, error code =%x", add_char_ret);
             }

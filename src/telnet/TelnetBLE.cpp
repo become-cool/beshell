@@ -11,32 +11,26 @@
 
 namespace be {
 
-    
     static Telnet * global_telnet = nullptr ;
     static TelnetBLE * global_telnet_ble = nullptr ;
 
-    static void gatt_msg_handler (uint8_t *data, size_t size) {
-        
-        if(size<2) {
-            return ;
-        }
-        
-        // print_block(data, size, 16) ;
-        // ds(data+2)
-        
+    struct {
+        int pkgid ;
+        uint8_t totalChunks ;
+        uint8_t * fullBody ;
+    } pendingPackageState = {-1, 0, nullptr} ;
+
+
+    // forwarding received package to telnet
+    static Parser parser([](std::unique_ptr<Package> pkg){
         assert(global_telnet) ;
-        
-        std::unique_ptr<Package> pkg = std::make_unique<Package>();
-        pkg->head.fields.pkgid = data[0];
-        pkg->head.fields.cmd = data[1];
-        pkg->body_len = (size-2) ;
         pkg->channle = global_telnet_ble ;
-
-
-        pkg->mallocBody((uint16_t)pkg->body_len+1, true) ;
-        memcpy(pkg->body(), data+2, pkg->body_len) ;
-
         global_telnet->execPackage(pkg) ;
+    }) ;
+
+    static void gatt_msg_handler (uint8_t *data, size_t size) {
+        // print_block(data, size, 8) ;
+        parser.parse(data, size) ;
     }
 
     bool TelnetBLE::setup(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) {
@@ -58,28 +52,23 @@ namespace be {
     }
     
     void TelnetBLE::sendData (const char * data, size_t datalen) {
+        print_block((uint8_t*)data, datalen, 8) ;
+        if(!data || datalen<=0) {
+            return ;
+        }
         be_telnet_gatt_server_send((uint8_t*)data, datalen, false) ;
     }
     
     void TelnetBLE::send (Package & pkg) {
-        uint8_t * buff = (uint8_t *)malloc(pkg.body_len+2) ;
-        buff[0] = pkg.head.fields.pkgid ;
-        buff[1] = pkg.head.fields.cmd ;
-        memcpy(buff+2, pkg.body(), pkg.body_len) ;
-        be_telnet_gatt_server_send(buff, pkg.body_len+2, false) ;
-        free(buff) ;
-    }
+        int fulllen = pkg.head_len + pkg.body_len + 1;
 
-    void TelnetBLE::send (const char * data, int datalen, int pkgId, uint8_t cmd) {
-        if(pkgId>=0) {
-            uint8_t * buff = (uint8_t *)malloc(datalen+2) ;
-            buff[0] = (uint8_t)pkgId ;
-            buff[1] = cmd ;
-            memcpy(buff+2, data, datalen) ;
-            be_telnet_gatt_server_send(buff, datalen+2, false) ;
-            free(buff) ;
-        } else {
-            be_telnet_gatt_server_send((uint8_t*)data, datalen, false) ;
-        }
+        uint8_t * buff = (uint8_t *)malloc(fulllen) ;
+        
+        memcpy(buff, pkg.head.raw, pkg.head_len) ;
+        memcpy(buff+pkg.head_len, pkg.body(), pkg.body_len) ;
+        buff[fulllen-1] = pkg.verifysum ;
+
+        be_telnet_gatt_server_send(buff, fulllen, false) ;
+        free(buff) ;
     }
 }
