@@ -52,7 +52,7 @@ namespace be {
     }
     
     void TelnetBLE::sendData (const char * data, size_t datalen) {
-        print_block((uint8_t*)data, datalen, 8) ;
+        // print_block((uint8_t*)data, datalen, 8) ;
         if(!data || datalen<=0) {
             return ;
         }
