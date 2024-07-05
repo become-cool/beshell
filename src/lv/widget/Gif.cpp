@@ -43,6 +43,10 @@ namespace be::lv {
         THIS_NCLASS(Img,thisobj)
         const char * src = (char *)JS_ToCString(ctx, value) ;
 
+        if(!FS::exist(src)){
+            JSTHROW("path not exists")
+        }
+
         string path = string("C:") + FS::toVFSPath(src) ;
         JS_FreeCString(ctx, src) ;
 
