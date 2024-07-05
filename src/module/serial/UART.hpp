@@ -51,6 +51,5 @@ namespace be{
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-    
     } ;
 }

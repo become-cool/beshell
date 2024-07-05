@@ -96,21 +96,20 @@ namespace be{
         gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, )
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
 
-        dn3(tx,rx,baudrate)
-
-        esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
+        esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, ESP_INTR_FLAG_IRAM);
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)
         }
 
         // Configure UART parameters
         uart_config_t uart_config = {
-            .baud_rate = (int)baudrate,
+            // .baud_rate = (int)baudrate,
+            .baud_rate = 9600,
             .data_bits = UART_DATA_8_BITS,
-            .parity = UART_PARITY_DISABLE,
+            .parity    = UART_PARITY_DISABLE,
             .stop_bits = UART_STOP_BITS_1,
-            .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
-            .rx_flow_ctrl_thresh = 122,
+            .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+            .source_clk = UART_SCLK_DEFAULT,
         };
         ret = uart_param_config(uart->m_uartNum, &uart_config) ;
         if(ret!=0) {
@@ -121,6 +120,10 @@ namespace be{
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","setpin", ret)
         }
+        
+        const char * d = "hello" ;
+        uart_write_bytes(uart->m_uartNum, d, sizeof(d));
+
         return JS_UNDEFINED ;
     }
 
@@ -145,7 +148,7 @@ namespace be{
     JSValue UART::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
         ASSERT_ARGC(1)
-
+        
         bool needfree = false ;
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
@@ -254,6 +257,4 @@ namespace be{
         THIS_NCLASS(UART, uart)
         return uart_is_driver_installed(uart->m_uartNum)? JS_TRUE : JS_FALSE ;
     }
-
-    
 }
