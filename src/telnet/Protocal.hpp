@@ -10,6 +10,8 @@
 
 namespace be {
 
+	class TelnetChannel ;
+
 	enum PkgDef {
 		HEAD1 = 5 ,
 		HEAD2 = 18 ,
@@ -56,7 +58,6 @@ namespace be {
 		uint8_t * _body = nullptr ;
 		bool sharedBody = false ;
 		
-		void mallocBody(uint16_t len, bool endZero=false) ;
 	public:
 
 		union {
@@ -74,8 +75,9 @@ namespace be {
 
 		size_t body_len = 0 ;
 		size_t chunk_len = 0 ;
-
 		uint8_t verifysum ;
+
+		TelnetChannel * channle = nullptr ;
 		
 		Package(uint8_t pkgid=0, uint8_t cmd=0, uint8_t * body=nullptr, size_t body_len=0, uint8_t h1=HEAD1, uint8_t h2=HEAD2) ;
 		Package(const Package *) ;
@@ -91,6 +93,7 @@ namespace be {
 		
 		size_t calculateSize() ;
 		void pack() ;
+		void mallocBody(uint16_t len, bool endZero=false) ;
 		void reset(uint8_t pkgid=0, uint8_t cmd=0,size_t bodylen=0);
 		void freeBody() ;
 	} ;

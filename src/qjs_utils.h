@@ -105,7 +105,7 @@ extern "C" {
 	ctype var = def ;                               \
     if( i<argc ) {                                  \
         if( api(ctx, &var, argv[i])!=0 ) {          \
-            JSTHROW("Invalid param type")   \
+            JSTHROW("Invalid param type")           \
         }                                           \
     }
 

@@ -277,7 +277,7 @@ namespace be {
     }
 
     void WiFi::use(be::BeShell * beshell) {
-        beshell->use<NVS>() ;
+        beshell->use<be::NVS>() ;
     }
 
     /**

@@ -47,7 +47,7 @@ namespace be {
         loopFunctions.push_back( std::pair<LoopFunction,void *>(func,opaque) ) ;
     }
 
-    void BeShell::setup() {
+    void BeShell::setup(const char * mainScriptPath) {
         telnet->setup() ;
         engine->setup() ;
 
@@ -67,6 +67,19 @@ namespace be {
                 << "\r\n" ;
         cout    << "build: " << __DATE__ << " " << __TIME__ << "\r\n" ;
         cout    << "type JavaScript code to run, or 'help' for more information\r\n\r\n" ;
+
+        if(mainScriptPath) {
+#ifdef ESP_PLATFORM
+            esp_reset_reason_t reset_reason = esp_reset_reason();
+            if(reset_reason==ESP_RST_PANIC) {
+                printf("BeShell was rebooted due to a crash\n") ;
+            } else {
+                engine->evalScript(mainScriptPath) ;
+            }
+#else
+            engine->evalScript(mainScriptPath) ;
+#endif
+        }
     }
 
     void BeShell::loop() {
@@ -90,9 +103,8 @@ namespace be {
         }
     }
 
-    void BeShell::main() {
-        setup() ;
+    void BeShell::main(const char * mainScriptPath) {
+        setup(mainScriptPath) ;
         run() ;
     }
-    
 }
