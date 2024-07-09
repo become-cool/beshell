@@ -1,9 +1,11 @@
 #include "TelnetChannel.hpp"
 #include <cstring>
 #include "mallocf.h"
+#include "debug.h"
 
 
 namespace be {
+
     TelnetChannel::TelnetChannel(Telnet * _telnet)
         : telnet(_telnet)
     {
@@ -11,8 +13,6 @@ namespace be {
         mutex  = xSemaphoreCreateMutex();
 #endif
     }
-    void TelnetChannel::setup () {}
-    void TelnetChannel::loop () {}
     
     void TelnetChannel::send (Package & pkg) {
         // mutexTake() ;
@@ -29,7 +29,6 @@ namespace be {
             datalen = strlen(data) ;
         }
         if(pkgId>=0) {
-
             do {
                 int pkglen = datalen>0xFFFF? 0xFFFF: datalen;
 

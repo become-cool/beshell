@@ -40,6 +40,7 @@ namespace be {
         uint8_t flagGlobal = 0 ;
         
         NativeModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
+        virtual ~NativeModule() ;
 
         static void use(BeShell * beshell) ;
 
@@ -51,6 +52,7 @@ namespace be {
 
         template <typename C>
         void exportClass() {
+            static_assert(std::is_base_of<be::NativeClass, C>::value, "C must be a subclass of NativeClass") ;
             assert(ctx) ;
             assert(m) ;
             JS_AddModuleExport(ctx, m, C::className) ;

@@ -28,15 +28,15 @@ using namespace std ;
 
 namespace be {
     
-    Package::Package(uint8_t pkgid, uint8_t cmd, uint8_t * __body, size_t _body_len, uint8_t h1, uint8_t h2)
-        : body_len(_body_len)
+    Package::Package(uint8_t pkgid, uint8_t cmd, uint8_t * body, size_t body_len, uint8_t h1, uint8_t h2)
+        : body_len(body_len)
     {
         head.fields.h1 = h1 ;
         head.fields.h2 = h2 ;
         reset(pkgid,cmd,body_len) ;
 
-        if(__body) {
-            _body = __body ;
+        if(body) {
+            _body = body ;
             sharedBody = true ;
         }
     }

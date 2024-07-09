@@ -17,7 +17,6 @@ namespace be {
     public:
         using TelnetChannel::TelnetChannel ;
         void setup() ;
-        void loop () ;
         void sendData (const char * data, size_t datalen) ;
     } ;
 }

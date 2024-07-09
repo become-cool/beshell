@@ -1,24 +1,33 @@
 #include "Telnet.hpp"
 #include "debug.h"
 #include "BeShell.hpp"
+#include "TelnetModule.hpp"
 #include <cassert>
 #include <string.h>
 #include <sys/stat.h>
 
+
+
+#define PKG_QUEUE_LEN 64
+
 using namespace std ;
 
 namespace be {
-    Telnet::Telnet(BeShell * _beshell)
-        : beshell(_beshell)
+
+    Telnet::Telnet(BeShell * beshell)
+        : beshell(beshell)
 #ifdef ESP_PLATFORM
         , channelSeiral(this)
 #endif
 #ifdef LINUX_PLATFORM
         , channelStdIO(this)
 #endif
-    {}
+    {
+    }
 
     void Telnet::setup() {
+        pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
+
 #ifdef ESP_PLATFORM
         channelSeiral.setup() ;
 #endif
@@ -27,12 +36,21 @@ namespace be {
 #endif
     }
     void Telnet::loop() {
-#ifdef ESP_PLATFORM
-        channelSeiral.loop() ;
-#endif
+        Package * ptr ;
+        std::unique_ptr<Package> pkg ;
+        if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
+            pkg.reset(ptr) ;
+            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
+            onReceived(pkg->channle,move(pkg)) ;
+        }
 #ifdef LINUX_PLATFORM
         channelStdIO.loop() ;
 #endif
+    }
+
+    void Telnet::execPackage(std::unique_ptr<Package> & pkg) {
+        Package * ptr = pkg.release() ;
+        xQueueSend(pkg_queue, &ptr, 0) ;
     }
 
     void Telnet::onReceived(TelnetChannel * ch, std::unique_ptr<Package> pkg){
@@ -174,6 +192,7 @@ namespace be {
         int pathlen = strlen(cpath) + 1 ;
         
         if( pathlen+6 != (int)pkg->body_len ) {
+            dn2(pathlen, pkg->body_len)
             ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
             return ;
         }
@@ -197,7 +216,6 @@ namespace be {
         uint16_t length = (argptr[4]<<8) | argptr[5] ;
 
         if(offset>=(size_t)statbuf.st_size) {
-            dd
             ch->sendError(pkg->head.fields.pkgid, "invalid arg offset") ;
             return ;
         }
@@ -235,5 +253,12 @@ namespace be {
 
         // dn(verifysum)
         ch->sendData((const char *)&verifysum,1) ;
+    }
+
+    void Telnet::useBLE() {
+#ifdef ESP_PLATFORM
+        bt = new TelnetBLE(this) ;
+        TelnetModule::useBLE() ;
+#endif
     }
 }
