@@ -119,7 +119,7 @@ namespace be {
         #endif
 
         #if SOC_SPI_PERIPH_NUM>2
-        exportName("spi1") ;
+        exportName("spi2") ;
         #endif
 
         #if SOC_SPI_PERIPH_NUM>3
@@ -208,7 +208,6 @@ namespace be {
 
 
         // SPI ---------------
-        dn(SPI1_HOST)
         #if SOC_SPI_PERIPH_NUM > 0
         SPI * spi0 = SPI::flyweight(ctx, SPI1_HOST) ;
         if(spi0) {
