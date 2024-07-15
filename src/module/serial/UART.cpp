@@ -103,8 +103,7 @@ namespace be{
 
         // Configure UART parameters
         uart_config_t uart_config = {
-            // .baud_rate = (int)baudrate,
-            .baud_rate = 9600,
+            .baud_rate = (int)baudrate,
             .data_bits = UART_DATA_8_BITS,
             .parity    = UART_PARITY_DISABLE,
             .stop_bits = UART_STOP_BITS_1,
@@ -120,9 +119,6 @@ namespace be{
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","setpin", ret)
         }
-        
-        const char * d = "hello" ;
-        uart_write_bytes(uart->m_uartNum, d, sizeof(d));
 
         return JS_UNDEFINED ;
     }
@@ -208,6 +204,7 @@ namespace be{
     void UART::loop(JSContext * ctx, void * opaque) {
         UART * uart = (UART *) opaque ;
         uart_chunk_t chunk ;
+        dn((int)uart->m_uartNum)
         if(xQueueReceive(uart->data_queue, &chunk, 0)) {
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
