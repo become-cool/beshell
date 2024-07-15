@@ -36,9 +36,9 @@
  *     i2c0: I2C,
  *     i2c1: I2C,
  * 
+ *     spi0: SPI,
+ *     spi1: SPI,
  *     spi2: SPI,
- *     spi3: SPI,
- *     spi4: SPI,
  * 
  *     i2s0: I2S,
  *     i2s1: I2S,
@@ -111,19 +111,19 @@ namespace be {
 
         // SPI ---------------
         #if SOC_SPI_PERIPH_NUM>0
-        exportName("spi1") ;
+        exportName("spi0") ;
         #endif
 
         #if SOC_SPI_PERIPH_NUM>1
-        exportName("spi2") ;
+        exportName("spi1") ;
         #endif
 
         #if SOC_SPI_PERIPH_NUM>2
-        exportName("spi3") ;
+        exportName("spi2") ;
         #endif
 
         #if SOC_SPI_PERIPH_NUM>3
-        exportName("spi4") ;
+        exportName("spi3") ;
         #endif
 
     }
@@ -209,30 +209,30 @@ namespace be {
 
         // SPI ---------------
         #if SOC_SPI_PERIPH_NUM > 0
-        SPI * spi1 = SPI::flyweight(ctx, SPI1_HOST) ;
-        if(spi1) {
-            exportValue("spi1", spi1->jsobj) ;
+        SPI * spi0 = SPI::flyweight(ctx, SPI1_HOST) ;
+        if(spi0) {
+            exportValue("spi0", spi0->jsobj) ;
         }
         #endif
         
         #if SOC_SPI_PERIPH_NUM > 1
-        SPI * spi2 = SPI::flyweight(ctx, SPI2_HOST) ;
-        if(spi2) {
-            exportValue("spi2", spi2->jsobj) ;
+        SPI * spi1 = SPI::flyweight(ctx, SPI2_HOST) ;
+        if(spi1) {
+            exportValue("spi1", spi1->jsobj) ;
         }
         #endif
 
         #if SOC_SPI_PERIPH_NUM > 2
-        SPI * spi3 = SPI::flyweight(ctx, SPI3_HOST) ;
-        if(spi3) {
-            exportValue("spi3", spi3->jsobj) ;
+        SPI * spi2 = SPI::flyweight(ctx, SPI3_HOST) ;
+        if(spi2) {
+            exportValue("spi2", spi2->jsobj) ;
             }
         #endif
 
         #if SOC_SPI_PERIPH_NUM > 3
-        SPI * spi4 = SPI::flyweight(ctx, SPI3_HOST) ;
-        if(spi4) {
-            exportValue("spi4", spi4->jsobj) ;
+        SPI * spi3 = SPI::flyweight(ctx, SPI4_HOST) ;
+        if(spi3) {
+            exportValue("spi3", spi3->jsobj) ;
         }
         #endif
     }

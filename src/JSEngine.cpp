@@ -252,7 +252,7 @@ namespace be {
     void JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat) {
         if(ignoreRepeat) {
             for(auto _pair:loopFunctions) {
-                if(func==_pair.first) {
+                if(func==_pair.first && opaque==_pair.second) {
                     return ;
                 }
             }

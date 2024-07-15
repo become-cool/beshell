@@ -4,15 +4,15 @@ using namespace std ;
 
 namespace be {
     
-    SPI * SPI::spi1 = nullptr ;    
+    SPI * SPI::spi0 = nullptr ;    
     #if SOC_SPI_PERIPH_NUM > 1
-    SPI * SPI::spi2 = nullptr ;
+    SPI * SPI::spi1 = nullptr ;
     #endif
     #if SOC_SPI_PERIPH_NUM > 2
-    SPI * SPI::spi3 = nullptr ;
+    SPI * SPI::spi2 = nullptr ;
     #endif
     #if SOC_SPI_PERIPH_NUM > 3
-    SPI * SPI::spi4 = nullptr ;
+    SPI * SPI::spi3 = nullptr ;
     #endif
 
     DEFINE_NCLASS_META(SPI, NativeClass)
@@ -49,15 +49,15 @@ namespace be {
             return var ;                        \
         }
     SPI * SPI::flyweight(JSContext * ctx, spi_host_device_t bus) {
-        DEFINE_BUS(SPI1_HOST, spi1)
+        DEFINE_BUS(SPI1_HOST, spi0)
         #if SOC_SPI_PERIPH_NUM > 1
-        else DEFINE_BUS(SPI2_HOST, spi2)
+        else DEFINE_BUS(SPI2_HOST, spi1)
         #endif
         #if SOC_SPI_PERIPH_NUM > 2
-        else DEFINE_BUS(SPI3_HOST, spi3)
+        else DEFINE_BUS(SPI3_HOST, spi2)
         #endif
         #if SOC_SPI_PERIPH_NUM > 3
-        else DEFINE_BUS(SPI4_HOST, spi4)
+        else DEFINE_BUS(SPI4_HOST, spi3)
         #endif
         return nullptr ;
     }
