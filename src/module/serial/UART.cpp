@@ -204,7 +204,6 @@ namespace be{
     void UART::loop(JSContext * ctx, void * opaque) {
         UART * uart = (UART *) opaque ;
         uart_chunk_t chunk ;
-        dn((int)uart->m_uartNum)
         if(xQueueReceive(uart->data_queue, &chunk, 0)) {
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
