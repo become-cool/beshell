@@ -1,4 +1,5 @@
 #include "UART.hpp"
+#include <BeShell.hpp>
 #include <JSEngine.hpp>
 #include <driver/gpio.h>
 
@@ -210,7 +211,7 @@ namespace be{
                 JSValue ret = JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
                 if( JS_IsException(ret) ) {
                     string uncatch = JSEngine::getExceptionStr(ctx,ret) ;
-                    JSEngine::fromJSContext(ctx)->beshell->telnet->output(str, -1, EXCEPTION) ;
+                    JSEngine::fromJSContext(ctx)->beshell->telnet->output(uncatch, -1, EXCEPTION) ;
                 }
                 JS_FreeValue(ctx, ab) ;
             }

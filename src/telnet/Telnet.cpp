@@ -110,8 +110,8 @@ namespace be {
 #endif
     }
 
-    void output(const std::string & data, int pkgid=-1, uint8_t cmd=OUTPUT) {
-        output(data.c_str(), data.length, pkgid, cmd) ;
+    void Telnet::output(const std::string & data, int pkgid, uint8_t cmd) {
+        output(data.c_str(), data.length(), pkgid, cmd) ;
     }
 
     TelnetChannel * Telnet::channel(const char * name) {
