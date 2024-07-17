@@ -14,5 +14,6 @@ namespace be {
         static JSValue setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setTimezone(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readEFUSE(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

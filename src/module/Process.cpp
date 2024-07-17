@@ -7,6 +7,7 @@
 #include "esp_system.h"
 #include "soc/soc.h"
 #include "esp_efuse.h"
+#include "esp_mac.h"
 #endif
 
 using namespace std;
@@ -29,6 +30,7 @@ namespace be {
         exportFunction("setTime", setTime);
         exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("readEFUSE", readEFUSE);
+        exportFunction("readMac", readMac);
 
         // JS_ComputeMemoryUsage
 
@@ -77,6 +79,26 @@ namespace be {
         esp_restart();
 #endif
         return JS_NewBool(ctx, true);
+    }
+
+    /**
+     * 读硬件地址
+     * 
+     * @function readMac
+     * @return number[] 代表硬件地址的字节数组
+     */
+    JSValue Process::readMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        uint8_t mac[6] ;
+#ifdef ESP_PLATFORM
+        if(esp_base_mac_addr_get(mac)!=ESP_OK) {
+            JSTHROW("failed to read mac addr")
+        }
+#endif
+        JSValue arr = JS_NewArray(ctx) ;
+        for(int i=0;i<sizeof(mac);i++) {
+            JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
+        }
+        return arr ;
     }
 
     /**
