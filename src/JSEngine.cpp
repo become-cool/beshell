@@ -181,7 +181,7 @@ namespace be {
             return ;
         }
 
-        string str = getExceptionStr(excep) ;
+        string str = getExceptionStr(ctx, excep) ;
         if(ch) {
             ch->send(str.c_str(), str.length(), pkgId, EXCEPTION) ;
         } else if(beshell->telnet) {
@@ -191,7 +191,7 @@ namespace be {
         JS_FreeValue(ctx, excep);
     }
     
-    string JSEngine::getExceptionStr(JSValue exception_val) {
+    string JSEngine::getExceptionStr(JSContext * ctx, JSValue exception_val) {
         const char * cstr = JS_ToCString(ctx, exception_val) ;
         if(!cstr) {
             return std::string("") ;
@@ -235,7 +235,7 @@ namespace be {
         JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
         JSValue ret = JS_GetException(ctx) ;
         if(dumpException && !JS_IsNull(ret) && !JS_IsUndefined(ret)) {
-            string str = getExceptionStr(ret) ;
+            string str = getExceptionStr(ctx, ret) ;
             printf("%s\n", str.c_str()) ;
             JS_FreeValue(ctx, ret) ;
             ret = JS_UNDEFINED ;

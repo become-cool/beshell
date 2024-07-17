@@ -40,7 +40,7 @@ namespace be {
 
         void print(JSValue content, int pkgId=-1, uint8_t cmd=OUTPUT, TelnetChannel * ch=nullptr) ;
         void dumpError(int pkgId=-1, TelnetChannel * ch=nullptr) ;
-        std::string getExceptionStr(JSValue exception) ;
+        static std::string getExceptionStr(JSContext * ctx, JSValue exception) ;
 
         static void setGlobalValue(JSContext * ctx, const char * name, JSValue) ;
         static JSValue getGlobalValue(const char * name) ;
