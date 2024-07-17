@@ -7,6 +7,7 @@ Added:
 * sensor driver TMP117
 * bt telnet
 * BeShell::useTelnet()
+* process.readMac()
 
 Fixed:
 
