@@ -110,6 +110,10 @@ namespace be {
 #endif
     }
 
+    void output(const std::string & data, int pkgid=-1, uint8_t cmd=OUTPUT) {
+        output(data.c_str(), data.length, pkgid, cmd) ;
+    }
+
     TelnetChannel * Telnet::channel(const char * name) {
 #ifdef ESP_PLATFORM
         if(strcmp(name,"serial")==0){

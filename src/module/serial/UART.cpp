@@ -207,7 +207,11 @@ namespace be{
         if(xQueueReceive(uart->data_queue, &chunk, 0)) {
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
-                JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
+                JSValue ret = JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
+                if( JS_IsException(ret) ) {
+                    string uncatch = JSEngine::getExceptionStr(ctx,ret) ;
+                    JSEngine::fromJSContext(ctx)->beshell->telnet->output(str, -1, EXCEPTION) ;
+                }
                 JS_FreeValue(ctx, ab) ;
             }
         }

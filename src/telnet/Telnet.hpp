@@ -43,6 +43,7 @@ namespace be {
         TelnetBLE * bt = nullptr ;
 
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
+        void output(const std::string & data, int pkgid=-1, uint8_t cmd=OUTPUT) ;
 
         void onReceived(TelnetChannel * , std::unique_ptr<Package>) ;
         void execPackage(std::unique_ptr<Package> &) ;
