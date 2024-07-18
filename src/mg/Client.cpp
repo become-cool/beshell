@@ -114,7 +114,6 @@ namespace be::mg {
         Client * client = (Client *)fnd ;
         switch(ev) {
             case MG_EV_POLL:
-                client->poll_times++ ;
                 if(++client->poll_times > 15000 ){
                     JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, "timeout"))
                     conn->is_closing = 1 ;
@@ -131,18 +130,13 @@ namespace be::mg {
 
                 struct mg_http_message *hm = (struct mg_http_message *) ev_data;
                 HTTPRequest * req = new HTTPRequest(client->ctx, hm) ;
-
-                // 智能回收模式 (jsobj gc 回收时自动 delete req)
-                req->shared() ; 
-                JS_FreeValue(client->ctx, req->jsobj) ;
+                req->shared() ; // 智能回收模式 (jsobj gc 回收时自动 delete req)
 
                 JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
 
-                // MAKE_ARGV2(argv, evname, req->jsobj)
-                // JS_Call(client->ctx, client->callback, JS_UNDEFINED, 2, argv) ;
-                // free(argv) ;
                 JS_CALL_ARG2(client->ctx, client->callback, evname, req->jsobj)
 
+                JS_FreeValue(client->ctx, req->jsobj) ;
                 JS_FreeValue(client->ctx, evname) ;
 
                 break ;
@@ -159,8 +153,21 @@ namespace be::mg {
                 client = NULL ;
                 fnd = NULL ;
                 break ;
+
+            case MG_EV_ERROR:
+                if(ev_data) {
+                    JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                    JSValue msg = JS_NewString(client->ctx, (const char *)ev_data) ;
+                    JS_CALL_ARG2(client->ctx, client->callback, evname, msg)
+                    JS_FreeValue(client->ctx, evname) ;
+                    JS_FreeValue(client->ctx, msg) ;
+                    break ;
+                }
+
             default:
-                JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, Mg::eventName(ev)))
+                    JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                    JS_CALL_ARG1(client->ctx, client->callback, evname)
+                    JS_FreeValue(client->ctx, evname) ;
                 break ;
         }
 
@@ -183,6 +190,8 @@ namespace be::mg {
             return JS_EXCEPTION ;
         }
 
+        dp(client)
+        dp(client->conn)
 
         JS_FreeCString(ctx, url) ;
         

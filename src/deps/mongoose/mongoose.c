@@ -16,6 +16,7 @@
 // license, as set out in https://www.mongoose.ws/licensing/
 
 #include "mongoose.h"
+#include "debug.h"
 
 #ifdef MG_ENABLE_LINES
 #line 1 "src/base64.c"
