@@ -40,14 +40,11 @@ namespace be::mg {
     std::string Mg::cert_path ;
     std::string Mg::certkey_path ;
 
-    char Mg::dns4[22] ;
+    char Mg::dns4[28] ;
 
     Mg::Mg(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
-        strcpy(dns4,"1.1.1.1:53") ;
-        mgr.dns4.url = dns4 ;
-
         exportClass<Server>() ;
         exportClass<Client>() ;
         exportClass<HTTPRequest>() ;
@@ -59,6 +56,8 @@ namespace be::mg {
         exportFunction("connCount",connCount,0) ;
         exportFunction("getDNS",getDNS,0) ;
         exportFunction("setDNS",setDNS,0) ;
+        exportFunction("getDNSTimeout",getDNSTimeout,0) ;
+        exportFunction("setDNSTimeout",setDNSTimeout,0) ;
         exportFunction("parseUrl",parseUrl,0) ;
         exportFunction("setLog",setLog,0) ;
 
@@ -88,6 +87,12 @@ namespace be::mg {
     }
 
     void Mg::use(be::BeShell * beshell) {
+
+        strcpy(dns4,"udp://8.8.8.8:53") ;
+        mgr.dns4.url = dns4 ;
+        
+        mgr.dnstimeout = 3000 ;
+
         beshell->use<WiFi>() ;
 
         beshell->addLoopFunction(loop, nullptr) ;
@@ -361,6 +366,29 @@ namespace be::mg {
         strcpy(dns4,url) ;
 
         JS_FreeCString(ctx,url) ;
+        return JS_UNDEFINED ;
+    }
+    
+    /**
+     * 返回当前 dns 请求超时时间设定，单位毫秒
+     * 
+     * @function getDNSTimeout
+     * @return number
+     */
+    JSValue Mg::getDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_NewUint32(ctx,mgr.dnstimeout) ;
+    }
+    
+    /**
+     * 设置 dns 请求超时时间，单位毫秒
+     * 
+     * @function setDNSTimeout
+     * @param ms:number
+     */
+    JSValue Mg::setDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT32(0, ms)
+        mgr.dnstimeout = ms ;
         return JS_UNDEFINED ;
     }
 

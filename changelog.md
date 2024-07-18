@@ -9,6 +9,8 @@ Added:
 * BeShell::useTelnet()
 * process.readMac()
 * mg.setDNS()
+* mg.getDNSTimeout()
+* mg.setDNSTimeout()
 
 Fixed:
 
@@ -19,6 +21,7 @@ Refactored:
 * BeShell::setup() 和 BeShell::main() 增加参数 mainScriptPath
 * telnet 做为 NativeModule 的子类，可在 js 中调用
 * serial.spiX "X"从0开始计数
+* mg.connect() crash
 
 ## v0.3.4   2024-6-4
 

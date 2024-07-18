@@ -13,7 +13,7 @@ namespace be::mg {
     class Mg: public be::NativeModule {
     private :
         static struct mg_mgr mgr ;
-        static char dns4[22] ;
+        static char dns4[28] ;
     public:
         static const char * name ;
 
@@ -37,6 +37,8 @@ namespace be::mg {
         static JSValue connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
