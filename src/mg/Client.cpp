@@ -31,6 +31,9 @@ namespace be::mg {
         JS_FreeValue(ctx, callback) ;
     }
     
+    void Client::setConn(struct mg_connection * conn){
+        this->conn = conn ;
+    }
 
     /**
      * 发送数据
@@ -107,12 +110,12 @@ namespace be::mg {
     //   MG_EV_SNTP_TIME,   // SNTP time received           struct timeval *
     //   MG_EV_USER,        // Starting ID for user events
     // };
-    void Client::eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fnd) {
+    void Client::eventHandler(struct mg_connection * conn, int ev, void * ev_data, void *fnd) {
         Client * client = (Client *)fnd ;
         switch(ev) {
             case MG_EV_POLL:
                 client->poll_times++ ;
-                if(++client->poll_times > 5000 ){
+                if(++client->poll_times > 15000 ){
                     JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, "timeout"))
                     conn->is_closing = 1 ;
                 }
@@ -135,9 +138,10 @@ namespace be::mg {
 
                 JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
 
-                MAKE_ARGV2(argv, evname, req->jsobj)
-                JS_Call(client->ctx, client->callback, JS_UNDEFINED, 2, argv) ;
-                free(argv) ;
+                // MAKE_ARGV2(argv, evname, req->jsobj)
+                // JS_Call(client->ctx, client->callback, JS_UNDEFINED, 2, argv) ;
+                // free(argv) ;
+                JS_CALL_ARG2(client->ctx, client->callback, evname, req->jsobj)
 
                 JS_FreeValue(client->ctx, evname) ;
 
@@ -154,9 +158,7 @@ namespace be::mg {
                 delete client ;
                 client = NULL ;
                 fnd = NULL ;
-
                 break ;
-
             default:
                 JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, Mg::eventName(ev)))
                 break ;
@@ -172,14 +174,15 @@ namespace be::mg {
         }
         ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
 
-        struct mg_connection * conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, nullptr) ;
+        Client * client = new Client(ctx, nullptr, argv[1]) ;
+        struct mg_connection * conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
+        client->conn = conn ;
         if(conn==NULL) {
             JS_ThrowReferenceError(ctx, "could not listen addr: %s", url) ;
             JS_FreeCString(ctx, url) ;
             return JS_EXCEPTION ;
         }
 
-        Client * client = new Client(ctx, conn, argv[1]) ;
 
         JS_FreeCString(ctx, url) ;
         

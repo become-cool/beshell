@@ -17,6 +17,7 @@ namespace be::mg {
     public:
         Client(JSContext * ctx, struct mg_connection *, JSValue callback) ;
         ~Client() ;
+        void setConn(struct mg_connection * conn) ;
         
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
