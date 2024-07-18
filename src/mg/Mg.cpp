@@ -40,9 +40,14 @@ namespace be::mg {
     std::string Mg::cert_path ;
     std::string Mg::certkey_path ;
 
+    char Mg::dns4[22] ;
+
     Mg::Mg(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
+        strcpy(dns4,"1.1.1.1:53") ;
+        mgr.dns4.url = dns4 ;
+
         exportClass<Server>() ;
         exportClass<Client>() ;
         exportClass<HTTPRequest>() ;
@@ -53,6 +58,7 @@ namespace be::mg {
         exportFunction("connPeer",connPeer,0) ;
         exportFunction("connCount",connCount,0) ;
         exportFunction("getDNS",getDNS,0) ;
+        exportFunction("setDNS",setDNS,0) ;
         exportFunction("parseUrl",parseUrl,0) ;
         exportFunction("setLog",setLog,0) ;
 
@@ -330,9 +336,33 @@ namespace be::mg {
      * @return string
      */
     JSValue Mg::getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_NewString(ctx,mgr.dns4.url) ;
+        if(mgr.dns4.url) {
+            return JS_NewString(ctx,mgr.dns4.url) ;
+        }
+        else {
+            return JS_NULL ;
+        }
     }
 
+    /**
+     * 设置 dns 服务器地址
+     * 
+     * @function setDNS
+     * @param url:string  eg: 1.1.1.1:53
+     */
+    JSValue Mg::setDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_CSTRING(0, url)
+        if( strlen(url)>=sizeof(dns4) ){
+            JS_FreeCString(ctx,url) ;
+            JSTHROW("url is too longger")
+        }
+
+        strcpy(dns4,url) ;
+
+        JS_FreeCString(ctx,url) ;
+        return JS_UNDEFINED ;
+    }
 
     /**
      * 解析 URL 字符串，返回对象：

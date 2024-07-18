@@ -8,6 +8,7 @@ Added:
 * bt telnet
 * BeShell::useTelnet()
 * process.readMac()
+* mg.setDNS()
 
 Fixed:
 
