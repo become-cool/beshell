@@ -236,26 +236,42 @@ extern "C" {
 #define JS_CALL_ARG1(ctx, func, arg1)                           \
     {                                                           \
         MAKE_ARGV1(argv, arg1)                                  \
-        JS_Call(ctx, func, JS_UNDEFINED, 1, argv) ;             \
+        JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 1, argv) ; \
+        if(JS_IsException(ret)) {                               \
+            JSEngine::fromJSContext(ctx)->dumpError() ;         \
+        }                                                       \
+        JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
 
 #define JS_CALL_ARG2(ctx, func, arg1, arg2)                     \
     {                                                           \
         MAKE_ARGV2(argv, arg1, arg2)                            \
-        JS_Call(ctx, func, JS_UNDEFINED, 2, argv) ;             \
+        JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 2, argv) ; \
+        if(JS_IsException(ret)) {                               \
+            JSEngine::fromJSContext(ctx)->dumpError() ;         \
+        }                                                       \
+        JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
 #define JS_CALL_ARG3(ctx, func, arg1, arg2, arg3)               \
     {                                                           \
         MAKE_ARGV3(argv, arg1, arg2, arg3)                      \
-        JS_Call(ctx, func, JS_UNDEFINED, 3, argv) ;             \
+        JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 3, argv) ; \
+        if(JS_IsException(ret)) {                               \
+            JSEngine::fromJSContext(ctx)->dumpError() ;         \
+        }                                                       \
+        JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
 #define JS_CALL_ARG4(ctx, func, arg1, arg2, arg3, arg4)         \
     {                                                           \
         MAKE_ARGV4(argv, arg1, arg2, arg3, arg4)                \
-        JS_Call(ctx, func, JS_UNDEFINED, 4, argv) ;             \
+        JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 4, argv) ; \
+        if(JS_IsException(ret)) {                               \
+            JSEngine::fromJSContext(ctx)->dumpError() ;         \
+        }                                                       \
+        JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
 
