@@ -30,6 +30,7 @@
 
 #include "Mg.hpp"
 #include <cstdint>
+#include "../js/mg.c"
 
 namespace be::mg {
 
@@ -50,6 +51,9 @@ namespace be::mg {
         exportClass<HTTPRequest>() ;
         exportClass<Response>() ;
 
+        exportName("get") ;
+        exportName("download") ;
+
         // exportFunction("isListening",isListening,0) ;
         // exportFunction("sntpRequest",sntpRequest,0) ;
         exportFunction("connPeer",connPeer,0) ;
@@ -65,8 +69,9 @@ namespace be::mg {
         exportFunction("connect",Client::connect,0) ;
     }
 
-    // void Mg::import(JSContext *ctx) {
-    // }
+    void Mg::import(JSContext *ctx) {
+        JSEngineEvalEmbeded(ctx, mg)
+    }
 
     bool Mg::isListening(const char * url) {
         struct mg_addr addr ;

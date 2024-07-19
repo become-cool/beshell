@@ -26,6 +26,7 @@ namespace be::mg {
         static void loop(const BeShell & beshell, void * data) ;
 
         static void use(be::BeShell * beshell) ;
+        void import(JSContext *ctx) ;
 
         static const char * eventName(int ev) ;
         static int eventConst(const char * evname) ;

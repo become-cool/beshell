@@ -11,6 +11,8 @@ Added:
 * mg.setDNS()
 * mg.getDNSTimeout()
 * mg.setDNSTimeout()
+* mg.get()
+* mg.download()
 
 Fixed:
 
