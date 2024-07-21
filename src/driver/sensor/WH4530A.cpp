@@ -48,18 +48,29 @@ namespace be::driver::sensor {
         }
 
         i2c->write<uint8_t,uint8_t>(addr, WH450A_SYSM_CTRL,      0x80);             // soft reset
+        vTaskDelay(5 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_WAIT_TIME,      0x0F);             // PS wait time
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_LED,         0xFF);             // LED driving current, pulse width
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_GAIN,        0x03);             // PS gain
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_PULSE,       0x00);             // PS pulse count
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_TIME,        0x0F);             // PS integration time
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_FILTER,      0x0F);             // PS low pass filter
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_PERSIS,      0x0);             // PS persistance
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_THRE_LL,     0xFF);                // PS low threshold low byte
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_THRE_LH,     0x0F);                // PS low threshold high byte
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_THRE_HL,     0xF4);              // PS high threshold low byte
         i2c->write<uint8_t,uint8_t>(addr, WH450A_PS_THRE_HH,     0x01);              // PS high threshold high byte
+        vTaskDelay(1 / portTICK_PERIOD_MS);
         i2c->write<uint8_t,uint8_t>(addr, WH450A_SYSM_CTRL,      0x02);             // PS enable
+        vTaskDelay(5 / portTICK_PERIOD_MS);
     
         return 0 ;
     }
