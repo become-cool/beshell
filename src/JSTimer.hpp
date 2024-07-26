@@ -44,7 +44,8 @@ namespace be {
 #if defined(ESP_PLATFORM)
         JSTimerEvent * setImmediateAsync(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
 #endif
-        
+        void updateTime(int64_t ms) ;
+
         void removeTimer(JSContext *ctx, JSTimerEvent *) ;
         void removeTimer(JSContext *ctx, uint32_t id) ;
         JSTimerEvent * findWithId(uint32_t id) ;
