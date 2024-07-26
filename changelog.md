@@ -24,6 +24,7 @@ Refactored:
 * telnet 做为 NativeModule 的子类，可在 js 中调用
 * serial.spiX "X"从0开始计数
 * mg.connect() crash
+* process.setTime 影响 setInterval()
 
 ## v0.3.4   2024-6-4
 
