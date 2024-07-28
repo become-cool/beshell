@@ -154,6 +154,17 @@ namespace be {
         return JS_UNDEFINED ;
     }
     
+    
+    void JSTimer::updateTime(int64_t ms) {
+        
+        uint64_t now = gettime() ;
+        ms-= now ;
+
+        for(auto event: events) {
+            event->deadline += ms ;
+        }
+    }
+    
     bool JSTimer::take(bool fromISR, bool createWhenFirst) {
 #ifdef ESP_PLATFORM
         bool toke = false ; 

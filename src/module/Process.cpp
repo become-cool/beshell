@@ -1,4 +1,5 @@
 #include <BeShell.hpp>
+#include <JSEngine.hpp>
 #include "module/Process.hpp"
 
 #ifdef ESP_PLATFORM
@@ -260,6 +261,8 @@ namespace be {
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, ms)
         
+        JSEngine::fromJSContext(ctx)->timer.updateTime(ms) ;
+
         struct timeval tv;
         tv.tv_sec = ms/1000;  // epoch time (seconds)
         tv.tv_usec = (ms%1000)*1000;    // microseconds
