@@ -25,7 +25,9 @@ namespace be::mg {
         JS_CFUNC_DEF("header", 0, HTTPRequest::header),
         JS_CFUNC_DEF("allHeaders", 0, HTTPRequest::all_headers),
         JS_CFUNC_DEF("body", 0, HTTPRequest::body),
+        JS_CFUNC_DEF("bodyLength", 0, HTTPRequest::bodyLength),
         JS_CFUNC_DEF("chunk", 0, HTTPRequest::chunk),
+        JS_CFUNC_DEF("chunkLength", 0, HTTPRequest::chunkLength),
         JS_CFUNC_DEF("raw", 0, HTTPRequest::raw),
         JS_CFUNC_DEF("rawHead", 0, HTTPRequest::rawHead),
         JS_CFUNC_DEF("matchURI", 0, HTTPRequest::match_uri),
@@ -128,24 +130,49 @@ namespace be::mg {
      * 返回 http 请求的 body 内容
      * 
      * @method body
-     * @return string
+     * @return ArrayBuffer
      */
     JSValue HTTPRequest::body(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, req->mg_msg->body.ptr, req->mg_msg->body.len) ;
+        return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->body.ptr, req->mg_msg->body.len) ;
     }
     
     /**
-     * 返回 http 请求的 body 的 chunk 内容
+     * 返回 http 请求的 body 数据长度
      * 
-     * 当 body 比较长时，会分片触发事件，该方法返回事件回调时 chunk 内容
+     * @method bodyLength
+     * @return number
+     */
+    JSValue HTTPRequest::bodyLength(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(HTTPRequest,req)
+        return JS_NewUint32(ctx, req->mg_msg->body.len) ;
+    }
+
+    /**
+     * 返回 http 请求的 body 分段数据内容
+     * 
+     * 所有数据接收完毕后，触发 `http.msg` 事件。
      * 
      * @method chunk
-     * @return string
+     * @return ArrayBuffer
      */
     JSValue HTTPRequest::chunk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, req->mg_msg->chunk.ptr, req->mg_msg->chunk.len) ;
+        return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->chunk.ptr, req->mg_msg->chunk.len) ;
+    }
+
+    
+    /**
+     * 返回 http 请求的 body 分段数据长度
+     * 
+     * > 参考 chunk() 方法
+     * 
+     * @method chunkLength
+     * @return number
+     */
+    JSValue HTTPRequest::chunkLength(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(HTTPRequest,req)
+        return JS_NewUint32(ctx, req->mg_msg->chunk.len) ;
     }
 
     

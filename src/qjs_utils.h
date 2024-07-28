@@ -4,6 +4,7 @@
 #include "deps/quickjs/quickjs-libc.h"
 #include "deps/quickjs/cutils.h"
 #include <stdbool.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -194,14 +195,47 @@ extern "C" {
         }                                   \
     }
 
-#define CALLBACK(func, thisobj, argc, argv)                                         \
-    {                                                                               \
-    JSValue ret = JS_Call(ctx, func, thisobj, argc, argv) ;                         \
-    if( JS_IsException(ret) ) {                                                     \
-        js_std_dump_error(ctx) ;                                                    \
-    }                                                                               \
-    JS_FreeValue(ctx, ret) ;                                                        \
+inline void printUncatchException(JSContext *ctx) {
+    JSValue error = JS_GetException(ctx);
+    const char * cstr = JS_ToCString(ctx, error) ;
+    if(cstr) {
+        printf(cstr) ;
+        printf("\n") ;
+        JS_FreeCString(ctx, cstr) ;
+
+        if (JS_IsError(ctx, error)) {
+            JSValue stack = JS_GetPropertyStr(ctx, error, "stack");
+            if (!JS_IsUndefined(stack)) {
+                cstr = JS_ToCString(ctx, stack) ;
+                printf(cstr) ;
+                printf("\n") ;
+                JS_FreeCString(ctx,cstr) ;
+                JS_FreeValue(ctx, stack);
+            }
+        }
     }
+    JS_FreeValue(ctx,error) ;
+}
+
+inline void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) {
+    if(codelen<0) {
+        codelen = strlen(code) ;
+    }
+    JSValue ret = JS_Eval(ctx,code,codelen,filename,eval_flags) ;
+    if( JS_IsException(ret) ) {
+        printUncatchException(ctx) ;
+    }
+    JS_FreeValue(ctx,ret) ;
+}
+
+inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) {
+    JSValue ret = JS_Call(ctx, jsFunc, jsThis, argc, args) ;
+    if( JS_IsException(ret) ) {
+        printUncatchException(ctx) ;
+    }
+    JS_FreeValue(ctx,ret) ;
+}
+
 #define MALLOC_ARGV1(argv, arg1)                                                    \
     argv = (JSValue*)malloc(sizeof(JSValue)) ;                                      \
     argv[0] = arg1 ;
@@ -416,6 +450,7 @@ bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 
 uint8_t * JS_ArrayToBufferUint8(JSContext *ctx, JSValue array, int * len) ;
+
     
 #ifdef __cplusplus
 }

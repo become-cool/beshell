@@ -23,7 +23,9 @@ namespace be::mg {
         static JSValue header(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue all_headers(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue body(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue bodyLength(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue chunk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue chunkLength(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue raw(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue rawHead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue match_uri(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

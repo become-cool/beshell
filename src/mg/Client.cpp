@@ -120,8 +120,9 @@ namespace be::mg {
                 }
                 break ;
 
+            // 大文件下载时会分批触发 MG_EV_HTTP_CHUNK , 只到下载完 最后触发一个 hm->chunk.len 为 0 的 MG_EV_HTTP_MSG 事件
+            case MG_EV_HTTP_CHUNK:
             case MG_EV_HTTP_MSG: 
-            case MG_EV_HTTP_CHUNK: 
             {
                 // moogose https 协议，会在 close 事件以后触发 msg 事件
                 if(!client || !client->ctx) {
@@ -189,9 +190,6 @@ namespace be::mg {
             JS_FreeCString(ctx, url) ;
             return JS_EXCEPTION ;
         }
-
-        dp(client)
-        dp(client->conn)
 
         JS_FreeCString(ctx, url) ;
         

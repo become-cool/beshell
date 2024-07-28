@@ -58,20 +58,5 @@ namespace be {
     } ;
 }
 
-#define JSEngineEvalEmbeded(ctx, filename)                  \
-    {                                                       \
-        JSValue res = JS_Eval(ctx, (const char *)embeded_js_src_##filename, strlen((char *)embeded_js_src_##filename), "embeded://"#filename ".js", JS_EVAL_TYPE_MODULE); \
-        if (JS_IsException(res)) {                          \
-            JSValue exception_val = JS_GetException(ctx);   \
-            const char * cstr = JS_ToCString(ctx, exception_val) ; \
-            printf("%s\n", cstr) ;                          \
-            JS_FreeCString(ctx, cstr) ;                     \
-            JSValue val = JS_GetPropertyStr(ctx, exception_val, "stack"); \
-            if (!JS_IsUndefined(val)) {                     \
-                cstr = JS_ToCString(ctx, val) ;             \
-                printf("%s\n", cstr) ;                      \
-                JS_FreeCString(ctx,cstr) ;                  \
-            }                                               \
-        }                                                   \
-        JS_FreeValue(ctx, res);                             \
-    }
+#define JSEngineEvalEmbeded(ctx, filename) \
+    JSEval(ctx, (const char *)embeded_js_src_##filename, -1, "embeded://"#filename ".js", JS_EVAL_TYPE_MODULE);
