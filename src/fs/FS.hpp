@@ -15,16 +15,16 @@ namespace be {
     class FS: public NativeModule {
     private:
 
-#ifdef ESP_PLATFORM
-        static std::map<std::string, FSPartition *> partitions;
-        static std::string pwd ;
-#endif
         static std::string prefix ;
         static bool inited ;
 
     protected:
     public:
     
+#ifdef ESP_PLATFORM
+        static std::map<std::string, FSPartition *> partitions;
+        static std::string pwd ;
+#endif
         static const char * name ;
 
         // for JS

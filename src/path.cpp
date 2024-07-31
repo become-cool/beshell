@@ -48,6 +48,11 @@ void path_normalize(char * path) {
         dst++ ;
     }
     *dst = '\0';
+
+    // 处理路径末尾的 /
+    while( strlen(path)>1 && *(path+strlen(path)-1) == '/' ) {
+        *(path+strlen(path)-1) = '\0' ;
+    }
 }
 
 std::string & path_normalize(std::string & path) {

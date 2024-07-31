@@ -4,6 +4,7 @@
 #include "FS.hpp"
 #include "fs/FS.hpp"
 #include "qjs_utils.h"
+#include "../path.hpp"
 #include <sys/stat.h>
 #include <cstring>
 #include <dirent.h>
@@ -263,7 +264,7 @@ namespace be {
      * ]
      * ```
      * 
-     * @function readdirSync
+     * @function listDirSync
      * @param path:string 路径
      * @param detail:bool=false 是否范围详细信息
      * @return string[] | object[]
@@ -272,6 +273,8 @@ namespace be {
         
         ASSERT_ARGC(1)
         ARGV_PATH(path, 0)
+        path_normalize(path) ;
+        std::string fullpath = FS::toVFSPath(path.c_str()) ;
 
         DIR* dir = opendir(path.c_str());
         string childpath ;
@@ -282,7 +285,7 @@ namespace be {
         }
 
         if(!dir) {
-            JS_ThrowReferenceError(ctx, "Cound not open dir %s", FS::trimVFSPath(path).c_str());
+            JS_ThrowReferenceError(ctx, "Cound not open dir %s", fullpath.c_str());
             return JS_EXCEPTION ;
         }
         
@@ -294,7 +297,7 @@ namespace be {
         while((dirEnt = readdir(dir))) {
                 // tt = gettime() ;
                 // printf("readdir() time: %lld\n", tt-t) ;
-                // t = tt ;
+                // t = tt  ;
 
             if(detail) {
 
@@ -324,13 +327,29 @@ namespace be {
             }
         }
 
+        closedir(dir);
 
 #ifdef ESP_PLATFORM
-        // @todo 
         // esp32 vfs 读取目录时，忽略了挂载点，将已知挂载点补充上
+        char ppath[256] ;
+        for(auto p:partitions) {
+            if(p.first=="/fs") {
+                continue;
+            }
+            path_dirname(p.first.c_str(), ppath) ;
+            if(ppath==fullpath) {
+                if(detail) {
+                    JSValue item = JS_NewObject(ctx) ;
+                    JS_SetPropertyUint32(ctx, ret, idx++, item) ;
+                    JS_SetPropertyStr(ctx, item, "name", JS_NewString(ctx, path_basename(p.first.c_str()))) ;
+                    JS_SetPropertyStr(ctx, item, "type", JS_NewString(ctx, "dir") ) ;
+                } else {
+                    JS_SetPropertyUint32(ctx, ret, idx++, JS_NewString(ctx, path_basename(p.first.c_str()))) ;
+                }
+            }
+        }
 #endif
 
-        closedir(dir);
         return ret ;
     }
 

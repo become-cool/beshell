@@ -2,6 +2,7 @@
 #include "string_utils.hpp"
 #include "BeShell.hpp"
 #include "telnet/Telnet.hpp"
+#include "../path.hpp"
 #include "debug.h"
 #include "mallocf.h"
 #include <cassert>
@@ -129,6 +130,27 @@ namespace be {
                 }
                 
                 closedir(dir);
+
+#ifdef ESP_PLATFORM
+                // esp32 vfs 读取目录时，忽略了挂载点，将已知挂载点补充上
+                char ppath[256] ;
+                for(auto p : FS::partitions) {
+                    if(p.first=="/fs") {
+                        continue;
+                    }
+                    path_dirname(p.first.c_str(), ppath) ;
+                    if(ppath==path) {
+                        if(bList){
+                            dirsBuff << std::setw(8) << "<dir>" << "   " << path_basename(p.first.c_str()) << "/" << endl ;
+                        } else {
+                            if(!fisrt) {
+                                filesBuff << ", " ;
+                            }
+                            filesBuff << path_basename(p.first.c_str()) ;
+                        }
+                    }
+                }
+#endif
 
                 if(!bList) {
                     filesBuff << endl ;
