@@ -68,5 +68,6 @@ Refactored:
 * I2CDevice::begin() rename to I2CDevice::setup()
 * DeviceTree 在 js 中调用
 * 加入了 be::driver:input 名称空间
+* lv.Animation 从 EventEmitter 继承，增加了 stop 事件
 
 ### v0.3.0   2024-4-22
