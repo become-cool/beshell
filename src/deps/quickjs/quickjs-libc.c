@@ -1977,19 +1977,18 @@ static void call_handler(JSContext *ctx, JSValueConst func)
 
 static int js_os_poll(JSContext *ctx)
 {
-    dd
     JSRuntime *rt = JS_GetRuntime(ctx);
     JSThreadState *ts = JS_GetRuntimeOpaque(rt);
     int min_delay, console_fd;
     int64_t cur_time, delay;
     JSOSRWHandler *rh;
     struct list_head *el;
-    dd
+    
     /* XXX: handle signals if useful */
 
     if (list_empty(&ts->os_rw_handlers) && list_empty(&ts->os_timers))
         return -1; /* no more events */
-    dd
+    
     /* XXX: only timers and basic console input are supported */
     if (!list_empty(&ts->os_timers)) {
         cur_time = get_time_ms();
@@ -2015,7 +2014,7 @@ static int js_os_poll(JSContext *ctx)
     } else {
         min_delay = -1;
     }
-dd
+
     console_fd = -1;
     list_for_each(el, &ts->os_rw_handlers) {
         rh = list_entry(el, JSOSRWHandler, link);
@@ -2024,7 +2023,7 @@ dd
             break;
         }
     }
-dd
+
     if (console_fd >= 0) {
         DWORD ti, ret;
         HANDLE handle;
@@ -3545,9 +3544,8 @@ static const JSCFunctionListEntry js_os_funcs[] = {
 
 static int js_os_init(JSContext *ctx, JSModuleDef *m)
 {
-    dd
     os_poll_func = js_os_poll;
-    dp(os_poll_func)
+    // dp(os_poll_func)
     
     /* OSTimer class */
     JS_NewClassID(&js_os_timer_class_id);
