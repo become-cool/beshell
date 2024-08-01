@@ -4,14 +4,14 @@
 using namespace std ;
 
 namespace be::lv {
-    DEFINE_NCLASS_META(Animation, NativeClass)
+    DEFINE_NCLASS_META(Animation, EventEmitter)
     std::vector<JSCFunctionListEntry> Animation::methods = {
         JS_CFUNC_DEF("start", 0, Animation::start),
         JS_CFUNC_DEF("stop", 0, Animation::stop),
     } ;
 
     Animation::Animation(JSContext * ctx, Obj * target)
-        : NativeClass(ctx,build(ctx))
+        : EventEmitter(ctx,build(ctx))
         , target(target)
     {
         assert(target) ;
@@ -29,6 +29,10 @@ namespace be::lv {
             stop(ctx) ;
         }
     }
+
+    // Animation::~Animation (){
+    //     printf("Animation destructor\n");
+    // }
     
     void Animation::start(JSContext * ctx) {
         JSEngine::fromJSContext(ctx)->addLoopObject(this, true) ;
@@ -41,6 +45,8 @@ namespace be::lv {
         JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
         shared_loopable = nullptr ;
         running = false ;
+
+        emitSync("stop", {}) ;
     }
 
     JSValue Animation::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

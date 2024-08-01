@@ -10,7 +10,7 @@ namespace be::lv {
 
     typedef void (*lv_anim_prop_setter)(void *, int32_t);
 
-    class Animation: public be::NativeClass, public be::ILoopable {
+    class Animation: public be::EventEmitter, public be::ILoopable {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
@@ -35,9 +35,7 @@ namespace be::lv {
     friend class Obj ;
     public:
         Animation(JSContext * ctx, Obj * target) ;
-        // ~Animation() {
-        //     printf("Animation destructor\n");
-        // }
+        // ~Animation() ;
 
         void start(JSContext * ctx) ;
         void stop(JSContext * ctx) ;
