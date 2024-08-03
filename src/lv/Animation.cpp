@@ -36,17 +36,25 @@ namespace be::lv {
     
     void Animation::start(JSContext * ctx) {
         JSEngine::fromJSContext(ctx)->addLoopObject(this, true) ;
-        shared_loopable = shared() ;
+        JS_DupValue(ctx, target->jsobj) ;
+
+        // shared_loopable = shared() ;
         startTime = gettime() ;
         running = true ;
     }
 
     void Animation::stop(JSContext * ctx) {
-        JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
-        shared_loopable = nullptr ;
+
         running = false ;
 
+        JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
+        // shared_loopable = nullptr ;
+        // dp(this)
+
+        JS_FreeValue(ctx, target->jsobj) ;
+
         emitSync("stop", {}) ;
+
     }
 
     JSValue Animation::start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -56,6 +64,7 @@ namespace be::lv {
     }
 
     JSValue Animation::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        dd
         THIS_NCLASS(Animation, that)
         that->stop(ctx) ;
         return JS_UNDEFINED ;

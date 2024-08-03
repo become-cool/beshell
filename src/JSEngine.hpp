@@ -16,12 +16,24 @@ namespace be {
         virtual void loop(JSContext *) = 0 ;
     } ;
 
+    struct ILoopableOp {
+        int op ;  // 1: add, -1: remove
+        ILoopable * obj ;
+        bool ignoreRepeat ;
+    } ;
+
     class JSEngine {
     private:
 
         Console * console = nullptr ;
+
+        
+        bool looping = false ;
+
         std::vector<std::pair<EngineLoopFunction,void *>> loopFunctions ; 
-        std::vector<ILoopable*> loopables ; 
+
+        std::vector<ILoopable*> loopables ;
+        std::vector<ILoopableOp> queueLoopableOps ;
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 

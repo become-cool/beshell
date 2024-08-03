@@ -112,6 +112,7 @@ namespace be {
         JS_AddIntrinsicBigInt(ctx);
 #endif
 
+
         // global 对象
         JSValue global = JS_GetGlobalObject(ctx);
         JS_SetPropertyStr(ctx, global, "global", global);
@@ -139,15 +140,28 @@ namespace be {
     }
 
     void JSEngine::loop() {
+        looping = true ;
+
         timer.loop(ctx) ;
         js_std_loop(ctx) ;
 
-        for(auto _pair:loopFunctions) {
-            _pair.first(ctx, _pair.second) ;
+        for (auto _pair = loopFunctions.rbegin(); _pair != loopFunctions.rend(); ++_pair) {
+        // for (auto _pair : loopFunctions) {
+            (*_pair).first(ctx, (*_pair).second) ;
         }
 
-        for(auto obj:loopables) {
+        for (auto obj : loopables) {
             obj->loop(ctx) ;
+        }
+
+        looping = false ;
+        for(auto op : queueLoopableOps) {
+            if(op.op==1) {
+                addLoopObject(op.obj,op.ignoreRepeat) ;
+            }
+            else if(op.op==-1) {
+                removeLoopObject(op.obj) ;
+            }
         }
     }
 
@@ -261,6 +275,10 @@ namespace be {
     }
 
     void JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat) {
+        if(looping) {
+            queueLoopableOps.push_back({1,obj,ignoreRepeat}) ;
+            return ;
+        }
         if(ignoreRepeat) {
             auto it = std::find(loopables.begin(), loopables.end(), obj);
             if(it != loopables.end()) {
@@ -272,10 +290,13 @@ namespace be {
 
     
     void JSEngine::removeLoopObject(ILoopable* obj) {
+        if(looping) {
+            queueLoopableOps.push_back({-1,obj,false}) ;
+            return ;
+        }
         auto it = std::find(loopables.begin(), loopables.end(), obj);
         if(it != loopables.end()) {
             loopables.erase(it) ;
         }
     }
-
 }
