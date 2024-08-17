@@ -1,6 +1,7 @@
 #pragma once
 
 #include "debug.h"
+#include "native_helper.h"
 #include "deps/quickjs/quickjs-libc.h"
 #include "deps/quickjs/cutils.h"
 #include <stdbool.h>
@@ -334,8 +335,12 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     }
     
 #define GET_INT32_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t, JS_ToInt32, default)
+#define GET_INT16_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t,  JS_ToInt32,  default)
+#define GET_INT8_PROP_OPT(obj, propName, cvar, default)    GET_INT_PROP_OPT(obj, propName, cvar, int32_t,   JS_ToInt32,  default)
 #define GET_UINT32_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
-
+#define GET_UINT16_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
+#define GET_UINT8_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, uint32_t,  JS_ToUint32, default)
+// #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint8_t, JS_ToUint32, default)
 
 #define GET_PROP(obj, propName, jsvar)                                                  \
     jsvar = JS_UNDEFINED ;                                                              \
