@@ -377,6 +377,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
         cvar = JS_ToBool(ctx, jsvar) ;                                                  \
+        JS_FreeValue(ctx, jsvar) ;                                                      \
     }
 
 
