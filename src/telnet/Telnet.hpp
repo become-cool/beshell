@@ -26,6 +26,7 @@ namespace be {
         
 #ifdef ESP_PLATFORM
         TelnetSerial channelSeiral ;
+        TelnetBLE * channelBLE = nullptr ;
 #endif
 #ifdef LINUX_PLATFORM
         TelnetStdIO channelStdIO ;
@@ -40,7 +41,6 @@ namespace be {
 
         void setup() ;
         void loop() ;
-        TelnetBLE * bt = nullptr ;
 
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
         void output(const std::string & data, int pkgid=-1, uint8_t cmd=OUTPUT) ;
