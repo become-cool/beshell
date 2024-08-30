@@ -342,6 +342,18 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, uint32_t,  JS_ToUint32, default)
 // #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint8_t, JS_ToUint32, default)
 
+#define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \
+    cvar ;                                                                              \
+    {                                                                                   \
+        JSValue value = JS_GetPropertyStr(ctx, obj, propName) ;                         \
+        if(JS_ToFloat64(ctx, &(cvar), value)!=0) {                                      \
+            cvar = default ;                                                            \
+        }                                                                               \
+        JS_FreeValue(ctx, value) ;                                                      \
+    }
+
+
+
 #define GET_PROP(obj, propName, jsvar)                                                  \
     jsvar = JS_UNDEFINED ;                                                              \
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
