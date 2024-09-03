@@ -264,9 +264,6 @@ namespace be {
         return ret ;
     }
     bool FS::writeFileSync(const char * cpath, const char * data, size_t len, bool append) {
-        if(data) {
-            return false ;
-        }
 
         std::string path = toVFSPath(cpath) ;
 
@@ -275,9 +272,11 @@ namespace be {
             return false ;
         }
 
-        fwrite(data, 1, len, fd);
+        if(data && len) {
+            fwrite(data, 1, len, fd);
+        }
+
         fclose(fd) ;
-        
         return true ;
     }
 
