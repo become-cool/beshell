@@ -13,6 +13,7 @@ Added:
 * mg.setDNSTimeout()
 * mg.get()
 * mg.download()
+* repl command: compile
 
 Fixed:
 

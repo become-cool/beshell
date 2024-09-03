@@ -381,13 +381,11 @@ namespace be {
             }
 
             string script(content.get(), readed) ;
-            dn(readed)
             
             uint32_t flag = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY ;
-            // uint32_t flag = JS_EVAL_TYPE_GLOBAL | JS_EVAL_FLAG_COMPILE_ONLY ;
             // if(argc>2 && JS_ToBool(ctx, argv[2])) {
             //     flag|= JS_EVAL_FLAG_STRIP ;
-            
+
             path+= ".bin" ;
 
             JSValue func = JS_Eval(beshell->engine->ctx, script.c_str(), readed, path.c_str(), flag) ; 

@@ -143,7 +143,7 @@ namespace be {
 
     const char * FS::trimVFSPath(const char * path) {
         int plen = strlen(path) ;
-        if (plen>=prefix.size() && 0==strcmp(path, prefix.c_str())) {
+        if (plen>=prefix.size() && 0==strncmp(path, prefix.c_str(), prefix.size())) {
             if(plen==prefix.size() || path[prefix.size()]=='/') {
                 return path + prefix.size() ;
             }

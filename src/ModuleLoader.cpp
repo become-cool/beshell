@@ -6,6 +6,7 @@
 #include "telnet/TelnetModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
+#include "fs/FS.hpp"
 #include <cstring>
 #include <cassert>
 #include <stdlib.h>
@@ -14,7 +15,21 @@
 #include "qjs_utils.h"
 #include "quickjs_private.h"
 
+/* insert 'el' between 'prev' and 'next' */
+static inline void __list_add(struct list_head *el, 
+                              struct list_head *prev, struct list_head *next)
+{
+    prev->next = el;
+    el->prev = prev;
+    el->next = next;
+    next->prev = el;
+}
 
+/* add 'el' at the end of the list 'head' (= before element head) */
+static inline void list_add_tail(struct list_head *el, struct list_head *head)
+{
+    __list_add(el, head->prev, head);
+}
 
 namespace be {
 
@@ -80,7 +95,9 @@ namespace be {
 
             char * fullpath = (char *)JS_ToCString(ctx,val1) ;
             path_normalize(fullpath) ;
-            JSValue val2 = JS_NewString(ctx, fullpath);
+            const char * fullpath2 = FS::trimVFSPath(fullpath) ;
+
+            JSValue val2 = JS_NewString(ctx, fullpath2);
 
             JS_FreeAtom(ctx,atom) ;
             JS_FreeValue(ctx,val1) ;
@@ -333,7 +350,14 @@ namespace be {
         
         m = (JSModuleDef*)JS_VALUE_GET_PTR(func_val);
         JS_FreeValue(ctx, func_val);
-        
+
+        // 将 bin 文件内的路径改为实际路径, 并添加到已加载module队列
+        if(asBin) {
+            JS_FreeAtom(ctx, m->module_name) ;
+            m->module_name = JS_NewAtom(ctx, path) ;
+            list_add_tail(&m->link, &ctx->loaded_modules);
+        }
+
         return m;
     }
 }
