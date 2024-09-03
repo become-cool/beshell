@@ -141,6 +141,16 @@ namespace be {
         return path ;
     }
 
+    const char * FS::trimVFSPath(const char * path) {
+        int plen = strlen(path) ;
+        if (plen>=prefix.size() && 0==strcmp(path, prefix.c_str())) {
+            if(plen==prefix.size() || path[prefix.size()]=='/') {
+                return path + prefix.size() ;
+            }
+        }
+        return path ;
+    }
+
     bool FS::exist(const char * path) {
         string _path = toVFSPath(path) ;
         struct stat statbuf;
