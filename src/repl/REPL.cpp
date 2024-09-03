@@ -387,14 +387,13 @@ namespace be {
             // uint32_t flag = JS_EVAL_TYPE_GLOBAL | JS_EVAL_FLAG_COMPILE_ONLY ;
             // if(argc>2 && JS_ToBool(ctx, argv[2])) {
             //     flag|= JS_EVAL_FLAG_STRIP ;
+            
+            path+= ".bin" ;
 
             JSValue func = JS_Eval(beshell->engine->ctx, script.c_str(), readed, path.c_str(), flag) ; 
             size_t bytecode_len;
             uint8_t * bytecode = JS_WriteObject(beshell->engine->ctx, &bytecode_len, func, JS_WRITE_OBJ_BYTECODE);
 
-            dn(bytecode_len)
-
-            path+= ".bin" ;
             if( FS::writeFileSync(path.c_str(), (const char *)bytecode, bytecode_len, false) ) {
                 ch->send("save bytecode to "+path+"\n") ;
             } else {
