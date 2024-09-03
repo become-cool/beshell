@@ -42,6 +42,7 @@ namespace be {
         {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
+            exportFunction("compile",compile) ;
             exportFunction("importSync",importSync) ;
             exportFunction("exportValue",exportValue) ;
             exportFunction("allModuleNames",allModuleNames) ;
@@ -132,6 +133,40 @@ namespace be {
             free(dir) ;
 
             return val ;
+        }
+        static JSValue compile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            ASSERT_ARGC(1)
+
+            std::string ARGV_TO_STRING(0, source)
+            std::string dist ;
+
+            if(argc>1) {
+                ARGV_TO_STRING(1, dist)
+            } else {
+                dist = source + ".bin" ;
+            }
+
+            int readed = 0 ;
+            std::unique_ptr<char> content = FS::readFileSync(source.c_str(), &readed) ;
+            if(readed<0) {
+                JSTHROW("could not read file: %s", source.c_str())
+            }
+
+            std::string script(content.get(), readed) ;
+            
+            uint32_t flag = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY ;
+
+            JSValue func = JS_Eval(ctx, script.c_str(), readed, dist.c_str(), flag) ; 
+            size_t bytecode_len;
+            uint8_t * bytecode = JS_WriteObject(ctx, &bytecode_len, func, JS_WRITE_OBJ_BYTECODE);
+
+            bool res = FS::writeFileSync(dist.c_str(), (const char *)bytecode, bytecode_len, false) ;
+            free(bytecode) ;
+            if(!res) {
+                JSTHROW("write file failed: %s", dist.c_str())
+            }
+
+            return JS_UNDEFINED ;
         }
         static JSValue exportValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             ASSERT_ARGC(3)

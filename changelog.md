@@ -14,6 +14,7 @@ Added:
 * mg.get()
 * mg.download()
 * repl command: compile
+* loader.compile()
 
 Fixed:
 
