@@ -27,6 +27,7 @@ Refactored:
 * serial.spiX "X"从0开始计数
 * mg.connect() crash
 * process.setTime 影响 setInterval()
+* 重构了 JSEngine 的循环机制
 
 ## v0.3.4   2024-6-4
 

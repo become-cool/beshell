@@ -441,7 +441,7 @@ namespace be {
             JS_FreeValue(ctx, that->slaveListener) ;
         }
         
-        JSEngine::fromJSContext(ctx)->addLoopFunction(I2C::loop, (void *)that) ;
+        JSEngine::fromJSContext(ctx)->addLoopFunction(I2C::loop, (void *)that, true, 0) ;
 
         that->slaveListener = JS_DupValue(ctx, argv[0]) ;
         return JS_UNDEFINED ;

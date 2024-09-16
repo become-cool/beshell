@@ -35,7 +35,7 @@ namespace be::lv {
     // }
     
     void Animation::start(JSContext * ctx) {
-        JSEngine::fromJSContext(ctx)->addLoopObject(this, true) ;
+        JSEngine::fromJSContext(ctx)->addLoopObject(this, true, 0) ;
         JS_DupValue(ctx, target->jsobj) ;
 
         // shared_loopable = shared() ;
@@ -47,9 +47,8 @@ namespace be::lv {
 
         running = false ;
 
-        JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
-        // shared_loopable = nullptr ;
-        // dp(this)
+        JSEngine * engine = JSEngine::fromJSContext(ctx) ;
+        engine->removeLooping(engine->findLooping(this)) ;
 
         JS_FreeValue(ctx, target->jsobj) ;
 
