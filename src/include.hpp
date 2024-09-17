@@ -70,3 +70,4 @@
 #include "driver/sys/DS1307.hpp"
 #include "driver/sys/SDCard.hpp"
 #include "driver/disp/ST7701.hpp"
+#include "driver/comm/PN532.hpp"
