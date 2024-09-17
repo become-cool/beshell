@@ -56,6 +56,9 @@
 #include "lv/LV.hpp"
 #endif
 
+// ext
+#include "ext/media/audio/Audio.hpp"
+
 // driver
 #include "driver/input/GT911.hpp"
 #include "driver/sensor/BMP280.hpp"
