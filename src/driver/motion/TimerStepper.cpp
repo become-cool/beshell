@@ -245,7 +245,7 @@ namespace be::driver::motion {
             eventsListenered|= EVENT_PASSING ;
         }
         if(eventsListenered>0) {
-            JSEngine::fromJSContext(ctx)->addLoopObject(this, true) ;
+            JSEngine::fromJSContext(ctx)->addLoopObject(this, true, 0) ;
         }
     }
     void TimerStepper::eventRemoved(const char * eventName) {
@@ -256,7 +256,7 @@ namespace be::driver::motion {
             eventsListenered&= ~EVENT_PASSING ;
         }
         if(eventsListenered==0) {
-            JSEngine::fromJSContext(ctx)->removeLoopObject(this) ;
+            JSEngine::fromJSContext(ctx)->removeLooping(this) ;
         }
     }
     void TimerStepper::loop(JSContext *) {

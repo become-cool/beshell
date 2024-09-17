@@ -113,7 +113,7 @@ namespace be::lv {
         }
 
         initTick() ;
-        beshell->addLoopFunction(loop) ;
+        beshell->addLoopFunction(loop,nullptr) ;
         lv_init() ;
 
         used = true ;

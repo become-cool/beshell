@@ -1,6 +1,7 @@
 #pragma once
 
 #include "debug.h"
+#include "native_helper.h"
 #include "deps/quickjs/quickjs-libc.h"
 #include "deps/quickjs/cutils.h"
 #include <stdbool.h>
@@ -195,46 +196,11 @@ extern "C" {
         }                                   \
     }
 
-inline void printUncatchException(JSContext *ctx) {
-    JSValue error = JS_GetException(ctx);
-    const char * cstr = JS_ToCString(ctx, error) ;
-    if(cstr) {
-        printf(cstr) ;
-        printf("\n") ;
-        JS_FreeCString(ctx, cstr) ;
+void printUncatchException(JSContext *ctx) ;
 
-        if (JS_IsError(ctx, error)) {
-            JSValue stack = JS_GetPropertyStr(ctx, error, "stack");
-            if (!JS_IsUndefined(stack)) {
-                cstr = JS_ToCString(ctx, stack) ;
-                printf(cstr) ;
-                printf("\n") ;
-                JS_FreeCString(ctx,cstr) ;
-                JS_FreeValue(ctx, stack);
-            }
-        }
-    }
-    JS_FreeValue(ctx,error) ;
-}
+void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) ;
 
-inline void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) {
-    if(codelen<0) {
-        codelen = strlen(code) ;
-    }
-    JSValue ret = JS_Eval(ctx,code,codelen,filename,eval_flags) ;
-    if( JS_IsException(ret) ) {
-        printUncatchException(ctx) ;
-    }
-    JS_FreeValue(ctx,ret) ;
-}
-
-inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) {
-    JSValue ret = JS_Call(ctx, jsFunc, jsThis, argc, args) ;
-    if( JS_IsException(ret) ) {
-        printUncatchException(ctx) ;
-    }
-    JS_FreeValue(ctx,ret) ;
-}
+void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) ;
 
 #define MALLOC_ARGV1(argv, arg1)                                                    \
     argv = (JSValue*)malloc(sizeof(JSValue)) ;                                      \
@@ -369,7 +335,23 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     }
     
 #define GET_INT32_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t, JS_ToInt32, default)
+#define GET_INT16_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t,  JS_ToInt32,  default)
+#define GET_INT8_PROP_OPT(obj, propName, cvar, default)    GET_INT_PROP_OPT(obj, propName, cvar, int32_t,   JS_ToInt32,  default)
 #define GET_UINT32_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
+#define GET_UINT16_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
+#define GET_UINT8_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, uint32_t,  JS_ToUint32, default)
+// #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint8_t, JS_ToUint32, default)
+
+#define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \
+    cvar ;                                                                              \
+    {                                                                                   \
+        JSValue value = JS_GetPropertyStr(ctx, obj, propName) ;                         \
+        if(JS_ToFloat64(ctx, &(cvar), value)!=0) {                                      \
+            cvar = default ;                                                            \
+        }                                                                               \
+        JS_FreeValue(ctx, value) ;                                                      \
+    }
+
 
 
 #define GET_PROP(obj, propName, jsvar)                                                  \
@@ -407,6 +389,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
         cvar = JS_ToBool(ctx, jsvar) ;                                                  \
+        JS_FreeValue(ctx, jsvar) ;                                                      \
     }
 
 

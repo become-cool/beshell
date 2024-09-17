@@ -243,7 +243,7 @@ namespace be{
             uart->data_queue = xQueueCreate(DATA_QUEUE_LEN, sizeof(uart_chunk_t));
         }
 
-        JSEngine::fromJSContext(ctx)->addLoopFunction(UART::loop, (void *)uart) ;
+        JSEngine::fromJSContext(ctx)->addLoopFunction(UART::loop, (void *)uart, true, 0) ;
 
         return JS_UNDEFINED ;
     }

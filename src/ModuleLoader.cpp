@@ -6,6 +6,7 @@
 #include "telnet/TelnetModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
+#include "fs/FS.hpp"
 #include <cstring>
 #include <cassert>
 #include <stdlib.h>
@@ -14,7 +15,21 @@
 #include "qjs_utils.h"
 #include "quickjs_private.h"
 
+/* insert 'el' between 'prev' and 'next' */
+static inline void __list_add(struct list_head *el, 
+                              struct list_head *prev, struct list_head *next)
+{
+    prev->next = el;
+    el->prev = prev;
+    el->next = next;
+    next->prev = el;
+}
 
+/* add 'el' at the end of the list 'head' (= before element head) */
+static inline void list_add_tail(struct list_head *el, struct list_head *head)
+{
+    __list_add(el, head->prev, head);
+}
 
 namespace be {
 
@@ -27,6 +42,7 @@ namespace be {
         {
             exportFunction("__filename",jsFilename) ;
             exportFunction("__dirname",jsDirname) ;
+            exportFunction("compile",compile) ;
             exportFunction("importSync",importSync) ;
             exportFunction("exportValue",exportValue) ;
             exportFunction("allModuleNames",allModuleNames) ;
@@ -80,7 +96,9 @@ namespace be {
 
             char * fullpath = (char *)JS_ToCString(ctx,val1) ;
             path_normalize(fullpath) ;
-            JSValue val2 = JS_NewString(ctx, fullpath);
+            const char * fullpath2 = FS::trimVFSPath(fullpath) ;
+
+            JSValue val2 = JS_NewString(ctx, fullpath2);
 
             JS_FreeAtom(ctx,atom) ;
             JS_FreeValue(ctx,val1) ;
@@ -115,6 +133,40 @@ namespace be {
             free(dir) ;
 
             return val ;
+        }
+        static JSValue compile(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+            ASSERT_ARGC(1)
+
+            std::string ARGV_TO_STRING(0, source)
+            std::string dist ;
+
+            if(argc>1) {
+                ARGV_TO_STRING(1, dist)
+            } else {
+                dist = source + ".bin" ;
+            }
+
+            int readed = 0 ;
+            std::unique_ptr<char> content = FS::readFileSync(source.c_str(), &readed) ;
+            if(readed<0) {
+                JSTHROW("could not read file: %s", source.c_str())
+            }
+
+            std::string script(content.get(), readed) ;
+            
+            uint32_t flag = JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY ;
+
+            JSValue func = JS_Eval(ctx, script.c_str(), readed, dist.c_str(), flag) ; 
+            size_t bytecode_len;
+            uint8_t * bytecode = JS_WriteObject(ctx, &bytecode_len, func, JS_WRITE_OBJ_BYTECODE);
+
+            bool res = FS::writeFileSync(dist.c_str(), (const char *)bytecode, bytecode_len, false) ;
+            free(bytecode) ;
+            if(!res) {
+                JSTHROW("write file failed: %s", dist.c_str())
+            }
+
+            return JS_UNDEFINED ;
         }
         static JSValue exportValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             ASSERT_ARGC(3)
@@ -333,7 +385,14 @@ namespace be {
         
         m = (JSModuleDef*)JS_VALUE_GET_PTR(func_val);
         JS_FreeValue(ctx, func_val);
-        
+
+        // 将 bin 文件内的路径改为实际路径, 并添加到已加载module队列
+        if(asBin) {
+            JS_FreeAtom(ctx, m->module_name) ;
+            m->module_name = JS_NewAtom(ctx, path) ;
+            list_add_tail(&m->link, &ctx->loaded_modules);
+        }
+
         return m;
     }
 }

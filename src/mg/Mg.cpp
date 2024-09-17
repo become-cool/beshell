@@ -100,7 +100,7 @@ namespace be::mg {
 
         beshell->use<WiFi>() ;
 
-        beshell->addLoopFunction(loop, nullptr) ;
+        beshell->addLoopFunction(loop, NULL) ;
 
         ca_path = FS::toVFSPath("/var/ca.pem") ;
         cert_path = FS::toVFSPath("/var/cert.pem") ;

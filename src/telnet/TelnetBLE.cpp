@@ -29,6 +29,7 @@ namespace be {
     }) ;
 
     static void gatt_msg_handler (uint8_t *data, size_t size) {
+        // printf("ble receive: \n") ;
         // print_block(data, size, 8) ;
         parser.parse(data, size) ;
     }
@@ -52,6 +53,7 @@ namespace be {
     }
     
     void TelnetBLE::sendData (const char * data, size_t datalen) {
+        // printf("ble send: \n") ;
         // print_block((uint8_t*)data, datalen, 8) ;
         if(!data || datalen<=0) {
             return ;
@@ -60,6 +62,8 @@ namespace be {
     }
     
     void TelnetBLE::send (Package & pkg) {
+        // printf("ble send pkg") ;
+
         int fulllen = pkg.head_len + pkg.body_len + 1;
 
         uint8_t * buff = (uint8_t *)malloc(fulllen) ;
