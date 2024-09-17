@@ -75,8 +75,9 @@ namespace be {
 
         static I2C * flyweight(JSContext *, i2c_port_t) ;
 
-        gpio_num_t sda() ;
-        gpio_num_t scl() ;
+        gpio_num_t sda() const ;
+        gpio_num_t scl() const ;
+        i2c_port_t number() const ;
 
         inline void take() ;
         inline void give() ;

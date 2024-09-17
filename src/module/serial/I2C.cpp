@@ -549,11 +549,14 @@ namespace be {
     }
     #endif
 
-    gpio_num_t I2C::sda() {
+    gpio_num_t I2C::sda() const {
         return _sda ;
     }
-    gpio_num_t I2C::scl() {
+    gpio_num_t I2C::scl() const {
         return _scl ;
+    }
+    i2c_port_t I2C::number() const {
+        return busnum ;
     }
 
     
