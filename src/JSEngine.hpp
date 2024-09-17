@@ -6,6 +6,8 @@
 #include "ModuleLoader.hpp"
 #include "basic/Console.hpp"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 namespace be {
     class BeShell ;
@@ -52,12 +54,12 @@ namespace be {
 
         Console * console = nullptr ;
 
+        SemaphoreHandle_t xSemaphore;
         bool inLooping = false ;
 
         uint16_t loopingAssignedId = 0 ;
         std::vector<struct Looping> lstLoopings ; 
         std::vector<LoopingOp> waitingLoopingOps ;
-
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 
@@ -99,6 +101,9 @@ namespace be {
         void removeLooping(EngineLoopFunction func, void * opaque) ;
         void removeLooping(EngineLoopFunction func) ;
         void removeLooping(ILoopable* obj) ;
+
+        bool take(int timeout=portMAX_DELAY) ;
+        void give() ;
     } ;
 }
 

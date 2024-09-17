@@ -58,7 +58,8 @@ namespace be {
     JSEngine::JSEngine(BeShell * beshell)
         : beshell(beshell)
         , mloader(beshell)
-    {}
+    {
+    }
 
     void JSEngine::setup() {
         if(rt!=NULL) {
@@ -66,6 +67,10 @@ namespace be {
         }
         
 #ifdef ESP_PLATFORM
+        
+        xSemaphore = xSemaphoreCreateBinary();
+        give() ;
+
         // // esp32 平台优先使用 PSRAM内存
         // if( getPsramTotal()>1024 ) {
         //     static const JSMallocFunctions def_malloc_funcs = {
@@ -145,6 +150,9 @@ namespace be {
     }
 
     void JSEngine::loop() {
+
+        take() ;
+
         inLooping = true ;
 
         timer.loop(ctx) ;
@@ -192,6 +200,8 @@ namespace be {
             }
         }
         waitingLoopingOps.clear() ;
+
+        give() ;
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -406,5 +416,12 @@ namespace be {
     }
     void JSEngine::removeLooping(ILoopable* obj) {
         removeLooping(findLooping(obj)) ;
+    }
+
+    bool JSEngine::take(int timeout) {
+        return xSemaphoreTake(xSemaphore, timeout) == pdTRUE ;
+    }
+    void JSEngine::give() {
+        xSemaphoreGive(xSemaphore);
     }
 }
