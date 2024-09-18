@@ -15,6 +15,7 @@ Added:
 * mg.download()
 * repl command: compile
 * loader.compile()
+* AudioPlayer
 
 Fixed:
 

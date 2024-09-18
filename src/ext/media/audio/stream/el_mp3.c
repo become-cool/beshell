@@ -11,16 +11,17 @@ static void mp3dec_output(audio_el_mp3_t * el, uint8_t * data, size_t size) {
 
         // 等这一帧以前的数据播放完成
         // xEventGroupWaitBits(el->base.stats, STAT_DRAIN, false, true, 100);
+        int bps = ((audio_pipe_t*)el->base.pipe)->need_expand? 32: 16 ;
 
-        printf("i2s bus:%d, samprate:%d, bps:%d, chans:%d \n",
-            el->i2s
-            , el->decoder->samprate
-            , 32
-            , el->decoder->nChans) ;
+        // printf("i2s bus:%d, samprate:%d, bps:%d, chans:%d \n",
+        //     el->i2s
+        //     , el->decoder->samprate
+        //     , bps
+        //     , el->decoder->nChans) ;
         i2s_set_clk(
             el->i2s
             , el->decoder->samprate
-            , 32
+            , bps
             , el->decoder->nChans
         );
 
@@ -123,7 +124,7 @@ static void task_mp3_decoder(audio_el_mp3_t * el) {
                 printf("MP3Decode failed ,code is %d, receive: %d, left data: %d, sync: %d \n",errs, data_size, decode_left, offset);
 
                 // 遇到错误，停止解码
-                // audio_pipe_emit_js(el->base.pipe, "error") ;
+                // audio_pipe_emit_event(el->base.pipe, "error") ;
 
                 ((audio_pipe_t *)el->base.pipe)->error = errs ;
                 ((audio_pipe_t *)el->base.pipe)->finished = false ;
@@ -147,11 +148,11 @@ static void task_mp3_decoder(audio_el_mp3_t * el) {
 
 audio_el_mp3_t * audio_el_mp3_create(audio_pipe_t * pipe, uint8_t core) {    
     audio_el_mp3_t * el ;
-    echo_alloc("audio_el_mp3_t",{
+    necho_alloc("audio_el_mp3_t",{
         ELEMENT_CREATE(pipe, audio_el_mp3_t, el, task_mp3_decoder, 1024*3, 5, core, 1024*2)
     })
 
-    echo_alloc("hexli", {
+    necho_alloc("hexli", {
         el->decoder = MP3InitDecoder();
     })
 
@@ -160,6 +161,7 @@ audio_el_mp3_t * audio_el_mp3_create(audio_pipe_t * pipe, uint8_t core) {
 
     el->undecode_buff = heap_caps_malloc(BUFF_SRC_SIZE, BUFF_SRC_MEMTYPE) ;
 
+    el->base.name = "mp3.decoder" ;
     return el ;
 }
 

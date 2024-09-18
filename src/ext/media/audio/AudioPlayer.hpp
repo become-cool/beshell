@@ -1,10 +1,10 @@
 #pragma once
 
-#include <NativeClass.hpp>
+#include <EventEmitter.hpp>
 #include "stream/audio_stream.h"
 
 namespace be::media {
-    class MusicPlayer: public be::NativeClass {
+    class AudioPlayer: public be::EventEmitter {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;
@@ -20,11 +20,12 @@ namespace be::media {
         void build_el_src(int core) ;
         void build_el_i2s(int core) ;
 
+        static void pipeCallback(const char * event, int param, AudioPlayer * player) ;
     public:
-        MusicPlayer(JSContext * ctx) ;
+        AudioPlayer(JSContext * ctx) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        ~MusicPlayer() ;
+        ~AudioPlayer() ;
 
         static JSValue playPCM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue playMP3(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

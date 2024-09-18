@@ -53,7 +53,7 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
         },data_size) ;
         if(data_size==0 || !pwrite) {
 
-            printf("el_i2s receive empty\n") ;
+            // printf("el_i2s receive empty\n") ;
             
             // 确定前级已流干（ring buffer 里的可读数据可能分在头尾两端，需要两次才能读空）
             if(audio_el_is_drain(el->base.upstream)) {
@@ -76,9 +76,15 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
         while(data_size) {
 
             data_wroten = 0 ;
+
             nechof_time("delay:%lld,%d->%d", {
-                // 扩展到 32 sample                
-                i2s_write_expand(el->i2s, pwrite, data_size, 16, 32, &data_wroten, portMAX_DELAY );
+                if(((audio_pipe_t*)el->base.pipe)->need_expand) {
+                    // 扩展到 32 sample                
+                    i2s_write_expand(el->i2s, pwrite, data_size, 16, 32, &data_wroten, portMAX_DELAY );
+                }
+                else {
+                    i2s_write(el->i2s, pwrite, data_size, &data_wroten, portMAX_DELAY);
+                }
             }, t, data_size, data_wroten)
 
             data_size-= data_wroten ;
@@ -99,6 +105,7 @@ audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t i2s_num, uint8
     if(el) {
         el->i2s = i2s_num ;
     }
+    el->base.name = "i2s" ;
     return el ;
 }
 

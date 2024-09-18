@@ -47,6 +47,7 @@ audio_el_midi_render_t * audio_el_midi_render_create(audio_pipe_t * pipe, tsf * 
 
     el->sf = sf ;
 
+    el->base.name = "midi.render" ;
     return el ;
 }
 

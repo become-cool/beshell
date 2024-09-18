@@ -10,7 +10,6 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 #include "debug.h"
-#include "deps/quickjs/quickjs-libc.h"
 
 
 #include "freertos/FreeRTOS.h"
@@ -48,6 +47,7 @@ typedef struct _audio_el_t{
     struct _audio_el_t * upstream;
     struct _audio_el_t * downstream;
     void * pipe ;
+    char * name ;
 
 } audio_el_t ;
 
@@ -147,6 +147,7 @@ typedef struct {
 } audio_el_midi_render_t ;
 
 
+typedef void (*audio_pipe_event_callback_t) (const char event, int param, void * opaque) ;
 
 typedef struct _audio_pipe {
 
@@ -157,12 +158,13 @@ typedef struct _audio_pipe {
     int8_t error ;
 
     int samplerate ;
+    bool need_expand ;  // 有的芯片不支持 16bit 音源，需要扩展到 32bit 输出到 i2s, 例如 ES8156
 
     audio_el_t * first ;
     audio_el_t * last ;
-    
-    JSContext * ctx ;
-    JSValue jsobj ;
+
+    audio_pipe_event_callback_t callback ;
+    void * callback_opaque ;
     
 } audio_pipe_t ;
 
@@ -252,7 +254,8 @@ void audio_pipe_link(audio_pipe_t * pipe, int audio_el_cnt, ...) ;
 void audio_pipe_set_stats(audio_pipe_t * pipe, int stats) ;
 void audio_pipe_clear_stats(audio_pipe_t * pipe, int stats) ;
 void audio_pipe_clear(audio_pipe_t * pipe) ;
-void audio_pipe_emit_js(audio_pipe_t * pipe, const char * event, JSValue param) ;
+#define audio_pipe_emit_event(pipe, event, param) \
+    if(((audio_pipe_t*)pipe)->callback) ((audio_pipe_t*)pipe)->callback(event, param, ((audio_pipe_t*)pipe)->callback_opaque)
 
 // midi player 
 audio_player_midi_t * audio_player_midi_create(audio_player_midi_conf_t * config) ;

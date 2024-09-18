@@ -58,7 +58,7 @@ static void task_func_midi_msg(audio_el_midi_msg_t * el) {
                     }
 
                     el->played_notes ++ ;
-                    audio_pipe_emit_js(el->base.pipe, "press", JS_NewInt32(((audio_pipe_t*)el->base.pipe)->ctx,  el->msg->key)) ;
+                    // audio_pipe_emit_event(el->base.pipe, "press", JS_NewInt32(((audio_pipe_t*)el->base.pipe)->ctx,  el->msg->key)) ;
 
                 }
                 else {
@@ -68,7 +68,7 @@ static void task_func_midi_msg(audio_el_midi_msg_t * el) {
                         // tsf_note_off(el->sf, el->sf_preset, el->msg->key);
                     }
                     
-                    audio_pipe_emit_js(el->base.pipe, "release", JS_NewInt32(((audio_pipe_t*)el->base.pipe)->ctx,  el->msg->key)) ;
+                    // audio_pipe_emit_event(el->base.pipe, "release", JS_NewInt32(((audio_pipe_t*)el->base.pipe)->ctx,  el->msg->key)) ;
                 }
                 break;
 
@@ -90,9 +90,9 @@ static void task_func_midi_msg(audio_el_midi_msg_t * el) {
         if(!el->msg) {
             audio_el_set_stat(el, STAT_STOPPED) ;
 
-            audio_pipe_emit_js(el->base.pipe, "finish", JS_UNDEFINED) ;
+            audio_pipe_emit_event(&el->base.pipe, "finish", 0) ;
 
-            printf("time: %lld = %lld - %lld sec\n", (esp_timer_get_time()/1000-el->start_ms)/1000, esp_timer_get_time()/1000/1000, el->start_ms/1000) ;
+            // printf("time: %lld = %lld - %lld sec\n", (esp_timer_get_time()/1000-el->start_ms)/1000, esp_timer_get_time()/1000/1000, el->start_ms/1000) ;
         }
     }
 }
@@ -117,6 +117,7 @@ audio_el_midi_msg_t * audio_el_midi_msg_create(audio_pipe_t * pipe, tsf* sf, aud
     
     audio_el_set_stat(el, STAT_STOPPED) ;
 
+    el->base.name = "midi.msg" ;
     return el ;
 }
 

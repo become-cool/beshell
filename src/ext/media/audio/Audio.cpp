@@ -1,5 +1,5 @@
 #include "Audio.hpp"
-#include "MusicPlayer.hpp"
+#include "AudioPlayer.hpp"
 
 
 namespace be::media{
@@ -9,6 +9,6 @@ namespace be::media{
     Audio::Audio(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
     {
-        exportClass<MusicPlayer>();
+        exportClass<AudioPlayer>();
     }
 }
