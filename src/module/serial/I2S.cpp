@@ -67,7 +67,7 @@ namespace be {
         struct i2s_conf  * conf = (struct i2s_conf  *)arg ;
         esp_err_t res = i2s_driver_install(conf->busnum, &conf->config, 0, NULL) ;
         if(res!=ESP_OK){
-            printf("i2s_driver_install() faild with error: %d\n", res) ;
+            // printf("i2s_driver_install() faild with error: %d\n", res) ;
             free(arg) ;
             return ;
         }

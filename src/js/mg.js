@@ -26,12 +26,12 @@ function get(url) {
           connect(conn, url)
           break
         case 'http.msg':
-          console.log("msg")
+          // console.log("msg")
           resolve(data.body())
           break
         case 'http.chunk':
-          console.log("chunk")
-          resolve(data.chunk())
+          // console.log("chunk")
+          // resolve(data.chunk())
           break
         case 'timeout':
         case 'error':
