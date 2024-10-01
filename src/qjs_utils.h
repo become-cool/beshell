@@ -391,12 +391,12 @@ JSValue js_get_glob_prop(JSContext *ctx, int depth, ...)  ;
 bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 #define JS_NewArrayWithBuff(var,buff,buff_len,api)                  \
-    JSValue var = JS_NewArray(ctx) ;                                \
+    var = JS_NewArray(ctx) ;                                        \
     for(int __i=0;__i<buff_len;__i++) {                             \
         JS_SetPropertyUint32(ctx, var, __i, api(ctx,buff[__i])) ;   \
     }
-#define JS_NewArrayWithUint8Buff(var,buff,buff_len) JS_NewArrayWithBuff(var,buff,buff_len,JS_NewUint32)
-#define JS_NewArrayWithInt8Buff(var,buff,buff_len)  JS_NewArrayWithBuff(var,buff,buff_len,JS_NewInt32)
+#define JS_NewArrayWithInt(var,buff,buff_len)  JS_NewArrayWithBuff(var,buff,buff_len,JS_NewInt32)
+#define JS_NewArrayWithUint(var,buff,buff_len) JS_NewArrayWithBuff(var,buff,buff_len,JS_NewUint32)
 
 #define JS_ForeachArray(jsobj,item,code)    \
     {                                       \
