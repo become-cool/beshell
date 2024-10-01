@@ -78,7 +78,7 @@ namespace be::driver {
         uint8_t * buffer = new uint8_t[bufferSize]() ;
 
         #define READ_REG(ADDRTYPE, REGTYPE)                                             \
-            if(that->i2c->read<ADDRTYPE>(that->addr, regAddr, buffer, bufferSize)) {    \
+            if(!that->i2c->read<ADDRTYPE>(that->addr, regAddr, buffer, bufferSize)) {   \
                 delete [] buffer ;                                                      \
                 JSTHROW("i2c read failed")                                              \
             }                                                                           \
