@@ -4,15 +4,6 @@
 
 using namespace std ;
 
-#define JSCHECK_MASTER                              \
-    if(that->mode!=I2C_MODE_MASTER) {               \
-        JSTHROW("I2C is not in %s mode", "master") ;\
-    }
-#define JSCHECK_SLAVE                               \
-    if(that->mode!=I2C_MODE_SLAVE) {                \
-        JSTHROW("I2C is not in %s mode", "slave") ; \
-    }
-
 
 namespace be {
 
@@ -33,17 +24,30 @@ namespace be {
         JS_CFUNC_DEF("ping", 1, I2C::ping),
         JS_CFUNC_DEF("scan", 1, I2C::scan),
         JS_CFUNC_DEF("send", 2, I2C::send),
+        JS_CFUNC_DEF("recv", 2, I2C::recv),
+        JS_CFUNC_DEF("recvUint8", 2, I2C::recvUint8),
+        
+        JS_CFUNC_DEF("write8", 2, I2C::write8),
+        JS_CFUNC_DEF("write16", 2, I2C::write16),
+        JS_CFUNC_DEF("write32", 2, I2C::write32),
+        JS_CFUNC_DEF("readI8", 2, I2C::readI8),
+        JS_CFUNC_DEF("readI16", 2, I2C::readI16),
+        JS_CFUNC_DEF("readI32", 2, I2C::readI32),
+        JS_CFUNC_DEF("readU8", 2, I2C::readU8),
+        JS_CFUNC_DEF("readU16", 2, I2C::readU16),
+        JS_CFUNC_DEF("readU32", 2, I2C::readU32),
+
+        // deprecated api
         JS_CFUNC_DEF("writeInt8", 2, I2C::write8),
         JS_CFUNC_DEF("writeInt16", 2, I2C::write16),
         JS_CFUNC_DEF("writeInt32", 2, I2C::write32),
         JS_CFUNC_DEF("writeUint8", 2, I2C::write8),
         JS_CFUNC_DEF("writeUint16", 2, I2C::write16),
         JS_CFUNC_DEF("writeUint32", 2, I2C::write32),
-        JS_CFUNC_DEF("recv", 2, I2C::recv),
-        JS_CFUNC_DEF("recvUint8", 2, I2C::recvUint8),
         JS_CFUNC_DEF("readR8", 2, I2C::readR8),
         JS_CFUNC_DEF("readR16", 2, I2C::readR16),
         JS_CFUNC_DEF("readR32", 2, I2C::readR32),
+
         #if SOC_I2C_SUPPORT_SLAVE
         JS_CFUNC_DEF("listen", 2, I2C::listen),
         JS_CFUNC_DEF("slaveWrite", 2, I2C::slaveWrite),
@@ -343,10 +347,29 @@ namespace be {
         return JS_NewUint32(ctx,byte) ;
     }
 
+    JSValue I2C::readI8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,int8_t>(ctx, this_val, argc, argv, true) ;
+    }
+    JSValue I2C::readI16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,int16_t>(ctx, this_val, argc, argv, true) ;
+    }
+    JSValue I2C::readI32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,int32_t>(ctx, this_val, argc, argv, true) ;
+    }
+    JSValue I2C::readU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,uint8_t>(ctx, this_val, argc, argv, true) ;
+    }
+    JSValue I2C::readU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,uint16_t>(ctx, this_val, argc, argv, true) ;
+    }
+    JSValue I2C::readU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return readRegInt<uint8_t,uint32_t>(ctx, this_val, argc, argv, true) ;
+    }
+
     #define READ_REG(bits)                                      \
         THIS_NCLASS(I2C, that)                                  \
         JSCHECK_MASTER                                          \
-        ASSERT_ARGC(3)                                           \
+        ASSERT_ARGC(3)                                          \
         ARGV_TO_UINT8(0, addr)                                  \
         ARGV_TO_UINT##bits(1, reg)                              \
         ARGV_TO_UINT32(2, len)                                  \
@@ -354,12 +377,13 @@ namespace be {
         if(!buffer) {                                           \
             JSTHROW("out of memory?") ;                         \
         }                                                       \
-        if(!that->read<uint##bits##_t>(addr,reg,buffer,len)){\
+        if(!that->read<uint##bits##_t>(addr,reg,buffer,len)){   \
             free(buffer) ;                                      \
             return JS_NULL;                                     \
         }                                                       \
-        JS_NewArrayWithUint8Buff(arr, buffer, len)              \
+        JSValue JS_NewArrayWithUint(arr, buffer, len)           \
         return arr ;
+
 
     JSValue I2C::readR8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         READ_REG(8)
@@ -369,194 +393,6 @@ namespace be {
     }
     JSValue I2C::readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         READ_REG(32)
-    }
-
-    // for slave 
-    #if SOC_I2C_SUPPORT_SLAVE
-    typedef struct {
-        uint8_t * data ;
-        int len ;
-    } i2c_chunk_t ;
-    void I2C::task_i2c_slave(void *arg) {
-        I2C * that = (I2C*)arg ;
-        i2c_chunk_t chunk;
-        uint8_t buff[32] ;
-        while (1) {
-            chunk.len = i2c_slave_read_buffer(that->busnum, buff, sizeof(buff), 1/portTICK_PERIOD_MS);
-            if ( chunk.len > 0 ) {
-                // 问答模式
-                if(that->slaverRegisters && chunk.len==that->slaverRegisterAddrSize) {
-                    uint16_t addr = 0;
-                    for(int i=0; i<that->slaverRegisterAddrSize; i++) {
-                        addr|= buff[i] << (i*8) ;
-                    }
-                    if( addr < that->slaverRegisterLength ) {
-                        uint8_t * ptr = that->slaverRegisters+addr*that->slaverRegisterAddrSize ;
-                        i2c_slave_write_buffer(
-                            that->busnum
-                            , ptr
-                            , that->slaverRegisterSize
-                            , 1/portTICK_PERIOD_MS
-                        );
-                        continue;
-                    }
-                }
-
-                // callback
-                chunk.data = (uint8_t *)malloc(chunk.len) ;
-                memcpy(chunk.data, buff, chunk.len) ;
-                if( xQueueSend(that->data_queue, &chunk, 0)!=pdPASS ){
-                    free(chunk.data) ;
-                }
-            }
-            vTaskDelay(1/portTICK_PERIOD_MS);
-        }
-    }
-
-    #define DATA_QUEUE_LEN 10
-    void I2C::loop(JSContext * ctx, void * opaque) {
-        I2C * i2c = (I2C *) opaque ;
-        i2c_chunk_t chunk ;
-        if(xQueueReceive(i2c->data_queue, &chunk, 0)) {
-            if(chunk.data) {
-                JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
-                JS_Call(ctx, i2c->slaveListener, JS_UNDEFINED, 1, &ab);
-                JS_FreeValue(ctx, ab) ;
-            }
-        }
-    }
-    
-    JSValue I2C::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(1)
-        if( !JS_IsFunction(ctx, argv[0]) ){
-            JSTHROW("arg callback must be a function")
-        }
-        THIS_NCLASS(I2C, that)
-        JSCHECK_SLAVE
-        
-        if(that->data_queue==nullptr){
-            that->data_queue = xQueueCreate(DATA_QUEUE_LEN, sizeof(i2c_chunk_t));
-        }
-        if(that->slaveListener!=JS_NULL){
-            JS_FreeValue(ctx, that->slaveListener) ;
-        }
-        
-        JSEngine::fromJSContext(ctx)->addLoopFunction(I2C::loop, (void *)that, true, 0) ;
-
-        that->slaveListener = JS_DupValue(ctx, argv[0]) ;
-        return JS_UNDEFINED ;
-    }
-    
-    JSValue I2C::slaveWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(1)
-        THIS_NCLASS(I2C, that)
-
-        int len ;
-        bool needfree = false ;
-        uint8_t * data = (uint8_t *)JS_GetArrayBuffer(ctx, (size_t*)&len, argv[0]) ;
-        if(!data) {
-            if(!JS_IsArray(ctx, argv[0])) {
-                JSTHROW("arg must be a array or ArrayBuffer")
-            } else {
-                data = JS_ArrayToBufferUint8(ctx, argv[0], &len) ;
-                needfree = true ;
-            }
-        }
-        if(data) {
-            esp_err_t res = i2c_slave_write_buffer(that->busnum, data, len, 10/portTICK_PERIOD_MS) ;
-            if(needfree) {
-                free(data) ;
-            }
-            return res == ESP_OK? JS_TRUE: JS_FALSE ;
-        } else {
-            return JS_FALSE ;
-        }
-    }
-
-    JSValue I2C::slaveWriteReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(2)
-        THIS_NCLASS(I2C, that)
-        JSCHECK_SLAVE
-
-        ARGV_TO_UINT32(0, reg_addr)
-        ARGV_TO_UINT32(1, reg_value)
-
-        if(reg_addr>=that->slaverRegisterLength) {
-            JSTHROW("reg addr out of range")
-        }
-
-        for(int i=0; i<that->slaverRegisterSize; i++) {
-            that->slaverRegisters[reg_addr*that->slaverRegisterAddrSize+i] = (reg_value>>(i*8))&0xff;
-        }
-
-        return JS_UNDEFINED ;
-    }
-    
-    JSValue I2C::slaveWriteBuff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(2)
-        THIS_NCLASS(I2C, that)
-        JSCHECK_SLAVE
-
-        ARGV_TO_UINT32(0, offset)
-
-        int len ;
-        bool needfree = false ;
-        uint8_t * data = (uint8_t *)JS_GetArrayBuffer(ctx, (size_t*)&len, argv[1]) ;
-        if(!data) {
-            if(!JS_IsArray(ctx, argv[0])) {
-                JSTHROW("arg must be a array or ArrayBuffer")
-            } else {
-                data = JS_ArrayToBufferUint8(ctx, argv[1], &len) ;
-                needfree = true ;
-            }
-        }
-        if(!data) {
-            JSTHROW("invalid data")
-        }
-        if(len%that->slaverRegisterSize!=0) {
-            if(needfree){
-                free(data) ;
-            }
-            JSTHROW("data length must be a multiple of reg_size")
-        }
-
-        int reg_len = len / that->slaverRegisterSize ;
-        if(offset + len > that->slaverRegisterLength * that->slaverRegisterSize) {
-            if(needfree){
-                free(data) ;
-            }
-            JSTHROW("out of range, buffer size is %d", that->slaverRegisterLength * that->slaverRegisterSize)
-        }
-
-        memcpy( that->slaverRegisters+offset, data, len ) ;
-        if(needfree){
-            free(data) ;
-        }
-
-        return JS_UNDEFINED ;
-    }
-
-    JSValue I2C::slaveReadBuff(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, that)
-        JSCHECK_SLAVE
-        ASSERT_ARGC(2)
-        ARGV_TO_UINT32(0, offset)
-        ARGV_TO_UINT32(1, length)
-        if(offset + length > that->slaverRegisterLength * that->slaverRegisterSize) {
-            JSTHROW("out of range, buffer size is %d", that->slaverRegisterLength * that->slaverRegisterSize)
-        }
-        return JS_NewArrayBufferCopy(ctx, that->slaverRegisters+offset, length) ;
-    }
-    #endif
-
-    gpio_num_t I2C::sda() const {
-        return _sda ;
-    }
-    gpio_num_t I2C::scl() const {
-        return _scl ;
-    }
-    i2c_port_t I2C::number() const {
-        return busnum ;
     }
 
     

@@ -11,20 +11,22 @@ using namespace std;
 using namespace be;
 
 namespace be::driver::io {
-    DEFINE_NCLASS_META(PCA9557, NativeClass)
+    DEFINE_NCLASS_META(PCA9557, I2CDevice)
 
     std::vector<JSCFunctionListEntry> PCA9557::methods = {
-            JS_CFUNC_DEF("setup", 0, PCA9557::setup),
             JS_CFUNC_DEF("read", 0, PCA9557::read),
             JS_CFUNC_DEF("write", 0, PCA9557::write),
-            JS_CFUNC_DEF("getMode", 0, PCA9557::getMode),
-            JS_CFUNC_DEF("setMode", 0, PCA9557::setMode),
+            JS_CFUNC_DEF("readMode", 0, PCA9557::readMode),
+            JS_CFUNC_DEF("writeMode", 0, PCA9557::writeMode),
             JS_CFUNC_DEF("getPinMode", 0, PCA9557::getPinMode),
             JS_CFUNC_DEF("setPinMode", 0, PCA9557::setPinMode),
     };
 
     PCA9557::PCA9557(JSContext *ctx, JSValue _jsobj)
-            : NativeClass(ctx, build(ctx, _jsobj)) {
+            : I2CDevice(ctx, build(ctx, _jsobj))
+    {
+        regVal_Mode = 0xFF ;
+        regVal_Value = 0xFF ;
     }
 
     JSValue PCA9557::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -32,15 +34,13 @@ namespace be::driver::io {
         return obj->jsobj;
     }
     
-    int PCA9557::setup(I2C * _i2c, uint8_t _addr) {
-        if(!_i2c) {
+    int PCA9557::setup() {
+        if(!i2c) {
             return -1 ;
         }
-        i2c = _i2c ;
-        addr = _addr ;
-        regVal_Mode = 0xFF ;
-        regVal_Value = 0xFF ;
-        i2c->write(addr, 3, regVal_Mode) ;
+        if(!readMode()) {
+            return  -2 ;
+        }
         return 0 ;
     }
 
@@ -73,15 +73,22 @@ namespace be::driver::io {
         i2c->write(addr, 1, regVal_Value) ;
         return true ;
     }
+    
+    uint8_t PCA9557::getMode() const {
+        return regVal_Mode ;
+    }
 
-    bool PCA9557::getMode(uint8_t & mode) {
+    bool PCA9557::readMode() {
         if(!i2c || !addr) {
             return false ;
         }
-        return i2c->read<uint8_t,uint8_t>(addr, 3, regVal_Mode) ;
+        if(!i2c->read<uint8_t,uint8_t>(addr, 3, regVal_Mode)){
+            return false ;
+        }
+        return true ;
     }
 
-    bool PCA9557::setMode(uint8_t mode) {
+    bool PCA9557::writeMode(uint8_t mode) {
         if(!i2c || !addr) {
             return false ;
         }
@@ -116,22 +123,6 @@ namespace be::driver::io {
         }
         return i2c->write(addr, 3, regVal_Mode) ;
     }
-    
-    JSValue PCA9557::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(PCA9557, thisobj)
-        ASSERT_ARGC(1)
-        ARGV_TO_UINT8(0, busnum)
-        ARGV_TO_UINT8_OPT(1, addr, 0x38)
-        I2C * i2c = be::I2C::flyweight(ctx, (i2c_port_t)busnum) ;
-        if(!i2c) {
-            JSTHROW("invalid i2c port number:%d", busnum)
-        }
-        int ret = thisobj->setup(i2c, addr) ;
-        if( ret!=0 ){
-            JSTHROW("%s.%s() failed, error: %d", "PCA9557", "setup", ret)
-        }
-        return JS_UNDEFINED ;
-    }
 
     JSValue PCA9557::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
@@ -139,10 +130,20 @@ namespace be::driver::io {
     JSValue PCA9557::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
     }
-    JSValue PCA9557::getMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
+    JSValue PCA9557::readMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(PCA9557, thisobj)
+        if(!thisobj->readMode()) {
+            JSTHROW("%s.%s() failed", "PCA9557", "readMode")
+        }
+        return JS_NewUint32(ctx, thisobj->getMode()) ;
     }
-    JSValue PCA9557::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue PCA9557::writeMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        THIS_NCLASS(PCA9557, thisobj)
+        ARGV_TO_UINT8(0, mode)
+        if(!thisobj->writeMode(mode)) {
+            JSTHROW("%s.%s() failed", "PCA9557", "writeMode")
+        }
         return JS_UNDEFINED ;
     }
     JSValue PCA9557::getPinMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

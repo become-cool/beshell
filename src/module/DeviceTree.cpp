@@ -13,6 +13,8 @@ namespace be{
     {
         exportName("device") ;
         exportName("load") ;
+        exportName("registerDriver") ;
+        exportName("unregisterDriver") ;
     }
 
     void DeviceTree::import(JSContext *ctx) {

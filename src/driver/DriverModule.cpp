@@ -1,4 +1,5 @@
 #include "DriverModule.hpp"
+#include "I2CDevice.hpp"
 
 namespace be::driver {
 
@@ -10,16 +11,7 @@ namespace be::driver {
         for(auto providerFunc : providers) {
             providerFunc(this) ;
         }
-        
-        exportName("device") ;
-        exportFunction("loadDeviceFromJson", loadeDeviceFromJson, 0) ;
+        exportClass<I2CDevice>() ;
     }
 
-    void DriverModule::import(JSContext *ctx) {
-        exportValue("device", JS_NewObject(ctx)) ;
-    }
-    
-    JSValue DriverModule::loadeDeviceFromJson(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
 }

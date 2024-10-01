@@ -4,6 +4,8 @@ import * as driver from 'driver'
 import * as gpio from 'gpio'
 import { importSync, exportValue } from 'loader'
 
+const jsDrivers = {}
+
 function setupSerialBus(type, num, conf) {
   let varname = type + num
   if (!serial[varname]) {
@@ -60,7 +62,7 @@ function load(deviceJsonPath) {
     if (devConf.module) {
       module = importSync(devConf.module)
     }
-    let driverClass = module[devConf.driver]
+    let driverClass = module[devConf.driver] || jsDrivers[devConf.driver]
     if (!driverClass) {
       console.error("unknow driver", devConf.driver)
       continue;
@@ -126,4 +128,25 @@ function load(deviceJsonPath) {
   }
 }
 
+function registerDriver(clazz, name) {
+  if(typeof clazz!='function') {
+    throw new Error('driver must be a class')
+  }
+  if(!name) {
+    name = clazz.name
+  }
+  if(!name) {
+    throw new Error('driver must have a name')
+  }
+  if(jsDrivers[name]) {
+    throw new Error('driver already registered')
+  }
+  jsDrivers[name] = clazz
+}
+function unregisterDriver(name) {
+  delete driver[name]
+}
+
 exportValue(dt, 'load', load)
+exportValue(dt, 'registerDriver', registerDriver)
+exportValue(dt, 'unregisterDriver', unregisterDriver)

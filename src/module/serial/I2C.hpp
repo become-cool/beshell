@@ -23,6 +23,16 @@ namespace be {
         esp_err_t res=i2c_master_cmd_begin(bus, cmd, 10/portTICK_PERIOD_MS) ;   \
         i2c_cmd_link_delete(cmd);
 
+    #define JSCHECK_MASTER                              \
+        if(that->mode!=I2C_MODE_MASTER) {               \
+            JSTHROW("I2C is not in %s mode", "master") ;\
+        }
+    #define JSCHECK_SLAVE                               \
+        if(that->mode!=I2C_MODE_SLAVE) {                \
+            JSTHROW("I2C is not in %s mode", "slave") ; \
+        }
+
+
     /**
      * 该类的构造函数没有绑定给 JS , 无法从 JS 创建实例。
      * 
@@ -283,28 +293,54 @@ namespace be {
          * @return number
          */
         static JSValue recvUint8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
+
+
+        template <typename TR, typename TV>
+        inline static JSValue readRegInt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, bool isSigned=true) {
+            THIS_NCLASS(I2C, that)
+            JSCHECK_MASTER
+            ASSERT_ARGC(2)
+            ARGV_TO_UINT8(0, addr)
+            uint32_t reg32 = 0 ;
+
+            if( JS_ToUint32(ctx, &reg32, argv[1])!=0 ) {
+                JSTHROW("Invalid register address")
+            }
+            TR reg = (TR)reg32 ;
+            ARGV_TO_UINT32_OPT(2, len, 1)
+
+            TV * buffer = (TV*) malloc( len * sizeof(TV) ) ;
+            if(!buffer) {
+                JSTHROW("out of memory?") ;
+            }
+            if(!that->read<TV>(addr,reg,(uint8_t*)buffer,len)){
+                free(buffer) ;
+                JSTHROW("i2c read failed") ;
+            }
+
+            JSValue arr ;
+            if(isSigned) {
+                JS_NewArrayWithInt(arr, buffer, len) ;
+            } else {
+                JS_NewArrayWithUint(arr, buffer, len) ;
+            }
+            free(buffer) ;
+            return arr ;
+        }
+
+        static JSValue readI8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readI16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readI32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue readU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+
+        // deprecated api
         static JSValue readR8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readR32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
 
-        
-
-        static JSValue readR8I8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR8U8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16I8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16U8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
-        static JSValue readR8I16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR8U16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16I16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16U16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
-        static JSValue readR8I32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR8U32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16I32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readR16U32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         // for slave mode ---------------
         #if SOC_I2C_SUPPORT_SLAVE

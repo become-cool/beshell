@@ -20,8 +20,6 @@ namespace be::driver {
     public:
         DriverModule(JSContext * ctx, const char * name) ;
 
-        void import(JSContext *ctx) ;
-
         template <typename D>
         static void useDriver(BeShell * beshell) {
             providers.push_back(provider<D>);

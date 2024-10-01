@@ -16,6 +16,9 @@ Added:
 * repl command: compile
 * loader.compile()
 * AudioPlayer
+* NativeClass::printOnDestruct
+* 增加了 JS 写设备驱动的机制
+
 
 Fixed:
 
@@ -29,6 +32,7 @@ Refactored:
 * mg.connect() crash
 * process.setTime 影响 setInterval()
 * 重构了 JSEngine 的循环机制
+* 重构了 I2C 的读/写接口
 
 ## v0.3.4   2024-6-4
 

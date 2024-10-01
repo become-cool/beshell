@@ -9,7 +9,7 @@ std::vector<JSCFunctionListEntry> PN532::methods = {
 
 
 PN532::PN532(JSContext *ctx, JSValue _jsobj)
-  : I2CDevice(ctx, build(ctx, _jsobj), PN532_I2C_ADDRESS)
+  : I2CDevice(ctx, build(ctx, _jsobj), 1, 1, PN532_I2C_ADDRESS)
 {
 }
 

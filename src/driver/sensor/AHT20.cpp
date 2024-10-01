@@ -19,7 +19,7 @@ namespace be::driver::sensor {
     };
 
     AHT20::AHT20(JSContext *ctx, JSValue _jsobj)
-            : I2CDevice(ctx, build(ctx, _jsobj), 0x38) {
+            : I2CDevice(ctx, build(ctx, _jsobj), 1, 1, 0x38) {
     }
 
     JSValue AHT20::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

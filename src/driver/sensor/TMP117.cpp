@@ -81,8 +81,8 @@ namespace be::driver::sensor {
             JS_CFUNC_DEF("read", 0, TMP117::read),
     };
 
-    TMP117::TMP117(JSContext *ctx, JSValue _jsobj)
-            : I2CDevice(ctx, build(ctx, _jsobj), 0x38) {
+    TMP117::TMP117(JSContext *ctx, JSValue jsobj)
+            : I2CDevice(ctx, build(ctx, jsobj)) {
     }
 
     JSValue TMP117::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
