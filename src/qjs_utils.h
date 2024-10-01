@@ -237,9 +237,7 @@ void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueCon
     {                                                           \
         MAKE_ARGV1(argv, arg1)                                  \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 1, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -248,9 +246,7 @@ void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueCon
     {                                                           \
         MAKE_ARGV2(argv, arg1, arg2)                            \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 2, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -258,9 +254,7 @@ void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueCon
     {                                                           \
         MAKE_ARGV3(argv, arg1, arg2, arg3)                      \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 3, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -268,9 +262,7 @@ void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueCon
     {                                                           \
         MAKE_ARGV4(argv, arg1, arg2, arg3, arg4)                \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 4, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }

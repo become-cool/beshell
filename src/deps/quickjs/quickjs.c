@@ -53680,6 +53680,13 @@ int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) {
     return 0 ;
 }
 
+int JS_GetClassIDFromConstructor(JSContext *ctx, JSValue func) {
+    JSValue proto = JS_GetPropertyStr(ctx, func, "prototype");
+    JSClassID class_id = -1;
+    JS_GetClassIDFromProto(ctx, proto, &class_id);
+    JS_FreeValue(ctx, proto);
+    return class_id ;
+}
 
 void setTimezoneOffset(int minute) {
     timezone_offset = minute ; 

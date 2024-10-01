@@ -1046,6 +1046,7 @@ int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
 JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m) ;
 
 int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) ;
+int JS_GetClassIDFromConstructor(JSContext *ctx, JSValue func) ;
 
 void JS_FreeLeaks(JSRuntime *rt,JSContext * ctx) ;
 
