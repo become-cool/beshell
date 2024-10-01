@@ -16,6 +16,12 @@ namespace be {
 	typedef void (*NClassFinalizerFunc)(JSRuntime *rt, JSValue val) ;
 
     class NativeClass {
+    private:
+        bool printOnDestruct = false ;
+        static JSValue printOnDestructGetter(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue printOnDestructSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
+
+
     protected:
         JSContext * ctx ;
         std::shared_ptr<NativeClass> self ;
@@ -85,11 +91,22 @@ namespace be {
         return JS_NewObjectClass(ctx, CLASS::classID) ;                 \
     }                                                                   \
     JSValue CLASS::build(JSContext * ctx, JSValue jsobj) {              \
-        if(!JS_IsNone(jsobj)) {                                         \
+        if( JS_IsNone(jsobj) ){                                         \
+            return CLASS::build(ctx) ;                                  \
+        }                                                               \
+        else if(JS_IsFunction(ctx, jsobj)) {                            \
+            if( JS_GetClassIDFromConstructor(ctx, jsobj)==CLASS::classID ) {   \
+                return JS_NewObjectClass(ctx, CLASS::classID) ;         \
+            }                                                           \
+            else {                                                      \
+                JSValue proto = JS_GetPropertyStr(ctx, jsobj, "prototype") ;    \
+                return JS_NewObjectProto(ctx,proto) ;         \
+            }                                                           \
+        }                                                               \
+        else {                                                          \
             return jsobj ;                                              \
         }                                                               \
-        return CLASS::build(ctx) ;                                      \
-    }                                                                   \
+    }
 
 #define DEFINE_NCLASS_META_DEFINECLASS(CLASS,PARENT_CLASS)              \
     JSValue CLASS::defineClass(JSContext * ctx) {                       \

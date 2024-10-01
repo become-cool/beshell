@@ -22,6 +22,9 @@ namespace be {
             JS_SetOpaque(jsobj, nullptr) ;
             JS_FreeValue(ctx,jsobj) ;
         }
+        if(printOnDestruct) {
+            printf("NativeClass destructor called\n") ;
+        }
     }
 
     NativeClass * NativeClass::fromJS(JSValue jsObj) {
@@ -61,6 +64,11 @@ namespace be {
         if(methods.size()) {
             JS_SetPropertyFunctionList(ctx, proto, methods.data(), methods.size());
         }
+        JSCFunctionListEntry settergetters[] = {
+            JS_CGETSET_DEF("printOnDestruct",printOnDestructGetter,printOnDestructSetter) ,
+        } ;
+        JS_SetPropertyFunctionList(ctx, proto, settergetters, sizeof(settergetters)/sizeof(JSCFunctionListEntry));
+
 
         JSValue jscotr = JS_NewCFunction2(ctx, constructor, className, 1, JS_CFUNC_constructor, 0) ;
         JS_SetConstructor(ctx, jscotr, proto) ;
@@ -133,5 +141,15 @@ namespace be {
         } else {
             return JS_NewObjectClass(ctx, classId) ;
         }
+    }
+    
+    JSValue NativeClass::printOnDestructGetter(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(NativeClass, that) ;
+        return that->printOnDestruct? JS_TRUE : JS_FALSE ;
+    }
+    JSValue NativeClass::printOnDestructSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
+        THIS_NCLASS(NativeClass, that) ;
+        that->printOnDestruct = JS_ToBool(ctx, value) ;
+        return JS_UNDEFINED ;
     }
 }
