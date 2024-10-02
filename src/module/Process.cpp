@@ -39,7 +39,7 @@ namespace be {
         exportName("platform") ;
     }
 
-    void Process::import(JSContext *ctx) {
+    void Process::exports(JSContext *ctx) {
         assert(ctx) ;
         assert(m) ;
 

@@ -69,7 +69,7 @@ namespace be::mg {
         exportFunction("connect",Client::connect,0) ;
     }
 
-    void Mg::import(JSContext *ctx) {
+    void Mg::exports(JSContext *ctx) {
         JSEngineEvalEmbeded(ctx, mg)
     }
 

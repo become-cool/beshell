@@ -60,6 +60,7 @@
 #include "ext/media/audio/Audio.hpp"
 
 // driver
+#include "driver/DriverModule.hpp"
 #include "driver/input/GT911.hpp"
 #include "driver/sensor/BMP280.hpp"
 #include "driver/sensor/AHT20.hpp"

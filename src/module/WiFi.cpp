@@ -241,7 +241,7 @@ namespace be {
         exportFunction("apStarted",apStarted,0) ;
     }
 
-    void WiFi::import(JSContext *ctx) {
+    void WiFi::exports(JSContext *ctx) {
         init() ;
 
         exportValue("_handlers", JS_NewObject(ctx)) ;

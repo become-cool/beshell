@@ -64,7 +64,7 @@ namespace be{
         }
     }
 
-    void TelnetModule::import(JSContext *ctx) {
+    void TelnetModule::exports(JSContext *ctx) {
         for(auto func : exportors) {
             func(ctx, this) ;
         }

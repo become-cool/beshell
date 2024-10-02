@@ -12,7 +12,7 @@ namespace be {
         GPIO(JSContext * ctx, const char * name) ;
         static void loop(JSContext *, void * arg) ;
 
-        void import(JSContext *ctx) ;
+        void exports(JSContext *ctx) ;
 
         static JSValue mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

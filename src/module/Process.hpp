@@ -6,7 +6,7 @@ namespace be {
     public:
         Process(JSContext * ctx, const char * name,uint8_t flagGlobal=1) ;
 
-        void import(JSContext *ctx) ;
+        void exports(JSContext *ctx) ;
         
         static JSValue reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

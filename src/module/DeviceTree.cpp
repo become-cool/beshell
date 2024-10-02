@@ -17,7 +17,7 @@ namespace be{
         exportName("unregisterDriver") ;
     }
 
-    void DeviceTree::import(JSContext *ctx) {
+    void DeviceTree::exports(JSContext *ctx) {
         exportValue("device", JS_NewObject(ctx)) ;
         
         JSEngineEvalEmbeded(ctx, device)

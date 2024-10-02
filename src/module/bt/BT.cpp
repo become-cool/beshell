@@ -10,7 +10,7 @@ namespace be {
         // exportClass<ClassName>() ;
     }
 
-    // void BT::import(JSContext *ctx) {
+    // void BT::exports(JSContext *ctx) {
     // }
 
     

@@ -5,7 +5,7 @@
 namespace be {
     class Serial: public NativeModule {
     protected:
-        void import(JSContext *ctx) ;
+        void exports(JSContext *ctx) ;
     public:
 
         static const char *name ;

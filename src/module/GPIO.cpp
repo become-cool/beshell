@@ -52,7 +52,7 @@ namespace be {
         EXPORT_FUNCTION(test) ;
     }
 
-    void GPIO::import(JSContext *ctx) {
+    void GPIO::exports(JSContext *ctx) {
         JSValue DEF_JS_FUNC(jsBlink, R"(
 function (gpio,time) {
     this.setMode(gpio,"output")
