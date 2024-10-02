@@ -65,45 +65,50 @@ namespace be::driver {
 
     JSValue I2CDevice::readReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2CDevice, that)
-        if(!that->i2c) {
+        if(!that->i2c || !that->addr) {
             JSTHROW("i2c device not initialized")
         }
 
         ASSERT_ARGC(1)
-        ARGV_TO_UINT32(argv[0], regAddr)
-        ARGV_TO_UINT8_OPT(argv[1], regCnt, 1)
-        bool isSigned = JS_ToBool(ctx, argv[2]) ;
-
+        ARGV_TO_UINT32(0, regAddr)
+        ARGV_TO_UINT8_OPT(1, regCnt, 1)
+        bool isSigned = false ;
+        if(argc>2) {
+            isSigned = JS_ToBool(ctx, argv[2]) ;
+        }
         uint8_t bufferSize = regCnt*that->regSize ;
         uint8_t * buffer = new uint8_t[bufferSize]() ;
 
-        #define READ_REG(ADDRTYPE, REGTYPE)                                             \
-            if(!that->i2c->read<ADDRTYPE>(that->addr, regAddr, buffer, bufferSize)) {   \
-                delete [] buffer ;                                                      \
-                JSTHROW("i2c read failed")                                              \
-            }                                                                           \
-            if(isSigned) {                                                              \
-                JS_NewArrayWithInt(arr, ((REGTYPE *)buffer), regCnt)                    \
-            } else {                                                                    \
-                JS_NewArrayWithUint(arr, ((REGTYPE *)buffer), regCnt)                   \
+        #define READ_REG(ADDRTYPE, REGTYPE)                                                     \
+            if(!that->i2c->read<ADDRTYPE>(that->addr, regAddr, buffer, bufferSize)) {           \
+                delete [] buffer ;                                                              \
+                JSTHROW("i2c read failed")                                                      \
+            }                                                                                   \
+            for(int i=0;i<regCnt;i++) {                                                         \
+                if(isSigned) {                                                                  \
+                    JS_SetPropertyUint32(ctx, arr, i, JS_NewInt32(ctx,(REGTYPE)((REGTYPE*)buffer)[i])) ;        \
+                } else {                                                                        \
+                    JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,(u##REGTYPE)((u##REGTYPE*)buffer)[i])) ; \
+                }                                                                               \
             }
 
         #define READ_REG_TYPES(ADDRTYPE)            \
             switch (that->regSize)                  \
             {                                       \
             case 1:                                 \
-                READ_REG(ADDRTYPE, uint8_t)         \
+                READ_REG(ADDRTYPE, int8_t)          \
                 break;                              \
             case 2:                                 \
-                READ_REG(ADDRTYPE, uint16_t)        \
+                READ_REG(ADDRTYPE, int16_t)         \
                 break;                              \
             case 4:                                 \
-                READ_REG(ADDRTYPE, uint32_t)        \
+                READ_REG(ADDRTYPE, int32_t)         \
                 break;                              \
             }
 
 
-        JSValue arr = JS_NULL ;
+        JSValue arr = JS_NewArray(ctx) ;
+
         switch (that->regAddrSize)
         {
         case 1:
@@ -117,15 +122,71 @@ namespace be::driver {
             break;
         }
 
-        
         delete [] buffer ;
         
         return arr ;
     }
 
+    #define WRITE_REG(REGTYPE)                                                  \
+        switch(that->regAddrSize) {                                             \
+        case 1:                                                                 \
+            if( !that->i2c->write<uint8_t,REGTYPE>(that->addr, regAddr, val) ){ \
+                JSTHROW("i2c write failed")                                     \
+            }                                                                   \
+            break;                                                              \
+        case 2:                                                                 \
+            if( !that->i2c->write<uint16_t,REGTYPE>(that->addr, regAddr, val) ){\
+                JSTHROW("i2c write failed")                                     \
+            }                                                                   \
+            break;                                                              \
+        case 4:                                                                 \
+            if( !that->i2c->write<uint32_t,REGTYPE>(that->addr, regAddr, val) ){\
+                JSTHROW("i2c write failed")                                     \
+            }                                                                   \
+            break;                                                              \
+        }
+        
+
     JSValue I2CDevice::writeReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2CDevice, that)
-        ASSERT_ARGC(1)
+        if(!that->i2c || !that->addr) {
+            JSTHROW("i2c device not initialized")
+        }
+
+        ASSERT_ARGC(2)
+        ARGV_TO_UINT32(0, regAddr)
+        size_t length = 0 ;
+        uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[1]) ;
+
+        // ArrayBuffer
+        if(buff) {
+            JSTHROW("not support array buffer")
+        }
+
+        // array 
+        else if(JS_IsArray(ctx, argv[0])) {
+            JSTHROW("not support array")
+        }
+
+        // Interger
+        switch (that->regSize)
+        {
+            case 1: {
+                ARGV_TO_UINT8(1, val)
+                WRITE_REG(uint8_t)
+                break;
+            }
+            case 2:{
+                ARGV_TO_UINT16(1, val)
+                WRITE_REG(uint16_t)
+                break;
+            }
+            case 4: {
+                ARGV_TO_UINT32(1, val)
+                WRITE_REG(uint32_t)
+                break;
+            }
+        }
 
         return JS_UNDEFINED ;
     }

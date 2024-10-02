@@ -100,7 +100,7 @@ namespace be {
             }                                                           \
             else {                                                      \
                 JSValue proto = JS_GetPropertyStr(ctx, jsobj, "prototype") ;    \
-                return JS_NewObjectProto(ctx,proto) ;         \
+                return JS_NewObjectProto(ctx,proto) ;                   \
             }                                                           \
         }                                                               \
         else {                                                          \
