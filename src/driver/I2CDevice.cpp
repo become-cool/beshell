@@ -155,18 +155,19 @@ namespace be::driver {
 
         ASSERT_ARGC(2)
         ARGV_TO_UINT32(0, regAddr)
-        size_t length = 0 ;
-        uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[1]) ;
 
-        // ArrayBuffer
-        if(buff) {
-            JSTHROW("not support array buffer")
-        }
+        // size_t length = 0 ;
+        // uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[1]) ;  // <- 如果不是 arraybuffer 会抛出异常
 
-        // array 
-        else if(JS_IsArray(ctx, argv[0])) {
-            JSTHROW("not support array")
-        }
+        // // ArrayBuffer
+        // if(buff) {
+        //     JSTHROW("not support array buffer")
+        // }
+
+        // // array 
+        // else if(JS_IsArray(ctx, argv[0])) {
+        //     JSTHROW("not support array")
+        // }
 
         // Interger
         switch (that->regSize)
