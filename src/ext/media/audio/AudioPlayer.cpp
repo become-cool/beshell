@@ -11,7 +11,7 @@ namespace be::media {
         JS_CFUNC_DEF("pause", 0, AudioPlayer::pause),
         JS_CFUNC_DEF("resume", 0, AudioPlayer::resume),
         JS_CFUNC_DEF("stop", 0, AudioPlayer::stop),
-        JS_CFUNC_DEF("isRunning", 0, AudioPlayer::isRunning),
+        JS_CFUNC_DEF("isPlaying", 0, AudioPlayer::isPlaying),
         JS_CFUNC_DEF("isPaused", 0, AudioPlayer::isPaused),
         JS_CFUNC_DEF("printStats", 0, AudioPlayer::printStats),
     } ;
@@ -158,11 +158,18 @@ namespace be::media {
     
         audio_pipe_set_stats(&player->pipe, STAT_RUNNING) ;
         audio_el_set_stat(player->pipe.first, STAT_STOPPING) ;
-        vTaskDelay(0) ;
+        
+        bool sync = false ;
+        if(argc>1) {
+            sync = JS_ToBool(ctx, argv[1]);
+        }
+        if(sync) {
+            xEventGroupWaitBits(player->playback->base.stats, STAT_STOPPED, false, false, portMAX_DELAY);
+        }
         
         return JS_UNDEFINED ;
     }
-    JSValue AudioPlayer::isRunning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue AudioPlayer::isPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(AudioPlayer, player)
         return player->pipe.running? JS_TRUE : JS_FALSE ;
     }

@@ -36,7 +36,7 @@ namespace be::media {
         static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue isRunning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isPaused(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue detach(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue printStats(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
