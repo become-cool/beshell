@@ -18,7 +18,7 @@ Added:
 * AudioPlayer
 * NativeClass::printOnDestruct
 * 增加了 JS 写设备驱动的机制
-
+* add lv.Obj.show()/hide()/setVisble()
 
 Fixed:
 
