@@ -82,21 +82,6 @@ namespace be {
         }
     }
 
-    void BeShell::loop() {
-
-        telnet->loop() ;
-
-        engine->loop() ;
-
-        for(auto pair:loopFunctions) {
-            pair.first(*this, pair.second) ;
-        }
-
-#ifdef ESP_PLATFORM
-        vTaskDelay(1) ;
-#endif
-    }
-
     void BeShell::run() {
         while(1) {
             loop() ;
