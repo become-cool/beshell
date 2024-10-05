@@ -22,9 +22,9 @@ namespace be::media {
         memset((void*)&pipe, 0, sizeof(audio_pipe_t)) ;
 
         pipe.callback = (audio_pipe_event_callback_t) pipeCallback ;
+        pipe.callback_opaque = this ;
 
-        // pipe.jsobj = JS_DupValue(ctx, jsobj) ;
-        // pipe.ctx = ctx ;
+        enableNativeEvent(ctx, sizeof(std::pair<const char *, int>)) ;
     }
     JSValue AudioPlayer::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new AudioPlayer(ctx) ;
@@ -47,7 +47,14 @@ namespace be::media {
     }
 
     void AudioPlayer::pipeCallback(const char * event, int param, AudioPlayer * player) {
+        dn3(event, param, xPortGetCoreID())
+        std::pair<const char *, int> event_data(event, param) ;
+        player->emitNativeEvent((void *)&event_data) ;
+    }
 
+    void AudioPlayer::onNativeEvent(JSContext *ctx, void * param) {
+        std::pair<const char *, int> * event_data = (std::pair<const char *, int> *)param ;
+        emitSync(event_data->first, {JS_NewInt32(ctx, event_data->second)}) ;
     }
     
     void AudioPlayer::build_el_src(int core) {

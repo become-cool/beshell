@@ -21,6 +21,10 @@ namespace be::media {
         void build_el_i2s(int core) ;
 
         static void pipeCallback(const char * event, int param, AudioPlayer * player) ;
+    
+    protected:
+        void onNativeEvent(JSContext *ctx, void * param) ;
+
     public:
         AudioPlayer(JSContext * ctx) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
