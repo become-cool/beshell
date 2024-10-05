@@ -1,3 +1,10 @@
+## dev
+
+Added:
+
+* EventEmitter 新的 native事件触发机制:  emitNativeEvent()/onNativeEvent()
+
+
 ## v0.3.5   2024-10-05
 
 Added:

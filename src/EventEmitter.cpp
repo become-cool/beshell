@@ -18,6 +18,18 @@ namespace be {
         JS_SetPropertyStr(ctx,jsobj,"_handlers",JS_NewObject(ctx)) ;
     }
 
+    EventEmitter::~EventEmitter() {
+
+        if(nevent_queue) {
+            JSEngine::fromJSContext(ctx)->removeLooping(nativeEventLoop, this) ;
+            vQueueDelete(nevent_queue) ;
+        }
+        if(native_param) {
+            free(native_param) ;
+            native_param = nullptr ;
+        }
+    }
+
     JSValue EventEmitter::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new EventEmitter(ctx) ;
         obj->shared() ;
@@ -199,4 +211,29 @@ namespace be {
         JS_FreeCString(ctx, event_name) ;
         return JS_NULL ;
     }
+
+    void EventEmitter::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
+        if(nevent_queue) {
+            return ;
+        }
+        native_param = malloc(param_size) ;
+        nevent_queue = xQueueCreate(queue_size, param_size);
+        JSEngine::fromJSContext(ctx)->addLoopFunction(nativeEventLoop, this, true) ;
+    }
+
+    void EventEmitter::emitNativeEvent(void * param) {
+        if(!nevent_queue) {
+            return ;
+        }
+        xQueueSend(nevent_queue, param, 0) ;
+    }
+    
+    void EventEmitter::nativeEventLoop(JSContext * ctx, void * opaque) {
+        while(xQueueReceive(((EventEmitter*)opaque)->nevent_queue, ((EventEmitter*)opaque)->native_param, 0)==pdTRUE) {
+            ((EventEmitter*)opaque)->onNativeEvent(ctx, ((EventEmitter*)opaque)->native_param) ;
+        }
+    }
+
+    void EventEmitter::onNativeEvent(JSContext *ctx, void * param) {}
+
 }
