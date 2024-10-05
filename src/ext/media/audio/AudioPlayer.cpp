@@ -160,7 +160,7 @@ namespace be::media {
         audio_el_set_stat(player->pipe.first, STAT_STOPPING) ;
         
         bool sync = false ;
-        if(argc>1) {
+        if(argc>0) {
             sync = JS_ToBool(ctx, argv[1]);
         }
         if(sync) {
