@@ -23,7 +23,7 @@ namespace be {
         QueueHandle_t nevent_queue = nullptr;
         void * native_param = nullptr ;
         void enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size=5) ;
-        static void nativeEventLoop(JSContext * ctx, void * opaque) ;
+        static void nativeEventLoop(JSContext * ctx, EventEmitter * opaque) ;
         virtual void onNativeEvent(JSContext *ctx, void * param) ;
 #endif
 

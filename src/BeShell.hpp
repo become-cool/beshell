@@ -38,9 +38,6 @@ namespace be {
             for(auto pair:loopFunctions) {
                 pair.first(*this, pair.second) ;
             }
-#ifdef ESP_PLATFORM
-            taskYIELD() ;
-#endif
         }
         void run() ;
         void main(const char * mainScriptPath=nullptr) ;

@@ -21,7 +21,7 @@ namespace be {
     EventEmitter::~EventEmitter() {
 
         if(nevent_queue) {
-            JSEngine::fromJSContext(ctx)->removeLooping(nativeEventLoop, this) ;
+            JSEngine::fromJSContext(ctx)->removeLooping((EngineLoopFunction)nativeEventLoop, this) ;
             vQueueDelete(nevent_queue) ;
         }
         if(native_param) {
@@ -218,7 +218,7 @@ namespace be {
         }
         native_param = malloc(param_size) ;
         nevent_queue = xQueueCreate(queue_size, param_size);
-        JSEngine::fromJSContext(ctx)->addLoopFunction(nativeEventLoop, this, true) ;
+        JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
     }
 
     void EventEmitter::emitNativeEvent(void * param) {
@@ -228,9 +228,9 @@ namespace be {
         xQueueSend(nevent_queue, param, 0) ;
     }
     
-    void EventEmitter::nativeEventLoop(JSContext * ctx, void * opaque) {
-        while(xQueueReceive(((EventEmitter*)opaque)->nevent_queue, ((EventEmitter*)opaque)->native_param, 0)==pdTRUE) {
-            ((EventEmitter*)opaque)->onNativeEvent(ctx, ((EventEmitter*)opaque)->native_param) ;
+    void EventEmitter::nativeEventLoop(JSContext * ctx, EventEmitter * ee) {
+        while(xQueueReceive(ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
+            ee->onNativeEvent(ctx, ee->native_param) ;
         }
     }
 
