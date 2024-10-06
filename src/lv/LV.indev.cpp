@@ -36,7 +36,7 @@ namespace be::lv {
 
         data->point.x = (lv_coord_t)indev_opa->x;
         data->point.y = (lv_coord_t)indev_opa->y;
-        data->state = indev_opa->ptr->pointCount()==0? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR ;
+        data->state = indev_opa->ptr->lastPointCount()==0? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR ;
     }
 
 

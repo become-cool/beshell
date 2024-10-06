@@ -6,6 +6,11 @@ Added:
 * AudioPlayer stop 事件
 
 
+Refactored:
+
+* 后台任务方式读取 pointer input dev, 避免低帧率状态下丢失事件
+
+
 ## v0.3.5   2024-10-05
 
 Added:

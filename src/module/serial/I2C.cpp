@@ -60,8 +60,9 @@ namespace be {
     I2C::I2C(JSContext * ctx, i2c_port_t busnum)
         : NativeClass(ctx, build(ctx))
         , busnum(busnum)
-        , sema(xSemaphoreCreateMutex())
-    {}
+    {
+        enableMutex() ;
+    }
     
     I2C::~I2C() {
         vSemaphoreDelete(sema) ;
@@ -77,11 +78,10 @@ namespace be {
         return obj->jsobj ;
     }
     
-    void I2C::take() {
-        xSemaphoreTake(sema, portMAX_DELAY) ;
-    }
-    void I2C::give() {
-        xSemaphoreGive(sema) ;
+    void I2C::enableMutex() {
+        if(!sema) {
+            sema = xSemaphoreCreateMutex() ;
+        }
     }
     
     I2C * I2C::flyweight(JSContext * ctx, i2c_port_t bus) {

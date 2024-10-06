@@ -47,7 +47,7 @@ namespace be::media {
     }
 
     void AudioPlayer::pipeCallback(const char * event, int param, AudioPlayer * player) {
-        dn3(event, param, xPortGetCoreID())
+        // dn3(event, param, xPortGetCoreID())
         std::pair<const char *, int> event_data(event, param) ;
         player->emitNativeEvent((void *)&event_data) ;
     }
