@@ -34,7 +34,6 @@ namespace be {
         exportFunction("readMac", readMac);
 
         // JS_ComputeMemoryUsage
-
         exportName("versions") ;
         exportName("platform") ;
     }
@@ -86,20 +85,47 @@ namespace be {
      * 读硬件地址
      * 
      * @function readMac
-     * @return number[] 代表硬件地址的字节数组
+     * @param phy:number=1 要读取的硬件地址，1表示wifi，2表示蓝牙
+     * @param format:number=1 返回格式，1表示字节数组，2表示十六进制字符串
+     * @return number[]|string 硬件地址
      */
     JSValue Process::readMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         uint8_t mac[6] ;
+
+        ARGV_TO_UINT8_OPT(0, phy, 1)
+        ARGV_TO_UINT8_OPT(1, format, 1)
+
 #ifdef ESP_PLATFORM
-        if(esp_base_mac_addr_get(mac)!=ESP_OK) {
-            JSTHROW("failed to read mac addr")
+        if(phy==1) {
+            if(esp_read_mac(mac,ESP_MAC_WIFI_STA)!=ESP_OK) {
+                JSTHROW("failed to read wifi mac addr")
+            }
+        }
+        else if(phy==2) {
+            if(esp_read_mac(mac,ESP_MAC_BT)!=ESP_OK) {
+                JSTHROW("failed to read ap mac addr")
+            }
+        }
+        else {
+            JSTHROW("arg phy must be 1 or 2")
         }
 #endif
-        JSValue arr = JS_NewArray(ctx) ;
-        for(int i=0;i<sizeof(mac);i++) {
-            JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
+
+        if(format==1) {
+            JSValue arr = JS_NewArray(ctx) ;
+            for(int i=0;i<sizeof(mac);i++) {
+                JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
+            }
+            return arr ;
         }
-        return arr ;
+        else if(format==2) {
+            char macstr[18] ;
+            sprintf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            return JS_NewString(ctx, macstr) ;
+        }
+        else {
+            JSTHROW("arg format must be 1 or 2")
+        }
     }
 
     /**
