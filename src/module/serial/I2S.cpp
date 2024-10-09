@@ -144,7 +144,7 @@ namespace be {
         GET_INT32_PROP_OPT(argv[0], "sout", pin_config.data_out_num, -1)
         GET_INT32_PROP_OPT(argv[0], "sin", pin_config.data_in_num, -1)
 
-        GET_UINT32_PROP_OPT(argv[0], "coreId", coreId, xPortGetCoreID())
+        GET_UINT32_PROP_OPT(argv[0], "core", coreId, xPortGetCoreID())
         if(coreId>2) {
             JSTHROW("coreId (%d) out of range, max is 2", coreId)
         }

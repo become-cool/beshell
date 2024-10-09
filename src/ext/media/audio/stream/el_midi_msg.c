@@ -104,7 +104,7 @@ audio_el_midi_msg_t * audio_el_midi_msg_create(audio_pipe_t * pipe, tsf* sf, aud
 
     audio_el_midi_msg_t * el ;
     necho_alloc("audio_el_midi_msg_t",{
-        ELEMENT_CREATE(pipe, audio_el_midi_msg_t, el, task_func_midi_msg, 1024*3, 5, 0, 0)
+        ELEMENT_CREATE(pipe, audio_el_midi_msg_t, el, task_func_midi_msg, 1024*3, 10, 0, 0)
     })
 
     el->sf = sf ;

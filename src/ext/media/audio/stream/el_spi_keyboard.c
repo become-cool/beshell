@@ -103,7 +103,7 @@ audio_el_spi_keyboard_t * audio_el_spi_keyboard_create(audio_pipe_t * pipe, tsf*
 
     audio_el_spi_keyboard_t * el ;
     necho_alloc("audio_el_spi_keyboard_t",{
-        ELEMENT_CREATE(pipe, audio_el_spi_keyboard_t, el, task_func_spi_keyboard, 1024*3, 5, 0, 0)
+        ELEMENT_CREATE(pipe, audio_el_spi_keyboard_t, el, task_func_spi_keyboard, 1024*3, 10, 0, 0)
     })
 
     el->byte_num = config->keys_cnt/8 ;
