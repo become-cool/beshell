@@ -4,6 +4,7 @@ Added:
 
 * EventEmitter 新的 native事件触发机制:  emitNativeEvent()/onNativeEvent()
 * AudioPlayer stop 事件
+* AudioPlayer.playPCM()
 
 
 Refactored:

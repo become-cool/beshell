@@ -83,7 +83,7 @@ namespace be::media {
         string path = be::FS::toVFSPath(ctx, argv[0]) ;
         player->build_el_src(1) ;
         player->build_el_mp3(1) ;
-        player->build_el_i2s(0) ;
+        player->build_el_i2s(1) ;
 
         bool sync = false ;
         if(argc>1) {
@@ -124,7 +124,50 @@ namespace be::media {
 
         return JS_UNDEFINED ;
     }
+    
     JSValue AudioPlayer::playPCM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        THIS_NCLASS(AudioPlayer, player)
+        if(player->pipe.running) {
+            JSTHROW("player is running")
+        }
+        CHECK_ARGC(1)
+        ARGV_TO_UINT32_OPT(1, samprate, 16000)
+        ARGV_TO_UINT32_OPT(2, bits, 32)
+        ARGV_TO_UINT32_OPT(3, channels, 1)
+    
+        player->build_el_src(1) ;
+        player->build_el_i2s(1) ;
+
+        string path = be::FS::toVFSPath(ctx, argv[0]) ;
+        if(path.length()>=sizeof(player->src->src_path)) {
+            JSTHROW("path is too long")
+        }
+        strcpy(player->src->src_path, path.c_str()) ;
+
+        // dn3(samprate,bits,channels)
+        i2s_set_clk((i2s_port_t)0,samprate,bits,(i2s_channel_t)channels);
+        if(bits==16) {
+            player->pipe.need_expand = true ;
+        }
+
+        if(!audio_el_src_strip_pcm(player->src)) {
+            JSTHROW("file not exists") ;
+        }
+
+        // 清空管道
+        audio_pipe_clear(&player->pipe) ;
+
+        // src -> playback
+        audio_pipe_link( &player->pipe, 2, player->src, player->playback ) ;
+
+        player->pipe.paused = false ;
+        player->pipe.running = true ;
+        player->pipe.finished = false ;
+        player->pipe.error = 0 ;
+
+        audio_pipe_set_stats(&player->pipe, STAT_RUNNING) ;
+
         return JS_UNDEFINED ;
     }
     JSValue AudioPlayer::pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
