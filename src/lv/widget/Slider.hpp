@@ -17,6 +17,13 @@ namespace be::lv {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
 
+        // static JSValue setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        // static JSValue getMin(JSContext *ctx, JSValueConst this_val) ;
+        // static JSValue getMax(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue setLeft(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
+        static JSValue getLeft(JSContext *ctx, JSValueConst this_val) ;
+
+
 // AUTO GENERATE CODE START [GETSETS] --------
 // AUTO GENERATE CODE END [GETSETS] --------
 
