@@ -63,14 +63,12 @@ namespace be::lv {
         if(JS_ToInt32(ctx, &val, value)!=0){
             JSTHROW("Invalid argument")
         }
-        dn(val)
         lv_slider_set_left_value( thisobj->lvobj(), val, LV_ANIM_OFF ) ;
         return JS_UNDEFINED ;
     }
     JSValue Slider::getLeft(JSContext *ctx, JSValueConst this_val) {
         THIS_NCLASS(Obj,thisobj)
         int32_t value = lv_slider_get_left_value( thisobj->lvobj() ) ;
-        dn(value)
         return JS_NewInt32(ctx, value) ;
     }
 
