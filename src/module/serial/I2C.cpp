@@ -21,6 +21,7 @@ namespace be {
     std::vector<JSCFunctionListEntry> I2C::methods = {
         JS_CFUNC_DEF("setup", 1, I2C::setup),
         JS_CFUNC_DEF("unsetup", 1, I2C::unsetup),
+        JS_CFUNC_DEF("isInstalled", 1, I2C::isInstalled),
         JS_CFUNC_DEF("ping", 1, I2C::ping),
         JS_CFUNC_DEF("scan", 1, I2C::scan),
         JS_CFUNC_DEF("send", 2, I2C::send),
@@ -223,6 +224,26 @@ namespace be {
 
         return i2c_driver_delete(that->busnum)==ESP_OK? JS_TRUE: JS_FALSE ;
     }
+    JSValue I2C::isInstalled(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2C, that)
+        return that->isInstalled()? TRUE: FALSE ;
+    }
+
+    bool I2C::isInstalled() {
+        i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+        
+        // 创建I2C开始命令
+        i2c_master_start(cmd);
+        i2c_master_stop(cmd);
+
+        // 使用指定的I2C外设端口检查驱动状态
+        esp_err_t err = i2c_master_cmd_begin(busnum, cmd, 0);
+        dn(err)
+        
+        i2c_cmd_link_delete(cmd);
+        
+        return err == ESP_ERR_INVALID_STATE? false: true ;
+    }
 
     bool I2C::ping(uint8_t addr) {
         if(mode!=I2C_MODE_MASTER) {
@@ -232,6 +253,8 @@ namespace be {
         I2C_COMMIT(busnum)
         return res==ESP_OK;
     }
+
+
 
     void I2C::scan(uint8_t from, uint8_t to) {
         if(mode!=I2C_MODE_MASTER) {

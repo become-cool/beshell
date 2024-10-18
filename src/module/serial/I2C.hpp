@@ -146,6 +146,8 @@ namespace be {
             return read<TR>(addr,reg,(uint8_t *)&out,sizeof(TV)) ;
         }
 
+        bool isInstalled() ;
+
         /**
          * 设置 i2c 外设, 若遇到错误则抛出异常
          * 
@@ -173,6 +175,7 @@ namespace be {
          */
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isInstalled(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         // for master mode ---------------
             
