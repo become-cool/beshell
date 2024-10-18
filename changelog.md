@@ -6,6 +6,7 @@ Added:
 * AudioPlayer stop 事件
 * AudioPlayer.playPCM()
 * add uart.setup() option properties: stopbits, parity
+* add driver.ST7701.initReg()
 
 Refactored:
 

@@ -37,6 +37,7 @@ namespace be::driver::disp {
 
     std::vector<JSCFunctionListEntry> ST7701::methods = {
         JS_CFUNC_DEF("setup", 0, ST7701::setup),
+        JS_CFUNC_DEF("initReg", 0, ST7701::initReg),
     } ;
 
     JSValue ST7701::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -82,7 +83,12 @@ namespace be::driver::disp {
 
         return JS_UNDEFINED ;
     }
-
+    
+    JSValue ST7701::initReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(ST7701,that)
+        that->initReg() ;
+        return JS_UNDEFINED ;
+    }
 
     void ST7701::write9b(uint16_t data)
     {
