@@ -5,11 +5,12 @@ Added:
 * EventEmitter 新的 native事件触发机制:  emitNativeEvent()/onNativeEvent()
 * AudioPlayer stop 事件
 * AudioPlayer.playPCM()
-
+* add uart.setup() option properties: stopbits, parity
 
 Refactored:
 
 * 后台任务方式读取 pointer input dev, 避免低帧率状态下丢失事件
+* dt.load() 可以接收对象参数
 
 
 ## v0.3.5   2024-10-05
