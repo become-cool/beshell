@@ -62,13 +62,13 @@ namespace be {
         i2s_pin_config_t pin ;
     } ;
 
-    static void task_install_i2s(void  * arg) {
+    static void task_install_i2s(struct i2s_conf  * conf) {
+        assert(conf) ;
 
-        struct i2s_conf  * conf = (struct i2s_conf  *)arg ;
         esp_err_t res = i2s_driver_install(conf->busnum, &conf->config, 0, NULL) ;
         if(res!=ESP_OK){
             // printf("i2s_driver_install() faild with error: %d\n", res) ;
-            free(arg) ;
+            free(conf) ;
             return ;
         }
 
@@ -81,13 +81,13 @@ namespace be {
             res = i2s_set_pin(conf->busnum, &conf->pin);
             if(res!=ESP_OK){
                 printf("i2s_set_pin() faild with error: %d", res) ;
-                free(arg) ;
+                free(conf) ;
                 return ;
             }
         }
 
         printf("i2s_driver_install() and i2s_set_pin() success\n") ;
-        free(arg) ;
+        free(conf) ;
 
         vTaskDelete(NULL) ;
 
@@ -146,20 +146,40 @@ namespace be {
 
         GET_UINT32_PROP_OPT(argv[0], "core", coreId, xPortGetCoreID())
         if(coreId>2) {
-            JSTHROW("coreId (%d) out of range, max is 2", coreId)
+            JSTHROW("core id (%d) out of range, max is 2", coreId)
         }
 
+        if(xPortGetCoreID()==coreId) {
+        
+            esp_err_t res = i2s_driver_install(that->busnum, &i2s_config, 0, NULL) ;
+            if(res!=ESP_OK){
+                JSTHROW("i2s_driver_install() faild with error: %d", res) ;
+            }
 
-        struct i2s_conf * conf = (struct i2s_conf *)malloc(sizeof(struct i2s_conf)) ;
-        conf->config = i2s_config ;
-        conf->pin = pin_config ;
-        conf->busnum = that->busnum ;
+    #if SOC_I2S_SUPPORTS_ADC_DAC
+            // if ((config->i2s_config.mode & I2S_MODE_DAC_BUILT_IN) != 0) {
+            //     // i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
+            // } else
+    #endif
+            {
+                res = i2s_set_pin(that->busnum, &pin_config);
+                if(res!=ESP_OK){
+                    JSTHROW("i2s_set_pin() faild with error: %d", res) ;
+                }
+            }
+        }
+        else {
 
-        xTaskCreatePinnedToCore(task_install_i2s, "task_install_i2s", 2048, (void *)conf, 5, NULL, coreId) ;
+            struct i2s_conf * conf = (struct i2s_conf *)malloc(sizeof(struct i2s_conf)) ;
+            conf->config = i2s_config ;
+            conf->pin = pin_config ;
+            conf->busnum = that->busnum ;
+
+            xTaskCreatePinnedToCore((TaskFunction_t)task_install_i2s, "task_install_i2s", 1024*5, (void *)conf, 5, NULL, coreId) ;
+        }
 
         return JS_UNDEFINED ;
     }
-    
     
 
     #define DEFINE_BUS(busconst, var)           \
