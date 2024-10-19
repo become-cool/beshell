@@ -30,6 +30,7 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
 // #define GATT_CHAR_UUID      0xFF01
 
 static char gatt_service_name[32] ;
+static int connected_devices = 0;
 
 
 #define TEST_MANUFACTURER_DATA_LEN  6
@@ -481,11 +482,15 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             gl_profile.conn_id = param->connect.conn_id;
             //start sent the update connection parameters to the peer device.
             esp_ble_gap_update_conn_params(&conn_params);
+            connected_devices++;
             break;
         }
         case ESP_GATTS_DISCONNECT_EVT:
             // ESP_LOGI(GATTS_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
             esp_ble_gap_start_advertising(&adv_params);
+            if(connected_devices>0) {
+                connected_devices--;
+            }
             break;
         case ESP_GATTS_CONF_EVT:
             // ESP_LOGI(GATTS_TAG, "ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);
@@ -624,9 +629,10 @@ void be_telnet_gatt_server_set_msg_handler(be_telnet_gatt_msg_handler_t handler)
 }
 
 void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
-    esp_ble_gatts_send_indicate(gl_profile.gatts_if, gl_profile.conn_id, gl_profile.char_handle, size, data,
-                                need_confirm);
-
+    if (connected_devices>0) {
+        esp_ble_gatts_send_indicate(gl_profile.gatts_if, gl_profile.conn_id, gl_profile.char_handle, size, data,
+                                    need_confirm);
+    }
 }
 
 
