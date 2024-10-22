@@ -20,7 +20,7 @@ files.forEach(file => {
 
 
 function js2c (src, cArrayName) {
-    let cArray = `unsigned char ${cArrayName}[] = {\n`;
+    let cArray = `static unsigned char ${cArrayName}[] = {\n`;
 
     for (let i = 0; i < src.length; i++) {
         if (i % 16 === 0 && i !== 0) {
@@ -55,11 +55,11 @@ using namespace be;
 
 namespace ${namespace} {
 
-${js2c(src, 'embeded_js_src')}
+${js2c(src, 'embeded_js_src_'+name)}
 
 std::string ${name}::name = "${name}" ;
     void ${name}::exportDriver(JSContext * ctx) {
-        JSEval(ctx, (const char *)embeded_js_src, -1, "embeded://${name}.js", JS_EVAL_TYPE_MODULE);
+        JSEval(ctx, (const char *)embeded_js_src_${name}, -1, "embeded://${name}.js", JS_EVAL_TYPE_MODULE);
         JSEngine::fromJSContext(ctx)->dumpError() ;
     }
 }
@@ -69,7 +69,8 @@ std::string ${name}::name = "${name}" ;
 }
 
 const jsDriverDef = [
-    ["PCA9557", "be::driver::io", __dirname+"/../src/js/driver/io/PCA9557.js", __dirname+"/../src/driver/io/PCA9557.cpp"]
+    ["PCA9557", "be::driver::io", __dirname+"/../src/js/driver/io/PCA9557.js", __dirname+"/../src/driver/io/PCA9557.cpp"],
+    ["TM1652", "be::driver::io", __dirname+"/../src/js/driver/io/TM1652.js", __dirname+"/../src/driver/io/TM1652.cpp"]
 ]
 
 for(let [name, namespace, jspath, cpppath] of jsDriverDef) {

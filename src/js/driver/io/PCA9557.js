@@ -9,22 +9,48 @@ const mapModeValue = {
 class PCA9557 extends driver.I2CDevice {
     mode = 0
     output = 0
+    alias={}
     setup(opt) {
+        if(!opt.addr) {
+            opt.addr = 0x1c
+        }
         super.setup(opt)
         if(opt.mode!=undefined) {
             this.setMode(opt.mode)
         } else {
             this.getMode(true)
         }
+        if(opt.alias) {
+            for(let p=0;p<8;p++){
+                if(opt.alias[p]) {
+                    this.alias[opt.alias[p]] = p
+                }
+            }
+        }
     }
     read(pin) {
-        let [mode] = this.readReg(0)
-        return (this.mode & (1<<pin))? 1: 0
+        let [val] = this.readReg(0)
+        if(this.alias[pin]!=undefined) {
+            pin = this.alias[pin]
+        }
+        return (val & (1<<pin))? 1: 0
     }
     write(pin,level) {
+        if(this.alias[pin]!=undefined) {
+            pin = this.alias[pin]
+        }
+        console.log("write pin", pin, level)
         let output = (this.output & ~(1 << pin)) | (level << pin)
         this.writeReg(1, output)
         this.output = output
+    }
+    readAllPins() {
+        let [val] = this.readReg(0)
+        return val
+    }
+    writeAllPins(val) {
+        this.writeReg(1, val)
+        this.output = val
     }
     getMode(sync) {
         if(sync) {
@@ -40,9 +66,16 @@ class PCA9557 extends driver.I2CDevice {
         if(sync) {
             this.getMode(true)
         }
+        if(this.alias[pin]!=undefined) {
+            pin = this.alias[pin]
+        }
+        console.log("pin")
         return (this.mode & (1<<pin))? "input": "ouput"
     }
     setPinMode(pin,dir,sync) {
+        if(this.alias[pin]!=undefined) {
+            pin = this.alias[pin]
+        }
         if(mapModeValue[dir]!=undefined) {
             dir = mapModeValue[dir]
         }

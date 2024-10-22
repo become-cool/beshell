@@ -71,6 +71,7 @@
 #include "driver/sensor/TMP117.hpp"
 #include "driver/io/PCA9557.hpp"
 #include "driver/io/TM1650.hpp"
+#include "driver/io/TM1652.hpp"
 #include "driver/sys/DS1307.hpp"
 #include "driver/sys/SDCard.hpp"
 #include "driver/disp/ST7701.hpp"

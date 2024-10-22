@@ -8,6 +8,7 @@ Added:
 * add uart.setup() option properties: stopbits, parity
 * add driver.ST7701.initReg()
 * add i2c.isInstalled()
+* driver TM1652
 
 Refactored:
 
