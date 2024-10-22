@@ -42,7 +42,7 @@ audio_el_midi_render_t * audio_el_midi_render_create(audio_pipe_t * pipe, tsf * 
 
     audio_el_midi_render_t * el ;
     necho_alloc("audio_el_midi_render_t",{
-        ELEMENT_CREATE(pipe, audio_el_midi_render_t, el, task_func_render, 1024*5, 5, 1, 1024*2)
+        ELEMENT_CREATE(pipe, audio_el_midi_render_t, el, task_func_render, 1024*5, 5, 10, 1024*2)
     })
 
     el->sf = sf ;

@@ -70,6 +70,12 @@ namespace be{
         return m_uartNum ;
     }
 
+
+    // typedef enum {
+    //     UART_PARITY_DISABLE = 0x0,   // 无校验位
+    //     UART_PARITY_EVEN = 0x2,      // 偶校验位
+    //     UART_PARITY_ODD = 0x3        // 奇校验位
+    // } uart_parity_t;
     /**
      * 
      * options 格式：
@@ -77,10 +83,13 @@ namespace be{
      * {
      *    tx:number,
      *    rx:number,
-     *    baudrate:number=115200
+     *    baudrate:number=115200,
+     *    stopbits:number=1,
+     *    parity:0|2|3=0,
      * }
      * ```
-     * 
+     * parity: 0=none, 2=even, 3=odd
+     *
      * @param options:object uart options
      * @return undefined
      */
@@ -93,21 +102,26 @@ namespace be{
 
         ASSERT_ARGC(1)
 
-        gpio_num_t GET_INT32_PROP(argv[0], "tx", tx, )
-        gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, )
+        gpio_num_t GET_INT32_PROP(argv[0], "tx", tx, UART_PIN_NO_CHANGE)
+        gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, UART_PIN_NO_CHANGE)
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
+        uart_stop_bits_t GET_UINT32_PROP_OPT(argv[0], "stopbits", stopbits, UART_STOP_BITS_1)
+        uart_parity_t GET_UINT32_PROP_OPT(argv[0], "parity", parity, UART_PARITY_DISABLE)
+
+        // dn3(baudrate,stopbits,parity)
 
         esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, NULL);
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)
         }
 
+
         // Configure UART parameters
         uart_config_t uart_config = {
             .baud_rate = (int)baudrate,
             .data_bits = UART_DATA_8_BITS,
-            .parity    = UART_PARITY_DISABLE,
-            .stop_bits = UART_STOP_BITS_1,
+            .parity    = parity,
+            .stop_bits = stopbits,
             .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
             .source_clk = UART_SCLK_DEFAULT,
         };

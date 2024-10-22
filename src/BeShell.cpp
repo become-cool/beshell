@@ -80,26 +80,20 @@ namespace be {
             engine->evalScript(mainScriptPath) ;
 #endif
         }
-    }
 
-    void BeShell::loop() {
-
-        telnet->loop() ;
-
-        engine->loop() ;
-
-        for(auto pair:loopFunctions) {
-            pair.first(*this, pair.second) ;
-        }
-
-#ifdef ESP_PLATFORM
-        vTaskDelay(1) ;
-#endif
+        vTaskPrioritySet(NULL, 10) ;
     }
 
     void BeShell::run() {
+
+        uint32_t lastLoopTime = 0 ;
+
         while(1) {
             loop() ;
+
+#ifdef ESP_PLATFORM
+            vTaskDelay( (lastLoopTime++%10)==0? 0: 1 ) ;
+#endif
         }
     }
 

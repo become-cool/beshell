@@ -32,7 +32,13 @@ namespace be {
         BeShell() ;
         ~BeShell() ;
         void setup(const char * mainScriptPath=nullptr) ;
-        void loop() ;
+        inline void loop() {
+            telnet->loop() ;
+            engine->loop() ;
+            for(auto pair:loopFunctions) {
+                pair.first(*this, pair.second) ;
+            }
+        }
         void run() ;
         void main(const char * mainScriptPath=nullptr) ;
 

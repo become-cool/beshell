@@ -34,7 +34,6 @@ namespace be {
         exportFunction("readMac", readMac);
 
         // JS_ComputeMemoryUsage
-
         exportName("versions") ;
         exportName("platform") ;
     }
@@ -86,20 +85,71 @@ namespace be {
      * 读硬件地址
      * 
      * @function readMac
-     * @return number[] 代表硬件地址的字节数组
+     * @param phy:"wifi"|"wifi.ap"|"wifi.softap"|"ble"|"eth"|"base"|"efuse"|"efuse.factory"|"efuse.customer"|"efuse.ext"="wifi" 要读取的硬件类型
+     * @param format:number=1 返回格式，1表示字节数组，2表示十六进制字符串
+     * @return number[]|string 硬件地址
      */
     JSValue Process::readMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        uint8_t mac[6] ;
+        
+        uint8_t mac[8] ;
+
+        esp_mac_type_t mac_type = ESP_MAC_WIFI_STA;
+        if(argc>0) {
+            const char *mac_type_str;
+            mac_type_str = JS_ToCString(ctx, argv[0]);
+            if (!mac_type_str) {
+                return JS_ThrowTypeError(ctx, "Invalid argument");
+            }
+            if (strcmp(mac_type_str, "wifi") == 0) {
+                mac_type = ESP_MAC_WIFI_STA;
+            } else if (strcmp(mac_type_str, "wifi.sta") == 0) {
+                mac_type = ESP_MAC_WIFI_STA;
+            } else if (strcmp(mac_type_str, "wifi.ap") == 0) {
+                mac_type = ESP_MAC_WIFI_SOFTAP;
+            } else if (strcmp(mac_type_str, "bt") == 0) {
+                mac_type = ESP_MAC_BT;
+            } else if (strcmp(mac_type_str, "eth") == 0) {
+                mac_type = ESP_MAC_ETH;
+            } else if (strcmp(mac_type_str, "base") == 0) {
+                mac_type = ESP_MAC_BASE;
+            } else if (strcmp(mac_type_str, "efuse") == 0) {
+                mac_type = ESP_MAC_EFUSE_FACTORY;
+            } else if (strcmp(mac_type_str, "efuse.factory") == 0) {
+                mac_type = ESP_MAC_EFUSE_FACTORY;
+            } else if (strcmp(mac_type_str, "efuse.customer") == 0) {
+                mac_type = ESP_MAC_EFUSE_CUSTOM;
+            } else if (strcmp(mac_type_str, "efuse.ext") == 0) {
+                mac_type = ESP_MAC_EFUSE_EXT;
+            } else {
+                JS_FreeCString(ctx, mac_type_str);
+                return JS_ThrowRangeError(ctx, "Unknown MAC type");
+            }
+            JS_FreeCString(ctx, mac_type_str);
+        }
+
+        ARGV_TO_UINT8_OPT(1, format, 1)
+
 #ifdef ESP_PLATFORM
-        if(esp_base_mac_addr_get(mac)!=ESP_OK) {
-            JSTHROW("failed to read mac addr")
+        if(esp_read_mac(mac,mac_type)!=ESP_OK) {
+            JSTHROW("failed to read wifi mac addr")
         }
 #endif
-        JSValue arr = JS_NewArray(ctx) ;
-        for(int i=0;i<sizeof(mac);i++) {
-            JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
+
+        if(format==1) {
+            JSValue arr = JS_NewArray(ctx) ;
+            for(int i=0;i<sizeof(mac);i++) {
+                JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
+            }
+            return arr ;
         }
-        return arr ;
+        else if(format==2) {
+            char macstr[24] ;
+            sprintf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            return JS_NewString(ctx, macstr) ;
+        }
+        else {
+            JSTHROW("arg format must be 1 or 2")
+        }
     }
 
     /**

@@ -6,12 +6,12 @@ using namespace std ;
 namespace be::media {
     DEFINE_NCLASS_META(AudioPlayer, EventEmitter)
     std::vector<JSCFunctionListEntry> AudioPlayer::methods = {
-        JS_CFUNC_DEF("playPCM", 0, AudioPlayer::playPCM),
+        JS_CFUNC_DEF("playWAV", 0, AudioPlayer::playWAV),
         JS_CFUNC_DEF("playMP3", 0, AudioPlayer::playMP3),
         JS_CFUNC_DEF("pause", 0, AudioPlayer::pause),
         JS_CFUNC_DEF("resume", 0, AudioPlayer::resume),
         JS_CFUNC_DEF("stop", 0, AudioPlayer::stop),
-        JS_CFUNC_DEF("isRunning", 0, AudioPlayer::isRunning),
+        JS_CFUNC_DEF("isPlaying", 0, AudioPlayer::isPlaying),
         JS_CFUNC_DEF("isPaused", 0, AudioPlayer::isPaused),
         JS_CFUNC_DEF("printStats", 0, AudioPlayer::printStats),
     } ;
@@ -22,9 +22,9 @@ namespace be::media {
         memset((void*)&pipe, 0, sizeof(audio_pipe_t)) ;
 
         pipe.callback = (audio_pipe_event_callback_t) pipeCallback ;
+        pipe.callback_opaque = this ;
 
-        // pipe.jsobj = JS_DupValue(ctx, jsobj) ;
-        // pipe.ctx = ctx ;
+        enableNativeEvent(ctx, sizeof(std::pair<const char *, int>)) ;
     }
     JSValue AudioPlayer::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new AudioPlayer(ctx) ;
@@ -47,7 +47,14 @@ namespace be::media {
     }
 
     void AudioPlayer::pipeCallback(const char * event, int param, AudioPlayer * player) {
+        // dn3(event, param, xPortGetCoreID())
+        std::pair<const char *, int> event_data(event, param) ;
+        player->emitNativeEvent((void *)&event_data) ;
+    }
 
+    void AudioPlayer::onNativeEvent(JSContext *ctx, void * param) {
+        std::pair<const char *, int> * event_data = (std::pair<const char *, int> *)param ;
+        emitSync(event_data->first, {JS_NewInt32(ctx, event_data->second)}) ;
     }
     
     void AudioPlayer::build_el_src(int core) {
@@ -76,7 +83,7 @@ namespace be::media {
         string path = be::FS::toVFSPath(ctx, argv[0]) ;
         player->build_el_src(1) ;
         player->build_el_mp3(1) ;
-        player->build_el_i2s(0) ;
+        player->build_el_i2s(1) ;
 
         bool sync = false ;
         if(argc>1) {
@@ -117,7 +124,41 @@ namespace be::media {
 
         return JS_UNDEFINED ;
     }
-    JSValue AudioPlayer::playPCM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue AudioPlayer::playWAV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        THIS_NCLASS(AudioPlayer, player)
+        if(player->pipe.running) {
+            JSTHROW("player is running")
+        }
+        CHECK_ARGC(1)
+    
+        player->build_el_src(1) ;
+        player->build_el_i2s(1) ;
+
+        string path = be::FS::toVFSPath(ctx, argv[0]) ;
+        if(path.length()>=sizeof(player->src->src_path)) {
+            JSTHROW("path is too long")
+        }
+        strcpy(player->src->src_path, path.c_str()) ;
+
+        if(!audio_el_src_strip_pcm(player->src)) {
+            JSTHROW("file not exists or not a wav file") ;
+        }
+
+        // 清空管道
+        audio_pipe_clear(&player->pipe) ;
+
+        // src -> playback
+        audio_pipe_link( &player->pipe, 2, player->src, player->playback ) ;
+
+        player->pipe.paused = false ;
+        player->pipe.running = true ;
+        player->pipe.finished = false ;
+        player->pipe.error = 0 ;
+
+        audio_pipe_set_stats(&player->pipe, STAT_RUNNING) ;
+
         return JS_UNDEFINED ;
     }
     JSValue AudioPlayer::pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -151,11 +192,18 @@ namespace be::media {
     
         audio_pipe_set_stats(&player->pipe, STAT_RUNNING) ;
         audio_el_set_stat(player->pipe.first, STAT_STOPPING) ;
-        vTaskDelay(0) ;
+        
+        bool sync = false ;
+        if(argc>0) {
+            sync = JS_ToBool(ctx, argv[1]);
+        }
+        if(sync) {
+            xEventGroupWaitBits(player->playback->base.stats, STAT_STOPPED, false, false, portMAX_DELAY);
+        }
         
         return JS_UNDEFINED ;
     }
-    JSValue AudioPlayer::isRunning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue AudioPlayer::isPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(AudioPlayer, player)
         return player->pipe.running? JS_TRUE : JS_FALSE ;
     }

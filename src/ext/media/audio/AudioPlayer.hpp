@@ -21,18 +21,22 @@ namespace be::media {
         void build_el_i2s(int core) ;
 
         static void pipeCallback(const char * event, int param, AudioPlayer * player) ;
+    
+    protected:
+        void onNativeEvent(JSContext *ctx, void * param) ;
+
     public:
         AudioPlayer(JSContext * ctx) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         ~AudioPlayer() ;
 
-        static JSValue playPCM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue playWAV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue playMP3(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue isRunning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isPaused(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue detach(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue printStats(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

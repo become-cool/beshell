@@ -20,7 +20,9 @@ namespace be {
 
     #define I2C_COMMIT(bus)                                                     \
         i2c_master_stop(cmd);                                                   \
+        take() ;                                                                \
         esp_err_t res=i2c_master_cmd_begin(bus, cmd, 10/portTICK_PERIOD_MS) ;   \
+        give() ;                                                                \
         i2c_cmd_link_delete(cmd);
 
     #define JSCHECK_MASTER                              \
@@ -50,7 +52,7 @@ namespace be {
         i2c_port_t busnum ;
         gpio_num_t _sda = GPIO_NUM_NC ;
         gpio_num_t _scl = GPIO_NUM_NC ;
-        SemaphoreHandle_t sema ;
+        SemaphoreHandle_t sema = nullptr ;
 
         i2c_mode_t mode = I2C_MODE_MASTER ;
 
@@ -85,12 +87,24 @@ namespace be {
 
         static I2C * flyweight(JSContext *, i2c_port_t) ;
 
+        inline void take() {
+            if(!sema) {
+                return ;
+            }
+            xSemaphoreTake(sema, portMAX_DELAY) ;
+        }
+        inline void give() {
+            if(!sema) {
+                return ;
+            }
+            xSemaphoreGive(sema) ;
+        }
+        void enableMutex() ;
+
         gpio_num_t sda() const ;
         gpio_num_t scl() const ;
         i2c_port_t number() const ;
 
-        inline void take() ;
-        inline void give() ;
         bool ping(uint8_t addr) ;
         void scan(uint8_t from=0, uint8_t to=127) ;
         bool send(uint8_t addr, uint8_t * data, size_t data_len) ;
@@ -132,6 +146,8 @@ namespace be {
             return read<TR>(addr,reg,(uint8_t *)&out,sizeof(TV)) ;
         }
 
+        bool isInstalled() ;
+
         /**
          * 设置 i2c 外设, 若遇到错误则抛出异常
          * 
@@ -159,6 +175,7 @@ namespace be {
          */
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isInstalled(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         // for master mode ---------------
             

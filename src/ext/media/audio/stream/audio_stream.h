@@ -35,7 +35,8 @@ extern "C" {
 #define STAT_ALL_PHASE      (STAT_RUNNING | STAT_STOPPING | STAT_STOPPED | STAT_PAUSING | STAT_PAUSED)
 // 以上 bit 是互斥的
 
-#define STAT_DRAIN          32
+#define STAT_FINISHED       32  // 正常播放完毕
+#define STAT_DRAIN          64
 
 typedef struct _audio_el_t{
 
@@ -147,7 +148,7 @@ typedef struct {
 } audio_el_midi_render_t ;
 
 
-typedef void (*audio_pipe_event_callback_t) (const char event, int param, void * opaque) ;
+typedef void (*audio_pipe_event_callback_t) (const char * event, int param, void * opaque) ;
 
 typedef struct _audio_pipe {
 

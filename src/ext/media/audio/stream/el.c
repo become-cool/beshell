@@ -133,12 +133,7 @@ inline void audio_el_stop_when_req(audio_el_t * el) {
         PLAYER(el)->running = false ;
         PLAYER(el)->paused = false ;
 
-        // if( PLAYER(el)->ctx && JS_IsObject(PLAYER(el)->jsobj) ){
-        //     if(PLAYER(el)->error) {
-        //         audio_pipe_emit_event(PLAYER(el), "error", JS_NewInt32(NULL, PLAYER(el)->error)) ;
-        //     }
-        //     audio_pipe_emit_event(PLAYER(el), PLAYER(el)->finished? "finish": "stop", JS_UNDEFINED) ;
-        // }
+        audio_pipe_emit_event(PLAYER(el), "stop", PLAYER(el)->finished) ;
     }
 
     vTaskDelay(0) ;

@@ -20,12 +20,15 @@ function setupSerialBus(type, num, conf) {
   }
 }
 
-function load(deviceJsonPath) {
-  let deviceConf = JSON.loadSync(deviceJsonPath, null)
-  if (!deviceConf) {
-    throw new Error(deviceJsonPath + " not exists or invalid.")
+function load(deviceConf) {
+  if( typeof deviceConf =='string' ) {
+    let json = JSON.loadSync(deviceConf, null)
+    if (!deviceConf) {
+      throw new Error(deviceConf + " not exists or invalid.")
+    }
+    console.log("load device config from:", deviceConf)
+    deviceConf = json
   }
-  console.log("load device config from:", deviceJsonPath)
 
   // gpio
   if (deviceConf.gpio) {

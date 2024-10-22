@@ -3,6 +3,10 @@
 namespace be::lv {
     DEFINE_NCLASS_META(Slider, Bar)
     std::vector<JSCFunctionListEntry> Slider::methods = {
+        // JS_CFUNC_DEF("setRange", 2, Slider::setRange),
+        // JS_CGETSET_DEF("min",Slider::getMin,Slider::invalidSetter) ,
+        // JS_CGETSET_DEF("max",Slider::getMax,Slider::invalidSetter) ,
+        JS_CGETSET_DEF("leftValue",Slider::getLeft,Slider::setLeft) ,
 // AUTO GENERATE CODE START [GETSET LIST] --------
 
 // AUTO GENERATE CODE END [GETSET LIST] --------
@@ -32,6 +36,40 @@ namespace be::lv {
         }
         Slider * widget = new Slider(ctx, obj, lv_slider_create(lvparent)) ;
         return widget->jsobj ;
+    }
+
+    
+    // JSValue Slider::setRange(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    //     THIS_NCLASS(Obj,thisobj)
+    //     ARGV_TO_INT32(0, min)
+    //     ARGV_TO_INT32(1, max)
+    //     lv_slider_set_range( thisobj->lvobj(), min, max ) ;
+    //     return JS_UNDEFINED ;
+    // }
+    // JSValue Slider::getMin(JSContext *ctx, JSValueConst this_val) {
+    //     THIS_NCLASS(Obj,thisobj)
+    //     int32_t value = lv_slider_get_min_value( thisobj->lvobj() ) ;
+    //     return JS_NewInt32(ctx, value) ;
+    // }
+    // JSValue Slider::getMax(JSContext *ctx, JSValueConst this_val) {
+    //     THIS_NCLASS(Obj,thisobj)
+    //     int32_t value = lv_slider_get_max_value( thisobj->lvobj() ) ;
+    //     return JS_NewInt32(ctx, value) ;
+    // }
+    
+    JSValue Slider::setLeft(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
+        THIS_NCLASS(Obj,thisobj)
+        int32_t val = 0 ;
+        if(JS_ToInt32(ctx, &val, value)!=0){
+            JSTHROW("Invalid argument")
+        }
+        lv_slider_set_left_value( thisobj->lvobj(), val, LV_ANIM_OFF ) ;
+        return JS_UNDEFINED ;
+    }
+    JSValue Slider::getLeft(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Obj,thisobj)
+        int32_t value = lv_slider_get_left_value( thisobj->lvobj() ) ;
+        return JS_NewInt32(ctx, value) ;
     }
 
 // AUTO GENERATE CODE START [GETSETS] --------

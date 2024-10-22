@@ -63,7 +63,6 @@ namespace be::lv {
     }
 
     JSValue Animation::stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        dd
         THIS_NCLASS(Animation, that)
         that->stop(ctx) ;
         return JS_UNDEFINED ;
