@@ -120,9 +120,9 @@ class TM1652 {
         if(!this.uart) {
             throw new Error("uart not setup")
         }
-        dot = 5-dot
+        dot = 4-dot
         let s = v.toString()
-        let bytes = [0x08, 0,0,0,0,0]
+        let bytes = [0x08,0,0,0,0,0]
         for(let i=0;i<s.length;i++) {
             let c = s.charAt(i)
             bytes[i+1] = fonts[c]
@@ -131,8 +131,8 @@ class TM1652 {
             }
         }
         this.uart.write(bytes)
+        process.delay(3)
         this.uart.write([0x18,0x18])
     }
 }
-
 exportValue(driver, "TM1652", TM1652)

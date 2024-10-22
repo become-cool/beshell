@@ -57,7 +57,7 @@ namespace ${namespace} {
 
 ${js2c(src, 'embeded_js_src_'+name)}
 
-std::string ${name}::name = "${name}" ;
+    std::string ${name}::name = "${name}" ;
     void ${name}::exportDriver(JSContext * ctx) {
         JSEval(ctx, (const char *)embeded_js_src_${name}, -1, "embeded://${name}.js", JS_EVAL_TYPE_MODULE);
         JSEngine::fromJSContext(ctx)->dumpError() ;

@@ -169,7 +169,7 @@ static unsigned char embeded_js_src_PCA9557[] = {
 0xa, 0x00
 };
 
-std::string PCA9557::name = "PCA9557" ;
+    std::string PCA9557::name = "PCA9557" ;
     void PCA9557::exportDriver(JSContext * ctx) {
         JSEval(ctx, (const char *)embeded_js_src_PCA9557, -1, "embeded://PCA9557.js", JS_EVAL_TYPE_MODULE);
         JSEngine::fromJSContext(ctx)->dumpError() ;
