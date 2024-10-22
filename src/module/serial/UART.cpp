@@ -1,4 +1,5 @@
 #include "UART.hpp"
+#include "quickjs/quickjs.h"
 #include <BeShell.hpp>
 #include <JSEngine.hpp>
 #include <driver/gpio.h>
@@ -163,6 +164,7 @@ namespace be{
         bool needfree = false ;
         size_t length = 0 ;
         uint8_t * buff = JS_GetArrayBuffer(ctx, &length, argv[0]) ;
+        JS_GetException(ctx) ; // 如果不是 ArrayBuffer ，JS_GetArrayBuffer 会产生异常
 
         // ArrayBuffer
         if(buff) {
