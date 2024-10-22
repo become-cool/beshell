@@ -26,6 +26,7 @@ namespace be {
             : NativeModule(ctx, name, flagGlobal) {
 
         exportFunction("reboot", reboot);
+        exportFunction("delay", delay);
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
@@ -267,6 +268,19 @@ namespace be {
         return obj ;
     }
     
+    /**
+     * 延时函数
+     * 
+     * @function delay
+     * @param ms:number 延时时间，单位为毫秒
+     * @return undefined
+     */
+    JSValue Process::delay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT32(0, ms)
+        vTaskDelay(ms/portTICK_PERIOD_MS) ;
+        return JS_UNDEFINED ;
+    }
 
     /**
      * 打印系统任务运行状态，包括任务名称、状态、优先级、栈大小、任务ID、运行次数、运行时间等信息。

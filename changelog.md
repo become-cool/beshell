@@ -9,6 +9,7 @@ Added:
 * add driver.ST7701.initReg()
 * add i2c.isInstalled()
 * driver TM1652
+* add process.delay(ms)
 
 Refactored:
 
