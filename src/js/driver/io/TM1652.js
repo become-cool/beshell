@@ -133,6 +133,7 @@ class TM1652 {
         this.uart.write(bytes)
         process.delay(5)
         this.uart.write([0x18,0x18])
+        process.delay(5)
     }
 }
 exportValue(driver, "TM1652", TM1652)
