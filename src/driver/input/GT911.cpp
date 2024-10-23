@@ -43,7 +43,7 @@ namespace be::driver::input {
             }
         }
         auto obj = new GT911(ctx,i2c,addr) ;
-        obj->self = std::shared_ptr<GT911> (obj) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
 
@@ -137,6 +137,9 @@ namespace be::driver::input {
         }
 
         if(thisobj->addr<0) {
+            if(!thisobj->i2c->isInstalled()) {
+                JSTHROW("i2c driver not installed, cannot detect address of GT911")
+            }
             if( thisobj->i2c->ping(0x5D) ){
                 thisobj->addr = 0x5D ;
             }
