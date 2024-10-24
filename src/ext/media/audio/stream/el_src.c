@@ -1,10 +1,12 @@
 #include "audio_stream.h"
+#include "driver/i2s.h"
+#include <stdbool.h>
 #include <string.h>
 
 
 audio_el_src_t *  audio_el_src_create(audio_pipe_t * pipe, uint8_t core) {
     audio_el_src_t * el ;
-    ELEMENT_CREATE(pipe, audio_el_src_t, el, task_src, 1024*3, 10, core, 1024*2)
+    ELEMENT_CREATE(pipe, audio_el_src_t, el, task_src, 1024*5, 10, core, 1024*2)
     el->base.name = "src" ;
     return el ;
 }
@@ -85,11 +87,34 @@ bool audio_el_src_strip_pcm(audio_el_src_t * el) {
         return false ;
     }
 
-    i2s_set_clk((i2s_port_t)0,
+    // dn3(
+    //     header.sampleRate,
+    //     header.bitsPerSample,
+    //     header.numChannels
+    // )
+
+    uint8_t bps = header.bitsPerSample ;
+    i2s_channel_t ch = (i2s_channel_t)header.numChannels ;
+
+    if(bps==16 && ch==1) {
+        ch = 2 ;
+        // bps = 32 ;
+        ((audio_pipe_t *)el->base.pipe)->need_expand = true ;
+    }
+    else {
+        ((audio_pipe_t *)el->base.pipe)->need_expand = false ;
+    }
+
+    i2s_set_clk(((audio_pipe_t *)el->base.pipe)->i2s,
         header.sampleRate,
-        header.bitsPerSample,
-        (i2s_channel_t)header.numChannels
+        bps ,
+        ch
     );
+    
+    i2s_stop(((audio_pipe_t *)el->base.pipe)->i2s) ;
+    i2s_zero_dma_buffer(((audio_pipe_t *)el->base.pipe)->i2s) ;
+    vTaskDelay(100 / portTICK_PERIOD_MS); 
+    i2s_start(((audio_pipe_t *)el->base.pipe)->i2s) ;
 
     // 查找 'data' 块
     char chunkId[4];
@@ -108,9 +133,11 @@ bool audio_el_src_strip_pcm(audio_el_src_t * el) {
         if (strncmp(chunkId, "data", 4) == 0) {
             // 'data' 标记(4 字节) + 块大小(4 字节) = 8 字节
             fseek(el->file, offset + 8, SEEK_SET);
+            // dn(offset + 8)
             return true ;
         } else {
             // 跳过非 'data' 块
+            // dn(chunkSize)
             fseek(el->file, chunkSize, SEEK_CUR);
             offset += 8 + chunkSize;  // 8 字节为 chunkId 和 chunkSize 的大小
         }
@@ -155,8 +182,13 @@ void task_src(audio_el_src_t * el) {
         }
 
         if(!el->file) {
-            goto finish ;
-            continue ;
+            printf("task_src() open file: %s\n", el->src_path) ;
+            el->file = fopen(el->src_path,"rb") ;
+            if(!el->file) {
+                printf("can not open file: %s", el->src_path) ;
+                goto finish ;
+            }
+                printf("file opened: %s", el->src_path) ;
         }
 
         nechof_time("fs read, bytes %d", {

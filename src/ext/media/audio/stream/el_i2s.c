@@ -3,6 +3,14 @@
 #include "qjs_utils.h"
 
 
+void audio_el_i2s_set_volume(audio_el_i2s_t * el, uint8_t volume) {
+    if(volume>100) {
+        volume = 100 ;
+    }
+    el->volume = volume/100 ;
+    el->use_volume = volume!=100 ;
+}
+
 
 // 任务线程：放音
 static void task_pcm_playback(audio_el_i2s_t * el) {
@@ -33,7 +41,7 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
         }
         // 暂停信号
         else if( bits&STAT_PAUSING ) {
-            i2s_zero_dma_buffer(el->i2s) ;
+            i2s_zero_dma_buffer(((audio_pipe_t *)el->base.pipe)->i2s) ;
             audio_el_set_stat(el, STAT_PAUSED) ;
             vTaskDelay(1) ;
             continue ;
@@ -58,7 +66,7 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
             // 确定前级已流干（ring buffer 里的可读数据可能分在头尾两端，需要两次才能读空）
             if(audio_el_is_drain(el->base.upstream)) {
                 // printf("i2s's input drain\n") ;
-                i2s_zero_dma_buffer(el->i2s) ;
+                i2s_zero_dma_buffer(((audio_pipe_t *)el->base.pipe)->i2s) ;
                 xEventGroupSetBits(el->base.upstream->stats, STAT_DRAIN) ;  
                 vTaskDelay(1) ;
             }
@@ -77,14 +85,24 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
 
             data_wroten = 0 ;
 
+            // printf("volume: %0.4f\n", el->volume) ;
+            // if(el->use_volume) {
+            //     int32_t* samples = (int32_t*)pwrite;
+            //     size_t sample_count = data_size / sizeof(int32_t);
+            //     for (size_t i = 0; i < sample_count; i++) {
+            //         samples[i] = (int32_t)(samples[i] * el->volume);
+            //     }
+            // }
+
             nechof_time("delay:%lld,%d->%d", {
                 if(((audio_pipe_t*)el->base.pipe)->need_expand) {
                     // 扩展到 32 sample                
-                    i2s_write_expand(el->i2s, pwrite, data_size, 16, 32, &data_wroten, portMAX_DELAY );
+                    i2s_write_expand(((audio_pipe_t *)el->base.pipe)->i2s, pwrite, data_size, 16, 32, &data_wroten, portMAX_DELAY );
                 }
                 else {
-                    i2s_write(el->i2s, pwrite, data_size, &data_wroten, portMAX_DELAY);
+                    i2s_write(((audio_pipe_t *)el->base.pipe)->i2s, pwrite, data_size, &data_wroten, portMAX_DELAY);
                 }
+                // dn2(data_size, data_wroten)
             }, t, data_size, data_wroten)
 
             data_size-= data_wroten ;
@@ -99,20 +117,15 @@ static void task_pcm_playback(audio_el_i2s_t * el) {
     while(1){}
 }
 
-audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t i2s_num, uint8_t core) {
+audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t core) {
     audio_el_i2s_t * el = NULL ;
     ELEMENT_CREATE(pipe, audio_el_i2s_t, el, task_pcm_playback, 1024*3, 10, core, 0)
-    if(el) {
-        el->i2s = i2s_num ;
-    }
     el->base.name = "i2s" ;
     return el ;
 }
 
-
-
         
 void audio_el_i2s_delete(audio_el_i2s_t * el) {
-    i2s_zero_dma_buffer(el->i2s);
+    i2s_zero_dma_buffer(((audio_pipe_t *)el->base.pipe)->i2s);
     audio_el_delete(el) ;
 }

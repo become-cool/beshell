@@ -31,6 +31,7 @@ namespace be::media {
 
         ~AudioPlayer() ;
 
+        static JSValue playWAV2(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue playWAV(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue playMP3(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -39,6 +40,7 @@ namespace be::media {
         static JSValue isPlaying(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isPaused(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue detach(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setVolume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue printStats(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
     } ;
