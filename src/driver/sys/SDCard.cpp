@@ -9,6 +9,8 @@
 #include "diskio_sdmmc.h"
 #include "diskio_impl.h"
 #include "driver/i2s.h"
+#include "driver/gpio.h"
+#include "hal/gpio_types.h"
 
 using namespace std ;
 
@@ -104,6 +106,16 @@ namespace be::driver::sys {
         conf->host.max_freq_khz = khz ;
 
         strncpy(conf->mount_path, mount.c_str(),sizeof(conf->mount_path)) ;
+
+        gpio_config_t io_conf = {
+            .pin_bit_mask = (1ULL << cs),
+            .mode = GPIO_MODE_OUTPUT,
+            .pull_up_en = GPIO_PULLUP_DISABLE,
+            .pull_down_en = GPIO_PULLDOWN_DISABLE,
+            .intr_type = GPIO_INTR_DISABLE,
+        };
+        gpio_config(&io_conf);
+
 
         // xTaskCreatePinnedToCore((TaskFunction_t)sd_card_task, "SD Card Task", 4096, (void*)conf, 5, NULL, 1);
         sd_card_task(conf) ;
