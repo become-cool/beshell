@@ -81,8 +81,8 @@ typedef struct {
 
     uint8_t * undecode_buff ;
     MP3DecInfo * decoder ;
+    bool i2s_clk_inited ;
 
-    uint8_t i2s ;
     int samprate ;
     int channels ;
 
@@ -91,7 +91,8 @@ typedef struct {
 // i2s 播放 element
 typedef struct {
     audio_el_t base ;
-    uint8_t i2s ;
+    float volume ;
+    bool use_volume ;
 } audio_el_i2s_t ;
 
 
@@ -164,6 +165,8 @@ typedef struct _audio_pipe {
     audio_el_t * first ;
     audio_el_t * last ;
 
+    i2s_port_t i2s ;
+
     audio_pipe_event_callback_t callback ;
     void * callback_opaque ;
     
@@ -227,7 +230,8 @@ void audio_el_mp3_delete(audio_el_mp3_t * el) ;
 void audio_el_mp3_reset(audio_el_mp3_t * el) ;
 
 // i2s playback
-audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t i2s_num, uint8_t core) ;
+audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t core) ;
+void audio_el_i2s_set_volume(audio_el_i2s_t * el, uint8_t volume) ;
 void audio_el_i2s_delete(audio_el_i2s_t * el) ;
 
 // midi message

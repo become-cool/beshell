@@ -1,4 +1,5 @@
 #include "audio_stream.h"
+#include "driver/i2s_types_legacy.h"
 
 #define BUFF_SRC_SIZE       MAINBUF_SIZE/2
 #define BUFF_SRC_MEMTYPE    MALLOC_CAP_DMA
@@ -6,28 +7,26 @@
 
 static void mp3dec_output(audio_el_mp3_t * el, uint8_t * data, size_t size) {
 
-    if( el->decoder->samprate!=el->samprate || el->decoder->nChans!=el->channels ) {
+    if( !el->i2s_clk_inited ) {
         // dn2(el->decoder->samprate, el->decoder->nChans)
 
         // 等这一帧以前的数据播放完成
         // xEventGroupWaitBits(el->base.stats, STAT_DRAIN, false, true, 100);
         int bps = ((audio_pipe_t*)el->base.pipe)->need_expand? 32: 16 ;
 
-        // printf("i2s bus:%d, samprate:%d, bps:%d, chans:%d \n",
-        //     el->i2s
-        //     , el->decoder->samprate
-        //     , bps
-        //     , el->decoder->nChans) ;
+        // dn3(el->decoder->samprate,bps,el->decoder->nChans)
         i2s_set_clk(
-            el->i2s
+            ((audio_pipe_t*)el->base.pipe)->i2s
             , el->decoder->samprate
             , bps
             , el->decoder->nChans
+            // , (i2s_channel_t)2
         );
-
 
         el->samprate = el->decoder->samprate ;
         el->channels = el->decoder->nChans ;
+
+        el->i2s_clk_inited = true ;
     }
 
     // if(pdTRUE != xRingbufferSend(el->base.ring, buff_pcm, el->info.outputSamps * 2, portMAX_DELAY)) {
@@ -58,7 +57,7 @@ static void task_mp3_decoder(audio_el_mp3_t * el) {
 
     mp3dec_set_output_func(mp3dec_output) ;
 
-    for(int i=0;i<10;) {
+    for(;;) {
         vTaskDelay(0) ;
 
         // 等待开始状态
@@ -175,4 +174,5 @@ void audio_el_mp3_delete(audio_el_mp3_t * el) {
 
 void audio_el_mp3_reset(audio_el_mp3_t * el) {
     MP3ResetDecoder(el->decoder) ;
+    el->i2s_clk_inited = false ;
 }

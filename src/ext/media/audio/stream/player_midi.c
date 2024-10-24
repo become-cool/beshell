@@ -13,6 +13,8 @@ audio_player_midi_t * audio_player_midi_create(audio_player_midi_conf_t * config
     }
     memset(player, 0, sizeof(audio_player_midi_t)) ;
 
+    player->base.i2s = (i2s_port_t)config->i2s_num ;
+
     player->sf = tsf_load_filename(config->sf2_path);
     if(!player->sf) {
         free(player) ;
@@ -42,7 +44,7 @@ audio_player_midi_t * audio_player_midi_create(audio_player_midi_conf_t * config
     }
     
     // element: i2s 播放
-    player->playback = audio_el_i2s_create(player, config->i2s_num, 0) ;
+    player->playback = audio_el_i2s_create(player, 0) ;
     if(!player->playback) {
         audio_player_midi_delete(player) ;
         return NULL ;
