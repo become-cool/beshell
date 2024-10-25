@@ -76,3 +76,4 @@
 #include "driver/sys/SDCard.hpp"
 #include "driver/disp/ST7701.hpp"
 #include "driver/comm/PN532.hpp"
+#include "driver/light/ws2812b/WS2812B.hpp"
