@@ -1,5 +1,7 @@
 #include "I2C.hpp"
+#include "hal/i2c_types.h"
 #include "qjs_utils.h"
+#include "thread.hpp"
 #include <JSEngine.hpp>
 
 using namespace std ;
@@ -119,6 +121,7 @@ namespace be {
         GET_INT32_PROP(argv[0], "scl", that->_scl, )
         i2c_mode_t GET_UINT32_PROP_OPT(argv[0], "mode", mode, I2C_MODE_MASTER)
         int GET_INT32_PROP_OPT(argv[0], "timeout", timeout, 10)
+        BaseType_t GET_UINT32_PROP_OPT(argv[0], "core", core, 0 )
 
         i2c_config_t i2c_config = {
             .mode = mode,
@@ -185,10 +188,20 @@ namespace be {
 
         that->mode = mode ;
 
-        if(i2c_param_config(that->busnum, &i2c_config)!=ESP_OK) {
-            return JS_FALSE ;
-        }
-        esp_err_t res = i2c_driver_install(that->busnum, mode, rx_buffer_len, tx_buffer_len, 0) ;
+
+        i2c_port_t bus = that->busnum ;
+        esp_err_t res ;
+        run_wait_on_core([&res, bus, mode, rx_buffer_len, tx_buffer_len, &i2c_config](){
+
+            res = i2c_param_config(bus, &i2c_config) ;
+            if(res!=ESP_OK) {
+                return ;
+            }
+            
+            res = i2c_driver_install(bus, mode, rx_buffer_len, tx_buffer_len, 0) ;
+
+        }, core) ;
+
         if(res!=ESP_OK) {
             return JS_FALSE ;
         }

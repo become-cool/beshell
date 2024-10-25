@@ -1,5 +1,6 @@
 #include "I2S.hpp"
 #include "esp_system.h"
+#include "thread.hpp"
 
 using namespace std ;
 
@@ -149,33 +150,19 @@ namespace be {
             JSTHROW("core id (%d) out of range, max is 2", coreId)
         }
 
-        if(xPortGetCoreID()==coreId) {
         
-            esp_err_t res = i2s_driver_install(that->busnum, &i2s_config, 0, NULL) ;
-            if(res!=ESP_OK){
-                JSTHROW("i2s_driver_install() faild with error: %d", res) ;
-            }
-
-    #if SOC_I2S_SUPPORTS_ADC_DAC
-            // if ((config->i2s_config.mode & I2S_MODE_DAC_BUILT_IN) != 0) {
-            //     // i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
-            // } else
-    #endif
-            {
-                res = i2s_set_pin(that->busnum, &pin_config);
-                if(res!=ESP_OK){
-                    JSTHROW("i2s_set_pin() faild with error: %d", res) ;
-                }
-            }
+        esp_err_t res ;
+        i2s_port_t bus = that->busnum ;
+        run_wait_on_core([&res, bus, &i2s_config](){
+            res = i2s_driver_install(bus, &i2s_config, 0, NULL) ;
+        }, coreId) ;
+        if(res!=ESP_OK){
+            JSTHROW("i2s_driver_install() faild with error: %d", res) ;
         }
-        else {
 
-            struct i2s_conf * conf = (struct i2s_conf *)malloc(sizeof(struct i2s_conf)) ;
-            conf->config = i2s_config ;
-            conf->pin = pin_config ;
-            conf->busnum = that->busnum ;
-
-            xTaskCreatePinnedToCore((TaskFunction_t)task_install_i2s, "task_install_i2s", 1024*5, (void *)conf, 5, NULL, coreId) ;
+        res = i2s_set_pin(that->busnum, &pin_config);
+        if(res!=ESP_OK){
+            JSTHROW("i2s_set_pin() faild with error: %d", res) ;
         }
 
         return JS_UNDEFINED ;
