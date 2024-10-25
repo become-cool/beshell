@@ -11,6 +11,7 @@ Added:
 * AudioPlayer.playPCM()
 * add uart.setup() option properties: stopbits, parity
 * add driver.ST7701.initReg()
+* add driver.WS2812B
 * add i2c.isInstalled()
 * driver TM1652
 * add process.delay(ms)
