@@ -48,6 +48,9 @@ using namespace std ;
 
             thisobj->startDaemon(dur,core) ;
         }
+        else {
+            JSTHROW("daemon property should be an object.")
+        }
         JS_FreeValue(ctx,daemon) ;
 
         return JS_UNDEFINED ;
