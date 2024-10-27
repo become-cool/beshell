@@ -78,6 +78,8 @@ namespace be::media {
         }
     }
     
+    // ffmpeg -i input.mp4 -ac 2 -q:a 7 -map a output.mp3
+    // -q:a 选项的值应该 >=7
     JSValue AudioPlayer::playMP3(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(AudioPlayer, player)
         if(player->pipe.running) {
