@@ -81,8 +81,8 @@ namespace be::driver::disp {
         THIS_NCLASS(RGB565,that)
         ASSERT_ARGC(1)
 
-        GET_INT32_PROP(argv[0], "width", that->_width, )
-        GET_INT32_PROP(argv[0], "height", that->_height, )
+        GET_UINT16_PROP(argv[0], "width", that->_width, )
+        GET_UINT16_PROP(argv[0], "height", that->_height, )
         int GET_INT32_PROP_OPT(argv[0], "pclk_hz", pclk_hz, 10*1000*1000)
 
         uint32_t GET_UINT32_PROP_OPT(argv[0], "bounce_buffer_size_px", bounce_buffer_size_px, 0)
@@ -94,32 +94,29 @@ namespace be::driver::disp {
             JSTHROW("missing pin property")
         }
 
-        gpio_num_t GET_INT32_PROP(pin, "de", pin_de, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "vsync", pin_vsync, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "hsync", pin_hsync, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "pclk", pin_pclk,) ;
+        gpio_num_t GET_GPIO_PROP(pin, "de", pin_de, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "vsync", pin_vsync, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "hsync", pin_hsync, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "pclk", pin_pclk,) ;
 
-        
-        
+        gpio_num_t GET_GPIO_PROP(pin, "r0", pin_r0, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "r1", pin_r1, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "r2", pin_r2, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "r3", pin_r3, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "r4", pin_r4, ) ;
 
-        gpio_num_t GET_INT32_PROP(pin, "r0", pin_r0, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "r1", pin_r1, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "r2", pin_r2, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "r3", pin_r3, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "r4", pin_r4, ) ;
-
-        gpio_num_t GET_INT32_PROP(pin, "g0", pin_g0, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "g1", pin_g1, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "g2", pin_g2, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "g3", pin_g3, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "g4", pin_g4, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "g5", pin_g5, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g0", pin_g0, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g1", pin_g1, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g2", pin_g2, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g3", pin_g3, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g4", pin_g4, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "g5", pin_g5, ) ;
         
-        gpio_num_t GET_INT32_PROP(pin, "b0", pin_b0, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "b1", pin_b1, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "b2", pin_b2, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "b3", pin_b3, ) ;
-        gpio_num_t GET_INT32_PROP(pin, "b4", pin_b4, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "b0", pin_b0, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "b1", pin_b1, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "b2", pin_b2, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "b3", pin_b3, ) ;
+        gpio_num_t GET_GPIO_PROP(pin, "b4", pin_b4, ) ;
 
         esp_lcd_rgb_panel_config_t panel_config ;
         memset(&panel_config, 0, sizeof(esp_lcd_rgb_panel_config_t)) ;

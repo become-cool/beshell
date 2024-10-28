@@ -74,8 +74,8 @@ namespace be::driver::sys {
     JSValue SDCard::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
 
-        spi_host_device_t GET_INT32_PROP(argv[0], "spi", spi, )
-        gpio_num_t GET_INT32_PROP(argv[0], "cs", cs, )
+        spi_host_device_t GET_INT_PROP(argv[0], "spi", spi, spi_host_device_t, )
+        gpio_num_t GET_GPIO_PROP(argv[0], "cs", cs, )
         int GET_INT32_PROP_OPT(argv[0], "khz", khz, 20000)
         string GET_STR_PROP(argv[0], "mount", mount, )
         mount = FS::toVFSPath(mount.c_str()) ;

@@ -41,7 +41,7 @@ namespace be::driver::light{
         if(that->length<1 && that->length>1024) {
             JSTHROW("length must be between 1 and 1024")
         }
-        gpio_port_t GET_UINT32_PROP(argv[0], "pin", pin,  )
+        gpio_num_t GET_GPIO_PROP(argv[0], "pin", pin,  )
 
         // LED strip general initialization, according to your led board design
         led_strip_config_t strip_config = {

@@ -117,9 +117,9 @@ namespace be {
         THIS_NCLASS(I2C, that)
         ASSERT_ARGC(1)
 
-        GET_INT32_PROP(argv[0], "sda", that->_sda, )
-        GET_INT32_PROP(argv[0], "scl", that->_scl, )
-        i2c_mode_t GET_UINT32_PROP_OPT(argv[0], "mode", mode, I2C_MODE_MASTER)
+        GET_GPIO_PROP(argv[0], "sda", that->_sda, )
+        GET_GPIO_PROP(argv[0], "scl", that->_scl, )
+        i2c_mode_t GET_UINT_PROP_OPT(argv[0], "mode", mode, i2c_mode_t, I2C_MODE_MASTER)
         int GET_INT32_PROP_OPT(argv[0], "timeout", timeout, 10)
         BaseType_t GET_UINT32_PROP_OPT(argv[0], "core", core, 0 )
 

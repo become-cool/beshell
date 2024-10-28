@@ -85,9 +85,9 @@ namespace be {
         THIS_NCLASS(SPI, that)
         ASSERT_ARGC(1)
 
-        gpio_num_t GET_INT32_PROP_OPT(argv[0], "miso", misopin, GPIO_NUM_NC)
-        gpio_num_t GET_INT32_PROP_OPT(argv[0], "mosi", mosipin, GPIO_NUM_NC)
-        gpio_num_t GET_INT32_PROP(argv[0], "sck", sckpin, )
+        gpio_num_t GET_GPIO_PROP_OPT(argv[0], "miso", misopin, GPIO_NUM_NC)
+        gpio_num_t GET_GPIO_PROP_OPT(argv[0], "mosi", mosipin, GPIO_NUM_NC)
+        gpio_num_t GET_GPIO_PROP(argv[0], "sck", sckpin, )
         int GET_INT32_PROP_OPT(argv[0], "quadwp_io_num", quadwp_io_num, -1)
         int GET_INT32_PROP_OPT(argv[0], "quadhd_io_num", quadhd_io_num, -1)
         int GET_INT32_PROP_OPT(argv[0], "max_transfer_sz", max_transfer_sz, 20480)

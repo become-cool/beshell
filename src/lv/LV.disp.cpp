@@ -38,7 +38,7 @@ namespace be::lv {
         
         lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL ;
         if(argc>1) {
-            GET_UINT32_PROP_OPT(argv[1], "render_mode", render_mode, LV_DISPLAY_RENDER_MODE_PARTIAL )
+            GET_UINT_PROP_OPT(argv[1], "render_mode", render_mode, lv_display_render_mode_t, LV_DISPLAY_RENDER_MODE_PARTIAL )
         }
         if( render_mode!=LV_DISPLAY_RENDER_MODE_PARTIAL
             && render_mode!=LV_DISPLAY_RENDER_MODE_FULL

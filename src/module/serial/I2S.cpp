@@ -130,11 +130,11 @@ namespace be {
 
         int coreId = 0 ;
 
-        GET_INT32_PROP_OPT(argv[0], "mode", i2s_config.mode, (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX))
+        GET_INT_PROP_OPT(argv[0], "mode", i2s_config.mode, i2s_mode_t, (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX))
         GET_UINT32_PROP_OPT(argv[0], "sample_rate", i2s_config.sample_rate, 44100)
-        GET_INT32_PROP_OPT(argv[0], "bits_per_sample", i2s_config.bits_per_sample, I2S_BITS_PER_SAMPLE_16BIT)
-        GET_INT32_PROP_OPT(argv[0], "channel_format", i2s_config.channel_format, I2S_CHANNEL_FMT_RIGHT_LEFT)
-        GET_INT32_PROP_OPT(argv[0], "communication_format", i2s_config.communication_format, I2S_COMM_FORMAT_STAND_I2S)
+        GET_INT_PROP_OPT(argv[0], "bits_per_sample", i2s_config.bits_per_sample, i2s_bits_per_sample_t, I2S_BITS_PER_SAMPLE_16BIT)
+        GET_INT_PROP_OPT(argv[0], "channel_format", i2s_config.channel_format, i2s_channel_fmt_t, I2S_CHANNEL_FMT_RIGHT_LEFT)
+        GET_INT_PROP_OPT(argv[0], "communication_format", i2s_config.communication_format, i2s_comm_format_t, I2S_COMM_FORMAT_STAND_I2S)
         GET_INT32_PROP_OPT(argv[0], "intr_alloc_flags", i2s_config.intr_alloc_flags, ESP_INTR_FLAG_LEVEL2 )
         GET_INT32_PROP_OPT(argv[0], "dma_buf_count", i2s_config.dma_buf_count, 2)
         GET_INT32_PROP_OPT(argv[0], "dma_buf_len", i2s_config.dma_buf_len, 128)

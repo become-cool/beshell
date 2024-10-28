@@ -313,11 +313,11 @@ namespace be::driver::motion {
         }
 
 
-        GET_INT32_PROP(optPin, "step", stepper->io_step, )
-        GET_INT32_PROP_OPT(optPin, "dir", stepper->io_dir, GPIO_NUM_NC)
-        GET_INT32_PROP_OPT(optPin, "en", stepper->io_en, GPIO_NUM_NC)
-        GET_INT32_PROP_OPT(optPin, "limitForward", stepper->io_limit_forward, GPIO_NUM_NC)
-        GET_INT32_PROP_OPT(optPin, "limit_backward", stepper->io_limit_backward, GPIO_NUM_NC)
+        GET_GPIO_PROP(optPin, "step", stepper->io_step, )
+        GET_GPIO_PROP_OPT(optPin, "dir", stepper->io_dir, GPIO_NUM_NC)
+        GET_GPIO_PROP_OPT(optPin, "en", stepper->io_en, GPIO_NUM_NC)
+        GET_GPIO_PROP_OPT(optPin, "limitForward", stepper->io_limit_forward, GPIO_NUM_NC)
+        GET_GPIO_PROP_OPT(optPin, "limit_backward", stepper->io_limit_backward, GPIO_NUM_NC)
         
         int32_t dir_forward_level ;
         GET_INT32_PROP_OPT(argv[0], "dirForwardLevel", dir_forward_level, 0)
