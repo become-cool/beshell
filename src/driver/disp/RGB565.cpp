@@ -188,7 +188,7 @@ namespace be::driver::disp {
         return JS_UNDEFINED ;
     }
 
-    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t * pixels) {
+    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,const color_t * pixels) {
         
         if(!playing) {
             return ;
