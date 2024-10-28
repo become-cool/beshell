@@ -6,7 +6,7 @@
 
 using namespace std ;
 
-namespace be::light{
+namespace be::driver::light{
     DEFINE_NCLASS_META(WS2812B, NativeClass)
     std::vector<JSCFunctionListEntry> WS2812B::methods = {
         JS_CFUNC_DEF("setup", 1, WS2812B::setup),

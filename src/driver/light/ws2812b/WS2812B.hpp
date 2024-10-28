@@ -5,7 +5,7 @@
 #include "led_strip.h"
 
 
-namespace be::light{
+namespace be::driver::light{
     class WS2812B: public be::NativeClass {
         DECLARE_NCLASS_META
     private:
