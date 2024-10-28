@@ -73,7 +73,11 @@ namespace be {
             esp_reset_reason_t reset_reason = esp_reset_reason();
             if(reset_reason==ESP_RST_PANIC) {
                 printf("BeShell was rebooted due to a crash\n") ;
-            } else {
+            }
+            else if(reset_reason==ESP_RST_INT_WDT) {
+                printf("BeShell was rebooted due to an interrupt watchdog timeout\n") ;
+            }
+            else {
                 engine->evalScript(mainScriptPath) ;
             }
 #else
