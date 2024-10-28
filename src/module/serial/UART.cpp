@@ -1,4 +1,5 @@
 #include "UART.hpp"
+#include "hal/gpio_types.h"
 #include "quickjs/quickjs.h"
 #include <BeShell.hpp>
 #include <JSEngine.hpp>
@@ -103,11 +104,11 @@ namespace be{
 
         ASSERT_ARGC(1)
 
-        gpio_num_t GET_INT32_PROP(argv[0], "tx", tx, UART_PIN_NO_CHANGE)
-        gpio_num_t GET_INT32_PROP(argv[0], "rx", rx, UART_PIN_NO_CHANGE)
+        gpio_num_t GET_GPIO_PROP(argv[0], "tx", tx, GPIO_NUM_NC)
+        gpio_num_t GET_GPIO_PROP(argv[0], "rx", rx, GPIO_NUM_NC)
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
-        uart_stop_bits_t GET_UINT32_PROP_OPT(argv[0], "stopbits", stopbits, UART_STOP_BITS_1)
-        uart_parity_t GET_UINT32_PROP_OPT(argv[0], "parity", parity, UART_PARITY_DISABLE)
+        uart_stop_bits_t GET_INT_PROP_OPT(argv[0], "stopbits", stopbits, uart_stop_bits_t, UART_STOP_BITS_1)
+        uart_parity_t GET_INT_PROP_OPT(argv[0], "parity", parity, uart_parity_t, UART_PARITY_DISABLE)
 
         // dn3(baudrate,stopbits,parity)
 

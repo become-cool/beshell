@@ -31,7 +31,7 @@ namespace be::driver::disp {
 
     JSValue ST7701::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new ST7701(ctx) ;
-        obj->self = std::shared_ptr<ST7701> (obj) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
 
@@ -53,10 +53,10 @@ namespace be::driver::disp {
             JSTHROW("missing pin property")
         }
 
-        GET_INT32_PROP(pin, "sda", that->pin_sda, )
-        GET_INT32_PROP(pin, "sck", that->pin_sck, )
-        GET_INT32_PROP(pin, "cs", that->pin_cs, )
-        GET_INT32_PROP_OPT(pin, "rst", that->pin_rst, GPIO_NUM_NC)
+        GET_GPIO_PROP(pin, "sda", that->pin_sda, )
+        GET_GPIO_PROP(pin, "sck", that->pin_sck, )
+        GET_GPIO_PROP(pin, "cs", that->pin_cs, )
+        GET_GPIO_PROP_OPT(pin, "rst", that->pin_rst, GPIO_NUM_NC)
 
         // dn4(that->pin_sda,that->pin_sck,that->pin_cs,that->pin_rst)
         

@@ -41,7 +41,7 @@ namespace be::driver::sensor {
         THIS_NCLASS(DS18B20, that)
         ASSERT_ARGC(1)
 
-        GET_INT32_PROP(argv[0], "pin", that->pin, )
+        GET_GPIO_PROP(argv[0], "pin", that->pin, )
 
 #if ESP_IDF_VERSION_MAJOR >= 5
         esp_rom_gpio_pad_select_gpio(that->pin);

@@ -289,7 +289,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define HMALLOC(var, size) var = malloc(size);
 #endif
 
-#define GET_INT_PROP(obj, propName, cvar, ctype, getter, excp)                      \
+#define GET_INTEGER_PROP(obj, propName, cvar, ctype, apitype, getter, excp)         \
     cvar ;                                                                          \
     {                                                                               \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                     \
@@ -304,13 +304,24 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
             excp ;                                                                  \
             return JS_EXCEPTION ;                                                   \
         }                                                                           \
-        getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
+        apitype cvar_tmp ;                                                          \
+        getter(ctx, &cvar_tmp, jsvar) ;                                             \
+        cvar = (ctype)cvar_tmp ;                                                    \
     }
 
-#define GET_INT32_PROP(obj, propName, cvar, excp)   GET_INT_PROP(obj, propName, cvar, int32_t, JS_ToInt32, excp)
-#define GET_UINT32_PROP(obj, propName, cvar, excp)  GET_INT_PROP(obj, propName, cvar, uint32_t, JS_ToUint32, excp)
+#define GET_INT_PROP(obj, propName, cvar, ctype, excp)  GET_INTEGER_PROP(obj, propName, cvar, ctype, int32_t, JS_ToInt32, excp)
+#define GET_UINT_PROP(obj, propName, cvar, ctype, excp) GET_INTEGER_PROP(obj, propName, cvar, ctype, uint32_t, JS_ToUint32, excp)
+#define GET_INT8_PROP(obj, propName, cvar, excp)        GET_INTEGER_PROP(obj, propName, cvar, int8_t, int32_t, JS_ToInt32, excp)
+#define GET_INT16_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, int16_t, int32_t, JS_ToInt32, excp)
+#define GET_INT32_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, int32_t, int32_t, JS_ToInt32, excp)
+#define GET_UINT8_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, excp)
+#define GET_UINT16_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, excp)
+#define GET_UINT32_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, excp)
+#define GET_GPIO_PROP(obj, propName, cvar, excp)        GET_INT_PROP(obj, propName, cvar, gpio_num_t, excp)
 
-#define GET_INT_PROP_OPT(obj, propName, cvar, ctype, getter, default)                   \
+
+
+#define GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, apitype, getter, default)      \
     cvar ;                                                                              \
     {                                                                                   \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
@@ -322,17 +333,22 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
                 JS_FreeValue(ctx, jsvar) ;                                              \
                 JSTHROW("property %s is not a number", propName) ;                      \
             }                                                                           \
-            getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
+            apitype cvar_tmp ;                                                          \
+            getter(ctx, &cvar_tmp, jsvar) ;                                             \
+            cvar = (ctype)cvar_tmp ;                                                    \
         }                                                                               \
     }
     
-#define GET_INT32_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t, JS_ToInt32, default)
-#define GET_INT16_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t,  JS_ToInt32,  default)
-#define GET_INT8_PROP_OPT(obj, propName, cvar, default)    GET_INT_PROP_OPT(obj, propName, cvar, int32_t,   JS_ToInt32,  default)
-#define GET_UINT32_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
-#define GET_UINT16_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
-#define GET_UINT8_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, uint32_t,  JS_ToUint32, default)
-// #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint8_t, JS_ToUint32, default)
+#define GET_INT_PROP_OPT(obj, propName, cvar, ctype, default)   GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, int32_t, JS_ToInt32, default)
+#define GET_UINT_PROP_OPT(obj, propName, cvar, ctype, default)  GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, uint32_t, JS_ToUint32, default)
+#define GET_INT8_PROP_OPT(obj, propName, cvar, default)         GET_INTEGER_PROP_OPT(obj, propName, cvar, int8_t, int32_t, JS_ToInt32, default)
+#define GET_INT16_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, int16_t, int32_t, JS_ToInt32,  default)
+#define GET_INT32_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, int32_t, int32_t, JS_ToInt32,  default)
+#define GET_UINT8_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, default)
+#define GET_UINT16_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, default)
+#define GET_UINT32_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, default)
+#define GET_GPIO_PROP_OPT(obj, propName, cvar, default)       GET_INT_PROP_OPT(obj, propName, cvar, gpio_num_t, default)
+
 
 #define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \
     cvar ;                                                                              \
