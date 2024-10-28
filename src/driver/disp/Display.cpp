@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include "Display.hpp"
+#include "NativeClass.hpp"
 #include "qjs_utils.h"
 #include "esp_heap_caps.h"
 
@@ -12,6 +13,7 @@ namespace be::driver::disp {
     DEFINE_NCLASS_META(Display, NativeClass)
     std::vector<JSCFunctionListEntry> Display::methods = {
         JS_CFUNC_DEF("drawRect", 0, Display::drawRect),
+        JS_CFUNC_DEF("fillRect", 0, Display::fillRect),
     } ;
     std::vector<JSCFunctionListEntry> Display::staticMethods = {
         JS_CFUNC_DEF("RGB", 0, Display::RGB),
@@ -59,6 +61,21 @@ namespace be::driver::disp {
         disp->drawRect(x1,y1,x2,y2,buff) ;
 
         delete[] buff ;
+
+        return JS_UNDEFINED ;
+    }
+
+
+    JSValue Display::fillRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        ASSERT_ARGC(5)
+        ARGV_TO_INT16(0,x1)
+        ARGV_TO_INT16(1,y1)
+        ARGV_TO_INT16(2,x2)
+        ARGV_TO_INT16(3,y2)
+        ARGV_TO_UINT16(4,color)
+
+        that->fillRect(x1,y1,x2,y2,color) ;
 
         return JS_UNDEFINED ;
     }
@@ -138,5 +155,20 @@ namespace be::driver::disp {
     }
     JSValue Display::toRGB565(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
+    }
+    
+    void Display::fillRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t color) {
+
+        uint16_t line_size = x2-x1+1;
+        uint8_t * buff = (uint8_t *)heap_caps_malloc(line_size*2, MALLOC_CAP_DMA) ;
+        int index = 0;
+        for(int i=0;i<line_size;i++) {
+            buff[index++] = (color >> 8) & 0xFF;
+            buff[index++] = color & 0xFF;
+        }
+
+        drawRect(x1, y1, x2, y2, (uint16_t*)buff) ;
+
+        free(buff) ;
     }
 }
