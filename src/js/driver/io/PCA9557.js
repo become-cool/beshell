@@ -39,7 +39,6 @@ class PCA9557 extends driver.I2CDevice {
         if(this.alias[pin]!=undefined) {
             pin = this.alias[pin]
         }
-        console.log("write pin", pin, level)
         let output = (this.output & ~(1 << pin)) | (level << pin)
         this.writeReg(1, output)
         this.output = output
