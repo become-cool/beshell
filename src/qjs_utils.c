@@ -127,3 +127,44 @@ uint8_t * JS_ArrayToBufferUint8(JSContext *ctx, JSValue array, int * len) {
 	}
 	return data ;
 }
+
+void printUncatchException(JSContext *ctx) {
+    JSValue error = JS_GetException(ctx);
+    const char * cstr = JS_ToCString(ctx, error) ;
+    if(cstr) {
+        printf(cstr) ;
+        printf("\n") ;
+        JS_FreeCString(ctx, cstr) ;
+
+        if (JS_IsError(ctx, error)) {
+            JSValue stack = JS_GetPropertyStr(ctx, error, "stack");
+            if (!JS_IsUndefined(stack)) {
+                cstr = JS_ToCString(ctx, stack) ;
+                printf(cstr) ;
+                printf("\n") ;
+                JS_FreeCString(ctx,cstr) ;
+                JS_FreeValue(ctx, stack);
+            }
+        }
+    }
+    JS_FreeValue(ctx,error) ;
+}
+
+void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) {
+    if(codelen<0) {
+        codelen = strlen(code) ;
+    }
+    JSValue ret = JS_Eval(ctx,code,codelen,filename,eval_flags) ;
+    if( JS_IsException(ret) ) {
+        printUncatchException(ctx) ;
+    }
+    JS_FreeValue(ctx,ret) ;
+}
+
+void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) {
+    JSValue ret = JS_Call(ctx, jsFunc, jsThis, argc, args) ;
+    if( JS_IsException(ret) ) {
+        printUncatchException(ctx) ;
+    }
+    JS_FreeValue(ctx,ret) ;
+}

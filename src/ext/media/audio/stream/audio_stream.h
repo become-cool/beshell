@@ -10,7 +10,6 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 #include "debug.h"
-#include "deps/quickjs/quickjs-libc.h"
 
 
 #include "freertos/FreeRTOS.h"
@@ -36,7 +35,8 @@ extern "C" {
 #define STAT_ALL_PHASE      (STAT_RUNNING | STAT_STOPPING | STAT_STOPPED | STAT_PAUSING | STAT_PAUSED)
 // 以上 bit 是互斥的
 
-#define STAT_DRAIN          32
+#define STAT_FINISHED       32  // 正常播放完毕
+#define STAT_DRAIN          64
 
 typedef struct _audio_el_t{
 
@@ -48,6 +48,7 @@ typedef struct _audio_el_t{
     struct _audio_el_t * upstream;
     struct _audio_el_t * downstream;
     void * pipe ;
+    char * name ;
 
 } audio_el_t ;
 
@@ -80,8 +81,8 @@ typedef struct {
 
     uint8_t * undecode_buff ;
     MP3DecInfo * decoder ;
+    bool i2s_clk_inited ;
 
-    uint8_t i2s ;
     int samprate ;
     int channels ;
 
@@ -90,7 +91,8 @@ typedef struct {
 // i2s 播放 element
 typedef struct {
     audio_el_t base ;
-    uint8_t i2s ;
+    float volume ;
+    bool use_volume ;
 } audio_el_i2s_t ;
 
 
@@ -147,6 +149,7 @@ typedef struct {
 } audio_el_midi_render_t ;
 
 
+typedef void (*audio_pipe_event_callback_t) (const char * event, int param, void * opaque) ;
 
 typedef struct _audio_pipe {
 
@@ -157,12 +160,15 @@ typedef struct _audio_pipe {
     int8_t error ;
 
     int samplerate ;
+    bool need_expand ;  // 有的芯片不支持 16bit 音源，需要扩展到 32bit 输出到 i2s, 例如 ES8156
 
     audio_el_t * first ;
     audio_el_t * last ;
-    
-    JSContext * ctx ;
-    JSValue jsobj ;
+
+    i2s_port_t i2s ;
+
+    audio_pipe_event_callback_t callback ;
+    void * callback_opaque ;
     
 } audio_pipe_t ;
 
@@ -224,7 +230,8 @@ void audio_el_mp3_delete(audio_el_mp3_t * el) ;
 void audio_el_mp3_reset(audio_el_mp3_t * el) ;
 
 // i2s playback
-audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t i2s_num, uint8_t core) ;
+audio_el_i2s_t * audio_el_i2s_create(audio_pipe_t * pipe, uint8_t core) ;
+void audio_el_i2s_set_volume(audio_el_i2s_t * el, uint8_t volume) ;
 void audio_el_i2s_delete(audio_el_i2s_t * el) ;
 
 // midi message
@@ -252,7 +259,8 @@ void audio_pipe_link(audio_pipe_t * pipe, int audio_el_cnt, ...) ;
 void audio_pipe_set_stats(audio_pipe_t * pipe, int stats) ;
 void audio_pipe_clear_stats(audio_pipe_t * pipe, int stats) ;
 void audio_pipe_clear(audio_pipe_t * pipe) ;
-void audio_pipe_emit_js(audio_pipe_t * pipe, const char * event, JSValue param) ;
+#define audio_pipe_emit_event(pipe, event, param) \
+    if(((audio_pipe_t*)pipe)->callback) ((audio_pipe_t*)pipe)->callback(event, param, ((audio_pipe_t*)pipe)->callback_opaque)
 
 // midi player 
 audio_player_midi_t * audio_player_midi_create(audio_player_midi_conf_t * config) ;

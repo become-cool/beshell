@@ -1,11 +1,13 @@
 #include "Telnet.hpp"
 #include "debug.h"
 #include "BeShell.hpp"
-#include "TelnetModule.hpp"
 #include <cassert>
 #include <string.h>
 #include <sys/stat.h>
 
+#ifdef ESP_PLATFORM
+#include "TelnetModule.hpp"
+#endif
 
 
 #define PKG_QUEUE_LEN 64
@@ -33,18 +35,6 @@ namespace be {
 #endif
 #ifdef LINUX_PLATFORM
         channelStdIO.setup() ;
-#endif
-    }
-    void Telnet::loop() {
-        Package * ptr ;
-        std::unique_ptr<Package> pkg ;
-        if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
-            pkg.reset(ptr) ;
-            // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-            onReceived(pkg->channle,move(pkg)) ;
-        }
-#ifdef LINUX_PLATFORM
-        channelStdIO.loop() ;
 #endif
     }
 
@@ -102,6 +92,9 @@ namespace be {
 
 #ifdef ESP_PLATFORM
             channelSeiral.send(pkg) ;
+            if(channelBLE) {
+                channelBLE->send(pkg) ;
+            }
 #endif
         }
 
@@ -118,6 +111,9 @@ namespace be {
 #ifdef ESP_PLATFORM
         if(strcmp(name,"serial")==0){
             return & channelSeiral ;
+        }
+        if(strcmp(name,"bt")==0){
+            return channelBLE ;
         }
 #endif
 #ifdef LINUX_PLATFORM
@@ -261,7 +257,7 @@ namespace be {
 
     void Telnet::useBLE() {
 #ifdef ESP_PLATFORM
-        bt = new TelnetBLE(this) ;
+        channelBLE = new TelnetBLE(this) ;
         TelnetModule::useBLE() ;
 #endif
     }

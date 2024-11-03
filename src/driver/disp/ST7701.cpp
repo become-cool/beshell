@@ -31,12 +31,13 @@ namespace be::driver::disp {
 
     JSValue ST7701::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         auto obj = new ST7701(ctx) ;
-        obj->self = std::shared_ptr<ST7701> (obj) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
 
     std::vector<JSCFunctionListEntry> ST7701::methods = {
         JS_CFUNC_DEF("setup", 0, ST7701::setup),
+        JS_CFUNC_DEF("initReg", 0, ST7701::initReg),
     } ;
 
     JSValue ST7701::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -52,10 +53,10 @@ namespace be::driver::disp {
             JSTHROW("missing pin property")
         }
 
-        GET_INT32_PROP(pin, "sda", that->pin_sda, )
-        GET_INT32_PROP(pin, "sck", that->pin_sck, )
-        GET_INT32_PROP(pin, "cs", that->pin_cs, )
-        GET_INT32_PROP_OPT(pin, "rst", that->pin_rst, GPIO_NUM_NC)
+        GET_GPIO_PROP(pin, "sda", that->pin_sda, )
+        GET_GPIO_PROP(pin, "sck", that->pin_sck, )
+        GET_GPIO_PROP(pin, "cs", that->pin_cs, )
+        GET_GPIO_PROP_OPT(pin, "rst", that->pin_rst, GPIO_NUM_NC)
 
         // dn4(that->pin_sda,that->pin_sck,that->pin_cs,that->pin_rst)
         
@@ -82,7 +83,12 @@ namespace be::driver::disp {
 
         return JS_UNDEFINED ;
     }
-
+    
+    JSValue ST7701::initReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(ST7701,that)
+        that->initReg() ;
+        return JS_UNDEFINED ;
+    }
 
     void ST7701::write9b(uint16_t data)
     {

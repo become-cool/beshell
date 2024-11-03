@@ -1,6 +1,7 @@
 #pragma once
 
 #include "debug.h"
+#include "native_helper.h"
 #include "deps/quickjs/quickjs-libc.h"
 #include "deps/quickjs/cutils.h"
 #include <stdbool.h>
@@ -195,46 +196,11 @@ extern "C" {
         }                                   \
     }
 
-inline void printUncatchException(JSContext *ctx) {
-    JSValue error = JS_GetException(ctx);
-    const char * cstr = JS_ToCString(ctx, error) ;
-    if(cstr) {
-        printf(cstr) ;
-        printf("\n") ;
-        JS_FreeCString(ctx, cstr) ;
+void printUncatchException(JSContext *ctx) ;
 
-        if (JS_IsError(ctx, error)) {
-            JSValue stack = JS_GetPropertyStr(ctx, error, "stack");
-            if (!JS_IsUndefined(stack)) {
-                cstr = JS_ToCString(ctx, stack) ;
-                printf(cstr) ;
-                printf("\n") ;
-                JS_FreeCString(ctx,cstr) ;
-                JS_FreeValue(ctx, stack);
-            }
-        }
-    }
-    JS_FreeValue(ctx,error) ;
-}
+void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) ;
 
-inline void JSEval(JSContext *ctx, const char * code, int codelen, const char * filename, int eval_flags) {
-    if(codelen<0) {
-        codelen = strlen(code) ;
-    }
-    JSValue ret = JS_Eval(ctx,code,codelen,filename,eval_flags) ;
-    if( JS_IsException(ret) ) {
-        printUncatchException(ctx) ;
-    }
-    JS_FreeValue(ctx,ret) ;
-}
-
-inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) {
-    JSValue ret = JS_Call(ctx, jsFunc, jsThis, argc, args) ;
-    if( JS_IsException(ret) ) {
-        printUncatchException(ctx) ;
-    }
-    JS_FreeValue(ctx,ret) ;
-}
+void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSValueConst * args) ;
 
 #define MALLOC_ARGV1(argv, arg1)                                                    \
     argv = (JSValue*)malloc(sizeof(JSValue)) ;                                      \
@@ -271,9 +237,7 @@ inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSV
     {                                                           \
         MAKE_ARGV1(argv, arg1)                                  \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 1, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -282,9 +246,7 @@ inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSV
     {                                                           \
         MAKE_ARGV2(argv, arg1, arg2)                            \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 2, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -292,9 +254,7 @@ inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSV
     {                                                           \
         MAKE_ARGV3(argv, arg1, arg2, arg3)                      \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 3, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -302,9 +262,7 @@ inline void JSCall(JSContext *ctx, JSValue jsFunc, JSValue jsThis, int argc, JSV
     {                                                           \
         MAKE_ARGV4(argv, arg1, arg2, arg3, arg4)                \
         JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 4, argv) ; \
-        if(JS_IsException(ret)) {                               \
-            JSEngine::fromJSContext(ctx)->dumpError() ;         \
-        }                                                       \
+        JSEngine::fromJSContext(ctx)->dumpError() ;             \
         JS_FreeValue(ctx,ret) ;                                 \
         free(argv) ;                                            \
     }
@@ -331,7 +289,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define HMALLOC(var, size) var = malloc(size);
 #endif
 
-#define GET_INT_PROP(obj, propName, cvar, ctype, getter, excp)                      \
+#define GET_INTEGER_PROP(obj, propName, cvar, ctype, apitype, getter, excp)         \
     cvar ;                                                                          \
     {                                                                               \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                     \
@@ -346,13 +304,24 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
             excp ;                                                                  \
             return JS_EXCEPTION ;                                                   \
         }                                                                           \
-        getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
+        apitype cvar_tmp ;                                                          \
+        getter(ctx, &cvar_tmp, jsvar) ;                                             \
+        cvar = (ctype)cvar_tmp ;                                                    \
     }
 
-#define GET_INT32_PROP(obj, propName, cvar, excp)   GET_INT_PROP(obj, propName, cvar, int32_t, JS_ToInt32, excp)
-#define GET_UINT32_PROP(obj, propName, cvar, excp)  GET_INT_PROP(obj, propName, cvar, uint32_t, JS_ToUint32, excp)
+#define GET_INT_PROP(obj, propName, cvar, ctype, excp)  GET_INTEGER_PROP(obj, propName, cvar, ctype, int32_t, JS_ToInt32, excp)
+#define GET_UINT_PROP(obj, propName, cvar, ctype, excp) GET_INTEGER_PROP(obj, propName, cvar, ctype, uint32_t, JS_ToUint32, excp)
+#define GET_INT8_PROP(obj, propName, cvar, excp)        GET_INTEGER_PROP(obj, propName, cvar, int8_t, int32_t, JS_ToInt32, excp)
+#define GET_INT16_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, int16_t, int32_t, JS_ToInt32, excp)
+#define GET_INT32_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, int32_t, int32_t, JS_ToInt32, excp)
+#define GET_UINT8_PROP(obj, propName, cvar, excp)       GET_INTEGER_PROP(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, excp)
+#define GET_UINT16_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, excp)
+#define GET_UINT32_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, excp)
+#define GET_GPIO_PROP(obj, propName, cvar, excp)        GET_INT_PROP(obj, propName, cvar, gpio_num_t, excp)
 
-#define GET_INT_PROP_OPT(obj, propName, cvar, ctype, getter, default)                   \
+
+
+#define GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, apitype, getter, default)      \
     cvar ;                                                                              \
     {                                                                                   \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
@@ -364,12 +333,33 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
                 JS_FreeValue(ctx, jsvar) ;                                              \
                 JSTHROW("property %s is not a number", propName) ;                      \
             }                                                                           \
-            getter(ctx, (ctype*)&cvar, jsvar) ;                                         \
+            apitype cvar_tmp ;                                                          \
+            getter(ctx, &cvar_tmp, jsvar) ;                                             \
+            cvar = (ctype)cvar_tmp ;                                                    \
         }                                                                               \
     }
     
-#define GET_INT32_PROP_OPT(obj, propName, cvar, default)   GET_INT_PROP_OPT(obj, propName, cvar, int32_t, JS_ToInt32, default)
-#define GET_UINT32_PROP_OPT(obj, propName, cvar, default)  GET_INT_PROP_OPT(obj, propName, cvar, uint32_t, JS_ToUint32, default)
+#define GET_INT_PROP_OPT(obj, propName, cvar, ctype, default)   GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, int32_t, JS_ToInt32, default)
+#define GET_UINT_PROP_OPT(obj, propName, cvar, ctype, default)  GET_INTEGER_PROP_OPT(obj, propName, cvar, ctype, uint32_t, JS_ToUint32, default)
+#define GET_INT8_PROP_OPT(obj, propName, cvar, default)         GET_INTEGER_PROP_OPT(obj, propName, cvar, int8_t, int32_t, JS_ToInt32, default)
+#define GET_INT16_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, int16_t, int32_t, JS_ToInt32,  default)
+#define GET_INT32_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, int32_t, int32_t, JS_ToInt32,  default)
+#define GET_UINT8_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, default)
+#define GET_UINT16_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, default)
+#define GET_UINT32_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, default)
+#define GET_GPIO_PROP_OPT(obj, propName, cvar, default)       GET_INT_PROP_OPT(obj, propName, cvar, gpio_num_t, default)
+
+
+#define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \
+    cvar ;                                                                              \
+    {                                                                                   \
+        JSValue value = JS_GetPropertyStr(ctx, obj, propName) ;                         \
+        if(JS_ToFloat64(ctx, &(cvar), value)!=0) {                                      \
+            cvar = default ;                                                            \
+        }                                                                               \
+        JS_FreeValue(ctx, value) ;                                                      \
+    }
+
 
 
 #define GET_PROP(obj, propName, jsvar)                                                  \
@@ -407,6 +397,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
     if(!JS_IsUndefined(obj)&&!JS_IsNull(obj)) {                                         \
         JSValue jsvar = JS_GetPropertyStr(ctx, obj, propName) ;                         \
         cvar = JS_ToBool(ctx, jsvar) ;                                                  \
+        JS_FreeValue(ctx, jsvar) ;                                                      \
     }
 
 
@@ -416,12 +407,12 @@ JSValue js_get_glob_prop(JSContext *ctx, int depth, ...)  ;
 bool qjs_instanceof(JSContext *ctx, JSValue obj, JSClassID clz_id) ;
 
 #define JS_NewArrayWithBuff(var,buff,buff_len,api)                  \
-    JSValue var = JS_NewArray(ctx) ;                                \
+    var = JS_NewArray(ctx) ;                                        \
     for(int __i=0;__i<buff_len;__i++) {                             \
         JS_SetPropertyUint32(ctx, var, __i, api(ctx,buff[__i])) ;   \
     }
-#define JS_NewArrayWithUint8Buff(var,buff,buff_len) JS_NewArrayWithBuff(var,buff,buff_len,JS_NewUint32)
-#define JS_NewArrayWithInt8Buff(var,buff,buff_len)  JS_NewArrayWithBuff(var,buff,buff_len,JS_NewInt32)
+#define JS_NewArrayWithInt(var,buff,buff_len)  JS_NewArrayWithBuff(var,buff,buff_len,JS_NewInt32)
+#define JS_NewArrayWithUint(var,buff,buff_len) JS_NewArrayWithBuff(var,buff,buff_len,JS_NewUint32)
 
 #define JS_ForeachArray(jsobj,item,code)    \
     {                                       \

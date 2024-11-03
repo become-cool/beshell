@@ -4,7 +4,7 @@
 #include "include.hpp"
 
 
-#define BESHELL_VERSION "0.3.3"
+#define BESHELL_VERSION "0.3.6"
 #define ESPIDF_VERSION IDF_VER
 #define QUICKJS_VERSION "2021-03-27"
 
@@ -32,7 +32,13 @@ namespace be {
         BeShell() ;
         ~BeShell() ;
         void setup(const char * mainScriptPath=nullptr) ;
-        void loop() ;
+        inline void loop() {
+            telnet->loop() ;
+            engine->loop() ;
+            for(auto pair:loopFunctions) {
+                pair.first(*this, pair.second) ;
+            }
+        }
         void run() ;
         void main(const char * mainScriptPath=nullptr) ;
 
@@ -52,8 +58,7 @@ namespace be {
 
         template <typename DriverClass>
         void useDriver() {
-            static_assert(std::is_base_of<NativeClass, DriverClass>::value, "DriverClass must be a subclass of NativeClass") ;
-            be::driver::DriverModule::useDriver<DriverClass>(this) ;
+            be::driver::DriverModule::useDriver<DriverClass>() ;
         }
     } ;
 

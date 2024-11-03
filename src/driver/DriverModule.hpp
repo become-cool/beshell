@@ -7,25 +7,41 @@ namespace be::driver {
 
     class DriverModule ;
     
-	typedef void (*DriverProvider)(DriverModule * dm) ;
+	typedef void (*NClassProvider)(DriverModule * dm) ;
+	typedef void (*ExtProvider)(JSContext *ctx, DriverModule * dm) ;
 
     class DriverModule: public be::NativeModule {
     private:
-        static std::vector<DriverProvider> providers ;
+        static std::vector<NClassProvider> providers ;
+        static std::map<std::string, ExtProvider> extProviders ;
         
         template <typename D>
-        static void provider(DriverModule *dm) {
+        static void nclassProvider(DriverModule *dm) {
             dm->exportClass<D>();
         }
+        
+        template <typename D>
+        static void extProvider(JSContext *ctx, DriverModule *dm) {
+            D::exportDriver(ctx) ;
+        }
+        
+    protected:
+        void exports(JSContext *ctx) ;
+
     public:
         DriverModule(JSContext * ctx, const char * name) ;
 
-        void import(JSContext *ctx) ;
-
-        template <typename D>
-        static void useDriver(BeShell * beshell) {
-            providers.push_back(provider<D>);
+        // NativeClass 类
+        template <typename D, typename std::enable_if<std::is_base_of<NativeClass, D>::value, int>::type = 0>
+        static void useDriver() {
+            providers.push_back(nclassProvider<D>);
         }
+
+        template <typename D, typename std::enable_if<!std::is_base_of<NativeClass, D>::value, int>::type = 0>
+        static void useDriver() {
+            extProviders[D::name] = extProvider<D>;
+        }
+
 
         static JSValue loadeDeviceFromJson(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
@@ -34,4 +50,5 @@ namespace be::driver {
 }
 
 
-        
+
+   

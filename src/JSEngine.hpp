@@ -6,20 +6,47 @@
 #include "ModuleLoader.hpp"
 #include "basic/Console.hpp"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 namespace be {
     class BeShell ;
+
 	typedef void (*EngineLoopFunction)(JSContext *, void *) ;
+    struct LoopingFunction {
+        EngineLoopFunction func ;
+        void * opaque ;
+    } ;
 
     class ILoopable {
     public:
         virtual void loop(JSContext *) = 0 ;
     } ;
 
-    struct ILoopableOp {
-        int op ;  // 1: add, -1: remove
-        ILoopable * obj ;
-        bool ignoreRepeat ;
+    struct Looping {
+        // 1: function (LoopingFunction), 2: object (ILoopable)
+        uint8_t type ;
+        union {
+            struct {
+                EngineLoopFunction function ;
+                void * opaque ;
+            } func ;
+            ILoopable * obj ;
+        } exec ;
+        uint32_t id ;
+        uint8_t priority ;
+        uint8_t priorityCount ;
+    } ;
+
+    struct LoopingOp {
+        int op ;                // 1: add, -1: remove
+        union {
+            struct {
+                bool ignoreRepeat ;
+                struct Looping looping ;
+            } add ;
+            uint16_t remove ;
+        } target ;
     } ;
 
     class JSEngine {
@@ -27,13 +54,12 @@ namespace be {
 
         Console * console = nullptr ;
 
-        
-        bool looping = false ;
+        SemaphoreHandle_t xSemaphore;
+        bool inLooping = false ;
 
-        std::vector<std::pair<EngineLoopFunction,void *>> loopFunctions ; 
-
-        std::vector<ILoopable*> loopables ;
-        std::vector<ILoopableOp> queueLoopableOps ;
+        uint16_t loopingAssignedId = 0 ;
+        std::vector<struct Looping> lstLoopings ; 
+        std::vector<LoopingOp> waitingLoopingOps ;
 
         static JSContext * SetupContext(JSRuntime *rt) ;
 
@@ -64,9 +90,20 @@ namespace be {
         static JSEngine * fromJSContext(JSContext *) ;
         static JSEngine * fromJSRuntime(JSRuntime *) ;
         
-        void addLoopFunction(EngineLoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
-        void addLoopObject(ILoopable* obj, bool ignoreRepeat=true) ;
-        void removeLoopObject(ILoopable* obj) ;
+        int32_t addLoopFunction(EngineLoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true, uint8_t priority=0) ;
+        int32_t addLoopObject(ILoopable* obj, bool ignoreRepeat=true, uint8_t priority=0) ;
+
+        int32_t findLooping(EngineLoopFunction func, void * opaque) ;
+        int32_t findLooping(EngineLoopFunction func) ;
+        int32_t findLooping(ILoopable* obj) ;
+        
+        void removeLooping(int32_t id) ;
+        void removeLooping(EngineLoopFunction func, void * opaque) ;
+        void removeLooping(EngineLoopFunction func) ;
+        void removeLooping(ILoopable* obj) ;
+
+        bool take(int timeout=portMAX_DELAY) ;
+        void give() ;
     } ;
 }
 

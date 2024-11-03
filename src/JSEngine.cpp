@@ -18,6 +18,11 @@
 
 using namespace std ;
 
+#define LOOPTYPE_FUNC 1
+#define LOOPTYPE_OBJ 2
+
+#define LOOPING_ADD 1
+#define LOOPING_REMOVE 2
 
 namespace be {
 
@@ -53,7 +58,8 @@ namespace be {
     JSEngine::JSEngine(BeShell * beshell)
         : beshell(beshell)
         , mloader(beshell)
-    {}
+    {
+    }
 
     void JSEngine::setup() {
         if(rt!=NULL) {
@@ -61,6 +67,10 @@ namespace be {
         }
         
 #ifdef ESP_PLATFORM
+        
+        xSemaphore = xSemaphoreCreateBinary();
+        give() ;
+
         // // esp32 平台优先使用 PSRAM内存
         // if( getPsramTotal()>1024 ) {
         //     static const JSMallocFunctions def_malloc_funcs = {
@@ -140,29 +150,58 @@ namespace be {
     }
 
     void JSEngine::loop() {
-        looping = true ;
+
+        take() ;
+
+        inLooping = true ;
 
         timer.loop(ctx) ;
         js_std_loop(ctx) ;
 
-        for (auto _pair = loopFunctions.rbegin(); _pair != loopFunctions.rend(); ++_pair) {
-        // for (auto _pair : loopFunctions) {
-            (*_pair).first(ctx, (*_pair).second) ;
-        }
+        // 执行 loop 函数
+        // for (auto _pair = loopFunctions.rbegin(); _pair != loopFunctions.rend(); ++_pair) {
+        // // for (auto _pair : loopFunctions) {
+        //     (*_pair).first(ctx, (*_pair).second) ;
+        // }
+        
+        for(struct Looping& looping : lstLoopings) {
+            if(looping.priorityCount) {
+                looping.priorityCount -- ;
+            } else {
+                looping.priorityCount = looping.priority ;
 
-        for (auto obj : loopables) {
-            obj->loop(ctx) ;
+                switch(looping.type) {
+                    case LOOPTYPE_FUNC:
+                        looping.exec.func.function(ctx, looping.exec.func.opaque) ;
+                        break ;
+                    case LOOPTYPE_OBJ:
+                        looping.exec.obj->loop(ctx) ;
+                        break ;
+                    default:
+                        break ;
+                }
+            }
         }
+        
+        inLooping = false ;
 
-        looping = false ;
-        for(auto op : queueLoopableOps) {
-            if(op.op==1) {
-                addLoopObject(op.obj,op.ignoreRepeat) ;
+        // 执行添加/移除 loopable 对象的异步操作请求
+        for(auto op : waitingLoopingOps) {
+            if(op.op==LOOPING_ADD) {
+                if( op.target.add.looping.type==LOOPTYPE_FUNC ) {
+                    addLoopFunction(op.target.add.looping.exec.func.function, op.target.add.looping.exec.func.opaque, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+                }
+                else if( op.target.add.looping.type==LOOPTYPE_OBJ ) {
+                    addLoopObject(op.target.add.looping.exec.obj, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+                }
             }
-            else if(op.op==-1) {
-                removeLoopObject(op.obj) ;
+            else if(op.op==LOOPING_REMOVE) {
+                removeLooping(op.target.remove) ;
             }
         }
+        waitingLoopingOps.clear() ;
+
+        give() ;
     }
 
     JSEngine * JSEngine::fromJSContext(JSContext * ctx) {
@@ -262,41 +301,127 @@ namespace be {
         JS_SetPropertyStr(ctx, global, name, value) ;
         JS_FreeValue(ctx,global) ;
     }
+    
+    
+    int32_t JSEngine::findLooping(EngineLoopFunction func, void * opaque) {
+        for(struct Looping& looping : lstLoopings) {
+            if( looping.type==LOOPTYPE_FUNC && looping.exec.func.function==func && looping.exec.func.opaque==opaque ) {
+                return looping.id ;
+            }
+        }
+        return -1 ;
+    }
+    int32_t JSEngine::findLooping(EngineLoopFunction func) {
+        for(struct Looping& looping : lstLoopings) {
+            if( looping.type==LOOPTYPE_FUNC && looping.exec.func.function==func ) {
+                return looping.id ;
+            }
+        }
+        return -1 ;
+    }
+    int32_t JSEngine::findLooping(ILoopable* obj) {
+        for(struct Looping& looping : lstLoopings) {
+            if( looping.type==LOOPTYPE_OBJ && looping.exec.obj==obj ) {
+                return looping.id ;
+            }
+        }
+        return -1 ;
+    }
 
-    void JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat) {
+    int32_t JSEngine::addLoopFunction(EngineLoopFunction func, void * opaque, bool ignoreRepeat, uint8_t priority) {
+        if(ignoreRepeat && findLooping(func, opaque)>=0)  {
+            return -1 ;
+        }
+
+        struct Looping looping = {
+            LOOPTYPE_FUNC,
+            {
+                .func = {
+                    .function = func,
+                    .opaque = opaque
+                } ,
+            } ,
+            loopingAssignedId ++,
+            priority,
+            0
+        } ;
+
+        
+        if(inLooping) {
+            waitingLoopingOps.push_back({
+                .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
+            }) ;
+        } else {
+            lstLoopings.push_back(looping) ;
+        }
+
+        return looping.id ;
+    }
+
+    int32_t JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat, uint8_t priority) {
         if(ignoreRepeat) {
-            for(auto _pair:loopFunctions) {
-                if(func==_pair.first && opaque==_pair.second) {
-                    return ;
+            for(struct Looping& looping : lstLoopings) {
+                if( looping.type==LOOPTYPE_OBJ && looping.exec.obj==obj ) {
+                    return -1 ;
                 }
             }
         }
-        loopFunctions.push_back( std::pair<EngineLoopFunction,void *>(func,opaque) ) ;
+
+        struct Looping looping = {
+            LOOPTYPE_OBJ,
+            {
+                .obj = obj
+            } ,
+            loopingAssignedId ++,
+            priority,
+            0
+        } ;
+        
+        if(inLooping) {
+            waitingLoopingOps.push_back({
+                .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
+            }) ;
+        } else {
+            lstLoopings.push_back(looping) ;
+        }
+
+        return looping.id ;
     }
 
-    void JSEngine::addLoopObject(ILoopable* obj, bool ignoreRepeat) {
-        if(looping) {
-            queueLoopableOps.push_back({1,obj,ignoreRepeat}) ;
+    void JSEngine::removeLooping(int32_t id) {
+        if(id<0) {
             return ;
         }
-        if(ignoreRepeat) {
-            auto it = std::find(loopables.begin(), loopables.end(), obj);
-            if(it != loopables.end()) {
-                return ;
+
+        if(inLooping) {
+            waitingLoopingOps.push_back({
+                .op=LOOPING_REMOVE, .target={ .remove=(uint16_t)id }
+            }) ;
+        }
+        else {
+            auto it = std::find_if(lstLoopings.begin(), lstLoopings.end(), [id](struct Looping& looping) {
+                return looping.id==id ;
+            }) ;
+            if(it!=lstLoopings.end()) {
+                lstLoopings.erase(it) ;
             }
         }
-        loopables.push_back(obj) ;
+    }
+    
+    void JSEngine::removeLooping(EngineLoopFunction func, void * opaque) {
+        removeLooping(findLooping(func, opaque)) ;
+    }
+    void JSEngine::removeLooping(EngineLoopFunction func) {
+        removeLooping(findLooping(func)) ;
+    }
+    void JSEngine::removeLooping(ILoopable* obj) {
+        removeLooping(findLooping(obj)) ;
     }
 
-    
-    void JSEngine::removeLoopObject(ILoopable* obj) {
-        if(looping) {
-            queueLoopableOps.push_back({-1,obj,false}) ;
-            return ;
-        }
-        auto it = std::find(loopables.begin(), loopables.end(), obj);
-        if(it != loopables.end()) {
-            loopables.erase(it) ;
-        }
+    bool JSEngine::take(int timeout) {
+        return xSemaphoreTake(xSemaphore, timeout) == pdTRUE ;
+    }
+    void JSEngine::give() {
+        xSemaphoreGive(xSemaphore);
     }
 }

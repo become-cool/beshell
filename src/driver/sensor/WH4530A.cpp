@@ -33,7 +33,7 @@ namespace be::driver::sensor {
     };
 
     WH4530A::WH4530A(JSContext *ctx, JSValue _jsobj)
-            : I2CDevice(ctx, build(ctx, _jsobj), 0x38) {
+            : I2CDevice(ctx, build(ctx, _jsobj), 1, 1, 0x38) {
     }
 
     JSValue WH4530A::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

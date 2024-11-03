@@ -233,7 +233,7 @@ async function disconnect() {
 
 let timerDeamon = -1
 function autoReconnect() {
-  console.log("start wifi sta deamon")
+  // console.log("start wifi sta deamon")
   timerDeamon = setInterval(() => {
     if (wifi.staConnected() || !(wifi.mode() & MODE_STA) || _connecting || !wifi.staStarted()) {
       return
@@ -325,7 +325,7 @@ function scan() {
 function waitIP() {
   return new Promise(resolve => {
     let status = wifi.status("sta")
-    console.log(status)
+    // console.log(status)
     if (status.connected && status.ip != "0.0.0.0") {
       resolve(status)
       return
@@ -335,7 +335,7 @@ function waitIP() {
       events.push('sta.disconnected')
     }
     wifi.race(events, evt => {
-      console.log(status)
+      // console.log(status)
       if (evt == 'sta.disconnected') {
         resolve(false)
       } else {

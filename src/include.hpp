@@ -56,7 +56,11 @@
 #include "lv/LV.hpp"
 #endif
 
+// ext
+#include "ext/media/audio/Audio.hpp"
+
 // driver
+#include "driver/DriverModule.hpp"
 #include "driver/input/GT911.hpp"
 #include "driver/sensor/BMP280.hpp"
 #include "driver/sensor/AHT20.hpp"
@@ -67,6 +71,9 @@
 #include "driver/sensor/TMP117.hpp"
 #include "driver/io/PCA9557.hpp"
 #include "driver/io/TM1650.hpp"
+#include "driver/io/TM1652.hpp"
 #include "driver/sys/DS1307.hpp"
 #include "driver/sys/SDCard.hpp"
 #include "driver/disp/ST7701.hpp"
+#include "driver/comm/PN532.hpp"
+#include "driver/light/ws2812b/WS2812B.hpp"

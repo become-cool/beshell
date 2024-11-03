@@ -69,7 +69,7 @@ namespace be::mg {
         exportFunction("connect",Client::connect,0) ;
     }
 
-    void Mg::import(JSContext *ctx) {
+    void Mg::exports(JSContext *ctx) {
         JSEngineEvalEmbeded(ctx, mg)
     }
 
@@ -100,7 +100,7 @@ namespace be::mg {
 
         beshell->use<WiFi>() ;
 
-        beshell->addLoopFunction(loop, nullptr) ;
+        beshell->addLoopFunction(loop, NULL) ;
 
         ca_path = FS::toVFSPath("/var/ca.pem") ;
         cert_path = FS::toVFSPath("/var/cert.pem") ;

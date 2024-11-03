@@ -21,7 +21,7 @@ namespace be::driver::input {
         uint8_t readConfigVersion() ;
         
         bool dataReady() ;
-        bool readPos(uint8_t i, uint16_t &x, uint16_t &y) ;
+        bool readPos(uint8_t i, int16_t &x, int16_t &y) ;
         uint8_t readPointCount() ;
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

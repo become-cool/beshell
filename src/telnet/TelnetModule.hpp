@@ -17,7 +17,7 @@ namespace be{
 
         TelnetModule(JSContext * ctx, const char * name) ;
 
-        void import(JSContext *ctx) ;
+        void exports(JSContext *ctx) ;
 
         static void useBLE() {
             exportors.push_back(exportBT) ;

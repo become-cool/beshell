@@ -73,33 +73,31 @@ namespace be {
             esp_reset_reason_t reset_reason = esp_reset_reason();
             if(reset_reason==ESP_RST_PANIC) {
                 printf("BeShell was rebooted due to a crash\n") ;
-            } else {
+            }
+            else if(reset_reason==ESP_RST_INT_WDT) {
+                printf("BeShell was rebooted due to an interrupt watchdog timeout\n") ;
+            }
+            else {
                 engine->evalScript(mainScriptPath) ;
             }
 #else
             engine->evalScript(mainScriptPath) ;
 #endif
         }
-    }
 
-    void BeShell::loop() {
-
-        telnet->loop() ;
-
-        engine->loop() ;
-
-        for(auto pair:loopFunctions) {
-            pair.first(*this, pair.second) ;
-        }
-
-#ifdef ESP_PLATFORM
-        vTaskDelay(1) ;
-#endif
+        vTaskPrioritySet(NULL, 10) ;
     }
 
     void BeShell::run() {
+
+        uint32_t lastLoopTime = 0 ;
+
         while(1) {
             loop() ;
+
+#ifdef ESP_PLATFORM
+            vTaskDelay( (lastLoopTime++%10)==0? 0: 1 ) ;
+#endif
         }
     }
 

@@ -13,24 +13,24 @@ namespace be{
     }
     
     static JSValue btSetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        Telnet * telnet = JSEngine::fromJSContext(ctx)->beshell->telnet ;
-        if( !telnet->bt ){
-            JSTHROW("call BeShell::useTelnet<TelnetBLE>() first")
+        TelnetBLE * channel = (TelnetBLE*) JSEngine::fromJSContext(ctx)->beshell->telnet->channel("bt") ;
+        if( !channel ){
+            JSTHROW("call BeShell::telnet->useBLE() first")
         }
 
         std::string ARGV_TO_STRING_OPT(0, name, "BeShell")
         ARGV_TO_UINT16_OPT(1, charId, 0x0512)
         ARGV_TO_UINT16_OPT(2, serverId, 0x0b0c)
 
-        JSEngine::fromJSContext(ctx)->beshell->telnet->bt->setup(name.c_str(),charId,serverId) ;
+        channel->setup(name.c_str(),charId,serverId) ;
         
         return JS_UNDEFINED ;
     }
 
     static JSValue btSend(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        Telnet * telnet = JSEngine::fromJSContext(ctx)->beshell->telnet ;
-        if( !telnet->bt ){
-            JSTHROW("call BeShell::useTelnet<TelnetBLE>() first")
+        TelnetChannel * channel = JSEngine::fromJSContext(ctx)->beshell->telnet->channel("bt") ;
+        if( !channel ){
+            JSTHROW("call BeShell::telnet->useBLE() first")
         }
 
         CHECK_ARGC(1)
@@ -41,7 +41,7 @@ namespace be{
 
         // ArrayBuffer
         if(buff) {
-            telnet->bt->sendData((char *)buff, length) ;
+            channel->sendData((char *)buff, length) ;
             return JS_UNDEFINED ;
         }
 
@@ -49,7 +49,7 @@ namespace be{
         else if(JS_IsArray(ctx, argv[0])) {
             buff = JS_ArrayToBufferUint8(ctx, argv[0], (int *)&length) ;
             if(length && buff) {
-                telnet->bt->sendData((char *)buff, length) ;
+                channel->sendData((char *)buff, length) ;
                 free(buff) ;
             } 
             return JS_UNDEFINED ;
@@ -58,13 +58,13 @@ namespace be{
         // string
         else {
             ARGV_TO_CSTRING_LEN(0, buff, length)
-            telnet->bt->sendData((char *)buff, length) ;
+            channel->sendData((char *)buff, length) ;
             JS_FreeCString(ctx, (const char *)buff) ;
             return JS_UNDEFINED ;
         }
     }
 
-    void TelnetModule::import(JSContext *ctx) {
+    void TelnetModule::exports(JSContext *ctx) {
         for(auto func : exportors) {
             func(ctx, this) ;
         }

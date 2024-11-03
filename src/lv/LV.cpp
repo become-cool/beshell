@@ -82,7 +82,7 @@ namespace be::lv {
 // AUTO GENERATE CODE END [EXPORT WIDGETS] --------
     }
 
-    // void LV::import() {
+    // void LV::exports() {
     // }
 
     static void lv_tick_inc_cb(void *data) {
@@ -113,7 +113,7 @@ namespace be::lv {
         }
 
         initTick() ;
-        beshell->addLoopFunction(loop) ;
+        beshell->addLoopFunction(loop,nullptr) ;
         lv_init() ;
 
         used = true ;

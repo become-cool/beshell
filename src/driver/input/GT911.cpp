@@ -26,10 +26,11 @@ namespace be::driver::input {
     } ;
 
     GT911::GT911(JSContext * ctx, be::I2C * i2c, uint8_t addr)
-        : InDevPointer(ctx,build(ctx))
+        : InDevPointer(ctx,build(ctx),5)
         , addr(addr)
         , i2c(i2c)
-    {}
+    {
+    }
 
     JSValue GT911::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ARGV_TO_UINT8_OPT(0, busnum, 255)
@@ -42,7 +43,7 @@ namespace be::driver::input {
             }
         }
         auto obj = new GT911(ctx,i2c,addr) ;
-        obj->self = std::shared_ptr<GT911> (obj) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
 
@@ -74,7 +75,7 @@ namespace be::driver::input {
         return data & 0x80 ;
     }
 
-    bool GT911::readPos(uint8_t i, uint16_t &x, uint16_t &y) {
+    bool GT911::readPos(uint8_t i, int16_t &x, int16_t &y) {
         if(!i2c) {
             return false ;
         }
@@ -136,6 +137,9 @@ namespace be::driver::input {
         }
 
         if(thisobj->addr<0) {
+            if(!thisobj->i2c->isInstalled()) {
+                JSTHROW("i2c driver not installed, cannot detect address of GT911")
+            }
             if( thisobj->i2c->ping(0x5D) ){
                 thisobj->addr = 0x5D ;
             }
@@ -150,7 +154,14 @@ namespace be::driver::input {
             JSTHROW("invalid GT911 address:0x%02X (must be 0x5D or 0x14)", thisobj->addr)
         }
 
+        // @todo read from setup options
+        thisobj->pointsSize = 1 ;
+        if(thisobj->pointsSize>INDEVPOINTER_MAX_NUM) {
+            thisobj->pointsSize = INDEVPOINTER_MAX_NUM ;
+        }
+
         thisobj->reset() ;
-        return JS_UNDEFINED ;
+
+        return InDevPointer::setup(ctx, this_val, argc, argv) ;
     }
 }

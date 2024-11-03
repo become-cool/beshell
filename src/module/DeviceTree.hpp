@@ -13,7 +13,7 @@ namespace be{
         static const char * name ;
         DeviceTree(JSContext * ctx, const char * name) ;
 
-        void import(JSContext *ctx) ;
+        void exports(JSContext *ctx) ;
 
         static void setDeviceJsonPath(const char * path) ;
     } ;

@@ -50,6 +50,10 @@ namespace be::lv {
         static JSValue enableEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue allStyleProps(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static JSValue show(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue hide(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setVisible(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
 // AUTO GENERATE CODE START [GETSETS] --------
         static JSValue getState(JSContext *ctx, JSValueConst this_val) ;
         static JSValue getEventCount(JSContext *ctx, JSValueConst this_val) ;

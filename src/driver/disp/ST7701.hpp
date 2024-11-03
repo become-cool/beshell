@@ -29,6 +29,7 @@ namespace be::driver::disp {
         ST7701(JSContext * ctx, JSValue jsobj=JS_NULL, uint16_t width=0, uint16_t height=0) ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue initReg(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 
 }

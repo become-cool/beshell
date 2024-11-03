@@ -64,12 +64,12 @@ namespace be {
             factory(ctx, m) ;
         }
 
-        nmodule->import(ctx) ;
+        nmodule->exports(ctx) ;
         
         return 0 ;
     }
     
-    void NativeModule::import(JSContext *ctx) {}
+    void NativeModule::exports(JSContext *ctx) {}
 
     void NativeModule::use(BeShell * beshell) {}
 }

@@ -141,6 +141,16 @@ namespace be {
         return path ;
     }
 
+    const char * FS::trimVFSPath(const char * path) {
+        int plen = strlen(path) ;
+        if (plen>=prefix.size() && 0==strncmp(path, prefix.c_str(), prefix.size())) {
+            if(plen==prefix.size() || path[prefix.size()]=='/') {
+                return path + prefix.size() ;
+            }
+        }
+        return path ;
+    }
+
     bool FS::exist(const char * path) {
         string _path = toVFSPath(path) ;
         struct stat statbuf;
@@ -264,9 +274,6 @@ namespace be {
         return ret ;
     }
     bool FS::writeFileSync(const char * cpath, const char * data, size_t len, bool append) {
-        if(data) {
-            return false ;
-        }
 
         std::string path = toVFSPath(cpath) ;
 
@@ -275,9 +282,11 @@ namespace be {
             return false ;
         }
 
-        fwrite(data, 1, len, fd);
+        if(data && len) {
+            fwrite(data, 1, len, fd);
+        }
+
         fclose(fd) ;
-        
         return true ;
     }
 

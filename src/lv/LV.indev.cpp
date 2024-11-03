@@ -23,8 +23,6 @@ namespace be::lv {
             return ;
         }
 
-        indev_opa->x = indev_opa->ptr->lastX() ;
-        indev_opa->y = indev_opa->ptr->lastY() ;
 
         // if( indev_opa->ptr->readPointCount()>0 ) {
         //     indev_opa->ptr->readPos(0, indev_opa->x, indev_opa->y);
@@ -34,9 +32,14 @@ namespace be::lv {
         //     data->state = LV_INDEV_STATE_REL;
         // }
 
+        if(indev_opa->ptr->lastPointCount()>0) {
+            indev_opa->x = indev_opa->ptr->lastX() ;
+            indev_opa->y = indev_opa->ptr->lastY() ;
+        }
+
         data->point.x = (lv_coord_t)indev_opa->x;
         data->point.y = (lv_coord_t)indev_opa->y;
-        data->state = indev_opa->ptr->pointCount()==0? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR ;
+        data->state = indev_opa->ptr->lastPointCount()==0? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR ;
     }
 
 

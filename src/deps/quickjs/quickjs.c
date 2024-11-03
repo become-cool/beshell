@@ -27173,7 +27173,7 @@ static JSModuleDef *js_find_loaded_module(JSContext *ctx, JSAtom name)
     /* first look at the loaded modules */
     list_for_each(el, &ctx->loaded_modules) {
         m = list_entry(el, JSModuleDef, link);
-        if (m->module_name == name)
+        if (m->module_name == name) 
             return m;
     }
     return NULL;
@@ -27196,7 +27196,7 @@ static JSModuleDef *js_host_resolve_imported_module(JSContext *ctx,
                                           rt->module_loader_opaque);
     }
     
-    // printf("js_host_resolve_imported_module(%s,%s)\n", base_cname, cname1) ;
+    // printf("js_host_resolve_imported_module(%s,%s) -> %s\n", base_cname, cname1, cname) ;
 
     if (!cname)
         return NULL;
@@ -27229,6 +27229,7 @@ static JSModuleDef *js_host_resolve_imported_module(JSContext *ctx,
     }
 
     m = rt->module_loader_func(ctx, cname, rt->module_loader_opaque);
+
     js_free(ctx, cname);
     return m;
 }
@@ -27685,8 +27686,9 @@ static int js_resolve_module(JSContext *ctx, JSModuleDef *m)
     int i;
     JSModuleDef *m1;
 
-    if (m->resolved)
+    if (m->resolved) {
         return 0;
+    }
 #ifdef DUMP_MODULE_RESOLVE
     {
         char buf1[ATOM_GET_STR_BUF_SIZE];
@@ -27699,8 +27701,9 @@ static int js_resolve_module(JSContext *ctx, JSModuleDef *m)
         JSReqModuleEntry *rme = &m->req_module_entries[i];
         m1 = js_host_resolve_imported_module_atom(ctx, m->module_name,
                                                   rme->module_name);
-        if (!m1)
+        if (!m1) {
             return -1;
+        }
         rme->module = m1;
         /* already done in js_host_resolve_imported_module() except if
            the module was loaded with JS_EvalBinary() */
@@ -53677,6 +53680,13 @@ int JS_GetClassIDFromProto(JSContext *ctx, JSValue proto, JSClassID * out) {
     return 0 ;
 }
 
+int JS_GetClassIDFromConstructor(JSContext *ctx, JSValue func) {
+    JSValue proto = JS_GetPropertyStr(ctx, func, "prototype");
+    JSClassID class_id = -1;
+    JS_GetClassIDFromProto(ctx, proto, &class_id);
+    JS_FreeValue(ctx, proto);
+    return class_id ;
+}
 
 void setTimezoneOffset(int minute) {
     timezone_offset = minute ; 

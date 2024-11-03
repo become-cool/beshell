@@ -25,7 +25,7 @@ namespace lv {
         
         LV(JSContext * ctx, const char * name) ;
 
-        // void import() ;
+        // void exports() ;
         static void loop(const BeShell &, void *) ;
         static void use(be::BeShell * beshell) ;
 

@@ -26,6 +26,7 @@ namespace be {
         
 #ifdef ESP_PLATFORM
         TelnetSerial channelSeiral ;
+        TelnetBLE * channelBLE = nullptr ;
 #endif
 #ifdef LINUX_PLATFORM
         TelnetStdIO channelStdIO ;
@@ -39,8 +40,18 @@ namespace be {
         Telnet(BeShell * beshell) ;
 
         void setup() ;
-        void loop() ;
-        TelnetBLE * bt = nullptr ;
+        inline void loop() {
+            Package * ptr ;
+            std::unique_ptr<Package> pkg ;
+            if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
+                pkg.reset(ptr) ;
+                // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
+                onReceived(pkg->channle,move(pkg)) ;
+            }
+#ifdef LINUX_PLATFORM
+            channelStdIO.loop() ;
+#endif
+        }
 
         void output(const char * data, size_t datalen, int pkgid=-1, uint8_t cmd=OUTPUT) ;
         void output(const std::string & data, int pkgid=-1, uint8_t cmd=OUTPUT) ;

@@ -131,7 +131,7 @@ namespace be {
     Serial::~Serial() {
     }
 
-    void Serial::import(JSContext *ctx) {
+    void Serial::exports(JSContext *ctx) {
         assert(ctx) ;
         assert(m) ;
 

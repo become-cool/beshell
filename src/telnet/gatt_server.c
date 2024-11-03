@@ -30,9 +30,10 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
 // #define GATT_CHAR_UUID      0xFF01
 
 static char gatt_service_name[32] ;
+static int connected_devices = 0;
 
 
-#define TEST_MANUFACTURER_DATA_LEN  17
+#define TEST_MANUFACTURER_DATA_LEN  6
 
 #define GATT_SERVICE_CHAR_VAL_LEN_MAX 0x40
 
@@ -56,6 +57,8 @@ static uint8_t adv_config_done = 0;
 #define adv_config_flag      (1 << 0)
 #define scan_rsp_config_flag (1 << 1)
 
+// #define CONFIG_SET_RAW_ADV_DATA 1
+
 #ifdef CONFIG_SET_RAW_ADV_DATA
 static uint8_t raw_adv_data[] = {
         0x02, 0x01, 0x06,
@@ -76,7 +79,7 @@ static uint8_t adv_service_uuid128[32] = {
 };
 
 // The length of adv data must be less than 31 bytes
-//static uint8_t test_manufacturer[TEST_MANUFACTURER_DATA_LEN] =  {0x12, 0x23, 0x45, 0x56};
+static uint8_t test_manufacturer[TEST_MANUFACTURER_DATA_LEN] =  {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 //adv data
 static esp_ble_adv_data_t adv_data = {
         .set_scan_rsp = false,
@@ -86,7 +89,7 @@ static esp_ble_adv_data_t adv_data = {
         .max_interval = 0x0010, //slave connection max interval, Time = max_interval * 1.25 msec
         .appearance = 0x00,
         .manufacturer_len = 0, //TEST_MANUFACTURER_DATA_LEN,
-        .p_manufacturer_data =  NULL, //&test_manufacturer[0],
+        .p_manufacturer_data = NULL, //test_manufacturer,
         .service_data_len = 0,
         .p_service_data = NULL,
         .service_uuid_len = sizeof(adv_service_uuid128),
@@ -102,7 +105,7 @@ static esp_ble_adv_data_t scan_rsp_data = {
         //.max_interval = 0x0010,
         .appearance = 0x00,
         .manufacturer_len = 0, //TEST_MANUFACTURER_DATA_LEN,
-        .p_manufacturer_data =  NULL, //&test_manufacturer[0],
+        .p_manufacturer_data = NULL, //test_manufacturer,
         .service_data_len = 0,
         .p_service_data = NULL,
         .service_uuid_len = sizeof(adv_service_uuid128),
@@ -258,7 +261,10 @@ static void example_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *
 
 static void example_exec_write_event_env(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param) {
     if (param->exec_write.exec_write_flag == ESP_GATT_PREP_WRITE_EXEC) {
-                esp_log_buffer_hex(GATTS_TAG, prepare_write_env->prepare_buf, prepare_write_env->prepare_len);
+        if(gatt_msg_handler_cb){
+            gatt_msg_handler_cb(prepare_write_env->prepare_buf, prepare_write_env->prepare_len) ;
+        }
+                // esp_log_buffer_hex(GATTS_TAG, prepare_write_env->prepare_buf, prepare_write_env->prepare_len);
     } else {
         ESP_LOGI(GATTS_TAG, "ESP_GATT_PREP_WRITE_CANCEL");
     }
@@ -299,12 +305,22 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
         adv_config_done |= scan_rsp_config_flag;
 #else
             //config adv data
+            const uint8_t *bleAddr = esp_bt_dev_get_address();
+            printf("ble mac: %02x:%02x:%02x:%02x:%02x:%02x\n", bleAddr[0], bleAddr[1], bleAddr[2], bleAddr[3], bleAddr[4], bleAddr[5]);
+
+            adv_data.manufacturer_len = 6 ;
+            adv_data.p_manufacturer_data = bleAddr ;
+            
             esp_err_t ret = esp_ble_gap_config_adv_data(&adv_data);
             if (ret) {
                 ESP_LOGE(GATTS_TAG, "config adv data failed, error code = %x", ret);
             }
             adv_config_done |= adv_config_flag;
             //config scan response data
+
+            scan_rsp_data.manufacturer_len = 6 ;
+            scan_rsp_data.p_manufacturer_data = bleAddr ;
+            
             ret = esp_ble_gap_config_adv_data(&scan_rsp_data);
             if (ret) {
                 ESP_LOGE(GATTS_TAG, "config scan response data failed, error code = %x", ret);
@@ -466,11 +482,15 @@ static void gatt_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t
             gl_profile.conn_id = param->connect.conn_id;
             //start sent the update connection parameters to the peer device.
             esp_ble_gap_update_conn_params(&conn_params);
+            connected_devices++;
             break;
         }
         case ESP_GATTS_DISCONNECT_EVT:
             // ESP_LOGI(GATTS_TAG, "ESP_GATTS_DISCONNECT_EVT, disconnect reason 0x%x", param->disconnect.reason);
             esp_ble_gap_start_advertising(&adv_params);
+            if(connected_devices>0) {
+                connected_devices--;
+            }
             break;
         case ESP_GATTS_CONF_EVT:
             // ESP_LOGI(GATTS_TAG, "ESP_GATTS_CONF_EVT, status %d attr_handle %d", param->conf.status, param->conf.handle);
@@ -609,9 +629,10 @@ void be_telnet_gatt_server_set_msg_handler(be_telnet_gatt_msg_handler_t handler)
 }
 
 void be_telnet_gatt_server_send(uint8_t *data, size_t size, bool need_confirm) {
-    esp_ble_gatts_send_indicate(gl_profile.gatts_if, gl_profile.conn_id, gl_profile.char_handle, size, data,
-                                need_confirm);
-
+    if (connected_devices>0) {
+        esp_ble_gatts_send_indicate(gl_profile.gatts_if, gl_profile.conn_id, gl_profile.char_handle, size, data,
+                                    need_confirm);
+    }
 }
 
 

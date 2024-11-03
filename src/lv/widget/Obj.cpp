@@ -25,6 +25,9 @@ namespace be::lv {
         JS_CFUNC_DEF("center", 2, Obj::center),
         JS_CFUNC_DEF("enableEvent", 1, Obj::enableEvent),
         JS_CFUNC_DEF("allStyleProps", 1, Obj::allStyleProps),
+        JS_CFUNC_DEF("show", 0, Obj::show),
+        JS_CFUNC_DEF("hide", 0, Obj::hide),
+        JS_CFUNC_DEF("setVisible", 1, Obj::setVisible),
 
 // AUTO GENERATE CODE START [GETSET LIST] --------
         JS_CGETSET_DEF("state",Obj::getState,be::lv::Obj::invalidSetter) ,
@@ -378,6 +381,53 @@ namespace be::lv {
 
         anim->shared() ;
         return anim->jsobj ;
+    }
+
+    
+    /**
+     * 显示对象
+     *
+     * > 等同于 Obj.removeFlag("hidden")
+     *
+     * @module lv
+     * @class Obj
+     */
+    JSValue Obj::show(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_remove_flag(thisobj->lvobj(), LV_OBJ_FLAG_HIDDEN) ;
+        return JS_UNDEFINED ;
+    }
+    
+    /**
+     * 隐藏对象
+     *
+     * > 等同于 Obj.addFlag("hidden")
+     *
+     * @module lv
+     * @class Obj
+     */
+    JSValue Obj::hide(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        lv_obj_add_flag(thisobj->lvobj(), LV_OBJ_FLAG_HIDDEN) ;
+        return JS_UNDEFINED ;
+    }
+    
+    /**
+     * 设置对象的可见状态
+     *
+     * @module lv
+     * @class Obj
+     * @param visible:boolean true:显示, false:隐藏
+     */
+    JSValue Obj::setVisible(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Obj,thisobj)
+        bool visible = JS_ToBool(ctx, argv[0]) ;
+        if(visible) {
+            lv_obj_remove_flag(thisobj->lvobj(), LV_OBJ_FLAG_HIDDEN) ;
+        } else {
+            lv_obj_add_flag(thisobj->lvobj(), LV_OBJ_FLAG_HIDDEN) ;
+        }
+        return JS_UNDEFINED ;
     }
     
     #define CREATE_WIDGET(typename, classname)                                      \
