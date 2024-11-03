@@ -40,10 +40,10 @@ namespace be {
         exportFunction("pull",pull,2) ;
         exportFunction("write",write,2) ;
         exportFunction("read",read,1) ;
-        exportFunction("adcSetBits",adcSetBits,2) ;
-        exportFunction("adcSetChannelAtten",adcSetChannelAtten,2) ;
-        exportFunction("readAnalog",readAnalog,0) ;
-        exportFunction("writeAnalog",writeAnalog,0) ;
+        // exportFunction("adcSetBits",adcSetBits,2) ;
+        // exportFunction("adcSetChannelAtten",adcSetChannelAtten,2) ;
+        // exportFunction("readAnalog",readAnalog,0) ;
+        // exportFunction("writeAnalog",writeAnalog,0) ;
         exportFunction("writePWM",writePWM,0) ;
         exportFunction("readPWM",readPWM,0) ;
         exportFunction("watch",watch,0) ;
@@ -192,34 +192,36 @@ function (gpio,time) {
         gpio_get_level((gpio_num_t)pin);
         return JS_NewUint32(ctx, gpio_get_level((gpio_num_t)pin)) ;
     }
-    JSValue GPIO::readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
-    JSValue GPIO::writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
+
+
+    // JSValue GPIO::readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    //     return JS_UNDEFINED ;
+    // }
+    // JSValue GPIO::writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    //     return JS_UNDEFINED ;
+    // }
     
     
-    /**
-     * 设置 adc 的位宽
-     * 
-     * @function adcSetBits
-     * @param adc:number adc (目前版本只能为 1)
-     * @param bits:number 位宽 (9-12)
-     * @return bool
-     */
-    JSValue GPIO::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(2)
-        ARGV_TO_UINT8(0, adc)
-        ARGV_TO_UINT8(1, bits)
-        if(adc!=1) {
-            JSTHROW("adcConfigBits() only set adc1")
-        }
-        if( bits<9 || bits>12 ) {
-            JSTHROW("adcConfigBits() arg bits must be 9-12")
-        }
-        return (adc1_config_width((adc_bits_width_t)(bits-9)) == ESP_OK)? JS_TRUE: JS_FALSE ;
-    }
+    // /**
+    //  * 设置 adc 的位宽
+    //  * 
+    //  * @function adcSetBits
+    //  * @param adc:number adc (目前版本只能为 1)
+    //  * @param bits:number 位宽 (9-12)
+    //  * @return bool
+    //  */
+    // JSValue GPIO::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    //     ASSERT_ARGC(2)
+    //     ARGV_TO_UINT8(0, adc)
+    //     ARGV_TO_UINT8(1, bits)
+    //     if(adc!=1) {
+    //         JSTHROW("adcConfigBits() only set adc1")
+    //     }
+    //     if( bits<9 || bits>12 ) {
+    //         JSTHROW("adcConfigBits() arg bits must be 9-12")
+    //     }
+    //     return (adc1_config_width((adc_bits_width_t)(bits-9)) == ESP_OK)? JS_TRUE: JS_FALSE ;
+    // }
 
     
     #define MAPCHANNEL(gpionum, channelnum, adcnum, vpin, vchannel, vadc)   \
@@ -253,39 +255,39 @@ function (gpio,time) {
             JSTHROW("pin is not a valid adc pin, must be 0, 2, 4, 12-15, 25-27, 32-39.")   \
         }
     
-    /**
-     * 设置 gpio 使用哪个 adc 通道
-     * 
-     * @function adcSetChannelAtten
-     * param pin:number mcu可用的gpio编号
-     * param atten:number adc通道 (1|2)
-     * @return bool
-     */
-    JSValue GPIO::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    // /**
+    //  * 设置 gpio 使用哪个 adc 通道
+    //  * 
+    //  * @function adcSetChannelAtten
+    //  * param pin:number mcu可用的gpio编号
+    //  * param atten:number adc通道 (1|2)
+    //  * @return bool
+    //  */
+    // JSValue GPIO::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
-        ASSERT_ARGC(2)
-        ARGV_TO_UINT8(0, pin)
-        ARGV_TO_UINT8(1, atten)
+    //     ASSERT_ARGC(2)
+    //     ARGV_TO_UINT8(0, pin)
+    //     ARGV_TO_UINT8(1, atten)
 
-        if( atten<0 || atten>3 ) {
-            JSTHROW("setChannelAtten() arg atten must be 0-3")
-        }
+    //     if( atten<0 || atten>3 ) {
+    //         JSTHROW("setChannelAtten() arg atten must be 0-3")
+    //     }
 
-        GPIO2ADCCHANNEL(pin, channel, adc)
+    //     GPIO2ADCCHANNEL(pin, channel, adc)
 
-        esp_err_t ret = ESP_FAIL ;
-        if(adc==1) {
-            ret = adc1_config_channel_atten((adc1_channel_t)channel, (adc_atten_t)atten) ;
-        }
+    //     esp_err_t ret = ESP_FAIL ;
+    //     if(adc==1) {
+    //         ret = adc1_config_channel_atten((adc1_channel_t)channel, (adc_atten_t)atten) ;
+    //     }
         
-        #if (SOC_ADC_PERIPH_NUM >= 2)
-        else if(adc==2) {
-            ret = adc2_config_channel_atten((adc2_channel_t)channel, (adc_atten_t)atten) ;
-        }
-        #endif
+    //     #if (SOC_ADC_PERIPH_NUM >= 2)
+    //     else if(adc==2) {
+    //         ret = adc2_config_channel_atten((adc2_channel_t)channel, (adc_atten_t)atten) ;
+    //     }
+    //     #endif
         
-        return (ret==ESP_OK)? JS_TRUE: JS_FALSE ;
-    }
+    //     return (ret==ESP_OK)? JS_TRUE: JS_FALSE ;
+    // }
 
     JSValue GPIO::writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
