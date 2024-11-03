@@ -1,3 +1,7 @@
+## Next Version Plan （not now）
+
+* BeShell::main() 增加参数 core
+
 ## dev
 
 Added:
