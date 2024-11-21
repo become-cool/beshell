@@ -2,7 +2,13 @@
 #include <string.h>
 #include <functional>
 #include <iostream>
+#include "EventEmitter.hpp"
 #include "debug.h"
+#include "deps/quickjs/quickjs.h"
+
+#ifdef ESP_PLATFORM
+#include "freertos/queue.h"
+#endif
 
 using namespace std ;
 
@@ -72,4 +78,74 @@ namespace be {
     void NativeModule::exports(JSContext *ctx) {}
 
     void NativeModule::use(BeShell * beshell) {}
+
+
+
+    EventModule::EventModule(JSContext * ctx, const char * name, uint8_t flagGlobal)
+        : NativeModule(ctx, name, flagGlobal)
+    {
+        exportName("_handlers") ;
+        exportName("on") ;
+        exportName("once") ;
+        exportName("race") ;
+        exportName("off") ;
+        exportName("emit") ;
+        exportName("originHandle") ;
+    }
+    
+    void EventModule::exports(JSContext *ctx) {
+        
+        exportValue("_handlers", JS_NewObject(ctx)) ;
+
+        JSValue proto = JS_GetClassProto(ctx, EventEmitter::classID) ;
+
+        exportValue("on", JS_GetPropertyStr(ctx, proto, "on"))  ;
+        exportValue("once", JS_GetPropertyStr(ctx, proto, "once"))  ;
+        exportValue("race", JS_GetPropertyStr(ctx, proto, "race"))  ;
+        exportValue("off", JS_GetPropertyStr(ctx, proto, "off"))  ;
+        exportValue("emit", JS_GetPropertyStr(ctx, proto, "emit"))  ;
+        exportValue("originHandle", JS_GetPropertyStr(ctx, proto, "originHandle"))  ;
+
+        JS_FreeValue(ctx, proto) ;
+    }
+
+    EventModule::~EventModule() {
+    
+#ifdef ESP_PLATFORM
+        if(nevent_queue) {
+            JSEngine::fromJSContext(ctx)->removeLooping((EngineLoopFunction)nativeEventLoop, this) ;
+            vQueueDelete((QueueHandle_t)nevent_queue) ;
+        }
+#endif
+    }
+
+#ifdef ESP_PLATFORM
+    void EventModule::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
+        if(nevent_queue) {
+            return ;
+        }
+        native_param = malloc(param_size) ;
+        nevent_queue = (void *)xQueueCreate(queue_size, param_size);
+        JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
+    }
+
+    void EventModule::emitNativeEvent(void * param) {
+        if(!nevent_queue) {
+            return ;
+        }
+        xQueueSend((QueueHandle_t)nevent_queue, param, 0) ;
+    }
+    
+    void EventModule::nativeEventLoop(JSContext * ctx, EventModule * ee) {
+        while(xQueueReceive((QueueHandle_t)ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
+            ee->onNativeEvent(ctx, ee->native_param) ;
+        }
+    }
+
+    void EventModule::onNativeEvent(JSContext *ctx, void * param) {}
+#endif
+
 }
+
+
+     

@@ -1,15 +1,7 @@
-build
-esp-idf
 .gdbinit.ci
 make
 GPATH
 GRTAGS
 GTAGS
-filesystem/root/home/become
-*.js.bin
-sdkconfig
-sdkconfig.old
-dependencies.lock
 node_modules
-tmp
 .vscode
