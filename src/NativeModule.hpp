@@ -9,6 +9,7 @@
 #include <map>
 #include <cassert>
 
+
 #define EXPORT_FUNCTION(funcname)   exportFunction(#funcname, funcname, 0) ;
 
 namespace be {
@@ -63,4 +64,28 @@ namespace be {
         
         friend class ModuleLoader ;
     } ;
+
+    class EventModule : public NativeModule {
+    
+    public:
+        EventModule(JSContext * ctx, const char * name, uint8_t flagGlobal=0) ;
+        ~EventModule() ;
+
+#ifdef ESP_PLATFORM
+        void enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size=5) ;
+        static void nativeEventLoop(JSContext * ctx, EventModule * opaque) ;
+        virtual void onNativeEvent(JSContext *ctx, void * param) ;
+        void emitNativeEvent(void * param) ;
+#endif
+
+    protected:
+        void exports(JSContext *ctx) ;
+
+    private:
+    
+#ifdef ESP_PLATFORM
+        void * nevent_queue = nullptr;
+        void * native_param = nullptr ;
+#endif
+    } ;       
 }

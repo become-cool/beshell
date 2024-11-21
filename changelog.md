@@ -15,6 +15,7 @@ Added:
 * add i2c.isInstalled()
 * driver TM1652
 * add process.delay(ms)
+* + EventModule
 
 Refactored:
 
