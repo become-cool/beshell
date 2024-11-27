@@ -143,7 +143,46 @@ namespace be {
     }
 
     void EventModule::onNativeEvent(JSContext *ctx, void * param) {}
+
+    void EventModule::emitSync(const char * eventName, std::initializer_list<JSValue> args) {
+        JSValue name = JS_NewString(ctx, eventName) ;
+        emitSync(name, args) ;
+        JS_FreeValue(ctx, name) ;
+    }
+    void EventModule::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
+        
+        assert(ctx) ;
+        assert(m) ;
+
+        int arglen = args.size() + 1;
+        JSValue * jsargv = new JSValue[arglen] ;
+        jsargv[0] = eventName ;
+        int i = 0 ;
+        for(auto arg : args) {
+            jsargv[i+1] = arg ;
+            ++ i ;
+        }
+
+        JSValue jsobj = js_get_module_ns(ctx, m) ;
+
+        JSValue proto = JS_GetClassProto(ctx, EventEmitter::classID) ;
+        JSValue func_emit = JS_GetPropertyStr(ctx, proto, "emit") ;
+        // dn(JS_IsFunction(ctx, func_emit))
+        
+        JSValue ret = JS_Call(ctx, func_emit, jsobj, arglen, jsargv) ;
+        if(JS_IsException(ret)) {
+            js_std_dump_error(ctx) ;
+        }
+        
+        JS_FreeValue(ctx, ret) ;
+        JS_FreeValue(ctx, func_emit) ;
+        JS_FreeValue(ctx, jsobj) ;
+
+        delete[] jsargv ;
+    }
 #endif
+
+
 
 }
 
