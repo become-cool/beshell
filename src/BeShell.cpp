@@ -47,7 +47,7 @@ namespace be {
         loopFunctions.push_back( std::pair<LoopFunction,void *>(func,opaque) ) ;
     }
 
-    void BeShell::setup(const char * mainScriptPath) {
+    void BeShell::setup(const char * mainScriptPath, bool ignoreCrash) {
         telnet->setup() ;
         engine->setup() ;
 
@@ -70,14 +70,17 @@ namespace be {
 
         if(mainScriptPath) {
 #ifdef ESP_PLATFORM
+            bool run = true ;
             esp_reset_reason_t reset_reason = esp_reset_reason();
             if(reset_reason==ESP_RST_PANIC) {
                 printf("BeShell was rebooted due to a crash\n") ;
+                run = false ;
             }
             else if(reset_reason==ESP_RST_INT_WDT) {
                 printf("BeShell was rebooted due to an interrupt watchdog timeout\n") ;
+                run = false ;
             }
-            else {
+            if(ignoreCrash||run) {
                 engine->evalScript(mainScriptPath) ;
             }
 #else

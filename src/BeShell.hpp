@@ -31,7 +31,7 @@ namespace be {
 
         BeShell() ;
         ~BeShell() ;
-        void setup(const char * mainScriptPath=nullptr) ;
+        void setup(const char * mainScriptPath=nullptr, bool ignoreCrash=false) ;
         inline void loop() {
             telnet->loop() ;
             engine->loop() ;
