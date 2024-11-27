@@ -249,7 +249,7 @@ namespace be {
                     JS_FreeValue(ctx, mi) ;
                 }
             }
-        }        
+        }
     }
 
     std::string ModuleLoader::resovleFS(const char * module_name, const char * base_dir) {
