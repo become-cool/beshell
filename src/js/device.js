@@ -1,12 +1,19 @@
 import * as dt from 'dt'
-import * as serial from 'serial'
 import * as driver from 'driver'
 import * as gpio from 'gpio'
 import { importSync, exportValue } from 'loader'
 
+try {
+  var serial = importSync("serial")
+} catch (e) {}
+
 const jsDrivers = {}
 
 function setupSerialBus(type, num, conf) {
+  if(!serial) {
+    console.error("serial module not used.")
+    return
+  }
   let varname = type + num
   if (!serial[varname]) {
     console.log("unknown", type, "bus:", varname)
