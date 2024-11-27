@@ -1,11 +1,13 @@
 #include "Client.hpp"
 #include "HTTPRequest.hpp"
 #include "Mg.hpp"
+#include "qjs_utils.h"
+#include "quickjs/quickjs.h"
 
 using namespace std ;
 
 namespace be::mg {
-    DEFINE_NCLASS_META(Client, NativeClass)
+    DEFINE_NCLASS_META(Client, EventEmitter)
     std::vector<JSCFunctionListEntry> Client::methods = {
         JS_CFUNC_DEF("send", 0, Client::send),
         JS_CFUNC_DEF("close", 0, Client::close),
@@ -13,7 +15,7 @@ namespace be::mg {
     } ;
 
     Client::Client(JSContext * ctx, struct mg_connection * conn, JSValue callback)
-        : NativeClass(ctx,build(ctx))
+        : EventEmitter(ctx,build(ctx))
         , conn(conn)
         , callback(JS_DupValue(ctx,callback))
     {
@@ -46,9 +48,36 @@ namespace be::mg {
         ASSERT_ARGC(1)
         THIS_NCLASS(Client,client)
 
-        ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
-        bool res = mg_send(client->conn, data, len) ;
-        JS_FreeCString(ctx, data) ;
+        bool res = false ;
+
+        // ws/wss
+        if(client->is_ws) {
+            size_t size ;
+
+            JSValue except = JS_GetException(ctx) ;
+            JS_FreeValue(ctx, except) ;
+
+            char * buff = (char *)JS_GetArrayBuffer(ctx, &size, argv[0]) ;
+
+            except = JS_GetException(ctx) ;
+            JS_FreeValue(ctx, except) ;
+
+            if(buff) {
+                res = mg_ws_send(client->conn, buff, size, WEBSOCKET_OP_BINARY);
+            }
+            else {
+                ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
+                res = mg_ws_send(client->conn, data, len, WEBSOCKET_OP_TEXT);
+                JS_FreeCString(client->ctx, buff) ;
+            }
+        }
+
+        // http/https
+        else {
+            ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
+            res = mg_send(client->conn, data, len) ;
+            JS_FreeCString(ctx, data) ;
+        }
 
         return res? JS_TRUE : JS_FALSE;
     }
@@ -115,7 +144,10 @@ namespace be::mg {
         switch(ev) {
             case MG_EV_POLL:
                 if(++client->poll_times > 15000 ){
-                    JS_CALL_ARG1(client->ctx, client->callback, JS_NewString(client->ctx, "timeout"))
+                    JSValue eventName = JS_NewString(client->ctx, "open") ;
+                    JS_CALL_ARG1(client->ctx, client->callback, eventName)
+                    JS_FreeValue(client->ctx, eventName) ;
+
                     conn->is_closing = 1 ;
                 }
                 break ;
@@ -183,7 +215,24 @@ namespace be::mg {
         ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
 
         Client * client = new Client(ctx, nullptr, argv[1]) ;
-        struct mg_connection * conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
+        struct mg_connection * conn = NULL ;
+
+        if ( strncmp(url,"http://", 5)==0 || strncmp(url,"https://", 6)==0 ) {
+            conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
+            client->is_ws = false ;
+        }
+
+        else if( strncmp(url,"ws://", 5)==0 || strncmp(url,"wss://", 6)==0 ) {
+            conn = mg_ws_connect(&Mg::mgr, url, Client::wsEventHandler, client, NULL) ;
+            client->is_ws = true ;
+        }
+
+        else {
+            delete client ;
+            JS_FreeCString(ctx, url) ;
+            JSTHROW("not support url protocol")
+        }
+
         client->conn = conn ;
         if(conn==NULL) {
             JS_ThrowReferenceError(ctx, "could not listen addr: %s", url) ;
