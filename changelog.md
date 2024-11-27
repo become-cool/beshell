@@ -2,7 +2,7 @@
 
 * BeShell::main() 增加参数 core
 
-## dev
+## v0.3.6   2024-11-27
 
 Added:
 
