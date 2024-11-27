@@ -69,6 +69,8 @@
 #error No platform defined. See valid options in mp3dec.h
 #endif
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -169,6 +171,9 @@ int MP3FindSyncWord(unsigned char *buf, int nBytes);
 
 void MP3ResetDecoder(MP3DecInfo * mp3DecInfo) ;
 
+typedef void (*mp3dec_output_func_t)(void * opaque, void * data, size_t size);
+void mp3dec_set_output_func(mp3dec_output_func_t func) ;
+
 #ifdef __cplusplus
 }
 #endif
@@ -180,7 +185,6 @@ void MP3ResetDecoder(MP3DecInfo * mp3DecInfo) ;
 
 
 
-#include <stdio.h>
 
 
 // #if( configUSE_16_BIT_TICKS == 1 )
@@ -195,8 +199,6 @@ void MP3ResetDecoder(MP3DecInfo * mp3DecInfo) ;
 // void hexli_set_ringbuf(void * ring, func_ringbuf_send func) ;
 
 
-typedef void (*mp3dec_output_func_t)(void * opaque, void * data, size_t size);
-void mp3dec_set_output_func(mp3dec_output_func_t func) ;
 
 // #define dfunc   printf("%s()@%d\n", __FUNCTION__, __LINE__) ;
 
