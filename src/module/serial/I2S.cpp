@@ -1,5 +1,8 @@
 #include "I2S.hpp"
 #include "esp_system.h"
+#include "freertos/idf_additions.h"
+#include "qjs_utils.h"
+#include "quickjs/quickjs.h"
 #include "thread.hpp"
 
 using namespace std ;
@@ -12,13 +15,15 @@ namespace be {
     I2S * I2S::i2s1 = nullptr ;
     #endif
 
-    DEFINE_NCLASS_META(I2S, NativeClass)
+    DEFINE_NCLASS_META(I2S, EventEmitter)
     std::vector<JSCFunctionListEntry> I2S::methods = {
         JS_CFUNC_DEF("setup", 0, I2S::setup),
+        JS_CFUNC_DEF("startRecord", 0, I2S::startRecord),
+        JS_CFUNC_DEF("stopRecord", 0, I2S::stopRecord),
     } ;
 
     I2S::I2S(JSContext * ctx, i2s_port_t busnum)
-        : NativeClass(ctx,build(ctx))
+        : EventEmitter(ctx,build(ctx))
         , busnum(busnum)
     {
     }
@@ -167,7 +172,60 @@ namespace be {
 
         return JS_UNDEFINED ;
     }
+
+    typedef struct {
+        size_t length ;
+        uint8_t buffer[512] ;
+    } record_pcm_t ;
+
+    void I2S::taskRecording(void *arg) {
+        record_pcm_t pcm ;
+        pcm.length = 0 ;
+        while(1) {
+            esp_err_t res = i2s_read((i2s_port_t)((I2S*)arg)->busnum,(char *)pcm.buffer, sizeof(pcm.buffer), &pcm.length, 0);
+            if (res==ESP_OK && pcm.length > 0) {
+                // printf("Read %d bytes from I2S, (%p)\n", pcm.length, pcm.buffer);
+                ((I2S*)arg)->emitNativeEvent(&pcm) ;
+            }
+
+            vTaskDelay(1) ;
+        }
+    }
     
+    JSValue I2S::startRecord(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2S, that)
+        
+        if(that->taskHandle) {
+            JSTHROW("is recording already")
+        }
+
+        that->enableNativeEvent(ctx, sizeof(record_pcm_t), 3) ;
+
+        xTaskCreatePinnedToCore(taskRecording, "task-recording", 1024*3, that, 5, &that->taskHandle, 1);
+
+        return JS_UNDEFINED ;
+    }
+
+    JSValue I2S::stopRecord(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(I2S, that)
+        
+        if(!that->taskHandle) {
+            return JS_UNDEFINED ;
+        }
+
+        vTaskDelete(that->taskHandle) ;
+        that->taskHandle = nullptr ;
+
+        return JS_UNDEFINED ;
+    }
+    
+    void I2S::onNativeEvent(JSContext *ctx, void * param) {
+        // dp(((record_pcm_t*)param)->buffer)
+
+        JSValue ab = JS_NewArrayBuffer(ctx, ((record_pcm_t*)param)->buffer, ((record_pcm_t*)param)->length, freeArrayBuffer, NULL, false) ;
+        emitSync("recording", {ab}) ;
+        // free(param) ;
+    }
 
     #define DEFINE_BUS(busconst, var)           \
         if(bus==busconst) {                     \
