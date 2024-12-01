@@ -5,6 +5,7 @@
 #include "EventEmitter.hpp"
 #include "debug.h"
 #include "deps/quickjs/quickjs.h"
+#include "quickjs/quickjs.h"
 
 #ifdef ESP_PLATFORM
 #include "freertos/queue.h"
@@ -24,7 +25,10 @@ namespace be {
         JS_SetModuleDefOpaque(m,this) ;
     }
 
-    NativeModule::~NativeModule(){}
+    NativeModule::~NativeModule(){
+        // @todo
+        // 可能需要将 ns 中的 opaque 清除
+    }
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
         assert(ctx) ;
@@ -71,10 +75,14 @@ namespace be {
         }
 
         nmodule->exports(ctx) ;
-        
+
         return 0 ;
     }
-    
+
+    JSValue NativeModule::nsObject() {
+        return js_get_module_ns(ctx, m ) ;
+    }
+
     void NativeModule::exports(JSContext *ctx) {}
 
     void NativeModule::use(BeShell * beshell) {}
@@ -129,11 +137,11 @@ namespace be {
         JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
     }
 
-    void EventModule::emitNativeEvent(void * param) {
+    bool EventModule::emitNativeEvent(void * param) {
         if(!nevent_queue) {
-            return ;
+            return false ;
         }
-        xQueueSend((QueueHandle_t)nevent_queue, param, 0) ;
+        return xQueueSend((QueueHandle_t)nevent_queue, param, 0)==pdTRUE ;
     }
     
     void EventModule::nativeEventLoop(JSContext * ctx, EventModule * ee) {
@@ -144,11 +152,6 @@ namespace be {
 
     void EventModule::onNativeEvent(JSContext *ctx, void * param) {}
 
-    void EventModule::emitSync(const char * eventName, std::initializer_list<JSValue> args) {
-        JSValue name = JS_NewString(ctx, eventName) ;
-        emitSync(name, args) ;
-        JS_FreeValue(ctx, name) ;
-    }
     void EventModule::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
         
         assert(ctx) ;

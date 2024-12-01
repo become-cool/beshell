@@ -3,6 +3,7 @@
 #include "deps/quickjs/quickjs-libc.h"
 #include "NativeClass.hpp"
 #include "debug.h"
+#include "quickjs/quickjs.h"
 #include <vector>
 #include <string>
 #include <set>
@@ -51,6 +52,12 @@ namespace be {
 
         void exportFunction(const char * funcName, JSCFunction * func, int length=0) ;
 
+        /**
+         * 返回被 import 后的 ns 对象
+         * 需要调用者 JS_FreeValue
+         */
+        JSValue nsObject() ;
+
         template <typename C>
         void exportClass() {
             static_assert(std::is_base_of<be::NativeClass, C>::value, "C must be a subclass of NativeClass") ;
@@ -75,10 +82,20 @@ namespace be {
         void enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size=5) ;
         static void nativeEventLoop(JSContext * ctx, EventModule * opaque) ;
         virtual void onNativeEvent(JSContext *ctx, void * param) ;
-        void emitNativeEvent(void * param) ;
+        bool emitNativeEvent(void * param) ;
 #endif
 
-    void emitSync(const char * eventName, std::initializer_list<JSValue> args) ;
+    inline void emitSync(const char * eventName, std::initializer_list<JSValue> args) {
+        JSValue name = JS_NewString(ctx, eventName) ;
+        emitSync(name, args) ;
+        JS_FreeValue(ctx, name) ;
+    }
+    inline void emitSyncFree(const char * eventName, std::initializer_list<JSValue> args) {
+        emitSync(eventName, args) ;
+        for(auto arg : args) {
+            JS_FreeValue(ctx, arg) ;
+        }
+    }
     void emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) ;
 
     protected:
