@@ -3,6 +3,7 @@
 #include "module/Process.hpp"
 #include "module/Path.hpp"
 #include "driver/DriverModule.hpp"
+#include "quickjs/quickjs.h"
 #include "telnet/TelnetModule.hpp"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
@@ -78,10 +79,10 @@ namespace be {
                     return JS_EXCEPTION ;
                 }
             }
-            JSValue mi = js_get_module_ns(ctx, mdef ) ;
+            JSValue ns = js_get_module_ns(ctx, mdef ) ;
 
             JS_FreeCString(ctx, modulename) ;
-            return mi ;
+            return ns ;
         }
         
         static JSValue jsFilename(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -212,13 +213,14 @@ namespace be {
     }
 
     NativeModule * ModuleLoader::moduleByName(JSContext * ctx, const char * name) {
-        if( modules.count(ctx)<1 ) {
+        ModuleLoader & mloader = JSEngine::fromJSContext(ctx)->mloader ;
+        if( mloader.modules.count(ctx)<1 ) {
             return nullptr ;
         }
-        if(modules[ctx].count(name)<1) {
+        if(mloader.modules[ctx].count(name)<1) {
             return nullptr ;
         }
-        return modules[ctx][name] ;
+        return mloader.modules[ctx][name] ;
     }
 
     void ModuleLoader::setup(JSContext * ctx) {
