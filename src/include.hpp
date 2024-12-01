@@ -32,6 +32,7 @@
 #include "module/Path.hpp"
 #include "module/Process.hpp"
 #include "module/WiFi.hpp"
+#include "module/nimble/NimBLE.hpp"
 
 // serial
 #include "module/serial/Serial.hpp"
