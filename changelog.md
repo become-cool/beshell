@@ -1,6 +1,13 @@
 ## Next Version Plan （not now）
 
+Added: 
+
+* i2c read() leaks memory
+
+Refactored:
+
 * BeShell::main() 增加参数 core
+
 
 ## v0.3.6   2024-11-27
 
