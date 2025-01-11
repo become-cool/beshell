@@ -418,6 +418,7 @@ namespace be {
             return JS_NULL;                                     \
         }                                                       \
         JSValue JS_NewArrayWithUint(arr, buffer, len)           \
+        free(buffer) ;                                          \
         return arr ;
 
 
