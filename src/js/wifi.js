@@ -234,6 +234,10 @@ async function disconnect() {
 let timerDeamon = -1
 function autoReconnect() {
   // console.log("start wifi sta deamon")
+  if(timerDeamon>=0) {
+    clearTimeout(timerDeamon)
+    timerDeamon = -1
+  }
   timerDeamon = setInterval(() => {
     if (wifi.staConnected() || !(wifi.mode() & MODE_STA) || _connecting || !wifi.staStarted()) {
       return
