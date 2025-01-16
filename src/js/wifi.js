@@ -178,7 +178,8 @@ async function connect(ssid, password, retry, retryDur) {
   wifi.setMode(mode | MODE_STA)
 
   await wifi.start()
-  await wifi.disconnect()
+  await sleep(100)
+  await wifi.disconnect(true)
 
   if (typeof ssid == 'object') {
     retry = ssid.retry
@@ -190,11 +191,13 @@ async function connect(ssid, password, retry, retryDur) {
   }
 
   retry = (parseInt(retry) || 0)
-  if (retry <= 0)
-    retry = 2
-  retryDur = (parseInt(retryDur) || 2000)
+  let deamon = retry<0
+  if (retry < 0) {
+    retry = 1
+  }
+  retryDur = (parseInt(retryDur) || 5000)
   if (retryDur <= 0) {
-    retryDur = 2000
+    retryDur = 5000
   }
 
   while ((retry--) > 0) {
@@ -204,7 +207,7 @@ async function connect(ssid, password, retry, retryDur) {
     var res = await waitConnecting()
     _connecting = false
     // console.log("connect", res?"failed":"sucess", res)
-    if (res != 0 && res != 202) {
+    if (res != 0 && res != 202 && retry) {
       console.log("retry", retryDur, "ms later ...")
       await sleep(retryDur)
     }
@@ -213,13 +216,16 @@ async function connect(ssid, password, retry, retryDur) {
     }
   }
 
+  if(deamon) {
+    startStaDeamon()
+  }
+
   return 0 == res
 }
 
-async function disconnect() {
-  if (timerDeamon >= 0) {
-    clearTimeout(timerDeamon)
-    timerDeamon = -1
+async function disconnect(dontStopDeamon) {
+  if(!dontStopDeamon) {
+    stopStaDeamon()
   }
   return new Promise(function (resolve) {
     if (!wifi.staConnected()) {
@@ -232,22 +238,33 @@ async function disconnect() {
 }
 
 let timerDeamon = -1
-function autoReconnect() {
-  // console.log("start wifi sta deamon")
-  if(timerDeamon>=0) {
-    clearTimeout(timerDeamon)
-    timerDeamon = -1
+function startStaDeamon(dur) {
+  stopStaDeamon()
+  if(!dur || isNaN(dur) ) {
+    dur=10000
   }
   timerDeamon = setInterval(() => {
-    if (wifi.staConnected() || !(wifi.mode() & MODE_STA) || _connecting || !wifi.staStarted()) {
+    if (wifi.staConnected() || !(wifi.mode() & 1) || wifi.isConnecting() || !wifi.staStarted()) {
       return
     }
     let staconf = wifi.config(1)
     if (!staconf.ssid) {
       return
     }
-    wifi.connect(staconf.ssid, staconf.password)
-  }, 10000)
+    wifi.connect(staconf.ssid, staconf.password,1,dur)
+  }, dur)
+}
+
+function stopStaDeamon() {
+  console.log("stopStaDeamon\n")
+  if (timerDeamon >= 0) {
+    clearTimeout(timerDeamon)
+    timerDeamon = -1
+  }
+}
+
+function isStaDeamonRunning() {
+  return timerDeamon >= 0
 }
 
 function startAP(ssid, password) {
@@ -312,7 +329,7 @@ function status(netif) {
 }
 
 function scan() {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     if (!(wifi.mode() & MODE_STA)) {
       wifi.setMode(wifi.mode() | MODE_STA)
     }
@@ -349,4 +366,4 @@ function waitIP() {
   })
 }
 
-[isReady, start, stop, connect, disconnect, isConnecting, startAP, stopAP, status, autoReconnect, scan, waitIP].map(func => exportValue(wifi, func.name, func))
+[isReady, start, stop, connect, disconnect, isConnecting, startAP, stopAP, status, startStaDeamon, stopStaDeamon, isStaDeamonRunning, scan, waitIP].map(func => exportValue(wifi, func.name, func))

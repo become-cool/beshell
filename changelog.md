@@ -3,10 +3,18 @@
 Added: 
 
 * i2c read() leaks memory
+* wifi.startStaDeamon()
+* wifi.stopStaDeamon()
+* wifi.isStaDeamonRunning()
+
+Removed:
+
+* *wifi.autoReconnect()
 
 Refactored:
 
 * BeShell::main() 增加参数 core
+* wifi.conenct()  auto call startStaDeamon() when retry==-1
 
 
 ## v0.3.6   2024-11-27
