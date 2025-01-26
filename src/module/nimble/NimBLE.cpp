@@ -3,6 +3,7 @@
 #include "JSEngine.hpp"
 #include "ModuleLoader.hpp"
 #include "NativeModule.hpp"
+#include "debug.h"
 #include "esp_err.h"
 #include "host/ble_gap.h"
 #include "module/nimble/NimBLE.hpp"
@@ -13,10 +14,15 @@
 #include "quickjs/quickjs.h"
 #include "services/gap/ble_svc_gap.h"
 #include <cassert>
+#include "host/util/util.h"
+#include "blecent.h"
 
 
 #define BLE_GAP_EVENT_EX_INIT 100
 #define BLE_GAP_EVENT_EX_RESET 101
+
+
+// void ble_store_config_init(void);
 
 namespace be {
 
@@ -35,6 +41,11 @@ namespace be {
         EXPORT_FUNCTION(startScan)
         EXPORT_FUNCTION(stopScan)
         EXPORT_FUNCTION(isScaning)
+
+        EXPORT_FUNCTION(connect)
+        EXPORT_FUNCTION(disconnect)
+        EXPORT_FUNCTION(discSvc)
+        EXPORT_FUNCTION(discChar)
 
         enableNativeEvent(ctx, sizeof(struct ble_gap_event), 10) ;
 
@@ -55,6 +66,11 @@ namespace be {
     }
 
     static void nimble_cb_sync(void) {
+        
+        /* Make sure we have proper identity address set (public preferred) */
+        int rc = ble_hs_util_ensure_addr(0);
+        assert(rc == 0);
+
         assert(singleton) ;
         struct ble_gap_event event ;
         event.type = BLE_GAP_EVENT_EX_INIT ;
@@ -69,115 +85,172 @@ namespace be {
     }
 
     static int gap_event_handler(struct ble_gap_event *event, NimBLE * nm) {
-        nm->emitNativeEvent(event) ;
+        // 先复制 data 指向的内存，再进入队列, 避免后续扫描数据覆盖
+        if(event->type==BLE_GAP_EVENT_DISC) {
+            if(event->disc.length_data) {
+                uint8_t * data = (uint8_t *)malloc(event->disc.length_data) ;
+                if(!data) {
+                    printf("out of memory? %d",event->disc.length_data) ;
+                    return 0 ;
+                }
+                memcpy(data, event->disc.data, event->disc.length_data) ;
+                event->disc.data = data ;
+            }
+        }
+#ifdef CONFIG_BT_NIMBLE_EXT_ADV
+        else if(event->type==BLE_GAP_EVENT_EXT_DISC) {
+            if(event->ext_disc.length_data) {
+                uint8_t * data = (uint8_t *)malloc(event->ext_disc.length_data) ;
+                if(!data) {
+                    printf("out of memory? %d",event->ext_disc.length_data) ;
+                    return 0 ;
+                }
+                memcpy(data, event->ext_disc.data, event->ext_disc.length_data) ;
+                event->ext_disc.data = data ;
+            }
+        }
+#endif
+        if(!nm->emitNativeEvent(event)) {
+            printf("ble scanning event queue full\n") ;
+            
+            if(event->type==BLE_GAP_EVENT_DISC) {
+                if(event->disc.data) {
+                    free((void *)event->disc.data) ;
+                    event->disc.length_data = 0 ;
+                }
+            }
+#ifdef CONFIG_BT_NIMBLE_EXT_ADV
+            else if(event->type==BLE_GAP_EVENT_EXT_DISC) {
+                if(event->ext_disc.data) {
+                    free((void *)event->ext_disc.data) ;
+                    event->ext_disc.length_data = 0 ;
+                }
+            }
+#endif
+        }
         return 0 ;
     }
 
+    template <typename T>
+    JSValue makeScanParam(JSContext * ctx, T * disc) {
 
-    static JSValue ble_hs_adv_fields_to_js(JSContext *ctx, const struct ble_hs_adv_fields *fields) {
-        JSValue obj = JS_NewObject(ctx);
+        JSValue param = JS_NewObject(ctx) ;
 
-        // 添加简单字段
-        JS_SetPropertyStr(ctx, obj, "flags", JS_NewUint32(ctx, fields->flags));
-        JS_SetPropertyStr(ctx, obj, "tx_pwr_lvl", JS_NewInt32(ctx, fields->tx_pwr_lvl));
-        JS_SetPropertyStr(ctx, obj, "appearance", JS_NewUint32(ctx, fields->appearance));
+        JSValue addr = JS_NewArray(ctx) ;
+        for(int i=0;i<sizeof(disc->addr.val);i++) {
+            JS_SetPropertyUint32(ctx, addr, i, JS_NewUint32(ctx, disc->addr.val[i])) ;
+        }
+        JS_SetPropertyStr(ctx, param, "addr", addr) ;
+        JS_SetPropertyStr(ctx, param, "rssi", JS_NewInt32(ctx, disc->rssi)) ;
 
-        // 转换 UUID16
-        if (fields->uuids16_is_complete && fields->uuids16 && fields->num_uuids16 > 0) {
-            JSValue uuids16_array = JS_NewArray(ctx);
-            for (uint8_t i = 0; i < fields->num_uuids16; i++) {
-                JS_SetPropertyUint32(ctx, uuids16_array, i, JS_NewUint32(ctx, fields->uuids16[i].value));
+        if(disc->data && disc->length_data) {
+            JS_SetPropertyStr(ctx, param, "data_length", JS_NewInt32(ctx, disc->length_data)) ;
+            JS_SetPropertyStr(ctx, param, "data", JS_NewArrayBufferCopy(ctx, disc->data, disc->length_data)) ;
+        }
+
+        // dn(disc->length_data)
+        // print_block((uint8_t *)disc->data, disc->length_data, 8) ;
+        
+        struct ble_hs_adv_fields fields;
+        int rc = ble_hs_adv_parse_fields(&fields, disc->data, disc->length_data);
+        if (rc == 0) {
+            if(fields.name_is_complete) {
+                JS_SetPropertyStr(ctx, param, "name", JS_NewStringLen(ctx, (const char *)fields.name, fields.name[fields.name_len-1]==0? fields.name_len-1: fields.name_len )) ;
             }
-            JS_SetPropertyStr(ctx, obj, "uuids16", uuids16_array);
-        } else {
-            JS_SetPropertyStr(ctx, obj, "uuids16", JS_NULL);
-        }
-
-        // 转换 UUID32
-        if (fields->uuids32_is_complete && fields->uuids32 && fields->num_uuids32 > 0) {
-            JSValue uuids32_array = JS_NewArray(ctx);
-            for (uint8_t i = 0; i < fields->num_uuids32; i++) {
-                JS_SetPropertyUint32(ctx, uuids32_array, i, JS_NewUint32(ctx, fields->uuids32[i].value));
+            if(fields.mfg_data && fields.mfg_data_len) {
+                JS_SetPropertyStr(ctx, param, "mfg", JS_NewArrayBufferCopy(ctx, fields.mfg_data, fields.mfg_data_len)) ;
             }
-            JS_SetPropertyStr(ctx, obj, "uuids32", uuids32_array);
-        } else {
-            JS_SetPropertyStr(ctx, obj, "uuids32", JS_NULL);
         }
 
-        // 转换 UUID128
-        if (fields->uuids128_is_complete && fields->uuids128 && fields->num_uuids128 > 0) {
-            JSValue uuids128_array = JS_NewArray(ctx);
-            for (uint8_t i = 0; i < fields->num_uuids128; i++) {
-                JSValue uuid_obj = JS_NewObject(ctx);
-                JS_SetPropertyStr(ctx, uuid_obj, "value", JS_NewString(ctx, (const char *)fields->uuids128[i].value));
-                JS_SetPropertyUint32(ctx, uuids128_array, i, uuid_obj);
-            }
-            JS_SetPropertyStr(ctx, obj, "uuids128", uuids128_array);
-        } else {
-            JS_SetPropertyStr(ctx, obj, "uuids128", JS_NULL);
-        }
-
-        // 转换 name
-        if (fields->name_is_complete && fields->name && fields->name_len > 0) {
-            JSValue name_str = JS_NewStringLen(ctx, (const char *)fields->name, (fields->name[fields->name_len-1]==0)? (fields->name_len-1): (fields->name_len) );
-            JS_SetPropertyStr(ctx, obj, "name", name_str);
-        } else {
-            JS_SetPropertyStr(ctx, obj, "name", JS_NULL);
-        }
-
-        // 转换 tx power level
-        if (fields->tx_pwr_lvl_is_present) {
-            JS_SetPropertyStr(ctx, obj, "tx_pwr_lvl", JS_NewInt32(ctx, fields->tx_pwr_lvl));
-        } else {
-            JS_SetPropertyStr(ctx, obj, "tx_pwr_lvl", JS_NULL);
-        }
-
-        // 转换 appearance
-        if (fields->appearance_is_present) {
-            JS_SetPropertyStr(ctx, obj, "appearance", JS_NewUint32(ctx, fields->appearance));
-        } else {
-            JS_SetPropertyStr(ctx, obj, "appearance", JS_NULL);
-        }
-
-        return obj;
+        return param ;
     }
 
-    
     void NimBLE::onNativeEvent(JSContext *ctx, void * param) {
         struct ble_gap_event * event = (struct ble_gap_event *) param ;
-
-        struct ble_gap_conn_desc desc;
-        int rc;
+// dn(event->type)
 
         switch (event->type) {
         case BLE_GAP_EVENT_DISC: {
-            struct ble_hs_adv_fields fields;
-            rc = ble_hs_adv_parse_fields(&fields, event->disc.data,
-                                        event->disc.length_data);
-            if (rc != 0) {
-                return ;
+            JSValue param = makeScanParam<struct ble_gap_disc_desc>(ctx, &event->disc) ;
+            emitSyncFree("scaning", {param}) ;
+            if(event->disc.data && event->disc.length_data) {
+                free((void*)event->disc.data) ;
+                event->disc.data = nullptr ;
+                event->disc.length_data = 0 ;
+            }
+            return ;
+        }
+#ifdef CONFIG_BT_NIMBLE_EXT_ADV
+        case BLE_GAP_EVENT_EXT_DISC: {
+            // event->ext_disc ;
+            // if(event->ext_disc.length_data==30) {
+            //     print_block((uint8_t *)event->ext_disc.data, event->ext_disc.length_data, 8) ;
+            // }
+        
+            // // dn(event->ext_disc.length_data)
+            // printf("%d,%d,%d,%d,%d,%d\n",
+            //     event->ext_disc.addr.val[0],
+            //     event->ext_disc.addr.val[1],
+            //     event->ext_disc.addr.val[2],
+            //     event->ext_disc.addr.val[3],
+            //     event->ext_disc.addr.val[4],
+            //     event->ext_disc.addr.val[5]
+            // ) ;
+
+            JSValue param = makeScanParam<struct ble_gap_ext_disc_desc>(ctx, &event->ext_disc) ;
+            emitSyncFree("scaning", {param}) ;
+
+            if(event->ext_disc.data && event->ext_disc.length_data) {
+                free((void*)event->ext_disc.data) ;
+                event->ext_disc.data = nullptr ;
+                event->ext_disc.length_data = 0 ;
             }
 
-            JSValue param = JS_NewObject(ctx) ;
-
-            if(fields.name_is_complete) {
-                JS_SetPropertyStr(ctx, param, "name", JS_NewStringLen(ctx, (const char *)fields.name, fields.name_len)) ;
-            }
-
-            emitSyncFree("scaning", {ble_hs_adv_fields_to_js(ctx, &fields)}) ;
+            // printf("BLE_GAP_EVENT_EXT_DISC\n") ;
+            return ;
+        }
+#endif
+        case BLE_GAP_EVENT_DISC_COMPLETE: {
+            // dn(event->disc_complete.reason)
+            emitSyncFree("scan-complete", {JS_NewInt32(ctx, event->disc_complete.reason)}) ;
             return ;
         }
 
         case BLE_GAP_EVENT_CONNECT: {
-            emitSyncFree("connect", {JS_NewInt32(ctx, event->connect.status)}) ;
+            struct ble_gap_conn_desc desc;
+            int rc = ble_gap_conn_find(event->connect.conn_handle, &desc);
+
+            char addr[18] ;
+            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
+                , desc.peer_id_addr.val[0]
+                , desc.peer_id_addr.val[1]
+                , desc.peer_id_addr.val[2]
+                , desc.peer_id_addr.val[3]
+                , desc.peer_id_addr.val[4]
+                , desc.peer_id_addr.val[5]
+            ) ;
+            emitSyncFree("connect", {
+                JS_NewInt32(ctx, event->connect.status),
+                JS_NewInt32(ctx, event->connect.conn_handle),
+                JS_NewString(ctx, addr)
+            }) ;
             return ;
         }
         case BLE_GAP_EVENT_DISCONNECT: {
-            emitSyncFree("disconnect", {JS_NewInt32(ctx, event->disconnect.reason)}) ;
-            return ;
-        }
-        case BLE_GAP_EVENT_DISC_COMPLETE: {
-            emitSyncFree("scan-complete", {JS_NewInt32(ctx, event->disc_complete.reason)}) ;
+            char addr[18] ;
+            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
+                , event->disconnect.conn.peer_id_addr.val[0]
+                , event->disconnect.conn.peer_id_addr.val[1]
+                , event->disconnect.conn.peer_id_addr.val[2]
+                , event->disconnect.conn.peer_id_addr.val[3]
+                , event->disconnect.conn.peer_id_addr.val[4]
+                , event->disconnect.conn.peer_id_addr.val[5]
+            ) ;
+            emitSyncFree("disconnect", {
+                JS_NewInt32(ctx, event->disconnect.reason) ,
+                JS_NewInt32(ctx, event->disconnect.conn.conn_handle),
+                JS_NewString(ctx, addr)
+            }) ;
             return ;
         }
         case BLE_GAP_EVENT_NOTIFY_RX:
@@ -202,13 +275,6 @@ namespace be {
                         event->mtu.value);
             return ;
 
-        case BLE_GAP_EVENT_EXT_DISC:
-            /* An advertisment report was received during GAP discovery. */
-            // ext_print_adv_report(&event->disc);
-
-            // enc_adv_data_cent_connect_if_interesting(&event->disc);
-            return ;
-
         case BLE_GAP_EVENT_EX_INIT:{
             emitSync("init", {}) ;
             return ;
@@ -230,6 +296,18 @@ namespace be {
 
         ble_hs_cfg.reset_cb = nimble_cb_reset;
         ble_hs_cfg.sync_cb = nimble_cb_sync;
+        ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
+
+        /* Initialize data structures to track connected peers. */
+        int rc = peer_init(MYNEWT_VAL(BLE_MAX_CONNECTIONS), 64, 64, 64);
+        assert(rc == 0);
+
+        /* Set the default device name. */
+        rc = ble_svc_gap_device_name_set("nimble-blecent");
+        assert(rc == 0);
+
+        /* XXX Need to have template for store */
+        // ble_store_config_init();
 
         nimble_port_freertos_init(task_nimble);
 
@@ -248,6 +326,9 @@ namespace be {
 
         if(argc>0) {
             GET_INT32_PROP_OPT(argv[0], "dur", dur, BLE_HS_FOREVER)
+            if(dur==0) {
+                dur = BLE_HS_FOREVER ;
+            }
             GET_UINT16_PROP_OPT(argv[0], "itvl", itvl, 0)
             GET_UINT16_PROP_OPT(argv[0], "window", window, 0)
             GET_UINT16_PROP_OPT(argv[0], "filter_policy", filter_policy, 0)
@@ -272,9 +353,16 @@ namespace be {
         disc_params.itvl = itvl;
         disc_params.window = window;
         disc_params.filter_policy = filter_policy;
-        disc_params.limited = limited;
         disc_params.filter_duplicates = filter_duplicates;
+        disc_params.limited = limited;
         disc_params.passive = passive;
+
+        // dn(disc_params.itvl)
+        // dn(disc_params.window)
+        // dn(disc_params.passive)
+        // dn(disc_params.limited)
+        // dn(disc_params.filter_policy)
+        // dn(disc_params.filter_duplicates)
 
         NativeModule * nm = ModuleLoader::moduleByName(ctx, name) ;
         if(!nm) {
