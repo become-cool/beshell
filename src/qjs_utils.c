@@ -108,9 +108,12 @@ uint8_t * JS_ArrayToBufferUint8(JSContext *ctx, JSValue array, int * len) {
 	if(!JS_IsArray(ctx, array)) {
 		return NULL ;
 	}
-	if(JS_ToUint32(ctx, len, JS_GetPropertyStr(ctx, array, "length"))!=0) {
+	JSValue jslen = JS_GetPropertyStr(ctx, array, "length") ;
+	if(JS_ToUint32(ctx, len, jslen)!=0) {
+		JS_FreeValue(ctx, jslen) ;
 		return NULL ;
 	}
+	JS_FreeValue(ctx, jslen) ;
 	uint8_t * data = NULL ;
 	if(*len) {
 		data = (uint8_t*)malloc(*len) ;
