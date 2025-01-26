@@ -13,9 +13,9 @@
 #include <esp_event_loop.h>
 #include <esp_log.h>
 #include <esp_wifi.h>
+#include <esp_netif.h>
 #include <lwip/dns.h>
 #include <lwip/sockets.h>
-#include <esp_netif.h>
 #include "../js/wifi.c"
 
 using namespace be ;
@@ -215,8 +215,10 @@ namespace be {
         exportName("isConnecting") ;
         exportName("status") ;
         exportName("scan") ;
-        exportName("autoReconnect") ;
         exportName("waitIP") ;
+        exportName("startStaDeamon") ;
+        exportName("stopStaDeamon") ;
+        exportName("isStaDeamonRunning") ;
 
         exportFunction("peripheralStart",start,0) ;
         exportFunction("peripheralStop",stop,0) ;
