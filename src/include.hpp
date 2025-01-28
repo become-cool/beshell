@@ -32,8 +32,11 @@
 #include "module/Path.hpp"
 #include "module/Process.hpp"
 #include "module/WiFi.hpp"
+#if CONFIG_BT_BLUEDROID_ENABLED
+#include "module/bt/BT.hpp"
+#elif CONFIG_BT_NIMBLE_ENABLED
 #include "module/nimble/NimBLE.hpp"
-
+#endif
 // serial
 #include "module/serial/Serial.hpp"
 #include "module/serial/UART.hpp"
