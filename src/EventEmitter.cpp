@@ -31,7 +31,7 @@ namespace be {
     }
 
     JSValue EventEmitter::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        auto obj = new EventEmitter(ctx) ;
+        auto obj = new EventEmitter(ctx, this_val) ;
         obj->shared() ;
         return obj->jsobj ;
     }
