@@ -40,6 +40,7 @@ namespace be {
         EXPORT_FUNCTION(read) ;
         EXPORT_FUNCTION(write) ;
         EXPORT_FUNCTION(seek) ;
+        EXPORT_FUNCTION(tell) ;
         EXPORT_FUNCTION(sync) ;
         EXPORT_FUNCTION(flush) ;
         EXPORT_FUNCTION(close) ;
@@ -632,6 +633,20 @@ namespace be {
         ARGV_TO_UINT32(1, offset)
         ARGV_TO_INT32_OPT(2, whence, SEEK_SET)
         return JS_NewInt32(ctx, fseek((FILE*)handle, offset, whence)) ;
+    }
+
+    /**
+     * 返回文件 read/write 的位置
+     * 
+     * @function telll
+     * @param handle number 由open()返回的文件句柄
+     * @return number
+     */
+    JSValue FS::tell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        ARGV_TO_INT64(0, handle)
+        long pos = ftell((FILE*)handle) ;
+        return JS_NewUint32(ctx, pos) ;
     }
     
     /**
