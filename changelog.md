@@ -2,14 +2,19 @@
 
 Added: 
 
-* i2c read() leaks memory
+* bt module
 * wifi.startStaDeamon()
 * wifi.stopStaDeamon()
 * wifi.isStaDeamonRunning()
+* fs.tell()
+
+Fixed:
+
+* i2c read() leaks memory
 
 Removed:
 
-* *wifi.autoReconnect()
+* wifi.autoReconnect()
 
 Refactored:
 

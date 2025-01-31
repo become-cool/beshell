@@ -48,6 +48,7 @@ namespace be {
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue seek(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue tell(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue flush(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sync(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
