@@ -2,14 +2,19 @@
 
 #include "NativeModule.hpp"
 
-namespace be {
+namespace be::nimble {
+
+    // 从 100 开始，大于 BLE_GAP_EVENT_XX 事件
+    #define JS_NIMBLE_EVENT_DISC_ALL 200  // 发现所有服务、特征、cccd
 
     struct js_nimble_event {
-        int type ;
+        uint8_t type ;
         union {
-            struct ble_gap_event * raw_event ;
-            struct peer * peer ;
-        } ;
+            struct {
+                int status ;
+                struct peer * peer ;
+            } disc_all ;
+        }  ;
     } ;
 
     class NimBLE: public be::EventModule {
@@ -32,11 +37,5 @@ namespace be {
 
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue discSvc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue discChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
-        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue subscribe(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
