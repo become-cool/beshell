@@ -552,7 +552,7 @@ namespace be{
         ARGV_TO_UINT16(0, conn_id)
         esp_err_t res = esp_ble_gattc_close(gattc_if_global,conn_id) ;
         if (res != ESP_OK) {
-            JSTHROW("esp_ble_gattc_close failed, err = %d", err)
+            JSTHROW("esp_ble_gattc_close failed, err = %d", res)
         }
         return JS_UNDEFINED ;
     }
