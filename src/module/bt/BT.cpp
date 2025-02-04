@@ -1,71 +1,61 @@
-#if CONFIG_BT_BLUEDROID_ENABLED
+// #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include "BT.hpp"
 #include "esp_bt.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
+#include "esp_err.h"
 #include "esp_gatt_defs.h"
 #include "esp_gattc_api.h"
 #include "esp_gap_ble_api.h"
+#include "esp_gatt_common_api.h"
 #include "esp_log.h"
 #include "esp_bt_device.h"
 #include "qjs_utils.h"
+#include "quickjs/quickjs.h"
 
 static const char *TAG = "bt";
 
 
 // 全局变量，用于记录连接相关信息
 static esp_gatt_if_t      gattc_if_global     = 0;
-static uint16_t           conn_id_global      = 0;
-static bool               get_service         = false;
-static esp_gatt_srvc_id_t remote_filter_srvc_id;
-static uint16_t           char_handle         = 0; // 发现特征后会存储
-
-// 写入数据示例
-static uint8_t write_data[5] = {0x01, 0x02, 0x03, 0x04, 0x05};
-
-
-#define SERVICE_UUID          "a6ed0401-d344-460a-8075-b9e8ec90d71b"
-static const uint8_t remote_service_uuid[16] = {0xa6, 0xed, 0x04, 0x01, 0xd3, 0x44, 0x46, 0x0a, 0x80, 0x75, 0xb9, 0xe8, 0xec, 0x90, 0xd7, 0x1b};
-
-#define CHARACTERISTIC_UUID   "a6ed0403-d344-460a-8075-b9e8ec90d71b"
-static const uint8_t remote_char_uuid[16] = {0xa6, 0xed, 0x04, 0x03, 0xd3, 0x44, 0x46, 0x0a, 0x80, 0x75, 0xb9, 0xe8, 0xec, 0x90, 0xd7, 0x1b};
-
 
 namespace be{
     const char * const BT::name = "bt" ;
+    BT * BT::singleton = nullptr ;
+    bool BT::bScanning = false ;
+
     BT::BT(JSContext * ctx, const char * name)
         : EventModule(ctx, name, 0)
     {
-        exportFunction("init",init,0) ;
-        exportFunction("scan",scan,0) ;
-        exportFunction("setMTU",setMTU,0) ;
-        exportFunction("connect",connect,0) ;
-        exportFunction("disconnect",disconnect,0) ;
-        exportFunction("search",search,0) ;
-        exportFunction("read",read,0) ;
-        exportFunction("write",write,0) ;
-        exportFunction("subscribe",subscribe,0) ;
+        if(!singleton) {
+            singleton = this ;
+        }
+        EXPORT_FUNCTION(init)
+        EXPORT_FUNCTION(setScanParam)
+        EXPORT_FUNCTION(startScan)
+        EXPORT_FUNCTION(stopScan)
+        EXPORT_FUNCTION(isScaning)
+        EXPORT_FUNCTION(setMTU)
+        EXPORT_FUNCTION(requestMTU)
+        EXPORT_FUNCTION(connect)
+        EXPORT_FUNCTION(disconnect)
+        EXPORT_FUNCTION(search)
+        EXPORT_FUNCTION(read)
+        EXPORT_FUNCTION(write)
+        EXPORT_FUNCTION(subscribe)
+
+        exportName("central") ;
+        exportName("peripheral") ;
+        exportName("parseAdv") ;
         
-        // enableNativeEvent(ctx, sizeof(struct ble_gap_event), 10) ;
+        enableNativeEvent(ctx, sizeof(struct be_bt_event), 10) ;
     }
 
     void BT::use(be::BeShell * beshell) {
         beshell->use<BT>() ;
     }
-
-    /**
-     * @brief 将 esp_bt_uuid_t 转换为字符串形式
-     *
-     * @param[in]  uuid      指向 esp_bt_uuid_t 结构体的指针
-     * @param[out] str       用于输出字符串的缓冲区
-     * @param[in]  str_size  缓冲区大小
-     * @return     返回传入的 str 指针，以方便链式调用或直接使用
-     *
-     * @note       - 对于 16 位和 32 位，直接输出为 0xXXXX / 0xXXXXXXXX 格式；
-     *             - 对于 128 位，输出为 XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX 的标准 UUID 格式。
-     *             - 如果需要遵循 BLE/GATT 的字节序，请自行调整 uuid128 的输出顺序。
-     */
+    
     static char * bt_uuid_to_string(const esp_bt_uuid_t *uuid, char *str, size_t str_size) {
         if (uuid == NULL || str == NULL || str_size == 0) {
             return NULL;
@@ -109,54 +99,21 @@ namespace be{
     // static esp_gattc_cb_param_t *gattc_cb_param = NULL;
 
     static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
-        dn(event)
-        switch (event) {
-            case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT:
-            dd
-                // if (param->scan_param_cmpl.status == ESP_BT_STATUS_SUCCESS) {
-                //     printf("Scan parameters set, starting scan...\n");
-                //     esp_ble_gap_start_scanning(10);  // Scan for 10 seconds
-                // } else {
-                //     printf("Failed to set scan parameters\n");
-                // }
+
+        switch(event){
+            // event queue 可能会丢失或不及时
+            case ESP_GAP_SEARCH_INQ_CMPL_EVT: {
+                BT::bScanning = false ;
                 break;
-
-            case ESP_GAP_BLE_SCAN_RESULT_EVT:
-            dd
-                if (param->scan_rst.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {
-                    // Get the device name
-                    // char device_name[64];
-                    // get_device_name(param, device_name, sizeof(device_name));
-
-                    // Log the device name and RSSI
-                    if(param->scan_rst.bda[0]==0xd1 && param->scan_rst.bda[5]==0xa0) {
-                        printf("Device found: %02x:%02x:%02x:%02x:%02x:%02x, RSSI %d\n", 
-                            param->scan_rst.bda[0],param->scan_rst.bda[1],param->scan_rst.bda[2],param->scan_rst.bda[3],param->scan_rst.bda[4],param->scan_rst.bda[5],
-                            param->scan_rst.rssi);
-                        
-                        print_block(param->scan_rst.ble_adv,31,16) ;
-
-                        esp_ble_gap_stop_scanning() ;
-
-                        esp_err_t err = esp_ble_gattc_open(
-                            gattc_if_global,  // gattc_if，如果只有一个 GATT client，通常是 app_id=0 对应的 gattc_if
-                            param->scan_rst.bda,   // 目标设备的 MAC 地址
-                            BLE_ADDR_TYPE_RANDOM,        // 若设备是 Public Address，则用此类型
-                            true // 是否开启重连特性（若连接断开，是否自动重连）
-                        );
-                        if (err != ESP_OK) {
-                            ESP_LOGE(TAG, "esp_ble_gattc_open failed, err = %d", err);
-                        }
-                    }
-                }
-                break;
-
-            case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
-                printf("Scan complete\n");
-                break;
-
-            default:
-                break;
+            }
+        }
+        if(BT::singleton){
+            be_bt_event event_msg = {
+                .event = event ,
+                .gattc_if = 0,
+                .gap = *param ,
+            } ;
+            BT::singleton->emitNativeEvent(&event_msg) ;
         }
     }
 
@@ -165,127 +122,286 @@ namespace be{
                                     esp_gatt_if_t gattc_if,
                                     esp_ble_gattc_cb_param_t *param)
     {
-        dn(event)
         switch (event) {
         case ESP_GATTC_REG_EVT:
             gattc_if_global = gattc_if ;
-            ESP_LOGI(TAG, "ESP_GATTC_REG_EVT");
-            // 开始扫描
-            // esp_ble_gap_set_scan_params(&ble_scan_params);
             break;
-
-        case ESP_GATTC_CONNECT_EVT: {
-            ESP_LOGI(TAG, "ESP_GATTC_CONNECT_EVT, conn_id %d, if %d", param->connect.conn_id, gattc_if);
-            // gattc_if_global = gattc_if;
-            conn_id_global  = param->connect.conn_id;
-            // 保存连接的蓝牙地址等信息，以便后续使用
-            break;
-        }
-
-        case ESP_GATTC_OPEN_EVT:
-            dn(param->open.conn_id)
-            if (param->open.status == ESP_GATT_OK) {
-                ESP_LOGI(TAG, "ESP_GATTC_OPEN_EVT conn_id %d, status %d", param->open.conn_id, param->open.status);
-            } else {
-                ESP_LOGE(TAG, "Open failed, status %d", param->open.status);
-            }
-            break;
-
-        case ESP_GATTC_SEARCH_RES_EVT: {
-            // 搜索到服务
-            // esp_gatt_srvc_id_t *srvc_id = &param->search_res.srvc_id;
-            printf("ESP_GATTC_SEARCH_RES_EVT\n") ;
-            
-            uint16_t count  = 0;
-            uint16_t offset = 0;
-            esp_gatt_status_t ret_status = esp_ble_gattc_get_attr_count(gattc_if,
-                                    param->search_res.conn_id,
-                                    ESP_GATT_DB_CHARACTERISTIC,
-                                    param->search_res.start_handle,
-                                    param->search_res.end_handle,
-                                    NULL ,
-                                    &count);
-            if (ret_status != ESP_GATT_OK) {
-                ESP_LOGE(TAG, "esp_ble_gattc_get_attr_count error, %d", __LINE__);
-                break;
-            }
-                dn(count)
-            if (count <= 0) {
-                break ;
-            }
-
-            char_elem_result = (esp_gattc_char_elem_t *)malloc(sizeof(esp_gattc_char_elem_t) * count);
-            if (!char_elem_result) {
-                ESP_LOGE(TAG, "gattc no mem");
-                break;
-            } else {
-                memset(char_elem_result, 0xff, sizeof(esp_gattc_char_elem_t) * count);
-                ret_status = esp_ble_gattc_get_all_char(gattc_if,
-                                    param->search_res.conn_id,
-                                    param->search_res.start_handle,
-                                    param->search_res.end_handle,
-                                    char_elem_result,
-                                    &count,
-                                    offset);
-                if (ret_status != ESP_GATT_OK) {
-                    ESP_LOGE(TAG, "esp_ble_gattc_get_all_char error, %d", __LINE__);
-                    free(char_elem_result);
-                    char_elem_result = NULL;
-                    break;
-                }
-                dn(count)
-                if (count > 0) {
-
-                    for (int i = 0; i < count; i ++) {
-                        char uuid_str[37] ;
-                        bt_uuid_to_string(&char_elem_result[i].uuid,uuid_str,sizeof(uuid_str)) ;
-
-                        printf("%s, handle:%d, properties:%d\n",uuid_str,char_elem_result[i].char_handle, char_elem_result[i].properties) ;
-                        
-                        /*  Every service have only one char in our 'ESP_GATTS_DEMO' demo, so we used first 'char_elem_result' */
-                        if (count > 0 && (char_elem_result[0].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY)){
-                            // esp_ble_gattc_register_for_notify (gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, char_elem_result[0].char_handle);
-                        }
-                    }
-                }
-
-                free(char_elem_result);
-                char_elem_result = NULL;
-            }
-
-
-            break;
-        }
-
-        case ESP_GATTC_SEARCH_CMPL_EVT: {
-            ESP_LOGI(TAG, "ESP_GATTC_SEARCH_CMPL_EVT");
-            if (get_service) {
-                // 如果找到目标服务，则发起特征发现
-                // esp_ble_gattc_get_char_by_uuid
-                // esp_ble_gattc_get_characteristic(gattc_if,
-                //                                 param->search_cmpl.conn_id,
-                //                                 &remote_filter_srvc_id,
-                //                                 NULL);
-            }
-            break;
-        }
-
-        case ESP_GATTC_WRITE_CHAR_EVT: {
-            if (param->write.status == ESP_GATT_OK) {
-                ESP_LOGI(TAG, "写特征成功, handle = %d", param->write.handle);
-            } else {
-                ESP_LOGE(TAG, "写特征失败, error status = %d", param->write.status);
-            }
-            break;
-        }
 
         default:
             break;
         }
+
+        if(BT::singleton){
+            be_bt_event event_msg = {
+                .event = static_cast<uint16_t>(100 + event) ,
+                .gattc_if = gattc_if,
+                .gatt = *param ,
+            } ;
+            BT::singleton->emitNativeEvent(&event_msg) ;
+        }
     }
 
+    void BT::onNativeEvent(JSContext *ctx, void * param) {
+        be_bt_event * msg = (be_bt_event*) param ;
+        if(msg->event<100) {
+            // dn(msg->event)
+            switch(msg->event) {
+                case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT: {
+                    // printf("scan start ...\n") ;
+                    break ;
+                }
+                case ESP_GAP_BLE_SCAN_RESULT_EVT:{
+                    switch(msg->gap.scan_rst.search_evt) {
+                        case ESP_GAP_SEARCH_INQ_RES_EVT: {
+                            uint8_t addr[18] ;
+                            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+                                msg->gap.scan_rst.bda[0] ,
+                                msg->gap.scan_rst.bda[1] ,
+                                msg->gap.scan_rst.bda[2] ,
+                                msg->gap.scan_rst.bda[3] ,
+                                msg->gap.scan_rst.bda[4] ,
+                                msg->gap.scan_rst.bda[5]
+                            );
+                            JSValue obj = JS_NewObject(ctx) ;
+                            JS_SetPropertyStr(ctx, obj, "searchEvt", JS_NewUint32(ctx, msg->gap.scan_rst.search_evt)) ;
+                            JS_SetPropertyStr(ctx, obj, "evt", JS_NewUint32(ctx, msg->gap.scan_rst.ble_evt_type)) ;
+                            JS_SetPropertyStr(ctx, obj, "devType", JS_NewUint32(ctx, msg->gap.scan_rst.dev_type)) ;
+                            JS_SetPropertyStr(ctx, obj, "addrType", JS_NewUint32(ctx, msg->gap.scan_rst.ble_addr_type)) ;
+                            JS_SetPropertyStr(ctx, obj, "addr", JS_NewString(ctx, addr)) ;
+                            JS_SetPropertyStr(ctx, obj, "rssi", JS_NewInt32(ctx, msg->gap.scan_rst.rssi)) ;
+                            JS_SetPropertyStr(ctx, obj, "flag", JS_NewInt32(ctx, msg->gap.scan_rst.flag)) ;
+                            JS_SetPropertyStr(ctx, obj, "num_resps", JS_NewInt32(ctx, msg->gap.scan_rst.num_resps)) ;
+                            JS_SetPropertyStr(ctx, obj, "scan_rsp_len", JS_NewUint32(ctx, msg->gap.scan_rst.scan_rsp_len)) ;
+                            JS_SetPropertyStr(ctx, obj, "num_dis", JS_NewUint32(ctx, msg->gap.scan_rst.num_dis)) ;
+                            JS_SetPropertyStr(ctx, obj, "adv_raw", JS_NewArrayBufferCopy(ctx, msg->gap.scan_rst.ble_adv, msg->gap.scan_rst.adv_data_len)) ;
+                            emitSyncFree("scan-res", {obj}) ;
+                            break ;
+                        }
+                        case ESP_GAP_SEARCH_INQ_CMPL_EVT: {
+                            // bScanning = false ;
+                            // printf("scan complete\n") ;
+                            emitSyncFree("scan-cmpl", {}) ;
+                            break ;
+                        }
+                        default:
+                            // dn(msg->gap.scan_rst.search_evt)
+                            break;
+                    }
+                    break ;
+                }
+                default:
+                    // dn(msg->event)
+                    break;
+            }
+        }
+        else if(msg->event<200) {
+            // dn(msg->event-100)
+            switch(msg->event-100) {
+            case ESP_GATTC_CONNECT_EVT:
+                break;
+            case ESP_GATTC_OPEN_EVT: {
+                char addr [18] ;
+                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+                            msg->gatt.open.remote_bda[0],
+                            msg->gatt.open.remote_bda[1],
+                            msg->gatt.open.remote_bda[2],
+                            msg->gatt.open.remote_bda[3],
+                            msg->gatt.open.remote_bda[4],
+                            msg->gatt.open.remote_bda[5]
+                );
+                emitSyncFree("open", {
+                    JS_NewUint32(ctx, msg->gatt.open.status) ,
+                    JS_NewUint32(ctx, msg->gatt.open.conn_id) ,
+                    JS_NewString(ctx, (const char *)addr) ,
+                    JS_NewUint32(ctx, msg->gatt.open.mtu) ,
+                }) ;
+                break ;
+            }
+            case ESP_GATTC_DIS_SRVC_CMPL_EVT:
+                // dn(ESP_GATTC_DIS_SRVC_CMPL_EVT)
+                emitSyncFree("dis-srvc-cmpl", {
+                    JS_NewInt32(ctx, msg->gatt.dis_srvc_cmpl.status) ,
+                    JS_NewInt32(ctx, msg->gatt.dis_srvc_cmpl.conn_id)
+                }) ;
+                break ;
+                
+            // 服务/特征 搜索
+            case ESP_GATTC_SEARCH_RES_EVT: {
+                // dn(ESP_GATTC_SEARCH_RES_EVT)
+                char uuid_str[37] ;
+                bt_uuid_to_string(&msg->gatt.search_res.srvc_id.uuid,uuid_str,sizeof(uuid_str)) ;
+
+                JSValue lstChars = getCharacteristics(ctx, 
+                    msg->gattc_if, 
+                    msg->gatt.search_res.conn_id,
+                    msg->gatt.search_res.start_handle,
+                    msg->gatt.search_res.end_handle) ;
+
+                JSValue objSvr = JS_NewObject(ctx) ;
+                JS_SetPropertyStr(ctx, objSvr, "chars", lstChars) ;
+                JS_SetPropertyStr(ctx, objSvr, "uuid", JS_NewString(ctx, uuid_str)) ;
+                
+                emitSyncFree("search-res", {JS_NewInt32(ctx, msg->gatt.search_res.conn_id), objSvr}) ;
+                break;
+            }
+            case ESP_GATTC_SEARCH_CMPL_EVT:
+                // dn(ESP_GATTC_SEARCH_CMPL_EVT)
+                emitSyncFree("search-cmpl", {
+                    JS_NewInt32(ctx, msg->gatt.dis_srvc_cmpl.status) ,
+                    JS_NewInt32(ctx, msg->gatt.dis_srvc_cmpl.conn_id)
+                }) ;
+                break ;
+
+            case ESP_GATTC_WRITE_CHAR_EVT: {
+                // printf("ESP_GATTC_WRITE_CHAR_EVT\n") ;
+                emitSyncFree("write-char", {
+                    JS_NewInt32(ctx, msg->gatt.write.status) ,
+                    JS_NewInt32(ctx, msg->gatt.write.handle) ,
+                    JS_NewInt32(ctx, msg->gatt.write.offset)
+                }) ;
+                break;
+            }
+            case ESP_GATTC_WRITE_DESCR_EVT: {
+                // printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
+                emitSyncFree("write-desc", {
+                    JS_NewInt32(ctx, msg->gatt.write.status) ,
+                    JS_NewInt32(ctx, msg->gatt.write.handle) ,
+                    JS_NewInt32(ctx, msg->gatt.write.offset)
+                }) ;
+                break;
+            }
+
+            case ESP_GATTC_NOTIFY_EVT: {
+                printf("ESP_GATTC_NOTIFY_EVT\n"); 
+                break;
+            }
+
+            case ESP_GATTC_CFG_MTU_EVT: {
+                emitSyncFree("cfg-mtu", {
+                    JS_NewInt32(ctx, msg->gatt.cfg_mtu.status) ,
+                    JS_NewInt32(ctx, msg->gatt.cfg_mtu.conn_id) ,
+                    JS_NewInt32(ctx, msg->gatt.cfg_mtu.mtu)
+                }) ;
+
+            }
+
+            default:break ;
+            }
+        }
+    }
+
+    JSValue BT::getCharacteristics(JSContext *ctx, esp_gatt_if_t gattc_if, uint16_t conn_id, uint16_t start_handle, uint16_t end_handle) {
+        uint16_t count  = 0;
+        uint16_t offset = 0;
+        esp_gatt_status_t ret_status = esp_ble_gattc_get_attr_count(
+                                gattc_if,
+                                conn_id,
+                                ESP_GATT_DB_CHARACTERISTIC,
+                                start_handle, end_handle, NULL, &count);
+        if (ret_status != ESP_GATT_OK) {
+            ESP_LOGE(TAG, "esp_ble_gattc_get_attr_count error, %d", __LINE__);
+            return JS_NULL ;
+        }
+        if (count <= 0) {
+            return JS_NewArray(ctx) ;
+        }
+        char_elem_result = (esp_gattc_char_elem_t *)malloc(sizeof(esp_gattc_char_elem_t) * count);
+        if (!char_elem_result) {
+            ESP_LOGE(TAG, "gattc no mem");
+            return JS_NULL ;
+        }
+
+        memset(char_elem_result, 0xff, sizeof(esp_gattc_char_elem_t) * count);
+        ret_status = esp_ble_gattc_get_all_char(
+                            gattc_if,
+                            conn_id,
+                            start_handle,
+                            end_handle,
+                            char_elem_result,
+                            &count,
+                            offset);
+        if (ret_status != ESP_GATT_OK) {
+            ESP_LOGE(TAG, "esp_ble_gattc_get_all_char error, %d", __LINE__);
+            free(char_elem_result);
+            char_elem_result = NULL;
+            return JS_NULL ;
+        }
+
+        JSValue lstChars = JS_NewArray(ctx) ;
+        for (int i = 0; i < count; i ++) {
+            JSValue objChar = JS_NewObject(ctx) ;
+            JS_SetPropertyUint32(ctx, lstChars, i, objChar) ;
+
+            char uuid_str[37] ;
+            bt_uuid_to_string(&char_elem_result[i].uuid,uuid_str,sizeof(uuid_str)) ;
+
+            // printf("%s, handle:%d, properties:%d\n",uuid_str,char_elem_result[i].char_handle, char_elem_result[i].properties) ;
+
+            JS_SetPropertyStr(ctx, objChar, "addr", JS_NewString(ctx, uuid_str)) ;
+            JS_SetPropertyStr(ctx, objChar, "handle", JS_NewUint32(ctx, char_elem_result[i].char_handle)) ;
+            JS_SetPropertyStr(ctx, objChar, "props", JS_NewUint32(ctx, char_elem_result[i].properties)) ;
+
+            /*  Every service have only one char in our 'ESP_GATTS_DEMO' demo, so we used first 'char_elem_result' */
+            if (count > 0 && (char_elem_result[0].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY)){
+                // esp_ble_gattc_register_for_notify (gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda, char_elem_result[0].char_handle);
+            
+                uint16_t descr_count = 0;
+                esp_err_t ret = esp_ble_gattc_get_attr_count(
+                            gattc_if, conn_id, ESP_GATT_DB_DESCRIPTOR, start_handle, end_handle, char_elem_result[i].char_handle,&descr_count
+                );
+                if (ret != ESP_GATT_OK || count == 0) {
+                    ESP_LOGW(TAG, "No descriptor found for this char (ret=%d, count=%d)", ret, count);
+                    continue;
+                }
+
+                esp_gattc_descr_elem_t *descr_elems = (esp_gattc_descr_elem_t *)malloc(sizeof(esp_gattc_descr_elem_t) * descr_count);
+                if (!descr_elems) {
+                    ESP_LOGE(TAG, "No memory for descr_elems!");
+                    continue;
+                }
+
+                ret = esp_ble_gattc_get_all_descr(gattc_if,
+                                                conn_id,
+                                                char_elem_result[i].char_handle,
+                                                descr_elems,
+                                                &descr_count,
+                                                0);
+                if (ret == ESP_GATT_OK && descr_count > 0) {
+                    JSValue mapDescr = JS_NewObject(ctx) ;
+                    for (int i = 0; i < descr_count; i ++) {
+                        JSValue objDescr = JS_NewObject(ctx) ;
+
+                        char uuid_str[37] ;
+                        bt_uuid_to_string(&descr_elems[i].uuid,uuid_str,sizeof(uuid_str)) ;
+
+                        JS_SetPropertyStr(ctx, objDescr, "uuid", JS_NewString(ctx, uuid_str)) ;
+                        JS_SetPropertyStr(ctx, objDescr, "handle", JS_NewUint32(ctx, descr_elems[i].handle)) ;
+                        JS_SetPropertyStr(ctx, mapDescr, uuid_str, objDescr) ;
+                    }
+
+                    JS_SetPropertyStr(ctx, objChar, "desc", mapDescr) ;
+                }
+
+                free(descr_elems);
+            }
+
+
+        }
+
+        free(char_elem_result);
+        char_elem_result = NULL;
+    
+        return lstChars ;
+    }
 
     JSValue BT::init(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        static bool be_inited = false ;
+        if(be_inited) {
+            return JS_UNDEFINED ;
+        }
+        be_inited = true ;
+
         esp_err_t ret;
         esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 
@@ -314,30 +430,47 @@ namespace be{
 
         esp_ble_gattc_register_callback(gattc_event_handler);
         esp_ble_gattc_app_register(0); // 注册应用ID
-        dd
         
         // 注册GAP回调函数
         ret = esp_ble_gap_register_callback(gap_event_handler);
         if (ret) {
             JSTHROW("GAP callback registration failed");
         }
-
         // esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
         // esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(auth_req));
-
         return JS_UNDEFINED ;
     }
-    
-    JSValue BT::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue BT::setScanParam(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 #if (BLE_42_FEATURE_SUPPORT == TRUE)
-        esp_ble_scan_params_t ble_scan_params = {
-            .scan_type = BLE_SCAN_TYPE_ACTIVE, //BLE_SCAN_TYPE_PASSIVE,
-            .own_addr_type = BLE_ADDR_TYPE_RANDOM, //BLE_ADDR_TYPE_PUBLIC, //BLE_ADDR_TYPE_RANDOM,
-            .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
-            .scan_interval = 0x50,
-            .scan_window = 0x40,
-            .scan_duplicate = BLE_SCAN_DUPLICATE_DISABLE,
-        };
+
+        CHECK_ARGC(1)
+
+        bool active = false ;
+        int own_addr_type = BLE_ADDR_TYPE_RANDOM ;
+        int scan_filter_policy = BLE_ADDR_TYPE_RANDOM ;
+
+        esp_ble_scan_params_t ble_scan_params ;
+        GET_INT32_PROP_OPT( argv[0], "scan_type",            ble_scan_params.scan_type,              BLE_SCAN_TYPE_PASSIVE )
+        GET_INT32_PROP_OPT( argv[0], "own_addr_type",        ble_scan_params.own_addr_type,          BLE_ADDR_TYPE_PUBLIC )
+        GET_INT32_PROP_OPT( argv[0], "scan_filter_policy",   ble_scan_params.scan_filter_policy,     BLE_SCAN_FILTER_ALLOW_ALL )
+        GET_INT16_PROP_OPT( argv[0], "scan_interval",        ble_scan_params.scan_interval,          0x50 )
+        GET_INT16_PROP_OPT( argv[0], "scan_window",          ble_scan_params.scan_window,            0x40 )
+        GET_INT32_PROP_OPT( argv[0], "scan_duplicate",       ble_scan_params.scan_duplicate,         BLE_SCAN_DUPLICATE_DISABLE )
+
+        // esp_ble_scan_params_t ble_scan_params = {
+        //     .scan_type = active? BLE_SCAN_TYPE_ACTIVE: BLE_SCAN_TYPE_PASSIVE,
+        //     .own_addr_type = BLE_ADDR_TYPE_RANDOM,  //BLE_ADDR_TYPE_PUBLIC, //BLE_ADDR_TYPE_RANDOM,
+        //     .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
+        //     .scan_interval = 0x50,
+        //     .scan_window = 0x40,
+        //     .scan_duplicate = BLE_SCAN_DUPLICATE_DISABLE,
+        // };
+        // dn(ble_scan_params.scan_type)
+        // dn(ble_scan_params.own_addr_type)
+        // dn(ble_scan_params.scan_filter_policy)
+        // dn(ble_scan_params.scan_interval)
+        // dn(ble_scan_params.scan_window)
+        // dn(ble_scan_params.scan_duplicate)
 
         // 开始扫描BLE设备
         esp_err_t ret = esp_ble_gap_set_scan_params(&ble_scan_params);
@@ -345,20 +478,51 @@ namespace be{
             JSTHROW("Failed to set scan params: %s", esp_err_to_name(ret));
         }
 
-        ret = esp_ble_gap_start_scanning(5) ;
+        return JS_UNDEFINED ;
+#else
+        JSTHROW("BLE 4.2 is not supported") ;
+#endif
+    }
+    
+    JSValue BT::startScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+#if (BLE_42_FEATURE_SUPPORT == TRUE)
+        // if(bScanning) {
+        //     JSTHROW("already scanning")
+        // }
+
+        ARGV_TO_UINT32_OPT(0,dur,UINT32_MAX)
+
+        esp_err_t ret = esp_ble_gap_start_scanning(5) ;
         if (ret != ESP_OK) {
             JSTHROW("Failed to start scanning: %s", esp_err_to_name(ret));
         }
-#endif
+        bScanning = true ;
+
         return JS_UNDEFINED ;
+#else
+        JSTHROW("BLE 4.2 is not supported") ;
+#endif
     }
 
-    JSValue BT::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue BT::stopScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+#if (BLE_42_FEATURE_SUPPORT == TRUE)
+        bScanning = false ;
+        return esp_ble_gap_stop_scanning()==ESP_OK? JS_TRUE: JS_FALSE ;
+#else
+        JSTHROW("BLE 4.2 is not supported") ;
+#endif
+    }
+    JSValue BT::isScaning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return bScanning? JS_TRUE: JS_FALSE ;
+    }
 
-        if(gattc_if_global<=0) {
-            JSTHROW("call bt.init() first")
+#define CHECK_GATTC_IF                      \
+        if(gattc_if_global<=0) {            \
+            JSTHROW("call bt.init() first") \
         }
 
+    JSValue BT::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
         esp_bd_addr_t addr = {0} ;
 
         CHECK_ARGC(1)
@@ -382,22 +546,46 @@ namespace be{
         }
         return JS_UNDEFINED ;
     }
-    JSValue BT::setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue BT::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
+        CHECK_ARGC(1)
+        ARGV_TO_UINT16(0, conn_id)
+        esp_err_t res = esp_ble_gattc_close(gattc_if_global,conn_id) ;
+        if (res != ESP_OK) {
+            JSTHROW("esp_ble_gattc_close failed, err = %d", err)
+        }
         return JS_UNDEFINED ;
     }
-    JSValue BT::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+    JSValue BT::setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT16(0, mtu)
+        esp_err_t res = esp_ble_gatt_set_local_mtu(mtu) ;
+        if(res!=ESP_OK) {
+            JSTHROW("esp_ble_gatt_set_local_mtu failed, err = %d", res)
+        }
+        return JS_UNDEFINED ;
+    }
+    JSValue BT::requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
+        CHECK_ARGC(1)
+        ARGV_TO_UINT16(0, conn_id)
+        esp_ble_gattc_send_mtu_req(gattc_if_global,conn_id) ;
         return JS_UNDEFINED ;
     }
     JSValue BT::search(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
         CHECK_ARGC(1)
         ARGV_TO_UINT16(0, conn_id)
         esp_ble_gattc_search_service(gattc_if_global, conn_id, NULL);
         return JS_UNDEFINED ;
     }
     JSValue BT::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
         return JS_UNDEFINED ;
     }
     JSValue BT::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
         CHECK_ARGC(3)
         ARGV_TO_UINT16(0, conn_id)
         ARGV_TO_UINT16(1, handle)
@@ -415,12 +603,33 @@ namespace be{
         return JS_UNDEFINED ;
     }
     JSValue BT::subscribe(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
+        CHECK_GATTC_IF
+        CHECK_ARGC(2)
+        ARGV_TO_UINT16(0, conn_id)
+        ARGV_TO_UINT16(1, handle)
+        ARGV_TO_UINT8_OPT(2, type, 1)
+        if(type!=1 && type!=2) {
+            JSTHROW("type must be 1 or 2")
+        }
 
-    void BT::onNativeEvent(JSContext *ctx, void * param) {
-// esp_ble_gattc_search_service
+        // 0x01,0x00 表示启用 Notification；0x02,0x00 可表示启用 Indication
+        uint8_t notify_en[2] = {type, 0x00};
+
+        esp_err_t err = esp_ble_gattc_write_char_descr(
+            gattc_if_global,
+            conn_id,
+            handle,
+            sizeof(notify_en),
+            notify_en,
+            ESP_GATT_WRITE_TYPE_RSP,
+            ESP_GATT_AUTH_REQ_NONE
+        );
+        if(err) {
+            JSTHROW("esp_ble_gattc_write_char_descr() failed, error = %d",err)
+        }
+
+        return JS_UNDEFINED ;
     }
 }
 
-#endif
+// #endif
