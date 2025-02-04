@@ -103,22 +103,24 @@ extern "C" {
 #define ARGV_TO_DOUBLE(i,var)   ARGV_TO_INT(i, var, double,    double,   JS_ToFloat64)
 
 
-#define ARGV_TO_INT_OPT(i, var, ctype, api, def)    \
-	ctype var = def ;                               \
-    if( i<argc ) {                                  \
-        if( api(ctx, &var, argv[i])!=0 ) {          \
-            JSTHROW("Invalid param type")           \
-        }                                           \
+#define ARGV_TO_INT_OPT(i, var, ctype, tmp_type, api, def)  \
+	ctype var = def ;                                       \
+    if( i<argc ) {                                          \
+        tmp_type tmp ;                                      \
+        if( api(ctx, &tmp, argv[i])!=0 ) {                  \
+            JSTHROW("Invalid param type")                   \
+        }                                                   \
+        var = (ctype)tmp ;                                  \
     }
 
-#define  ARGV_TO_UINT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t,  JS_ToUint32, def)
-#define   ARGV_TO_INT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, int32_t,   JS_ToInt32, def)
-#define ARGV_TO_UINT16_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, def)
-#define ARGV_TO_INT16_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, def)
-#define ARGV_TO_UINT32_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t, JS_ToUint32, def)
-#define ARGV_TO_INT32_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int32_t,  JS_ToInt32, def)
-#define ARGV_TO_INT64_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int64_t,  JS_ToInt64, def)
-#define ARGV_TO_DOUBLE_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, double, JS_ToFloat64, def)
+#define  ARGV_TO_UINT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint8_t, uint32_t,  JS_ToUint32, def)
+#define   ARGV_TO_INT8_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, int8_t, int32_t,   JS_ToInt32, def)
+#define ARGV_TO_UINT16_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint16_t, uint32_t, JS_ToUint32, def)
+#define ARGV_TO_INT16_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int16_t, int32_t,  JS_ToInt32, def)
+#define ARGV_TO_UINT32_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, uint32_t, uint32_t, JS_ToUint32, def)
+#define ARGV_TO_INT32_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int32_t, int32_t,  JS_ToInt32, def)
+#define ARGV_TO_INT64_OPT(i,var,def)    ARGV_TO_INT_OPT(i, var, int64_t, int64_t,  JS_ToInt64, def)
+#define ARGV_TO_DOUBLE_OPT(i,var,def)   ARGV_TO_INT_OPT(i, var, double, double, JS_ToFloat64, def)
 
 
 #define ARGV_TO_CSTRING_LEN(i, var, len)                    \
