@@ -309,17 +309,9 @@ namespace be {
             printf("invalid ctx in ModuleLoader::normalize()\n") ;
             return nullptr ;
         }
-        // 内置模块 
-        // -------------
-        for (const auto & pair : mloader->modules[ctx]) {
-            if( pair.first==module_name ) {
-                return js_strdup(ctx, module_name) ;
-            }
-        }
 
         // resolve file
         // -------------
-    
         std::string fullpath ;
         // 绝对路
         if(module_name[0]=='/') {
@@ -343,6 +335,16 @@ namespace be {
         }
         
         if(!fullpath.length()) {
+
+            // 内置模块 
+            // -------------
+            for (const auto & pair : mloader->modules[ctx]) {
+                if( pair.first==module_name ) {
+                    return js_strdup(ctx, module_name) ;
+                }
+            }
+
+            // not found
             JS_ThrowReferenceError(ctx, " Cannot find module: %s", module_name) ;
             return nullptr ;
         }
