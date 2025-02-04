@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#if CONFIG_BT_NIMBLE_ENABLED
 
 #include <assert.h>
 #include <string.h>
+#include "debug.h"
 #include "host/ble_hs.h"
 #include "blecent.h"
 
@@ -502,6 +504,10 @@ peer_svc_find_uuid(const struct peer *peer, const ble_uuid_t *uuid)
     const struct peer_svc *svc;
 
     SLIST_FOREACH(svc, &peer->svcs, next) {
+
+        uint8_t * u = & svc->svc.uuid.u ;
+        printf("svc: %02x%02x\n", *u, *(u+1)) ;
+
         if (ble_uuid_cmp(&svc->svc.uuid.u, uuid) == 0) {
             return svc;
         }
@@ -519,10 +525,15 @@ peer_chr_find_uuid(const struct peer *peer, const ble_uuid_t *svc_uuid,
 
     svc = peer_svc_find_uuid(peer, svc_uuid);
     if (svc == NULL) {
+        printf(">>not found svc\n") ;
         return NULL;
     }
 
     SLIST_FOREACH(chr, &svc->chrs, next) {
+
+        uint8_t * u = & chr->chr.uuid.u ;
+        printf("char: %02x%02x\n", *u, *(u+1)) ;
+
         if (ble_uuid_cmp(&chr->chr.uuid.u, chr_uuid) == 0) {
             return chr;
         }
@@ -605,6 +616,7 @@ peer_svc_disced(uint16_t conn_handle, const struct ble_gatt_error *error,
 
     peer = arg;
     assert(peer->conn_handle == conn_handle);
+// printf("conn_handle=%d\n",conn_handle) ;
 
     switch (error->status) {
     case 0:
@@ -639,12 +651,10 @@ peer_disc_all(uint16_t conn_handle, peer_disc_fn *disc_cb, void *disc_cb_arg)
     struct peer_svc *svc;
     struct peer *peer;
     int rc;
-
     peer = peer_find(conn_handle);
     if (peer == NULL) {
         return BLE_HS_ENOTCONN;
     }
-
     /* Undiscover everything first. */
     while ((svc = SLIST_FIRST(&peer->svcs)) != NULL) {
         SLIST_REMOVE_HEAD(&peer->svcs, next);
@@ -657,6 +667,7 @@ peer_disc_all(uint16_t conn_handle, peer_disc_fn *disc_cb, void *disc_cb_arg)
 
     rc = ble_gattc_disc_all_svcs(conn_handle, peer_svc_disced, peer);
     if (rc != 0) {
+        printf("ble_gattc_disc_all_svcs() faided, rc=%d\n",rc) ;
         return rc;
     }
 
@@ -806,5 +817,4 @@ err:
     return rc;
 }
 
-
-
+#endif

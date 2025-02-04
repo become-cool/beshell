@@ -1,3 +1,5 @@
+#if CONFIG_BT_NIMBLE_ENABLED
+
 #include "NimBLE.hpp"
 #include "../../BeShell.hpp"
 #include "JSEngine.hpp"
@@ -14,8 +16,10 @@
 #include "quickjs/quickjs.h"
 #include "services/gap/ble_svc_gap.h"
 #include <cassert>
+#include <stdio.h>
 #include "host/util/util.h"
 #include "blecent.h"
+#include "Peer.hpp"
 
 
 #define BLE_GAP_EVENT_EX_INIT 100
@@ -24,7 +28,7 @@
 
 // void ble_store_config_init(void);
 
-namespace be {
+namespace be::nimble {
 
     const char * const NimBLE::name = "nimble" ;
 
@@ -43,9 +47,6 @@ namespace be {
         EXPORT_FUNCTION(isScaning)
 
         EXPORT_FUNCTION(connect)
-        EXPORT_FUNCTION(disconnect)
-        EXPORT_FUNCTION(discSvc)
-        EXPORT_FUNCTION(discChar)
 
         enableNativeEvent(ctx, sizeof(struct ble_gap_event), 10) ;
 
@@ -167,125 +168,148 @@ namespace be {
 
     void NimBLE::onNativeEvent(JSContext *ctx, void * param) {
         struct ble_gap_event * event = (struct ble_gap_event *) param ;
-// dn(event->type)
 
-        switch (event->type) {
-        case BLE_GAP_EVENT_DISC: {
-            JSValue param = makeScanParam<struct ble_gap_disc_desc>(ctx, &event->disc) ;
-            emitSyncFree("scaning", {param}) ;
-            if(event->disc.data && event->disc.length_data) {
-                free((void*)event->disc.data) ;
-                event->disc.data = nullptr ;
-                event->disc.length_data = 0 ;
+        // Nimble 定义的事件
+        if(event->type<200) {
+            switch (event->type) {
+            case BLE_GAP_EVENT_DISC: {
+                JSValue param = makeScanParam<struct ble_gap_disc_desc>(ctx, &event->disc) ;
+                emitSyncFree("scaning", {param}) ;
+                if(event->disc.data && event->disc.length_data) {
+                    free((void*)event->disc.data) ;
+                    event->disc.data = nullptr ;
+                    event->disc.length_data = 0 ;
+                }
+                return ;
             }
-            return ;
-        }
-#ifdef CONFIG_BT_NIMBLE_EXT_ADV
-        case BLE_GAP_EVENT_EXT_DISC: {
-            // event->ext_disc ;
-            // if(event->ext_disc.length_data==30) {
-            //     print_block((uint8_t *)event->ext_disc.data, event->ext_disc.length_data, 8) ;
+    #ifdef CONFIG_BT_NIMBLE_EXT_ADV
+            case BLE_GAP_EVENT_EXT_DISC: {
+                // event->ext_disc ;
+                // if(event->ext_disc.length_data==30) {
+                //     print_block((uint8_t *)event->ext_disc.data, event->ext_disc.length_data, 8) ;
+                // }
+            
+                // // dn(event->ext_disc.length_data)
+                // printf("%d,%d,%d,%d,%d,%d\n",
+                //     event->ext_disc.addr.val[0],
+                //     event->ext_disc.addr.val[1],
+                //     event->ext_disc.addr.val[2],
+                //     event->ext_disc.addr.val[3],
+                //     event->ext_disc.addr.val[4],
+                //     event->ext_disc.addr.val[5]
+                // ) ;
+
+                JSValue param = makeScanParam<struct ble_gap_ext_disc_desc>(ctx, &event->ext_disc) ;
+                emitSyncFree("scaning", {param}) ;
+
+                if(event->ext_disc.data && event->ext_disc.length_data) {
+                    free((void*)event->ext_disc.data) ;
+                    event->ext_disc.data = nullptr ;
+                    event->ext_disc.length_data = 0 ;
+                }
+
+                // printf("BLE_GAP_EVENT_EXT_DISC\n") ;
+                return ;
+            }
+    #endif
+            case BLE_GAP_EVENT_DISC_COMPLETE: {
+                // dn(event->disc_complete.reason)
+                emitSyncFree("scan-complete", {JS_NewInt32(ctx, event->disc_complete.reason)}) ;
+                return ;
+            }
+
+            // case BLE_GAP_EVENT_CONNECT: {
+            //     struct ble_gap_conn_desc desc;
+            //     int rc = ble_gap_conn_find(event->connect.conn_handle, &desc);
+
+            //     char addr[18] ;
+            //     sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
+            //         , desc.peer_id_addr.val[0]
+            //         , desc.peer_id_addr.val[1]
+            //         , desc.peer_id_addr.val[2]
+            //         , desc.peer_id_addr.val[3]
+            //         , desc.peer_id_addr.val[4]
+            //         , desc.peer_id_addr.val[5]
+            //     ) ;
+            //     emitSyncFree("connect", {
+            //         JS_NewInt32(ctx, event->connect.status),
+            //         JS_NewInt32(ctx, event->connect.conn_handle),
+            //         JS_NewString(ctx, addr)
+            //     }) ;
+            //     return ;
             // }
-        
-            // // dn(event->ext_disc.length_data)
-            // printf("%d,%d,%d,%d,%d,%d\n",
-            //     event->ext_disc.addr.val[0],
-            //     event->ext_disc.addr.val[1],
-            //     event->ext_disc.addr.val[2],
-            //     event->ext_disc.addr.val[3],
-            //     event->ext_disc.addr.val[4],
-            //     event->ext_disc.addr.val[5]
-            // ) ;
+            case BLE_GAP_EVENT_DISCONNECT: {
+                char addr[18] ;
+                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
+                    , event->disconnect.conn.peer_id_addr.val[0]
+                    , event->disconnect.conn.peer_id_addr.val[1]
+                    , event->disconnect.conn.peer_id_addr.val[2]
+                    , event->disconnect.conn.peer_id_addr.val[3]
+                    , event->disconnect.conn.peer_id_addr.val[4]
+                    , event->disconnect.conn.peer_id_addr.val[5]
+                ) ;
+                emitSyncFree("disconnect", {
+                    JS_NewInt32(ctx, event->disconnect.reason) ,
+                    JS_NewInt32(ctx, event->disconnect.conn.conn_handle),
+                    JS_NewString(ctx, addr)
+                }) ;
+                return ;
+            }
+            case BLE_GAP_EVENT_NOTIFY_RX:
+                /* Peer sent us a notification or indication. */
+                // MODLOG_DFLT(INFO, "received %s; conn_handle=%d attr_handle=%d "
+                //             "attr_len=%d\n",
+                //             event->notify_rx.indication ?
+                //             "indication" :
+                //             "notification",
+                //             event->notify_rx.conn_handle,
+                //             event->notify_rx.attr_handle,
+                //             OS_MBUF_PKTLEN(event->notify_rx.om));
 
-            JSValue param = makeScanParam<struct ble_gap_ext_disc_desc>(ctx, &event->ext_disc) ;
-            emitSyncFree("scaning", {param}) ;
+                // /* Attribute data is contained in event->notify_rx.om. Use
+                // * `os_mbuf_copydata` to copy the data received in notification mbuf */
+                return ;
 
-            if(event->ext_disc.data && event->ext_disc.length_data) {
-                free((void*)event->ext_disc.data) ;
-                event->ext_disc.data = nullptr ;
-                event->ext_disc.length_data = 0 ;
+            case BLE_GAP_EVENT_MTU:
+                printf("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
+                            event->mtu.conn_handle,
+                            event->mtu.channel_id,
+                            event->mtu.value);
+                return ;
+
+            case BLE_GAP_EVENT_EX_INIT:{
+                emitSync("init", {}) ;
+                return ;
+            }
+            case BLE_GAP_EVENT_EX_RESET:{
+                emitSync("reset", {}) ;
+                return ;
             }
 
-            // printf("BLE_GAP_EVENT_EXT_DISC\n") ;
-            return ;
-        }
-#endif
-        case BLE_GAP_EVENT_DISC_COMPLETE: {
-            // dn(event->disc_complete.reason)
-            emitSyncFree("scan-complete", {JS_NewInt32(ctx, event->disc_complete.reason)}) ;
-            return ;
+
+            default:
+                return ;
+            }
         }
 
-        case BLE_GAP_EVENT_CONNECT: {
-            struct ble_gap_conn_desc desc;
-            int rc = ble_gap_conn_find(event->connect.conn_handle, &desc);
-
-            char addr[18] ;
-            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
-                , desc.peer_id_addr.val[0]
-                , desc.peer_id_addr.val[1]
-                , desc.peer_id_addr.val[2]
-                , desc.peer_id_addr.val[3]
-                , desc.peer_id_addr.val[4]
-                , desc.peer_id_addr.val[5]
-            ) ;
-            emitSyncFree("connect", {
-                JS_NewInt32(ctx, event->connect.status),
-                JS_NewInt32(ctx, event->connect.conn_handle),
-                JS_NewString(ctx, addr)
-            }) ;
-            return ;
-        }
-        case BLE_GAP_EVENT_DISCONNECT: {
-            char addr[18] ;
-            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X"
-                , event->disconnect.conn.peer_id_addr.val[0]
-                , event->disconnect.conn.peer_id_addr.val[1]
-                , event->disconnect.conn.peer_id_addr.val[2]
-                , event->disconnect.conn.peer_id_addr.val[3]
-                , event->disconnect.conn.peer_id_addr.val[4]
-                , event->disconnect.conn.peer_id_addr.val[5]
-            ) ;
-            emitSyncFree("disconnect", {
-                JS_NewInt32(ctx, event->disconnect.reason) ,
-                JS_NewInt32(ctx, event->disconnect.conn.conn_handle),
-                JS_NewString(ctx, addr)
-            }) ;
-            return ;
-        }
-        case BLE_GAP_EVENT_NOTIFY_RX:
-            /* Peer sent us a notification or indication. */
-            // MODLOG_DFLT(INFO, "received %s; conn_handle=%d attr_handle=%d "
-            //             "attr_len=%d\n",
-            //             event->notify_rx.indication ?
-            //             "indication" :
-            //             "notification",
-            //             event->notify_rx.conn_handle,
-            //             event->notify_rx.attr_handle,
-            //             OS_MBUF_PKTLEN(event->notify_rx.om));
-
-            // /* Attribute data is contained in event->notify_rx.om. Use
-            // * `os_mbuf_copydata` to copy the data received in notification mbuf */
-            return ;
-
-        case BLE_GAP_EVENT_MTU:
-            printf("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
-                        event->mtu.conn_handle,
-                        event->mtu.channel_id,
-                        event->mtu.value);
-            return ;
-
-        case BLE_GAP_EVENT_EX_INIT:{
-            emitSync("init", {}) ;
-            return ;
-        }
-        case BLE_GAP_EVENT_EX_RESET:{
-            emitSync("reset", {}) ;
-            return ;
-        }
-
-        default:
-            return ;
+        // beshell 定义的事件
+        else {
+            struct js_nimble_event * jsevent = (struct js_nimble_event *) param ;
+            switch (jsevent->type) {
+            case JS_NIMBLE_EVENT_DISC_ALL: {
+                if( jsevent->disc_all.status==0 ){
+                    assert(jsevent->disc_all.peer) ;
+                    Peer * npeer = new Peer(ctx, jsevent->disc_all.peer) ;
+                    emitSyncFree("connect", {JS_NULL, npeer->jsobj}) ;
+                }
+                else {
+                    emitSyncFree("connect", {JS_NewInt32(ctx, jsevent->disc_all.status)}) ;
+                }
+            }
+            
+            default:
+                break;
+            }
         }
     }
 
@@ -395,3 +419,5 @@ namespace be {
     }
 
 }
+
+#endif
