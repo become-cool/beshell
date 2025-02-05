@@ -17,6 +17,7 @@
 #include <lwip/dns.h>
 #include <lwip/sockets.h>
 #include "../js/wifi.c"
+#include "NativeModule.hpp"
 
 using namespace be ;
 
@@ -29,10 +30,12 @@ using namespace be ;
 #define MAX_SSID_CHARLEN        31
 #define MAX_PASSWORD_CHARLEN    63
 
+typedef struct {
+    esp_event_base_t event_base ;
+    int32_t event_id ;
+    int reason ;
+} wifi_nevent_t ;
 
-
-static JSValue __event_handle = JS_UNDEFINED ;
-static JSContext * __event_handle_ctx = NULL ;
 
 static esp_netif_t * netif_ap = NULL ;
 esp_netif_t * get_netif_ap() {
@@ -46,6 +49,7 @@ esp_netif_t * get_netif_sta() {
 
 static esp_event_handler_instance_t instance_any_id;
 static esp_event_handler_instance_t instance_got_ip;
+static esp_event_handler_instance_t instance_lost_ip;
 
 static bool wifi_inited = false ;
 bool WiFi::hasInited() {
@@ -141,12 +145,9 @@ static void esp32_wifi_eventHandler(void* arg, esp_event_base_t event_base, int3
 	// printf("event_base: %d, event_id: %d\n", (int32_t)event_base, event_id);
     // dn2( ((int32_t)event_base), event_id)
     
-    int eventType = -1 ;
     if(event_base==WIFI_EVENT) {
-        eventType = 1 ;
-        
         if(event_id == WIFI_EVENT_WIFI_READY) {
-            printf("WIFI_EVENT_WIFI_READY\n") ;
+            // printf("WIFI_EVENT_WIFI_READY\n") ;
         }
         else if(event_id == WIFI_EVENT_SCAN_DONE) {
             // printf("WIFI_EVENT_SCAN_DONE\n") ;
@@ -172,38 +173,150 @@ static void esp32_wifi_eventHandler(void* arg, esp_event_base_t event_base, int3
         }
     }
     else if(event_base==IP_EVENT) {
-        eventType = 2 ;
     }
     else {
-        eventType = (int)event_base ;
-        return ;
     }
     
-    if( __event_handle_ctx!=NULL && JS_IsFunction(__event_handle_ctx, __event_handle) ) {
-        MAKE_ARGV3(argv, JS_NewInt32(__event_handle_ctx, eventType), JS_NewInt32(__event_handle_ctx, event_id), JS_UNDEFINED)
-        // dis reason
+    if(WiFi::singleton) {
+        wifi_nevent_t nevent = {
+            .event_base = event_base ,
+            .event_id = event_id ,
+            .reason = 0 ,
+        } ;
         if(event_base==WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-            argv[2] = JS_NewInt32(__event_handle_ctx, REASON(event_data)) ;
+            nevent.reason = REASON(event_data) ;
         }
-        JSEngine::fromJSContext(__event_handle_ctx)->timer.setTimer(__event_handle_ctx, __event_handle, 0, false, JS_UNDEFINED, 3, argv) ;
-        free(argv) ;
+        WiFi::singleton->emitNativeEvent(&nevent) ;
     }
+    // if( __event_handle_ctx!=NULL && JS_IsFunction(__event_handle_ctx, __event_handle) ) {
+    //     MAKE_ARGV3(argv, JS_NewInt32(__event_handle_ctx, eventType), JS_NewInt32(__event_handle_ctx, event_id), JS_UNDEFINED)
+    //     // dis reason
+    //     if(event_base==WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    //         argv[2] = JS_NewInt32(__event_handle_ctx, REASON(event_data)) ;
+    //     }
+    //     dd
+    //     JSEngine::fromJSContext(__event_handle_ctx)->timer.setTimer(__event_handle_ctx, __event_handle, 0, false, JS_UNDEFINED, 3, argv) ;
+    //     free(argv) ;
+    // }
+}
+
+
+// // event type
+// const EVENT_WIFI = 1
+// const EVENT_IP = 2
+
+// // WiFi events
+// const WIFI_READY = 0
+// const WIFI_SCAN_DONE = 1
+// const WIFI_STA_START = 2
+// const WIFI_STA_STOP = 3
+// const WIFI_STA_CONNECTED = 4
+// const WIFI_STA_DISCONNECTED = 5
+// // const WIFI_STA_AUTHMODE_CHANGE = 6
+// // const WIFI_STA_WPS_ER_SUCCESS = 7
+// // const WIFI_STA_WPS_ER_FAILED = 8
+// // const WIFI_STA_WPS_ER_TIMEOUT = 9
+// // const WIFI_STA_WPS_ER_PIN = 10
+// // const WIFI_STA_WPS_ER_PBC_OVERLAP = 11
+// const WIFI_AP_START = 12
+// const WIFI_AP_STOP = 13
+// const WIFI_AP_STACONNECTED = 14
+// const WIFI_AP_STADISCONNECTED = 15
+// // const WIFI_AP_PROBEREQRECVED = 16
+// // const WIFI_FTM_REPORT = 17
+// // const WIFI_STA_BSS_RSSI_LOW = 18
+// // const WIFI_ACTION_TX_STATUS = 19
+// // const WIFI_ROC_DONE = 21
+// // const WIFI_STA_BEACON_TIMEOUT = 21
+// const WIFI_STA_CONNECTING = 101
+
+// let evtNames = {}
+// evtNames[WIFI_READY] = "ready"
+// evtNames[WIFI_SCAN_DONE] = "scan.done"
+// evtNames[WIFI_STA_START] = "sta.start"
+// evtNames[WIFI_STA_STOP] = "sta.stop"
+// evtNames[WIFI_STA_CONNECTED] = "sta.connected"
+// evtNames[WIFI_STA_DISCONNECTED] = "sta.disconnected"
+// evtNames[WIFI_AP_START] = "ap.start"
+// evtNames[WIFI_AP_STOP] = "ap.stop"
+// evtNames[WIFI_AP_STACONNECTED] = "ap.sta.connected"
+// evtNames[WIFI_AP_STADISCONNECTED] = "ap.sta.disconnected"
+// evtNames[WIFI_STA_CONNECTING] = "sta.connecting"
+// evtNames[102] = "sta.disconnecting"
+
+// // IP events
+// const STA_GOT_IP = 0
+// const STA_LOST_IP = 1
+// // const AP_STAIPASSIGNED = 2
+// // const GOT_IP6 = 3
+// // const ETH_GOT_IP = 4
+// // const PPP_GOT_IP = 5
+// // const PPP_LOST_IP = 6
+
+// let ipEvtNames = {}
+// ipEvtNames[STA_GOT_IP] = "ip.got"
+// ipEvtNames[STA_LOST_IP] = "ip.lost"
+
+// // power safe
+// const PS_NONE = 0
+// // const PS_MIN_MODEM = 1
+// // const PS_MAX_MODEM = 2 
+
+#define MAP_EVENT(event_id, event_name)         \
+        case event_id :{                        \
+            name = (char *)event_name ;         \
+            break;                              \
+        }
+
+
+void be::WiFi::onNativeEvent(JSContext *ctx, void * param) {
+    wifi_nevent_t * nevent = (wifi_nevent_t*) param ;
+    char * name = nullptr ;
+    if(nevent->event_base==WIFI_EVENT) {
+        switch(nevent->event_id) {
+            MAP_EVENT(WIFI_EVENT_WIFI_READY, "ready")
+            MAP_EVENT(WIFI_EVENT_SCAN_DONE, "scan.done")
+            MAP_EVENT(WIFI_EVENT_STA_START, "sta.start")
+            MAP_EVENT(WIFI_EVENT_STA_STOP, "sta.stop")
+            MAP_EVENT(WIFI_EVENT_STA_CONNECTED, "sta.connected")
+            MAP_EVENT(WIFI_EVENT_STA_DISCONNECTED, "sta.disconnected")
+            MAP_EVENT(WIFI_EVENT_AP_START, "ap.start")
+            MAP_EVENT(WIFI_EVENT_AP_STOP, "ap.stop")
+            MAP_EVENT(WIFI_EVENT_AP_STACONNECTED, "ap.sta.connected")
+            MAP_EVENT(WIFI_EVENT_AP_STADISCONNECTED, "ap.sta.disconnected")
+            MAP_EVENT(WIFI_EVENT_STA_CONNECTING, "sta.connecting")
+            MAP_EVENT(WIFI_EVENT_STA_DISCONNECTING, "sta.disconnecting")
+            MAP_EVENT(WIFI_EVENT_HOME_CHANNEL_CHANGE, "home-channel-chage")
+            MAP_EVENT(WIFI_EVENT_STA_NEIGHBOR_REP, "sta.neighbor-report")
+            default: break;
+        }
+    }
+    else if(nevent->event_base==IP_EVENT) {
+        switch(nevent->event_id) {
+            MAP_EVENT(IP_EVENT_STA_GOT_IP, "ip.got")
+            MAP_EVENT(IP_EVENT_STA_LOST_IP, "ip.lost")
+            default: break;
+        }
+    }
+    if(!name){
+        static char unknow_name[20] ;
+        snprintf(unknow_name,sizeof(unknow_name),"event:%d",nevent->event_id) ;
+        name = unknow_name ;
+    }
+    emitSyncFree(name, {}) ;
 }
 
 namespace be {
 
     const char * const WiFi::name = "wifi" ;
+    WiFi * WiFi::singleton = nullptr ;
     
     WiFi::WiFi(JSContext * ctx, const char * name)
-        : NativeModule(ctx, name, 0)
+        : EventModule(ctx, name, 0)
     {
-        exportName("on") ;
-        exportName("once") ;
-        exportName("race") ;
-        exportName("off") ;
-        exportName("emit") ;
-        exportName("originHandle") ;
-        exportName("_handlers") ;
+        if(!singleton) {
+            singleton = this ;
+        }
         
         exportName("start") ;
         exportName("isReady") ;
@@ -233,7 +346,6 @@ namespace be {
         exportFunction("getIpInfo",getIpInfo,0) ;
         exportFunction("setHostname",setHostname,0) ;
         exportFunction("allSta",allSta,0) ;
-        exportFunction("registerEventHandle",registerEventHandle,0) ;
         exportFunction("scanStart",scanStart,0) ;
         exportFunction("scanStop",scanStop,0) ;
         exportFunction("isScanning",isScanning,0) ;
@@ -241,13 +353,15 @@ namespace be {
         exportFunction("staStarted",staStarted,0) ;
         exportFunction("staConnected",staConnected,0) ;
         exportFunction("apStarted",apStarted,0) ;
+
+        enableNativeEvent(ctx, sizeof(wifi_nevent_t), 5) ;
     }
 
     void WiFi::exports(JSContext *ctx) {
+
+        EventModule::exports(ctx) ;
+
         init() ;
-
-        exportValue("_handlers", JS_NewObject(ctx)) ;
-
         JSEngineEvalEmbeded(ctx, wifi)
     }
 
@@ -274,6 +388,7 @@ namespace be {
 
         ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_any_id))
         ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)NULL, &instance_got_ip))
+        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_LOST_IP, &esp32_wifi_eventHandler, (void *)NULL, &instance_lost_ip))
 
         wifi_inited = true ;
     }
@@ -686,7 +801,6 @@ namespace be {
         if(password_len==0) {
             wifi_config.sta.threshold.authmode = WIFI_AUTH_OPEN ;
         }
-
         SET_MEMBER_INT(sta, scan_method)
         SET_MEMBER_INT(sta, channel)
         SET_MEMBER_INT(sta, listen_interval)
@@ -752,10 +866,8 @@ namespace be {
 
     JSValue WiFi::peripheralConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
-        if( JS_IsFunction(ctx, __event_handle) ) {
-            MAKE_ARGV2(argv, JS_NewInt32(__event_handle_ctx, 1), JS_NewInt32(__event_handle_ctx, WIFI_EVENT_STA_CONNECTING))
-            JS_Call(ctx, __event_handle, JS_UNDEFINED, 2, argv) ;
-            free(argv) ;
+        if(singleton){
+            singleton->emitSync("sta.connecting", {}) ;
         }
         return JS_NewInt32(ctx, esp_wifi_connect()) ;
     }
@@ -891,31 +1003,6 @@ namespace be {
         return arr ;
     }
 
-    
-    /**
-     * 注册一个事件函数, 当 wifi 状态变化时, 该函数会被调用
-     * 
-     * 回调函数的参数：
-     * 
-     * ```
-     * callback(eventType:number, eventId:number, reason:number)
-     * ```
-     * 
-     * reason 表示 disconnect 事件的断开原因
-     * 
-     * @return undefined
-     */
-    JSValue WiFi::registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(1)
-        if( !JS_IsFunction(ctx, argv[0]) ){
-            JSTHROW("wifi event handle must be a function")
-        }
-        JS_FreeValue(ctx, __event_handle) ;
-        __event_handle = JS_DupValue(ctx, argv[0]) ;
-        __event_handle_ctx = ctx ;
-        return JS_UNDEFINED ;
-    }
-
 
     /**
      * 扫描周围的 WiFi 热点，必须在 STA 模式下运行
@@ -956,7 +1043,7 @@ namespace be {
             .channel = 0,
             .show_hidden = true
         };
-
+ 
         esp_err_t ret = esp_wifi_scan_start(&scanConf, false) ;
         if( ret == ESP_OK) {
             _scanning = true ;
