@@ -308,6 +308,14 @@ namespace be {
         if(mloader->modules.count(ctx)<1) {
             printf("invalid ctx in ModuleLoader::normalize()\n") ;
             return nullptr ;
+        }        
+
+        // 内置模块 
+        // -------------
+        for (const auto & pair : mloader->modules[ctx]) {
+            if( pair.first==module_name ) {
+                return js_strdup(ctx, module_name) ;
+            }
         }
 
         // resolve file
@@ -335,15 +343,6 @@ namespace be {
         }
         
         if(!fullpath.length()) {
-
-            // 内置模块 
-            // -------------
-            for (const auto & pair : mloader->modules[ctx]) {
-                if( pair.first==module_name ) {
-                    return js_strdup(ctx, module_name) ;
-                }
-            }
-
             // not found
             JS_ThrowReferenceError(ctx, " Cannot find module: %s", module_name) ;
             return nullptr ;
