@@ -6,18 +6,21 @@ namespace be {
 
     class BeShell ;
 
-    class WiFi: public be::NativeModule {
+    class WiFi: public be::EventModule {
     public:
         static const char * const name ;
+        static WiFi * singleton ;
 
         WiFi(JSContext * ctx, const char * name) ;
 
-        static bool hasInited() ;
         void exports(JSContext *ctx) ;
 
         static void use(be::BeShell * beshell) ;
 
+        virtual void onNativeEvent(JSContext *ctx, void * param) ;
+
         static void init() ;
+        static bool hasInited() ;
 
         static JSValue start(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -32,7 +35,6 @@ namespace be {
         static JSValue getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue registerEventHandle(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue scanStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
