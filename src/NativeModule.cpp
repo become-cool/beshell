@@ -28,6 +28,13 @@ namespace be {
     NativeModule::~NativeModule(){
         // @todo
         // 可能需要将 ns 中的 opaque 清除
+
+#ifdef ESP_PLATFORM
+        if(nevent_queue) {
+            JSEngine::fromJSContext(ctx)->removeLooping((EngineLoopFunction)nativeEventLoop, this) ;
+            vQueueDelete((QueueHandle_t)nevent_queue) ;
+        }
+#endif
     }
     
     void NativeModule::exportFunction(const char * name, JSCFunction * func, int length) {
@@ -88,6 +95,32 @@ namespace be {
     void NativeModule::use(BeShell * beshell) {}
 
 
+#ifdef ESP_PLATFORM
+    void NativeModule::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
+        if(nevent_queue) {
+            return ;
+        }
+        native_param = malloc(param_size) ;
+        nevent_queue = (void *)xQueueCreate(queue_size, param_size);
+        JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
+    }
+
+    bool NativeModule::emitNativeEvent(void * param) {
+        if(!nevent_queue) {
+            return false ;
+        }
+        return xQueueSend((QueueHandle_t)nevent_queue, param, 0)==pdTRUE ;
+    }
+    
+    void NativeModule::nativeEventLoop(JSContext * ctx, NativeModule * ee) {
+        while(xQueueReceive((QueueHandle_t)ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
+            ee->onNativeEvent(ctx, ee->native_param) ;
+        }
+    }
+
+    void NativeModule::onNativeEvent(JSContext *ctx, void * param) {}
+#endif
+
 
     EventModule::EventModule(JSContext * ctx, const char * name, uint8_t flagGlobal)
         : NativeModule(ctx, name, flagGlobal)
@@ -117,40 +150,7 @@ namespace be {
         JS_FreeValue(ctx, proto) ;
     }
 
-    EventModule::~EventModule() {
-    
 #ifdef ESP_PLATFORM
-        if(nevent_queue) {
-            JSEngine::fromJSContext(ctx)->removeLooping((EngineLoopFunction)nativeEventLoop, this) ;
-            vQueueDelete((QueueHandle_t)nevent_queue) ;
-        }
-#endif
-    }
-
-#ifdef ESP_PLATFORM
-    void EventModule::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
-        if(nevent_queue) {
-            return ;
-        }
-        native_param = malloc(param_size) ;
-        nevent_queue = (void *)xQueueCreate(queue_size, param_size);
-        JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
-    }
-
-    bool EventModule::emitNativeEvent(void * param) {
-        if(!nevent_queue) {
-            return false ;
-        }
-        return xQueueSend((QueueHandle_t)nevent_queue, param, 0)==pdTRUE ;
-    }
-    
-    void EventModule::nativeEventLoop(JSContext * ctx, EventModule * ee) {
-        while(xQueueReceive((QueueHandle_t)ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
-            ee->onNativeEvent(ctx, ee->native_param) ;
-        }
-    }
-
-    void EventModule::onNativeEvent(JSContext *ctx, void * param) {}
 
     void EventModule::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
         
