@@ -13,6 +13,8 @@
 #include "esp_bt_device.h"
 #include "qjs_utils.h"
 #include "quickjs/quickjs.h"
+#include "../../js/bt/central.c"
+#include "../../js/bt/peripheral.c"
 
 static const char *TAG = "bt";
 
@@ -54,6 +56,12 @@ namespace be{
 
     void BT::use(be::BeShell * beshell) {
         beshell->use<BT>() ;
+    }
+    
+    void BT::exports(JSContext *ctx) {
+        EventModule::exports(ctx) ;
+
+        JSEngineEvalEmbeded(ctx, central)
     }
     
     static char * bt_uuid_to_string(const esp_bt_uuid_t *uuid, char *str, size_t str_size) {

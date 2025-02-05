@@ -18,11 +18,12 @@ namespace be{
     
 
     class BT: public be::EventModule {
+
     public:
         static const char * const name ;
         static BT * singleton ;
         static bool bScanning ;
-        
+
         BT(JSContext * ctx, const char * name) ;
 
         void onNativeEvent(JSContext *ctx, void * param) ;
@@ -42,7 +43,8 @@ namespace be{
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue subscribe(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
+    protected:
+        virtual void exports(JSContext *ctx) ;
     private :
         static JSValue getCharacteristics(JSContext *ctx, esp_gatt_if_t gattc_if, uint16_t conn_id, uint16_t start_handle, uint16_t end_handle) ;
     } ;
