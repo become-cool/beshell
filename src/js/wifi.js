@@ -2,9 +2,10 @@ import { exportValue } from "loader"
 import * as wifi from "wifi"
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
 }
-;["on", "off", "once", "race", "emit", "originHandle"].map(fname => exportValue(wifi, fname, EventEmitter.prototype[fname]))
 
 // wifi mode
 // const MODE_NONE = 0
@@ -13,103 +14,17 @@ const MODE_AP = 2
 // const MODE_APSTA = 3
 
 
-// event type
-const EVENT_WIFI = 1
-const EVENT_IP = 2
-
-// WiFi events
-const WIFI_READY = 0
-const WIFI_SCAN_DONE = 1
-const WIFI_STA_START = 2
-const WIFI_STA_STOP = 3
-const WIFI_STA_CONNECTED = 4
-const WIFI_STA_DISCONNECTED = 5
-// const WIFI_STA_AUTHMODE_CHANGE = 6
-// const WIFI_STA_WPS_ER_SUCCESS = 7
-// const WIFI_STA_WPS_ER_FAILED = 8
-// const WIFI_STA_WPS_ER_TIMEOUT = 9
-// const WIFI_STA_WPS_ER_PIN = 10
-// const WIFI_STA_WPS_ER_PBC_OVERLAP = 11
-const WIFI_AP_START = 12
-const WIFI_AP_STOP = 13
-const WIFI_AP_STACONNECTED = 14
-const WIFI_AP_STADISCONNECTED = 15
-// const WIFI_AP_PROBEREQRECVED = 16
-// const WIFI_FTM_REPORT = 17
-// const WIFI_STA_BSS_RSSI_LOW = 18
-// const WIFI_ACTION_TX_STATUS = 19
-// const WIFI_ROC_DONE = 21
-// const WIFI_STA_BEACON_TIMEOUT = 21
-const WIFI_STA_CONNECTING = 101
-
-let evtNames = {}
-evtNames[WIFI_READY] = "ready"
-evtNames[WIFI_SCAN_DONE] = "scan.done"
-evtNames[WIFI_STA_START] = "sta.start"
-evtNames[WIFI_STA_STOP] = "sta.stop"
-evtNames[WIFI_STA_CONNECTED] = "sta.connected"
-evtNames[WIFI_STA_DISCONNECTED] = "sta.disconnected"
-evtNames[WIFI_AP_START] = "ap.start"
-evtNames[WIFI_AP_STOP] = "ap.stop"
-evtNames[WIFI_AP_STACONNECTED] = "ap.sta.connected"
-evtNames[WIFI_AP_STADISCONNECTED] = "ap.sta.disconnected"
-evtNames[WIFI_STA_CONNECTING] = "sta.connecting"
-evtNames[102] = "sta.disconnecting"
-
-// IP events
-const STA_GOT_IP = 0
-const STA_LOST_IP = 1
-// const AP_STAIPASSIGNED = 2
-// const GOT_IP6 = 3
-// const ETH_GOT_IP = 4
-// const PPP_GOT_IP = 5
-// const PPP_LOST_IP = 6
-
-let ipEvtNames = {}
-ipEvtNames[STA_GOT_IP] = "ip.got"
-ipEvtNames[STA_LOST_IP] = "ip.lost"
-
-// power safe
-const PS_NONE = 0
-// const PS_MIN_MODEM = 1
-// const PS_MAX_MODEM = 2 
-
-
-wifi.registerEventHandle(function (eventType, eventId, data) {
-
-  let eventName = null
-  let eventArgv = []
-
-  if (eventType == EVENT_WIFI) {
-    eventName = evtNames[eventId]
-    switch (eventId) {
-      case WIFI_STA_DISCONNECTED:
-        eventArgv.push(data)  // disconnect reason
-      case WIFI_STA_CONNECTED:
-        _connecting = false
-        break
-    }
+wifi.on("sta.connected",()=>{
+  _connecting = false
+})
+wifi.on(["sta.start","ap.start"],()=>{
+  if (contrastStatus(true)) {
+    wifi.emit("start")
   }
-  else if (eventType == EVENT_IP) {
-    eventName = ipEvtNames[eventId]
-  }
-
-  // console.log("..>",eventType,eventId,eventName)
-  if (eventName) {
-    wifi.emit(eventName, ...eventArgv)
-  }
-
-  if (eventType == EVENT_WIFI) {
-    if (eventId == WIFI_STA_START || eventId == WIFI_AP_START) {
-      if (contrastStatus(true)) {
-        wifi.emit("start")
-      }
-    }
-    else if (eventId == WIFI_STA_STOP || eventId == WIFI_AP_STOP) {
-      if (contrastStatus(false)) {
-        wifi.emit("stop")
-      }
-    }
+})
+wifi.on(["sta.stop","ap.stop"],()=>{
+  if (contrastStatus(false)) {
+    wifi.emit("stop")
   }
 })
 
@@ -181,18 +96,23 @@ async function connect(ssid, password, retry, retryDur) {
   await sleep(100)
   await wifi.disconnect(true)
 
+  let res
+
   if (typeof ssid == 'object') {
     retry = ssid.retry
     retryDur = ssid.retryDur
-    wifi.setStaConfig(ssid)
+    res = wifi.setStaConfig(ssid)
   }
   else {
-    wifi.setStaConfig({ ssid, password })
+    res = wifi.setStaConfig({ ssid, password })
+  }
+  if(res) {
+    return false
   }
 
   retry = (parseInt(retry) || 0)
   let deamon = retry<0
-  if (retry < 0) {
+  if (retry <= 0) {
     retry = 1
   }
   retryDur = (parseInt(retryDur) || 5000)
@@ -200,11 +120,14 @@ async function connect(ssid, password, retry, retryDur) {
     retryDur = 5000
   }
 
+  console.log(retry,retryDur)
+
   while ((retry--) > 0) {
     // console.log("connect to ap:",ssid,'...')
     _connecting = true
-    wifi.peripheralConnect()
-    var res = await waitConnecting()
+    res = wifi.peripheralConnect()
+
+    res = await waitConnecting()
     _connecting = false
     // console.log("connect", res?"failed":"sucess", res)
     if (res != 0 && res != 202 && retry) {
