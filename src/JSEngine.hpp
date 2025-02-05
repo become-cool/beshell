@@ -85,7 +85,6 @@ namespace be {
 
         JSValue eval(const char * code, int code_len=-1, const char * filename="eval", int flags=JS_EVAL_TYPE_GLOBAL) ;
         JSValue evalScript(const char * filepath, int flags=JS_EVAL_TYPE_MODULE, bool dumpException=true) ;
-        void runScript(const char * filepath, int flags=JS_EVAL_TYPE_MODULE) ;
 
         static JSEngine * fromJSContext(JSContext *) ;
         static JSEngine * fromJSRuntime(JSRuntime *) ;
