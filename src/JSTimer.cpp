@@ -77,7 +77,10 @@ namespace be {
                 
                 JSValue ret = JS_Call(ctx, event->func, event->thisobj, event->argc, event->argv) ;
                 if( JS_IsException(ret) ) {
-                    js_std_dump_error(ctx) ;
+                    JSValue excpt = JS_GetException(ctx) ;
+                    std::string error = JSEngine::getExceptionStr(ctx, excpt) ;
+                    printf("timer callback error:\n") ;
+                    printf(error.c_str()) ;
                 }
                 JS_FreeValue(ctx, ret) ;
 
