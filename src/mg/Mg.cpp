@@ -55,7 +55,7 @@ namespace be::mg {
         exportName("download") ;
 
         // exportFunction("isListening",isListening,0) ;
-        // exportFunction("sntpRequest",sntpRequest,0) ;
+        exportFunction("sntpRequest",sntpRequest,0) ;
         exportFunction("connPeer",connPeer,0) ;
         exportFunction("connCount",connCount,0) ;
         exportFunction("getDNS",getDNS,0) ;
@@ -159,90 +159,80 @@ namespace be::mg {
     void Mg::loop(const BeShell & beshell, void * data) {
         mg_mgr_poll(&mgr, 0);
     }
+    
+    typedef struct  {
+        JSValue callback ;
+        JSContext * ctx ;
+    } sntp_callback_t ;
 
-    // static void sntp_callback(mg_req_t * req, int64_t time) {
-    //     MAKE_ARGV1( argv, JS_NewInt64(req->ctx, time) )
-    //     JS_Call(req->ctx, req->callback, JS_UNDEFINED, 1, argv) ;
-    //     free(argv) ;
-    // }
+    static void sntp_event_handler(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
+        if (ev == MG_EV_SNTP_TIME) {
+            struct timeval *tv = (struct timeval *) ev_data;
+            if(c->fn_data) {
+                int64_t timestamp = (int64_t)tv->tv_sec*1000 ;
+                timestamp+= tv->tv_usec/1000 ;
+                MAKE_ARGV2(argv, JS_NULL, JS_NewInt64(((sntp_callback_t*)c->fn_data)->ctx, timestamp))
+                JSValue ret = JS_Call(
+                    ((sntp_callback_t*)c->fn_data)->ctx ,
+                    ((sntp_callback_t*)c->fn_data)->callback ,
+                    JS_NULL, 2, argv
+                ) ;
+                JS_FreeValue( ((sntp_callback_t*)c->fn_data)->ctx , ret ) ;
+                free(argv) ;
+            }
+            // 标记连接关闭并释放资源
+            c->is_closing = 1;
+        }
+        
+        else if (ev == MG_EV_ERROR) {
+            if(c->fn_data) {
+                JSValue argv = JS_NewString( ((sntp_callback_t*)c->fn_data)->ctx, (char *)ev_data ) ;
+                JSValue ret = JS_Call(
+                    ((sntp_callback_t*)c->fn_data)->ctx ,
+                    ((sntp_callback_t*)c->fn_data)->callback ,
+                    JS_NULL, 1, (JSValueConst*) & argv
+                ) ;
+                JS_FreeValue( ((sntp_callback_t*)c->fn_data)->ctx , ret ) ;
+                JS_FreeValue( ((sntp_callback_t*)c->fn_data)->ctx , argv ) ;
+            }
+        }
+        
+        else if (ev == MG_EV_CLOSE) {
+            if(c->fn_data) {
+                JS_FreeValue( ((sntp_callback_t*)c->fn_data)->ctx, ((sntp_callback_t*)c->fn_data)->callback ) ;
+                free(c->fn_data) ;
+                c->fn_data = nullptr ;
+            }
+        } 
+    }
 
-    // static void sntp_cb(struct mg_connection *c, int ev, void *evd, void *fnd) {
-    //     if (ev == MG_EV_POLL) {
-    //         mg_req_t * req = (mg_req_t *)fnd ;
-    //         req->poll_times++ ;
-    //         if(++req->poll_times > 3000 ){
-    //             sntp_callback((mg_req_t *)fnd, -1) ;
-    //             c->is_closing = 1 ;
-    //         }
-    //     } else if (ev == MG_EV_CONNECT) {
-    //         if (c->is_resolving) {
-    //             sntp_callback((mg_req_t *)fnd, -2) ;
-    //             c->is_closing = 1 ;
-    //         }
-    //         else {
-    //             uint8_t buf[48] = {0};
-    //             buf[0] = (0 << 6) | (4 << 3) | 3;
-    //             mg_send(c, buf, sizeof(buf));
-    //         }
-    //     } else if (ev == MG_EV_READ) {
-    //         struct timeval tv = {0, 0};
-    //         if (mg_sntp_parse(c->recv.buf, c->recv.len, &tv) == 0) {
-    //             mg_req_t * req = (mg_req_t *)fnd ;
-    //             int64_t ms = tv.tv_sec ;
-    //             ms*= 1000 ;
-    //             sntp_callback((mg_req_t *)fnd, ms) ;
-    //         }
-    //         c->recv.len = 0;  // Clear receive buffer
-    //         c->is_closing = 1 ;
-    //     } else if (ev==MG_EV_ERROR) {
-    //         mg_req_t * req = (mg_req_t *)fnd ;
-    //         sntp_callback((mg_req_t *)fnd, -3) ;
-    //         c->is_closing = 1 ;
-    //     } else if (ev == MG_EV_CLOSE) {
-    //         mg_req_t * req = (mg_req_t *)fnd ;
-    //         JS_FreeValue(req->ctx, req->callback) ;
-    //         free(req) ;
-    //         req = NULL ;
-    //         fnd = NULL ;
-    //     }
-    //     (void) evd;
-    // }
+    JSValue Mg::sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        if( argc>1 && !JS_IsFunction(ctx,argv[1]) ) {
+            JSTHROW("arg callback must be a function")
+        }
 
-    // JSValue Mg::sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ARGV_TO_CSTRING(0, url) ;
 
-    //     ASSERT_ARGC(2)
+        // 连接到SNTP服务器（例如pool.ntp.org的UDP 123端口， "udp://pool.ntp.org:123"）
+        struct mg_connection *c = mg_sntp_connect(&mgr, url, sntp_event_handler, &mgr);
+        JS_FreeCString(ctx, url);
 
-    //     ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
-    //     if(!JS_IsFunction(ctx, argv[1])) {
-    //         JSTHROW("arg callback must be a function")
-    //     }
+        if (c == NULL) {
+            JSTHROW("connet SNTP server failed");
+        }
 
-    //     mg_req_t * req = malloc(sizeof(mg_req_t)) ;
-    //     if(!req) {
-    //         JSTHROW("out of memory?")
-    //     }
-    //     req->ctx = ctx ;
-    //     req->callback = JS_DupValue(ctx,argv[1]) ;
-    //     req->poll_times = 0 ;    
+        if(argc>1) {
+            sntp_callback_t * cb = (sntp_callback_t*)malloc(sizeof(sntp_callback_t)) ;
+            cb->callback = JS_DupValue(ctx,argv[1]) ;
+            cb->ctx = ctx ;
+            c->fn_data = cb ;
+        }
 
-    //     struct mg_connection * conn = mg_sntp_connect(&mgr, url, sntp_cb, req) ;
-    //     if(!conn) {
-    //         sntp_callback(req, -4) ;
-    //         free(req) ;
-    //         JS_FreeValue(ctx,argv[1]) ;
-    //     }
-    //     else {
-    //         // mg 内部机制 有 sntp 1小时访问一次的全局限制
-    //         // 取消 mg 的 sntp 实现，在 sntp_cb() 函数中接管
-    //         conn->pfn = NULL ;
-    //     }
+        mg_sntp_send(c, 0);  // 发送SNTP请求（参数0表示立即请求）
 
-    //     if(url) {
-    //         JS_FreeCString(ctx, url) ;
-    //     }
-
-    //     return JS_UNDEFINED ;
-    // }
+        return JS_UNDEFINED ;
+    }
 
     
     /**
@@ -297,11 +287,6 @@ namespace be::mg {
      * 
      * @return [Client](Client.md)
      */
-
-
-    JSValue Mg::sntpHTTPRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
-    }
 
     /**
      * 返回指定客户端连接的对端地址 [ip:port]

@@ -33,7 +33,7 @@ namespace be::mg {
 
         static bool isListening(const char * url) ;
 
-        static JSValue sntpHTTPRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connPeer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
