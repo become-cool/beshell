@@ -7,6 +7,7 @@ Added:
 * wifi.stopStaDeamon()
 * wifi.isStaDeamonRunning()
 * fs.tell()
+* mg.sntpRequest()
 
 Fixed:
 
