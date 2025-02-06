@@ -95,7 +95,7 @@ namespace be::mg {
 
         strcpy(dns4,"udp://8.8.8.8:53") ;
         mgr.dns4.url = dns4 ;
-        
+
         mgr.dnstimeout = 3000 ;
 
         beshell->use<WiFi>() ;
@@ -106,7 +106,7 @@ namespace be::mg {
         cert_path = FS::toVFSPath("/var/cert.pem") ;
         certkey_path = FS::toVFSPath("/var/key.pem") ;
     }
-    
+
     const char * Mg::eventName(int ev) {
         switch(ev){
             case MG_EV_ERROR: return "error" ;
@@ -298,6 +298,10 @@ namespace be::mg {
      * @return [Client](Client.md)
      */
 
+
+    JSValue Mg::sntpHTTPRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
+    }
 
     /**
      * 返回指定客户端连接的对端地址 [ip:port]

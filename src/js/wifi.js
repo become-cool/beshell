@@ -179,7 +179,6 @@ function startStaDeamon(dur) {
 }
 
 function stopStaDeamon() {
-  console.log("stopStaDeamon\n")
   if (timerDeamon >= 0) {
     clearTimeout(timerDeamon)
     timerDeamon = -1
