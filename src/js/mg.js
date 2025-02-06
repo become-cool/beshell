@@ -23,7 +23,7 @@ function get(url) {
     let conn = mg.connect(url, (event, data) => {
       switch (event) {
         case 'connect':
-          connect(conn, url)
+          // connect(conn, url)
           break
         case 'http.msg':
           // console.log("msg")
@@ -51,7 +51,7 @@ function download(url, localPath, progress_cb) {
     let conn = mg.connect(url, (event, msg) => {
       switch (event) {
         case 'connect':
-          connect(conn, url)
+          // connect(conn, url)
           break
         case 'http.msg':
         case 'http.chunk':
