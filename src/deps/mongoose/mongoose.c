@@ -247,7 +247,7 @@ static void dns_cb(struct mg_connection *c, int ev, void *ev_data,
     for (d = s_reqs; d != NULL; d = tmp) {
       tmp = d->next;
       if (now > d->expire) {
-        printf("%lu %lu dns poll timeout\n", d->expire, now);
+        // printf("%lu %lu dns poll timeout\n", d->expire, now);
         mg_error(d->c, "DNS timeout");
       }
     }
