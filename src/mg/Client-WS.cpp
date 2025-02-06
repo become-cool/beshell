@@ -86,9 +86,9 @@ namespace be::mg {
                 client = NULL ;
                 fnd = NULL ;
         }
-        else if (ev == MG_EV_ERROR) { // WebSocket 连接关闭
+        else if (ev == MG_EV_ERROR) {
             if(ev_data) {
-                JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                JSValue evname = JS_NewString(client->ctx, "error") ;
                 JSValue msg = JS_NewString(client->ctx, (const char *)ev_data) ;
                 JS_CALL_ARG2(client->ctx, client->callback, evname, msg)
                 JS_FreeValue(client->ctx, evname) ;
@@ -96,11 +96,12 @@ namespace be::mg {
             }
         }
         else {
-            JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
-            JS_CALL_ARG1(client->ctx, client->callback, evname)
-            JS_FreeValue(client->ctx, evname) ;
+            if(ev!=MG_EV_POLL) {
+                JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                JS_CALL_ARG1(client->ctx, client->callback, evname)
+                JS_FreeValue(client->ctx, evname) ;
+            }
         }
-
     }
 
 }
