@@ -74,7 +74,7 @@ function isConnecting() {
 function waitConnecting() {
   return new Promise(function (resolve) {
     wifi.race(["sta.disconnected", "sta.connected"], (evt, ...args) => {
-      resolve(args[0] || 0)
+      resolve(evt == "sta.connected")
     })
   })
 }
@@ -120,8 +120,6 @@ async function connect(ssid, password, retry, retryDur) {
     retryDur = 5000
   }
 
-  console.log(retry,retryDur)
-
   while ((retry--) > 0) {
     // console.log("connect to ap:",ssid,'...')
     _connecting = true
@@ -130,7 +128,7 @@ async function connect(ssid, password, retry, retryDur) {
     res = await waitConnecting()
     _connecting = false
     // console.log("connect", res?"failed":"sucess", res)
-    if (res != 0 && res != 202 && retry) {
+    if (!res) {
       console.log("retry", retryDur, "ms later ...")
       await sleep(retryDur)
     }
@@ -143,7 +141,7 @@ async function connect(ssid, password, retry, retryDur) {
     startStaDeamon()
   }
 
-  return 0 == res
+  return res
 }
 
 async function disconnect(dontStopDeamon) {
