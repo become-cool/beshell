@@ -10,6 +10,7 @@ Added:
 * mg.sntpRequest()
 * mongoose 支持 mqtt
 * NativeClass::emitSyncFree()
+* spi eth ic driver W5500
 
 Fixed:
 

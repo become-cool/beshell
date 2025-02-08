@@ -92,7 +92,7 @@ namespace be {
         int GET_INT32_PROP_OPT(argv[0], "quadhd_io_num", quadhd_io_num, -1)
         int GET_INT32_PROP_OPT(argv[0], "max_transfer_sz", max_transfer_sz, 20480)
         
-        printf("spi[%d] miso=%d, mosi=%d, sck=%d\n", that->busnum, misopin, mosipin, sckpin);
+        // printf("spi[%d] miso=%d, mosi=%d, sck=%d\n", that->busnum, misopin, mosipin, sckpin);
         // dn(busnum)
 
         spi_bus_config_t buscfg = {

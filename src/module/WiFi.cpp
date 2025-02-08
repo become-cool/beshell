@@ -387,8 +387,7 @@ namespace be {
         ESP_API(esp_wifi_init(&cfg))
 
         ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_any_id))
-        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp32_wifi_eventHandler, (void *)NULL, &instance_got_ip))
-        ESP_API(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_LOST_IP, &esp32_wifi_eventHandler, (void *)NULL, &instance_lost_ip))
+        ESP_API(esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_got_ip))
 
         wifi_inited = true ;
     }
