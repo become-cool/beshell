@@ -87,8 +87,8 @@ namespace be {
      * 
      * @function readMac
      * @param phy:"wifi"|"wifi.ap"|"wifi.softap"|"ble"|"eth"|"base"|"efuse"|"efuse.factory"|"efuse.customer"|"efuse.ext"="wifi" 要读取的硬件类型
-     * @param format:number=1 返回格式，1表示字节数组，2表示十六进制字符串
-     * @return number[]|string 硬件地址
+     * @param format:bool=false 返回格式，false返回ArrayBuffer，true返回十六进制字符串
+     * @return ArrayBuffer|string 硬件地址
      */
     JSValue Process::readMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         
@@ -128,7 +128,10 @@ namespace be {
             JS_FreeCString(ctx, mac_type_str);
         }
 
-        ARGV_TO_UINT8_OPT(1, format, 1)
+        bool format = false ;
+        if(argc>1) {
+            format = JS_ToBool(ctx, argv[1]) ;
+        }
 
 #ifdef ESP_PLATFORM
         if(esp_read_mac(mac,mac_type)!=ESP_OK) {
@@ -136,20 +139,13 @@ namespace be {
         }
 #endif
 
-        if(format==1) {
-            JSValue arr = JS_NewArray(ctx) ;
-            for(int i=0;i<sizeof(mac);i++) {
-                JS_SetPropertyUint32(ctx, arr, i, JS_NewUint32(ctx,mac[i]) ) ;
-            }
-            return arr ;
+        if(!format) {
+            return JS_NewArrayBufferCopy(ctx, mac, sizeof(mac)) ;
         }
-        else if(format==2) {
+        else {
             char macstr[24] ;
             sprintf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             return JS_NewString(ctx, macstr) ;
-        }
-        else {
-            JSTHROW("arg format must be 1 or 2")
         }
     }
 
