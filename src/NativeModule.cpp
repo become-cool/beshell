@@ -105,6 +105,9 @@ namespace be {
         JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
     }
 
+    // 注意，该函数可能返回 false ，
+    // 消息没有实际进入到队列中，因为队列满了或队列尚未创建
+    // 如果消息中有由接收方负责释放的指针，此时需要由发送方负责释放回收
     bool NativeModule::emitNativeEvent(void * param) {
         if(!nevent_queue) {
             return false ;

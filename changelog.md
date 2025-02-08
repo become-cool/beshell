@@ -8,6 +8,7 @@ Added:
 * wifi.isStaDeamonRunning()
 * fs.tell()
 * mg.sntpRequest()
+* NativeClass::emitSyncFree()
 
 Fixed:
 
@@ -21,6 +22,7 @@ Refactored:
 
 * BeShell::main() 增加参数 core
 * wifi.conenct()  auto call startStaDeamon() when retry==-1
+* EventEmitter::emitNativeEvent() 返回 bool
 
 
 ## v0.3.6   2024-11-27
