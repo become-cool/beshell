@@ -89,7 +89,7 @@ idf_component_register(
         #     ${src_dirs}
         INCLUDE_DIRS
             ${include_dirs}
-        REQUIRES 
+        PRIV_REQUIRES 
             driver
             mbedtls
             vfs
@@ -99,6 +99,7 @@ idf_component_register(
             esp_timer
             nvs_flash
             esp_wifi
+            esp_eth
             efuse
             esp_netif
             esp_ringbuf
