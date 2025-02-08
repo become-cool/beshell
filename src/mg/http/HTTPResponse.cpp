@@ -10,8 +10,8 @@
  * @class Response
  */
 
-#include "Response.hpp"
-#include "HTTPRequest.hpp"
+#include "./HTTPResponse.hpp"
+#include "./HTTPRequest.hpp"
 #include "mallocf.h"
 #include <fs/FS.hpp>
 

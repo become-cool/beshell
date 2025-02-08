@@ -1,5 +1,5 @@
-#include "Server.hpp"
-#include "Mg.hpp"
+#include "./HTTPServer.hpp"
+#include "../Mg.hpp"
 #include "module/WiFi.hpp"
 
 

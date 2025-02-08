@@ -1,6 +1,6 @@
-#include "Client.hpp"
-#include "HTTPRequest.hpp"
-#include "Mg.hpp"
+#include "./HTTPClient.hpp"
+#include "./HTTPRequest.hpp"
+#include "../Mg.hpp"
 #include "quickjs/quickjs.h"
 
 using namespace std ;

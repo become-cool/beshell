@@ -8,6 +8,7 @@ Added:
 * wifi.isStaDeamonRunning()
 * fs.tell()
 * mg.sntpRequest()
+* mongoose 支持 mqtt
 * NativeClass::emitSyncFree()
 
 Fixed:
