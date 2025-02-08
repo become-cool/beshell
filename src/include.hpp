@@ -45,10 +45,6 @@
 #include "module/serial/I2S.hpp"
 
 // mg
-#include "mg/Response.hpp"
-#include "mg/HTTPRequest.hpp"
-#include "mg/Client.hpp"
-#include "mg/Server.hpp"
 #include "mg/Mg.hpp"
 
 // sqlite3

@@ -1,6 +1,6 @@
-#include "Client.hpp"
-#include "HTTPRequest.hpp"
-#include "Mg.hpp"
+#include "./HTTPClient.hpp"
+#include "./HTTPRequest.hpp"
+#include "../Mg.hpp"
 #include "qjs_utils.h"
 #include "quickjs/quickjs.h"
 
@@ -212,17 +212,17 @@ namespace be::mg {
         if( !JS_IsFunction(ctx, argv[1]) ) {
             JSTHROW("arg callback must be a function")
         }
-        ARGV_TO_CSTRING_E(0, url, "arg url must be a string")
+        ARGV_TO_CSTRING_LEN_E(0, url, urlLen, "arg url must be a string")
 
         Client * client = new Client(ctx, nullptr, argv[1]) ;
         struct mg_connection * conn = NULL ;
 
-        if ( strncmp(url,"http://", 5)==0 || strncmp(url,"https://", 6)==0 ) {
+        if ( strncmp(url,"http://", urlLen)==0 || strncmp(url,"https://", urlLen)==0 ) {
             conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
             client->is_ws = false ;
         }
 
-        else if( strncmp(url,"ws://", 5)==0 || strncmp(url,"wss://", 6)==0 ) {
+        else if( strncmp(url,"ws://", urlLen)==0 || strncmp(url,"wss://", urlLen)==0 ) {
             conn = mg_ws_connect(&Mg::mgr, url, Client::wsEventHandler, client, NULL) ;
             client->is_ws = true ;
         }
@@ -235,7 +235,7 @@ namespace be::mg {
 
         client->conn = conn ;
         if(conn==NULL) {
-            JS_ThrowReferenceError(ctx, "could not listen addr: %s", url) ;
+            JS_ThrowReferenceError(ctx, "could not connect to url: %s", url) ;
             JS_FreeCString(ctx, url) ;
             return JS_EXCEPTION ;
         }

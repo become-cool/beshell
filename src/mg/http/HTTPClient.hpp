@@ -4,6 +4,7 @@
 #include "deps/mongoose/mongoose.h"
 
 namespace be::mg {
+    
     class Client: public be::EventEmitter {
         DECLARE_NCLASS_META
     private:

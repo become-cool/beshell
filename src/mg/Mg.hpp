@@ -2,10 +2,11 @@
 
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include "HTTPRequest.hpp"
-#include "Response.hpp"
+#include "http/HTTPServer.hpp"
+#include "http/HTTPClient.hpp"
+#include "http/HTTPRequest.hpp"
+#include "http/HTTPResponse.hpp"
+#include "mqtt/MQTTClient.hpp"
 #include "deps/mongoose/mongoose.h"
 
 
@@ -42,8 +43,10 @@ namespace be::mg {
         static JSValue setDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     friend class Server ;
     friend class Client ;
+    friend class MQTTClient ;
     } ;
 }

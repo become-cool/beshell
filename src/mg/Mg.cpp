@@ -66,7 +66,7 @@ namespace be::mg {
         exportFunction("setLog",setLog,0) ;
 
         exportFunction("listenHttp",Server::listenHttp,0) ;
-        exportFunction("connect",Client::connect,0) ;
+        exportFunction("connect",connect,0) ;
     }
 
     void Mg::exports(JSContext *ctx) {
@@ -432,5 +432,21 @@ namespace be::mg {
 
         JS_FreeCString(ctx, log) ;
         return JS_UNDEFINED ;
+    }
+    
+    JSValue Mg::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        ARGV_TO_CSTRING_LEN_E(0, url, urlLen, "arg url must be a string")
+        if ( strncmp(url,"http://", 7)==0 || strncmp(url,"https://", 8)==0 || strncmp(url,"ws://", 5)==0 || strncmp(url,"wss://", 6)==0 ) {
+            JS_FreeCString(ctx, url) ;
+            return Client::connect(ctx, this_val, argc, argv) ;
+        }
+        else if ( strncmp(url,"mqtt://", 7)==0 || strncmp(url,"mqtts://", 8)==0 ) {
+            JS_FreeCString(ctx, url) ;
+            return MQTTClient::connect(ctx, this_val, argc, argv) ;
+        }
+        
+        JS_FreeCString(ctx, url) ;
+        JSTHROW("url not support")
     }
 }
