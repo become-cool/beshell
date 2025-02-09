@@ -16,6 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+ #include "sdkconfig.h"
+ 
 #if CONFIG_BT_NIMBLE_ENABLED
 
 #include <assert.h>

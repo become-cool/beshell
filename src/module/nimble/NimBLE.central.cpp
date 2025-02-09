@@ -1,6 +1,7 @@
+#include "NimBLE.hpp"
+
 #if CONFIG_BT_NIMBLE_ENABLED
 
-#include "NimBLE.hpp"
 #include "../../BeShell.hpp"
 #include "JSEngine.hpp"
 #include "ModuleLoader.hpp"
