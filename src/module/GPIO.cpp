@@ -7,6 +7,7 @@
 
 #include "GPIO.hpp"
 #include "driver/adc.h"
+#include "driver/gpio.h"
 #include <map>
 #include <vector>
 
@@ -32,6 +33,8 @@ namespace be {
     static bool pending_event = false ;
 
     static map< uint8_t, pair< vector<JSValue>, vector<JSValue> > > watching_callbacks ;
+
+    bool GPIO::isr_installed=false ;
 
     GPIO::GPIO(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
@@ -323,6 +326,29 @@ function (gpio,time) {
         pending_event = true ;
     }
 
+    
+    bool GPIO::installISR(int flag) {
+        if(isr_installed) {
+            return true ;
+        }
+        esp_err_t res = gpio_install_isr_service(flag) ;
+        if(res!=ESP_OK) {
+            printf("gpio_install_isr_service() failed:%d\n", res) ;
+            return false ;
+        }
+        isr_installed = true ;
+        return true ;
+    }
+
+    void GPIO::uninstallISR() {
+        if(!isr_installed) {
+            return ;
+        }
+        gpio_uninstall_isr_service() ;
+        isr_installed = false ;
+    }
+
+
     /**
      * 监听 gpio 外部电平变化
      * 
@@ -351,9 +377,9 @@ function (gpio,time) {
             JSTHROW("watch() arg edge must be rasing|falling|both")
         }
 
-        esp_err_t ret = gpio_install_isr_service(0);
-        // dn(ret)
-        // dn4(ESP_ERR_NO_MEM,ESP_ERR_INVALID_ARG,ESP_ERR_NOT_SUPPORTED,ESP_ERR_INVALID_STATE)
+        if(!installISR(0)){
+            JSTHROW("install gpio isr failed")
+        }
 
         gpio_isr_handler_remove((gpio_num_t)pin);
 

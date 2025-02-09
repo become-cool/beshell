@@ -7,12 +7,14 @@
 namespace be {
  
     class GPIO: public be::NativeModule {
-    private:
     public:
         GPIO(JSContext * ctx, const char * name) ;
         static void loop(JSContext *, void * arg) ;
 
         void exports(JSContext *ctx) ;
+        
+        static bool installISR(int flag=0) ;
+        static void uninstallISR() ;
 
         static JSValue mode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -33,6 +35,9 @@ namespace be {
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+    
+    private:
+        static bool isr_installed ;
     } ;
 }
 
