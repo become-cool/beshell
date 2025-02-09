@@ -1,6 +1,7 @@
-// #if CONFIG_BT_BLUEDROID_ENABLED
-
 #include "BT.hpp"
+
+#if CONFIG_BT_BLUEDROID_ENABLED
+
 #include "esp_bt.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
@@ -640,4 +641,4 @@ namespace be{
     }
 }
 
-// #endif
+#endif

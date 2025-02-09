@@ -1,6 +1,7 @@
+#include "Peer.hpp"
+
 #if CONFIG_BT_NIMBLE_ENABLED
 
-#include "Peer.hpp"
 #include "NativeClass.hpp"
 #include "debug.h"
 #include "qjs_utils.h"

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "sdkconfig.h"
+
+#if CONFIG_BT_NIMBLE_ENABLED
+
 #include "NativeModule.hpp"
 
 namespace be::nimble {
@@ -39,3 +43,4 @@ namespace be::nimble {
         static JSValue disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }
+#endif

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "sdkconfig.h"
+#if CONFIG_BT_BLUEDROID_ENABLED
+
 #include "BeShell.hpp"
 #include "NativeModule.hpp"
 #include "esp_gattc_api.h"
@@ -49,3 +52,5 @@ namespace be{
         static JSValue getCharacteristics(JSContext *ctx, esp_gatt_if_t gattc_if, uint16_t conn_id, uint16_t start_handle, uint16_t end_handle) ;
     } ;
 }
+
+#endif

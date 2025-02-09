@@ -1,5 +1,8 @@
 #pragma once
 
+#include "sdkconfig.h"
+#if CONFIG_BT_NIMBLE_ENABLED
+
 #include <NativeClass.hpp>
 #include "host/ble_gap.h"
 
@@ -23,3 +26,5 @@ namespace be::nimble {
 
     } ;
 }
+
+#endif
