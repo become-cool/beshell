@@ -14,6 +14,7 @@ namespace be::driver::comm {
 
     public:
         W5500(JSContext * ctx, JSValue _jsobj=JS_NULL) ;
+        ~W5500() ;
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -40,6 +41,9 @@ namespace be::driver::comm {
         uint8_t mac_addr[ETH_ADDR_LEN] ;
 
         esp_netif_ip_info_t ipinfo ;
+
+        esp_event_handler_instance_t handlerEth = NULL ;
+        esp_event_handler_instance_t handlerIp = NULL ;
 
         static void ethEventHandler(W5500 * that, esp_event_base_t event_base, int32_t event_id, void *event_data) ;
         static void gotIpEventHandler(W5500 * that, esp_event_base_t event_base, int32_t event_id, void * event_data) ;

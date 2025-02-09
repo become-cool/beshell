@@ -1,8 +1,11 @@
 #include "W5500.hpp"
+#include "Platform.hpp"
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_eth_mac_spi.h"
 #include "esp_event.h"
+#include "module/GPIO.hpp"
+#include "platform.hpp"
 
 
 using namespace std ;
@@ -31,9 +34,22 @@ namespace be::driver::comm {
 
         enableNativeEvent(ctx, sizeof(w5500_event_t), 5) ;
     }
+    
+    W5500::~W5500() {
+        // ds("~W5500")
+        if(handlerEth) {
+            esp_event_handler_instance_unregister(ETH_EVENT, ESP_EVENT_ANY_ID, handlerEth);
+            handlerEth = NULL ;
+        }
+        if(handlerIp) {
+            esp_event_handler_instance_unregister(ETH_EVENT, ESP_EVENT_ANY_ID, handlerIp);
+            handlerIp = NULL ;
+        }
+    }
 
     JSValue W5500::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        auto obj = new W5500(ctx) ;
+        auto obj = new W5500(ctx, this_val) ;
+        obj->shared() ;
         return obj->jsobj ;
     }
 
@@ -99,7 +115,6 @@ namespace be::driver::comm {
             memset(&that->ipinfo,0,sizeof(esp_netif_ip_info_t)) ;
         }
 
-
         that->emitNativeEvent(&msg) ;
     }
 
@@ -129,7 +144,6 @@ namespace be::driver::comm {
         else if(event_wrapper->type==2) {
             switch (event_wrapper->event_id) {
             case IP_EVENT_ETH_GOT_IP: {
-
                 char ip_str[16];
                 JSValue jsipinfo = JS_NewObject(ctx) ;
                 
@@ -188,6 +202,11 @@ namespace be::driver::comm {
         eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
         eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
 
+        be::platform::networkInit() ;
+
+        if(!GPIO::installISR(0)){
+            JSTHROW("install gpio isr failed")
+        }
 
         // Configure SPI interface for specific SPI module
         spi_device_interface_config_t spi_devcfg = {
@@ -230,8 +249,12 @@ namespace be::driver::comm {
         }
     
         // Register user defined event handers
-        esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, (esp_event_handler_t)&ethEventHandler, (void*)that);
-        esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, (esp_event_handler_t)&gotIpEventHandler, (void*)that);
+        esp_event_handler_instance_register(ETH_EVENT, ESP_EVENT_ANY_ID, (esp_event_handler_t)&ethEventHandler, (void*)that, &that->handlerEth);
+        esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID, (esp_event_handler_t)&gotIpEventHandler, (void*)that, &that->handlerIp);
+
+        // 需要在这里增加一个引用表示 esp native 事件监听，否则 w5500 js 对象被释放以后，esp event handle 里会传入 that 的野指针
+        // unsetup 以后在 free 这个引用， 同时 unregister esp handler
+        JS_DupValue(ctx, that->jsobj) ;
     
         // Start Ethernet driver state machine
         if(esp_eth_start(that->eth_handle)!=ESP_OK){

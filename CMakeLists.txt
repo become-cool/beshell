@@ -89,7 +89,7 @@ idf_component_register(
         #     ${src_dirs}
         INCLUDE_DIRS
             ${include_dirs}
-        PRIV_REQUIRES 
+        PRIV_REQUIRES
             driver
             mbedtls
             vfs

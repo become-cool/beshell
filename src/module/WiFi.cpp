@@ -18,6 +18,7 @@
 #include <lwip/sockets.h>
 #include "../js/wifi.c"
 #include "NativeModule.hpp"
+#include "platform.hpp"
 
 using namespace be ;
 
@@ -376,9 +377,9 @@ namespace be {
             return ;
         }
 
+        be::platform::networkInit() ;
+
         esp_err_t res ;
-        ESP_API(esp_event_loop_create_default())
-        ESP_API(esp_netif_init())
 
         netif_sta = esp_netif_create_default_wifi_sta();
         netif_ap = esp_netif_create_default_wifi_ap();
