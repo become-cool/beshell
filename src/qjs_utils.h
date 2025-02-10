@@ -190,13 +190,14 @@ extern "C" {
     }
 
 
-#define CALL_IDF_API(func_invoke)           \
+#define CALL_IDF_API(func_invoke, excep_msg)\
     {                                       \
         esp_err_t res = func_invoke ;       \
         if( res != ESP_OK ) {               \
-            JSTHROW(#func_invoke " failed, err: %d", res)   \
+            JSTHROW(excep_msg " failed, err: %d", res)   \
         }                                   \
     }
+
 
 void printUncatchException(JSContext *ctx) ;
 

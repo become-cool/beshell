@@ -4,6 +4,10 @@
 #include "NativeClass.hpp"
 #include "qjs_utils.h"
 #include "esp_heap_caps.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_vendor.h"
+#include "esp_lcd_panel_ops.h"
+#include "quickjs/quickjs.h"
 
 using namespace std ;
 
@@ -14,14 +18,24 @@ namespace be::driver::disp {
     std::vector<JSCFunctionListEntry> Display::methods = {
         JS_CFUNC_DEF("drawRect", 0, Display::drawRect),
         JS_CFUNC_DEF("fillRect", 0, Display::fillRect),
+        JS_CFUNC_DEF("reset", 0, Display::reset),
+        JS_CFUNC_DEF("init", 0, Display::init),
+        JS_CFUNC_DEF("off", 0, Display::off),
+        JS_CFUNC_DEF("on", 0, Display::on),
+        JS_CFUNC_DEF("pause", 0, Display::pause),
+        JS_CFUNC_DEF("resume", 0, Display::resume),
+        JS_CFUNC_DEF("setOffset", 0, Display::setOffset),
+        JS_CFUNC_DEF("mirror", 0, Display::mirror),
+        JS_CFUNC_DEF("swapXY", 0, Display::swapXY),
+        JS_CFUNC_DEF("invertColor", 0, Display::invertColor),
     } ;
+
     std::vector<JSCFunctionListEntry> Display::staticMethods = {
         JS_CFUNC_DEF("RGB", 0, Display::RGB),
         JS_CFUNC_DEF("RGB565", 0, Display::RGB565),
         JS_CFUNC_DEF("toRGB", 0, Display::toRGB),
         JS_CFUNC_DEF("toRGB565", 0, Display::toRGB565),
     } ;
-
     Display::Display(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
         : NativeClass(ctx, build(ctx,_jsobj))
         , _width(width)
@@ -36,11 +50,14 @@ namespace be::driver::disp {
         return _height ;
     }
 
+    #define CHECK_HANDLE                    \
+            if(!that->handle) {             \
+                JSTHROW("call setup first") \
+            }
+
     JSValue Display::drawRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        Display * disp = (Display *)fromJS(this_val) ;
-        if(!disp) {
-            JSTHROW("not a valid object")
-        }
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
         ASSERT_ARGC(5)
         ARGV_TO_INT16(0,x1)
         ARGV_TO_INT16(1,y1)
@@ -58,7 +75,7 @@ namespace be::driver::disp {
 
         std::fill_n(buff, size, color);
 
-        disp->drawRect(x1,y1,x2,y2,buff) ;
+        that->drawRect(x1,y1,x2,y2,buff) ;
 
         delete[] buff ;
 
@@ -68,6 +85,7 @@ namespace be::driver::disp {
 
     JSValue Display::fillRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Display, that)
+        CHECK_HANDLE
         ASSERT_ARGC(5)
         ARGV_TO_INT16(0,x1)
         ARGV_TO_INT16(1,y1)
@@ -159,16 +177,102 @@ namespace be::driver::disp {
     
     void Display::fillRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,color_t color) {
 
-        uint16_t line_size = x2-x1+1;
-        uint8_t * buff = (uint8_t *)heap_caps_malloc(line_size*2, MALLOC_CAP_DMA) ;
-        int index = 0;
-        for(int i=0;i<line_size;i++) {
-            buff[index++] = (color >> 8) & 0xFF;
-            buff[index++] = color & 0xFF;
+        uint16_t line_size = x2-x1;
+        uint16_t lines = y2-y1;
+
+        uint16_t * buff = (uint16_t *)heap_caps_malloc(line_size*lines*sizeof(color_t), MALLOC_CAP_DMA) ;
+        for(int i=0;i<line_size*lines;i++) {
+            buff[i] = color ;
         }
 
         drawRect(x1, y1, x2, y2, (uint16_t*)buff) ;
 
         free(buff) ;
+    }
+
+    JSValue Display::pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display,that)
+        that->playing = false ;
+        return JS_UNDEFINED ;
+    }
+    JSValue Display::resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display,that)
+        that->playing = true ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Display::reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        return esp_lcd_panel_reset(that->handle) == ESP_OK? JS_TRUE: JS_FALSE ;
+    }
+    JSValue Display::init(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        esp_lcd_panel_reset(that->handle) ;
+        return esp_lcd_panel_init(that->handle) == ESP_OK? JS_TRUE: JS_FALSE ;
+    }
+    JSValue Display::off(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        return esp_lcd_panel_disp_on_off(that->handle,true) == ESP_OK? JS_TRUE: JS_FALSE ;
+    }
+    JSValue Display::on(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        return esp_lcd_panel_disp_on_off(that->handle,false) == ESP_OK? JS_TRUE: JS_FALSE ;
+    }
+
+    void Display::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,const color_t * pixels) {
+        if(!playing) {
+            return ;
+        }
+        if(!handle) {
+            return;
+        }
+        esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
+    }
+
+    JSValue Display::setOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        ARGV_TO_INT16_OPT(0, x, 0)
+        ARGV_TO_INT16_OPT(1, y, 0)
+        CALL_IDF_API( esp_lcd_panel_set_gap(that->handle, x, y), "esp_lcd_panel_set_gap() failed" )
+        return JS_UNDEFINED ;
+    }
+    JSValue Display::mirror(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        bool x = false ;
+        bool y = false ;
+        if(argc>0) {
+            x = JS_ToBool(ctx, argv[0]) ;
+        }
+        if(argc>1) {
+            y = JS_ToBool(ctx, argv[1]) ;
+        }
+        CALL_IDF_API( esp_lcd_panel_mirror(that->handle, x, y), "esp_lcd_panel_mirror() failed" )
+        return JS_UNDEFINED ;
+    }
+    JSValue Display::swapXY(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        bool swap = true ;
+        if(argc>0) {
+            swap = JS_ToBool(ctx, argv[0]) ;
+        }
+        CALL_IDF_API( esp_lcd_panel_swap_xy(that->handle, swap), "esp_lcd_panel_swap_xy() failed" )
+        return JS_UNDEFINED ;
+    }
+    JSValue Display::invertColor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Display, that)
+        CHECK_HANDLE
+        bool invert = true ;
+        if(argc>0) {
+            invert = JS_ToBool(ctx, argv[0]) ;
+        }
+        CALL_IDF_API( esp_lcd_panel_invert_color(that->handle, invert), "esp_lcd_panel_invert_color() failed" )
+        return JS_UNDEFINED ;
     }
 }
