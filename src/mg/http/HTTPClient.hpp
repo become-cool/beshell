@@ -14,6 +14,7 @@ namespace be::mg {
         JSValue callback ;
         uint16_t poll_times = 0 ;
         bool is_ws = false ;
+        bool is_tls = false ;
 
         static void eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fnd) ;
         static void wsEventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fnd) ;

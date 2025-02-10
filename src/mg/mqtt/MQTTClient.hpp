@@ -28,7 +28,7 @@ namespace be::mg{
         struct mg_connection * conn ;
         JSValue callback ;
         uint16_t poll_times = 0 ;
-        bool is_ws = false ;
+        bool is_tls = false ;
 
         MQTTClient(JSContext * ctx, struct mg_connection * conn, JSValue callback) ;
         ~MQTTClient() ;
