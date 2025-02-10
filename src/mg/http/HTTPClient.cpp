@@ -31,6 +31,7 @@ namespace be::mg {
             }
         }
         JS_FreeValue(ctx, callback) ;
+        callback = JS_NULL ;
     }
     
     void Client::setConn(struct mg_connection * conn){
@@ -140,17 +141,11 @@ namespace be::mg {
     //   MG_EV_USER,        // Starting ID for user events
     // };
     void Client::eventHandler(struct mg_connection * conn, int ev, void * ev_data, void *fnd) {
+        if(!conn->fn_data || !fnd || conn->fn_data!=fnd) {
+            return ;
+        }
         Client * client = (Client *)fnd ;
         switch(ev) {
-            case MG_EV_POLL:
-                if(++client->poll_times > 15000 ){
-                    JSValue eventName = JS_NewString(client->ctx, "open") ;
-                    JS_CALL_ARG1(client->ctx, client->callback, eventName)
-                    JS_FreeValue(client->ctx, eventName) ;
-
-                    conn->is_closing = 1 ;
-                }
-                break ;
 
             // 大文件下载时会分批触发 MG_EV_HTTP_CHUNK , 只到下载完 最后触发一个 hm->chunk.len 为 0 的 MG_EV_HTTP_MSG 事件
             case MG_EV_HTTP_CHUNK:
@@ -160,6 +155,7 @@ namespace be::mg {
                 if(!client || !client->ctx) {
                     break ;
                 }
+                client->poll_times = 0 ;
 
                 struct mg_http_message *hm = (struct mg_http_message *) ev_data;
                 HTTPRequest * req = new HTTPRequest(client->ctx, hm) ;
@@ -175,17 +171,22 @@ namespace be::mg {
                 break ;
             }
 
-            case MG_EV_CLOSE :
-
+            case MG_EV_CLOSE : {
+            
+                JSValue evname = JS_NewString(client->ctx, "close") ;
+                JS_CALL_ARG1(client->ctx, client->callback, evname)
+                JS_FreeValue(client->ctx, evname) ;
+                
                 // moogose https 协议，会在 close 事件以后触发 msg 事件
                 if(conn->fn_data==client) {
                     conn->fn_data = NULL ;
-                }
 
-                delete client ;
-                client = NULL ;
-                fnd = NULL ;
+                    delete client ;
+                    client = NULL ;
+                    fnd = NULL ;
+                }
                 break ;
+            }
 
             case MG_EV_ERROR:
                 if(ev_data) {
@@ -197,13 +198,13 @@ namespace be::mg {
                     break ;
                 }
 
-            default:
-                    JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
-                    JS_CALL_ARG1(client->ctx, client->callback, evname)
-                    JS_FreeValue(client->ctx, evname) ;
+            default: {
+                JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                JS_CALL_ARG1(client->ctx, client->callback, evname)
+                JS_FreeValue(client->ctx, evname) ;
                 break ;
+            }
         }
-
     }
     
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -216,15 +217,22 @@ namespace be::mg {
 
         Client * client = new Client(ctx, nullptr, argv[1]) ;
         struct mg_connection * conn = NULL ;
-
-        if ( strncmp(url,"http://", urlLen)==0 || strncmp(url,"https://", urlLen)==0 ) {
+        if ( strncmp(url,"http://", 7)==0 || strncmp(url,"https://", 8)==0 ) {
             conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
             client->is_ws = false ;
+
+            if(url[4]=='s') {
+                client->is_tls = true ;
+            }
         }
 
-        else if( strncmp(url,"ws://", urlLen)==0 || strncmp(url,"wss://", urlLen)==0 ) {
+        else if( strncmp(url,"ws://", 5)==0 || strncmp(url,"wss://", 6)==0 ) {
             conn = mg_ws_connect(&Mg::mgr, url, Client::wsEventHandler, client, NULL) ;
             client->is_ws = true ;
+            
+            if(url[2]=='s') {
+                client->is_tls = true ;
+            }
         }
 
         else {
