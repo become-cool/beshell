@@ -64,12 +64,6 @@ namespace be::driver::disp {
     DEFINE_NCLASS_META(RGB565, Display)
     std::vector<JSCFunctionListEntry> RGB565::methods = {
         JS_CFUNC_DEF("setup", 0, RGB565::setup),
-        JS_CFUNC_DEF("reset", 0, RGB565::reset),
-        JS_CFUNC_DEF("init", 0, RGB565::init),
-        JS_CFUNC_DEF("pause", 0, RGB565::pause),
-        JS_CFUNC_DEF("resume", 0, RGB565::resume),
-        JS_CFUNC_DEF("off", 0, RGB565::off),
-        JS_CFUNC_DEF("on", 0, RGB565::on),
     } ;
 
     RGB565::RGB565(JSContext * ctx, JSValue _jsobj, uint16_t width, uint16_t height)
@@ -188,49 +182,10 @@ namespace be::driver::disp {
         return JS_UNDEFINED ;
     }
 
-    void RGB565::drawRect(coord_t x1,coord_t y1,coord_t x2,coord_t y2,const color_t * pixels) {
-        
-        if(!playing) {
-            return ;
-        }
-        assert(handle) ;
-        // xSemaphoreGive(sem_gui_ready);
-        // xSemaphoreTake(sem_vsync_end, portMAX_DELAY);
-        esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
-    }
-
     bool RGB565::createBuff() {
         _buffSize = _width*_height*sizeof(color_t) ;
         ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(handle, 2, &_buff1, &_buff2));
         return true ;
-    }
-    JSValue RGB565::reset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        return esp_lcd_panel_reset(that->handle) == ESP_OK? JS_TRUE: JS_FALSE ;
-    }
-    JSValue RGB565::init(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        esp_lcd_panel_reset(that->handle) ;
-        return esp_lcd_panel_init(that->handle) == ESP_OK? JS_TRUE: JS_FALSE ;
-    }
-
-    JSValue RGB565::pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        that->playing = false ;
-        return JS_UNDEFINED ;
-    }
-    JSValue RGB565::resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        that->playing = true ;
-        return JS_UNDEFINED ;
-    }
-    JSValue RGB565::off(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        return esp_lcd_panel_disp_on_off(that->handle,true) == ESP_OK? JS_TRUE: JS_FALSE ;
-    }
-    JSValue RGB565::on(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(RGB565,that)
-        return esp_lcd_panel_disp_on_off(that->handle,false) == ESP_OK? JS_TRUE: JS_FALSE ;
     }
     
 }

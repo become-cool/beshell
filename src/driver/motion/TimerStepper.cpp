@@ -331,14 +331,14 @@ namespace be::driver::motion {
             .pull_down_en = GPIO_PULLDOWN_DISABLE,
             .intr_type = GPIO_INTR_DISABLE,
         };
-        CALL_IDF_API( gpio_config(&cfg) )
+        CALL_IDF_API( gpio_config(&cfg), "gpio_config() failed" )
 
         if(stepper->io_dir>-1) {
             cfg.pin_bit_mask = (1ULL<<stepper->io_dir) ;
             cfg.mode = GPIO_MODE_OUTPUT ;
             cfg.pull_up_en = GPIO_PULLUP_DISABLE ;
             cfg.pull_down_en = GPIO_PULLDOWN_DISABLE ;
-            CALL_IDF_API( gpio_config(&cfg) ) ;
+            CALL_IDF_API( gpio_config(&cfg), "gpio_config() failed" ) ;
             cfg.intr_type = GPIO_INTR_DISABLE ;
         }
 
@@ -347,7 +347,7 @@ namespace be::driver::motion {
             .arg = stepper ,
             .name = "timer-stepper"
         };
-        CALL_IDF_API( esp_timer_create(&timer_args, &(stepper->timer)) )
+        CALL_IDF_API( esp_timer_create(&timer_args, &(stepper->timer)), "esp_timer_create() failed" )
 
         return JS_UNDEFINED ;
     }
@@ -385,7 +385,7 @@ namespace be::driver::motion {
     JSValue TimerStepper::run() {
 
         if(io_dir>-1) {
-            CALL_IDF_API( gpio_set_level(io_dir, run_dir) )
+            CALL_IDF_API( gpio_set_level(io_dir, run_dir), "gpio_set_level() failed" )
         }
 
         _freq = 0 ;
@@ -444,7 +444,7 @@ namespace be::driver::motion {
         // dn(use_accel)
 
         level = 0 ;
-        CALL_IDF_API( esp_timer_start_periodic(timer, period) )
+        CALL_IDF_API( esp_timer_start_periodic(timer, period), "esp_timer_start_periodic() failed" )
 
         is_running = true ;
 
