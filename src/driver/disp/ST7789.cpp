@@ -37,8 +37,10 @@ namespace be::driver::disp {
         spi_host_device_t GET_INT_PROP(argv[0], "spi", spi, spi_host_device_t, )
         GET_UINT16_PROP(argv[0], "width", that->_width, )
         GET_UINT16_PROP(argv[0], "height", that->_height, )
-        unsigned int GET_UINT32_PROP_OPT(argv[0], "pclk_hz", pclk_hz, 10*1000*1000)
-        int GET_INT32_PROP_OPT(argv[0], "spi_mode", spi_mode, 0)
+        unsigned int GET_UINT32_PROP_OPT(argv[0], "pclk", pclk, 10*1000*1000)
+        int GET_INT32_PROP_OPT(argv[0], "spiMode", spiMode, 0)
+        lcd_rgb_element_order_t GET_INT_PROP_OPT(argv[0], "rgbOrder", rgbOrder, lcd_rgb_element_order_t, LCD_RGB_ELEMENT_ORDER_RGB)
+        lcd_rgb_data_endian_t GET_INT_PROP_OPT(argv[0], "endian", endian, lcd_rgb_data_endian_t, LCD_RGB_DATA_ENDIAN_LITTLE)
         
         gpio_num_t GET_GPIO_PROP(argv[0], "dc", dc, ) ;
         gpio_num_t GET_GPIO_PROP(argv[0], "cs", cs, ) ;
@@ -48,8 +50,8 @@ namespace be::driver::disp {
         esp_lcd_panel_io_spi_config_t io_config = {
             .cs_gpio_num = cs,
             .dc_gpio_num = dc,
-            .spi_mode = spi_mode,
-            .pclk_hz = pclk_hz,
+            .spi_mode = spiMode,
+            .pclk_hz = pclk,
             .trans_queue_depth = 10,
             .lcd_cmd_bits = 8,
             .lcd_param_bits = 8,
@@ -60,10 +62,10 @@ namespace be::driver::disp {
         CALL_IDF_API(esp_lcd_new_panel_io_spi(spi, &io_config, &io_handle), "create panel io failed")
 
         // 创建ST7789面板
-        
         const esp_lcd_panel_dev_config_t panel_config = {
             .reset_gpio_num = res,
-            .color_space = ESP_LCD_COLOR_SPACE_BGR,
+            .rgb_ele_order = (lcd_rgb_element_order_t)rgbOrder,
+            .data_endian = endian,
             .bits_per_pixel = 16,
         };
         
@@ -72,7 +74,6 @@ namespace be::driver::disp {
         // 初始化LCD面板
         CALL_IDF_API(esp_lcd_panel_reset(that->handle), "reset panel failed")
         CALL_IDF_API(esp_lcd_panel_init(that->handle),"init panel failed")
-        CALL_IDF_API(esp_lcd_panel_invert_color(that->handle, true), "invert color failed")
         CALL_IDF_API(esp_lcd_panel_disp_on_off(that->handle, true), "display on failed")
 
         if( JS_IsException(Display::setup(ctx, this_val, argc, argv)) ) {

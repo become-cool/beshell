@@ -13,6 +13,7 @@ namespace be::lv {
     } disp_drv_opa_t ;
 
     void disp_flush_cb(lv_display_t * lvdisp, const lv_area_t * area, unsigned char * color_p) {
+        // dn4(area->x1, area->y1, area->x2, area->y2)
         disp_drv_opa_t* opa = (disp_drv_opa_t*)lv_display_get_driver_data(lvdisp) ;
         if(opa) {
             ((Display*)(opa->display.get()))->drawRect(area->x1,area->y1,area->x2,area->y2, (color_t*)color_p) ;
@@ -36,13 +37,13 @@ namespace be::lv {
             JSTHROW("This display has already been registered to lvgl.")
         }
         
-        lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL ;
+        lv_display_render_mode_t renderMode = LV_DISPLAY_RENDER_MODE_PARTIAL ;
         if(argc>1) {
-            GET_UINT_PROP_OPT(argv[1], "render_mode", render_mode, lv_display_render_mode_t, LV_DISPLAY_RENDER_MODE_PARTIAL )
+            GET_UINT_PROP_OPT(argv[1], "renderMode", renderMode, lv_display_render_mode_t, LV_DISPLAY_RENDER_MODE_PARTIAL )
         }
-        if( render_mode!=LV_DISPLAY_RENDER_MODE_PARTIAL
-            && render_mode!=LV_DISPLAY_RENDER_MODE_FULL
-            && render_mode!=LV_DISPLAY_RENDER_MODE_DIRECT
+        if( renderMode!=LV_DISPLAY_RENDER_MODE_PARTIAL
+            && renderMode!=LV_DISPLAY_RENDER_MODE_FULL
+            && renderMode!=LV_DISPLAY_RENDER_MODE_DIRECT
         ) {
             JSTHROW("Invalid render mode.")
         }
@@ -55,7 +56,7 @@ namespace be::lv {
             JSTHROW("Failed to create buffer for display.")
         }
 
-        lv_display_set_buffers(lvdisp, display->buff1(), display->buff2(), display->buffSize(), render_mode);
+        lv_display_set_buffers(lvdisp, display->buff1(), display->buff2(), display->buffSize(), renderMode);
 
         lv_display_set_antialiasing(lvdisp, true) ;
 

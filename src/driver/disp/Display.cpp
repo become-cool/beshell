@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <algorithm>
 #include "Display.hpp"
@@ -76,6 +77,7 @@ namespace be::driver::disp {
 
         std::fill_n(buff, size, color);
 
+        dn4(x1,y1,x2,y2)
         that->drawRect(x1,y1,x2,y2,buff) ;
 
         delete[] buff ;
@@ -107,10 +109,11 @@ namespace be::driver::disp {
 
         THIS_NCLASS(Display,that)
         ASSERT_ARGC(1)
+        CHECK_HANDLE
 
-        int16_t GET_INT16_PROP_OPT(argv[0], "ox", ox, 0)
-        int16_t GET_INT16_PROP_OPT(argv[0], "oy", oy, 0)
-        CALL_IDF_API( esp_lcd_panel_set_gap(that->handle, ox, oy), "esp_lcd_panel_set_gap() failed" )
+        int16_t GET_INT16_PROP_OPT(argv[0], "offsetX", offsetX, 0)
+        int16_t GET_INT16_PROP_OPT(argv[0], "offsetY", offsetY, 0)
+        CALL_IDF_API( esp_lcd_panel_set_gap(that->handle, offsetX, offsetY), "esp_lcd_panel_set_gap() failed" )
 
         bool GET_BOOL_PROP_OPT(argv[0], "swapXY", swapXY, false)
         CALL_IDF_API( esp_lcd_panel_swap_xy(that->handle, swapXY), "esp_lcd_panel_swap_xy() failed" )
@@ -121,12 +124,12 @@ namespace be::driver::disp {
         bool GET_BOOL_PROP_OPT(argv[0], "mirrorX", mirrorX, false)
         bool GET_BOOL_PROP_OPT(argv[0], "mirrorY", mirrorY, false)
         CALL_IDF_API( esp_lcd_panel_mirror(that->handle, mirrorX, mirrorY), "esp_lcd_panel_mirror() failed" )
-        
+
         return JS_UNDEFINED ;
     }
 
     bool Display::createBuff() {
-        _buffSize = sizeof(color_t) * _width * (_height+5)/10;
+        _buffSize = sizeof(color_t) * _width * 20;
         if(!this->_buff1) {
             this->_buff1 = heap_caps_malloc(_buffSize, MALLOC_CAP_SPIRAM);  // MALLOC_CAP_SPIRAM
             if(!this->_buff1) {
@@ -204,11 +207,15 @@ namespace be::driver::disp {
         uint16_t lines = y2-y1;
 
         uint16_t * buff = (uint16_t *)heap_caps_malloc(line_size*lines*sizeof(color_t), MALLOC_CAP_DMA) ;
+        if(!buff) {
+            buff = (uint16_t*) malloc(line_size*lines*sizeof(color_t)) ;
+        }
+
         for(int i=0;i<line_size*lines;i++) {
             buff[i] = color ;
         }
 
-        drawRect(x1, y1, x2, y2, (uint16_t*)buff) ;
+        drawRect(x1, y1, x2+1, y2+1, (uint16_t*)buff) ;
 
         free(buff) ;
     }
@@ -253,7 +260,7 @@ namespace be::driver::disp {
         if(!handle) {
             return;
         }
-        esp_lcd_panel_draw_bitmap(handle, x1, y1, x2, y2, pixels);
+        esp_lcd_panel_draw_bitmap(handle, x1, y1, x2+1, y2+1, pixels);
     }
 
     JSValue Display::setOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
