@@ -16,6 +16,7 @@ namespace be::driver::disp {
 
     DEFINE_NCLASS_META(Display, NativeClass)
     std::vector<JSCFunctionListEntry> Display::methods = {
+        JS_CFUNC_DEF("setup", 0, Display::setup),
         JS_CFUNC_DEF("drawRect", 0, Display::drawRect),
         JS_CFUNC_DEF("fillRect", 0, Display::fillRect),
         JS_CFUNC_DEF("reset", 0, Display::reset),
@@ -99,6 +100,28 @@ namespace be::driver::disp {
     }
 
     JSValue Display::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
+    }
+    
+    JSValue Display::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        THIS_NCLASS(Display,that)
+        ASSERT_ARGC(1)
+
+        int16_t GET_INT16_PROP_OPT(argv[0], "ox", ox, 0)
+        int16_t GET_INT16_PROP_OPT(argv[0], "oy", oy, 0)
+        CALL_IDF_API( esp_lcd_panel_set_gap(that->handle, ox, oy), "esp_lcd_panel_set_gap() failed" )
+
+        bool GET_BOOL_PROP_OPT(argv[0], "swapXY", swapXY, false)
+        CALL_IDF_API( esp_lcd_panel_swap_xy(that->handle, swapXY), "esp_lcd_panel_swap_xy() failed" )
+
+        bool GET_BOOL_PROP_OPT(argv[0], "invertColor", invertColor, false)
+        CALL_IDF_API( esp_lcd_panel_invert_color(that->handle, invertColor), "esp_lcd_panel_invert_color() failed" )
+
+        bool GET_BOOL_PROP_OPT(argv[0], "mirrorX", mirrorX, false)
+        bool GET_BOOL_PROP_OPT(argv[0], "mirrorY", mirrorY, false)
+        CALL_IDF_API( esp_lcd_panel_mirror(that->handle, mirrorX, mirrorY), "esp_lcd_panel_mirror() failed" )
+        
         return JS_UNDEFINED ;
     }
 

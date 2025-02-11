@@ -23,6 +23,7 @@ namespace be::driver::disp {
         size_t buffSize() const ;
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue drawRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue fillRect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
