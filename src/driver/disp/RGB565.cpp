@@ -179,6 +179,10 @@ namespace be::driver::disp {
             JSTHROW("init panel failed, err=%d", res)
         }
         
+        if( JS_IsException(Display::setup(ctx, this_val, argc, argv)) ) {
+            return JS_EXCEPTION ;
+        }
+
         return JS_UNDEFINED ;
     }
 

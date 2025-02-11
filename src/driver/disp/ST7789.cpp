@@ -75,6 +75,10 @@ namespace be::driver::disp {
         CALL_IDF_API(esp_lcd_panel_invert_color(that->handle, true), "invert color failed")
         CALL_IDF_API(esp_lcd_panel_disp_on_off(that->handle, true), "display on failed")
 
+        if( JS_IsException(Display::setup(ctx, this_val, argc, argv)) ) {
+            return JS_EXCEPTION ;
+        }
+
         return JS_UNDEFINED ;
     }
 
