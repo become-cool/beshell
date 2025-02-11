@@ -55,9 +55,6 @@ namespace be::driver::disp {
             .lcd_param_bits = 8,
         };
 
-        dn(io_config.pclk_hz)
-        dn(io_config.spi_mode)
-
         esp_lcd_panel_io_handle_t io_handle = NULL;
         esp_err_t err ;
         CALL_IDF_API(esp_lcd_new_panel_io_spi(spi, &io_config, &io_handle), "create panel io failed")
