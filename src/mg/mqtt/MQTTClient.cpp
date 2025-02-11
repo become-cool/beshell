@@ -106,7 +106,7 @@ namespace be::mg {
                 emitCallback("open", {}) ;
                 break;
             case MG_EV_CONNECT:
-                if (is_ws) {
+                if (is_tls) {
                     struct mg_tls_opts opts ;
                     memset(& opts, 0, sizeof(struct mg_tls_opts)) ;
                     mg_tls_init(conn, &opts);
@@ -225,9 +225,6 @@ namespace be::mg {
 
         std::string ARGV_TO_STRING(0, ctopic)
         ARGV_TO_UINT8_OPT(1, qos, 1)
-        
-        ds(ctopic.c_str())
-        dn(qos)
 
         struct mg_str topic = mg_str(ctopic.c_str()) ;
         mg_mqtt_sub(that->conn, &topic, qos) ;
