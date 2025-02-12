@@ -156,11 +156,12 @@ class Characteristic extends EventEmitter {
       this.emit("subscribe", status, offset)
     })
   }
-  write(data) {
-    bt.write(this.connid, this.handle, data)
+  write(data,rsp) {
+    bt.write(this.connid, this.handle, data, !!rsp)
     return new Promise((resolve, reject) => {
       this.once("write-char", (status, offset) => {
         if (status) {
+          console.log("write failed with error: " + status)
           reject(new Error("write failed with error: " + status))
         } else {
           resolve()
@@ -236,6 +237,30 @@ function parseAdv(raw) {
   return adv
 }
 
+function waitScanning(ms) {
+  if(!ms) ms  = 10000
+  let timeout = false
+  return new Promise((resolve,reject)=>{
+    if(!bt.isScanning()) {
+      resolve()
+      return
+    }
+    let timer = setTimeout(()=>{
+      reject("timeout")
+      clearTimeout(timer)
+      timer = -1
+    },ms)
+    bt.once("scan-cmpl",()=>{
+      if(!timeout) {
+        resolve()
+        clearTimeout(timer)
+        timer = -1
+      }
+    })
+  })
+}
+
 export const central = new Central
 exportValue(bt,"central",central)
 exportValue(bt,"parseAdv",parseAdv)
+exportValue(bt,"waitScanning",waitScanning)

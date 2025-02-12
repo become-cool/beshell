@@ -37,7 +37,8 @@ namespace be{
         static JSValue startScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stopScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setScanParam(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue isScaning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue waitScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
