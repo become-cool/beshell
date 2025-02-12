@@ -8,7 +8,8 @@ function request(url, handle) {
   let t = Date.now()
   let reason=null
   return new Promise((resolve, reject) => {
-    let conn = mg.connect(url, (event, data) => {
+    let conn 
+    conn = mg.connect(url, (event, data) => {
       switch (event) {
         case 'poll':
           let n = Date.now()
@@ -42,8 +43,11 @@ function request(url, handle) {
         case 'error':
           reject(reason||event)
           break
+        case 'http.msg':
+        case 'http.chunk':
+          t = Date.now() // 不需要break
         default:
-          handle(conn,event,data,resolve,reject)
+          handle(conn,event,data,resolve,reject,reason)
           break
       }
     })
@@ -62,12 +66,15 @@ function get(url) {
 async function download(url, localPath, progress_cb) {
   let fhandle = fs.open(localPath, "w")
   let wroten = 0
+  let done = false
+  let total = 0
   try{
-    await request(url, (conn,event,msg,resolve,reject)=>{
+    await request(url, (conn,event,msg,resolve,reject,reason)=>{
       if(event=='http.msg'||event=='http.chunk'){
 
+        total = msg.bodyLength()
+
         let data = (event == 'http.msg') ? msg.body() : msg.chunk()
-        // let n = data.byteLength - wroten
         let chunk = data.slice(wroten, data.byteLength)
 
         fs.write(fhandle, chunk)
@@ -79,6 +86,13 @@ async function download(url, localPath, progress_cb) {
           fs.close(fhandle)
           fhandle = 0
           resolve()
+          done = true
+        }
+      }
+      else if (event=='close'){
+        if(!done) {
+          done = true
+          reject("the connection was unexpectedly disconnected.")
         }
       }
     })
@@ -89,59 +103,4 @@ async function download(url, localPath, progress_cb) {
     }
     throw e
   }
-}
-
-function download2(url, localPath, progress_cb) {
-
-  let fhandle = fs.open(localPath, "w")
-  let wroten = 0
-
-  let t = Date.now()
-  let reason=undefined
-  return new Promise((resolve, reject) => {
-    let conn = mg.connect(url, (event, msg) => {
-      switch (event) {
-        case 'poll':
-          let n = Date.now()
-          let s = n - t
-          if(s>4320000000) { //50年，可能修改了系统时间
-            t=n
-            s=0
-          }
-          else if(s>15000) {
-            // console.log("timeout")
-            conn.close()
-            reason = 'timeout'
-          }
-          break
-        case 'connect':
-          connect(conn,url)
-          break
-        case 'http.msg':
-        case 'http.chunk':
-          t = Date.now()
-
-          let data = (event == 'http.msg') ? msg.body() : msg.chunk()
-          // let n = data.byteLength - wroten
-          let chunk = data.slice(wroten, data.byteLength)
-
-          fs.write(fhandle, chunk)
-          wroten += chunk.byteLength
-
-          progress_cb && progress_cb(msg.bodyLength(), wroten)
-
-          if (wroten == msg.bodyLength()) {
-            fs.close(fhandle)
-            resolve()
-          }
-
-          break
-        case 'timeout':
-        case 'error':
-          fs.close(fhandle)
-          reject(reason||event)
-          break
-      }
-    })
-  })
 }
