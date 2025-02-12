@@ -38,7 +38,7 @@ namespace be{
         EXPORT_FUNCTION(setScanParam)
         EXPORT_FUNCTION(startScan)
         EXPORT_FUNCTION(stopScan)
-        EXPORT_FUNCTION(isScaning)
+        EXPORT_FUNCTION(isScanning)
         EXPORT_FUNCTION(setMTU)
         EXPORT_FUNCTION(requestMTU)
         EXPORT_FUNCTION(connect)
@@ -51,8 +51,9 @@ namespace be{
         exportName("central") ;
         exportName("peripheral") ;
         exportName("parseAdv") ;
+        exportName("waitScanning") ;
         
-        enableNativeEvent(ctx, sizeof(struct be_bt_event), 10) ;
+        enableNativeEvent(ctx, sizeof(struct be_bt_event), 128) ;
     }
 
     void BT::use(be::BeShell * beshell) {
@@ -122,7 +123,9 @@ namespace be{
                 .gattc_if = 0,
                 .gap = *param ,
             } ;
-            BT::singleton->emitNativeEvent(&event_msg) ;
+            if( !BT::singleton->emitNativeEvent(&event_msg) ){
+                printf("bt queue full (ev:%d)\n", event) ;
+            }
         }
     }
 
@@ -136,6 +139,13 @@ namespace be{
             gattc_if_global = gattc_if ;
             break;
 
+        case ESP_GATTC_WRITE_CHAR_EVT: 
+            // printf("ESP_GATTC_WRITE_CHAR_EVT\n") ;
+            break;
+        case ESP_GATTC_WRITE_DESCR_EVT: 
+            // printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
+            break;
+
         default:
             break;
         }
@@ -146,7 +156,9 @@ namespace be{
                 .gattc_if = gattc_if,
                 .gatt = *param ,
             } ;
-            BT::singleton->emitNativeEvent(&event_msg) ;
+            if( !BT::singleton->emitNativeEvent(&event_msg) ){
+                printf("bt queue full\n") ;
+            }
         }
     }
 
@@ -262,7 +274,7 @@ namespace be{
                 break ;
 
             case ESP_GATTC_WRITE_CHAR_EVT: {
-                // printf("ESP_GATTC_WRITE_CHAR_EVT\n") ;
+                // printf("ESP_GATTC_WRITE_CHAR_EVT2\n") ;
                 emitSyncFree("write-char", {
                     JS_NewInt32(ctx, msg->gatt.write.status) ,
                     JS_NewInt32(ctx, msg->gatt.write.handle) ,
@@ -271,7 +283,7 @@ namespace be{
                 break;
             }
             case ESP_GATTC_WRITE_DESCR_EVT: {
-                // printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
+                printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
                 emitSyncFree("write-desc", {
                     JS_NewInt32(ctx, msg->gatt.write.status) ,
                     JS_NewInt32(ctx, msg->gatt.write.handle) ,
@@ -501,7 +513,7 @@ namespace be{
 
         ARGV_TO_UINT32_OPT(0,dur,UINT32_MAX)
 
-        esp_err_t ret = esp_ble_gap_start_scanning(5) ;
+        esp_err_t ret = esp_ble_gap_start_scanning(dur) ;
         if (ret != ESP_OK) {
             JSTHROW("Failed to start scanning: %s", esp_err_to_name(ret));
         }
@@ -521,7 +533,7 @@ namespace be{
         JSTHROW("BLE 4.2 is not supported") ;
 #endif
     }
-    JSValue BT::isScaning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue BT::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return bScanning? JS_TRUE: JS_FALSE ;
     }
 
@@ -604,7 +616,16 @@ namespace be{
             JSTHROW("argv is not a valid ArrayBuffer")
         }
 
-        esp_err_t err = esp_ble_gattc_write_char( gattc_if_global, conn_id, handle, size, buff, ESP_GATT_WRITE_TYPE_NO_RSP, ESP_GATT_AUTH_REQ_NONE);
+        bool rsp = false ;
+        if(argc>3) {
+            rsp = JS_ToBool(ctx, argv[3]) ;
+        }
+
+        esp_err_t err = esp_ble_gattc_write_char(
+            gattc_if_global, conn_id, handle, size, buff ,
+            ( rsp? ESP_GATT_WRITE_TYPE_RSP: ESP_GATT_WRITE_TYPE_NO_RSP ) ,
+            ESP_GATT_AUTH_REQ_NONE
+        ) ;
         if (err != ESP_OK) {
             JSTHROW("esp_ble_gattc_write_char() failed, error = %x")
         }
