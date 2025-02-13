@@ -99,14 +99,18 @@ function load(deviceConf) {
           console.error("unknown lv type", devConf.lv.type)
         }
       }
+      let id = 0
       if (!devId[driverClass.name]) {
         devId[driverClass.name] = 0
       } else {
-        devId[driverClass.name]++
+        id = devId[driverClass.name]++
       }
-      let varname = driverClass.name.toLowerCase() + "_" + devId[driverClass.name]
-      dt.device[varname] = dev
-      if (devConf.name) {
+      let varname = driverClass.name.toLowerCase()
+      if(id==0) {
+        dt.device[varname] = dev
+      }
+      dt.device[varname][id] = dev
+      if (devConf.name && !dt.device[devConf.name]) {
         dt.device[devConf.name] = dev
       }
     } catch (e) {
