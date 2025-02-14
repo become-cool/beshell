@@ -12,6 +12,7 @@ Added:
 * NativeClass::emitSyncFree()
 * spi eth ic driver W5500
 * lcd ic driver ST7789
+* adc driver CS1237
 
 Fixed:
 
