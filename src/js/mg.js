@@ -4,25 +4,40 @@ import * as mg from "mg"
 ;[get, download].map(func => exportValue(mg, func.name, func))
 
 
+function WatchDog (ms, timeoutCb){
+  let timer = -1
+  function tick() {
+    if(timer>-1) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(()=>{
+      timer = -1
+      if(timer>-1) {
+        clearTimeout()
+      }
+      timeoutCb()
+    },ms)
+  }
+  tick.stop = ()=>{
+    if(timer>-1) {
+      clearTimeout(timer)
+    }
+    timer = -1
+  }
+  tick()
+  return tick
+}
+
 function request(url, handle) {
-  let t = Date.now()
   let reason=null
   return new Promise((resolve, reject) => {
-    let conn 
+    let conn = null
+    let timeTick = WatchDog(3000,()=>{
+      conn && conn.close()
+      reason = "timeout"
+    })
     conn = mg.connect(url, (event, data) => {
       switch (event) {
-        case 'poll':
-          let n = Date.now()
-          let s = n - t
-          if(s>4320000000) { //50年，可能修改了系统时间
-            t=n
-            s=0
-          }
-          else if(s>15000) {
-            conn.close()
-            reason = 'timeout'
-          }
-          break
         case 'connect':
           
           let info = mg.parseUrl(url)
@@ -43,9 +58,12 @@ function request(url, handle) {
         case 'error':
           reject(reason||event)
           break
+        case 'close':
+          tick.stop()
+          break
         case 'http.msg':
         case 'http.chunk':
-          t = Date.now() // 不需要break
+          timeTick()
         default:
           handle(conn,event,data,resolve,reject,reason)
           break
