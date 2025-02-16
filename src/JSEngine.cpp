@@ -143,6 +143,10 @@ namespace be {
 
         JSEngineEvalEmbeded(ctx, json)
         
+
+        NativeClass::defineClass(ctx) ;
+        setGlobalValue(ctx, "NativeClass", JS_DupValue(ctx,NativeClass::getClass(ctx,NativeClass::classID)) ) ;
+
         EventEmitter::defineClass(ctx) ;
         setGlobalValue(ctx, "EventEmitter", JS_DupValue(ctx,NativeClass::getClass(ctx,EventEmitter::classID)) ) ;
 
@@ -154,15 +158,6 @@ namespace be {
         take() ;
 
         inLooping = true ;
-
-        timer.loop(ctx) ;
-        js_std_loop(ctx) ;
-
-        // 执行 loop 函数
-        // for (auto _pair = loopFunctions.rbegin(); _pair != loopFunctions.rend(); ++_pair) {
-        // // for (auto _pair : loopFunctions) {
-        //     (*_pair).first(ctx, (*_pair).second) ;
-        // }
         
         for(struct Looping& looping : lstLoopings) {
             if(looping.priorityCount) {
@@ -182,24 +177,35 @@ namespace be {
                 }
             }
         }
+
+        timer.loop(ctx) ;
+        
+        js_std_loop(ctx) ;
+
+        // gc
+        static int gc_count = 0 ;
+        while(gc_count++>100) {
+            gc_count = 0 ;
+            JS_RunGC(JS_GetRuntime(ctx)) ;
+        }
         
         inLooping = false ;
 
         // 执行添加/移除 loopable 对象的异步操作请求
-        for(auto op : waitingLoopingOps) {
-            if(op.op==LOOPING_ADD) {
-                if( op.target.add.looping.type==LOOPTYPE_FUNC ) {
-                    addLoopFunction(op.target.add.looping.exec.func.function, op.target.add.looping.exec.func.opaque, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
-                }
-                else if( op.target.add.looping.type==LOOPTYPE_OBJ ) {
-                    addLoopObject(op.target.add.looping.exec.obj, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
-                }
-            }
-            else if(op.op==LOOPING_REMOVE) {
-                removeLooping(op.target.remove) ;
-            }
-        }
-        waitingLoopingOps.clear() ;
+        // for(auto op : waitingLoopingOps) {
+        //     if(op.op==LOOPING_ADD) {
+        //         if( op.target.add.looping.type==LOOPTYPE_FUNC ) {
+        //             addLoopFunction(op.target.add.looping.exec.func.function, op.target.add.looping.exec.func.opaque, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+        //         }
+        //         else if( op.target.add.looping.type==LOOPTYPE_OBJ ) {
+        //             addLoopObject(op.target.add.looping.exec.obj, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+        //         }
+        //     }
+        //     else if(op.op==LOOPING_REMOVE) {
+        //         removeLooping(op.target.remove) ;
+        //     }
+        // }
+        // waitingLoopingOps.clear() ;
 
         give() ;
     }
@@ -347,13 +353,13 @@ namespace be {
         } ;
 
         
-        if(inLooping) {
-            waitingLoopingOps.push_back({
-                .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
-            }) ;
-        } else {
+        // if(inLooping) {
+        //     waitingLoopingOps.push_back({
+        //         .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
+        //     }) ;
+        // } else {
             lstLoopings.push_back(looping) ;
-        }
+        // }
 
         return looping.id ;
     }
@@ -377,13 +383,13 @@ namespace be {
             0
         } ;
         
-        if(inLooping) {
-            waitingLoopingOps.push_back({
-                .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
-            }) ;
-        } else {
+        // if(inLooping) {
+        //     waitingLoopingOps.push_back({
+        //         .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
+        //     }) ;
+        // } else {
             lstLoopings.push_back(looping) ;
-        }
+        // }
 
         return looping.id ;
     }
@@ -393,19 +399,19 @@ namespace be {
             return ;
         }
 
-        if(inLooping) {
-            waitingLoopingOps.push_back({
-                .op=LOOPING_REMOVE, .target={ .remove=(uint16_t)id }
-            }) ;
-        }
-        else {
+        // if(inLooping) {
+        //     waitingLoopingOps.push_back({
+        //         .op=LOOPING_REMOVE, .target={ .remove=(uint16_t)id }
+        //     }) ;
+        // }
+        // else {
             auto it = std::find_if(lstLoopings.begin(), lstLoopings.end(), [id](struct Looping& looping) {
                 return looping.id==id ;
             }) ;
             if(it!=lstLoopings.end()) {
                 lstLoopings.erase(it) ;
             }
-        }
+        // }
     }
     
     void JSEngine::removeLooping(EngineLoopFunction func, void * opaque) {
