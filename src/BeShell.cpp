@@ -104,8 +104,8 @@ namespace be {
         }
     }
 
-    void BeShell::main(const char * mainScriptPath) {
-        setup(mainScriptPath) ;
+    void BeShell::main(const char * mainScriptPath, bool ignoreCrash) {
+        setup(mainScriptPath, ignoreCrash) ;
         run() ;
     }
 }

@@ -40,7 +40,7 @@ namespace be {
             }
         }
         void run() ;
-        void main(const char * mainScriptPath=nullptr) ;
+        void main(const char * mainScriptPath=nullptr, bool ignoreCrash=false) ;
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
         
