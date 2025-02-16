@@ -7,6 +7,7 @@ namespace be {
     DEFINE_NCLASS_META_STATIC(EventEmitter)
     DEFINE_NCLASS_META_BUILD(EventEmitter)
 
+
     std::vector<JSCFunctionListEntry> EventEmitter::methods = {
         JS_CFUNC_DEF("eventAdded", 1, EventEmitter::eventAdded),
         JS_CFUNC_DEF("eventRemoved", 1, EventEmitter::eventRemoved),
@@ -191,12 +192,23 @@ namespace be {
         JSValue func_emit = js_get_prop(ctx, jsobj, 1, "emit") ;
         JSValue ret = JS_Call(ctx, func_emit, jsobj, arglen, jsargv) ;
         if(JS_IsException(ret)) {
-            js_std_dump_error(ctx) ;
+            JSEngine::fromJSContext(ctx)->dumpError() ;
         }
         JS_FreeValue(ctx, ret) ;
         JS_FreeValue(ctx, func_emit) ;
 
         delete[] jsargv ;
+    }
+    void EventEmitter::emitSync(const char * eventName) {
+        JSValue jsargv = JS_NewString(ctx, eventName) ;
+        JSValue func_emit = js_get_prop(ctx, jsobj, 1, "emit") ;
+        JSValue ret = JS_Call(ctx, func_emit, jsobj, 1, &jsargv) ;
+        if(JS_IsException(ret)) {
+            JSEngine::fromJSContext(ctx)->dumpError() ;
+        }
+        JS_FreeValue(ctx, ret) ;
+        JS_FreeValue(ctx, jsargv) ;
+        JS_FreeValue(ctx, func_emit) ;
     }
 
     void EventEmitter::eventAdded(const char * eventName) {}

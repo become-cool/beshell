@@ -34,6 +34,7 @@ namespace be {
         void emitSyncFree(const char * eventName, std::initializer_list<JSValue> args) ;
         void emitSync(const char * eventName, std::initializer_list<JSValue> args) ;
         void emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) ;
+        void emitSync(const char * eventName) ;
 
 #ifdef ESP_PLATFORM
         bool emitNativeEvent(void * param) ;
