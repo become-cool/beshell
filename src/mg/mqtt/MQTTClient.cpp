@@ -141,7 +141,6 @@ namespace be::mg {
                 break;
             }
             case MG_EV_CLOSE:
-            dd
                 emitSync("close") ;
                 break;
             default:
