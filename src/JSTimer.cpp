@@ -37,7 +37,9 @@ namespace be {
     
         void destroy (JSContext * ctx) {
             JS_FreeValue(ctx, func) ;
+            func = JS_NULL ;
             JS_FreeValue(ctx, thisobj) ;
+            thisobj = JS_NULL ;
             if(argc>0 && argv) {
                 for(int i=0;i<argc; i++) {
                     JS_FreeValue(ctx, argv[i]) ;
@@ -72,21 +74,24 @@ namespace be {
         }
         uint64_t now = gettime() ;
 
-        for(auto event: events) {
+        for(auto it = events.begin(); it != events.end();) {
+            auto event = *it ;
             if(event->deadline <= now) {
-                
+                if(!JS_IsFunction(ctx, event->func)) {
+                    printf("timer callback is not a function\n") ;
+                    removeTimer(ctx, event) ;
+                    continue ;
+                }
+
                 JSValue ret = JS_Call(ctx, event->func, event->thisobj, event->argc, event->argv) ;
                 if( JS_IsException(ret) ) {
-                    JSValue excpt = JS_GetException(ctx) ;
-                    std::string error = JSEngine::getExceptionStr(ctx, excpt) ;
-                    printf("timer callback error:\n") ;
-                    printf(error.c_str()) ;
+                    JSEngine::getExceptionStr(ctx, ret) ;
                 }
                 JS_FreeValue(ctx, ret) ;
 
                 // 一次性任务
                 if(!event->repeat) {
-                    removeTimer(ctx, event) ;
+                    removeTimer(ctx, event->id) ;
                     continue ;
                 }
 
@@ -99,6 +104,10 @@ namespace be {
                     event->deadline+= event->interval ;
                 }
 
+                it ++ ;
+            }
+            else {
+                it ++ ;
             }
         }
         
@@ -253,6 +262,7 @@ namespace be {
         MUTEX({
             auto it = std::find(events.begin(),events.end(),event) ;
             if(it==events.end()) {
+                printf("removing timer event not found\n") ;
                 give(false) ;
                 return ;
             }
