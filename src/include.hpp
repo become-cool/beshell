@@ -75,6 +75,7 @@
 #include "driver/io/TM1652.hpp"
 #include "driver/sys/DS1307.hpp"
 #include "driver/sys/SDCard.hpp"
+#include "driver/adc/CS1237.hpp"
 #include "driver/disp/ST7701.hpp"
 #include "driver/disp/ST7789.hpp"
 #include "driver/comm/nfc/PN532.hpp"

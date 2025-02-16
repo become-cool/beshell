@@ -64,6 +64,7 @@ function request(url, handle) {
         case 'http.msg':
         case 'http.chunk':
           timeTick()
+          // 不需要break
         default:
           handle(conn,event,data,resolve,reject,reason)
           break

@@ -12,6 +12,7 @@ Added:
 * NativeClass::emitSyncFree()
 * spi eth ic driver W5500
 * lcd ic driver ST7789
+* adc driver CS1237
 * 在主循环中自动调用 gc
 * process.gc()
 * process.ref()
@@ -31,6 +32,7 @@ Refactored:
 * BeShell::main() 增加参数 core
 * wifi.conenct()  auto call startStaDeamon() when retry==-1
 * EventEmitter::emitNativeEvent() 返回 bool
+* 修改了 dt.device 中驱动对象的存放结构
 
 
 ## v0.3.6   2024-11-27
