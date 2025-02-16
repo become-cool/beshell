@@ -33,6 +33,8 @@ namespace be {
         exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("readEFUSE", readEFUSE);
         exportFunction("readMac", readMac);
+        exportFunction("gc", gc);
+        exportFunction("ref", ref);
 
         // JS_ComputeMemoryUsage
         exportName("versions") ;
@@ -356,5 +358,26 @@ namespace be {
 
         return JS_UNDEFINED ;
     }
-    
+
+    JSValue Process::gc(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        JS_RunGC(JS_GetRuntime(ctx)) ;
+        return JS_UNDEFINED ;
+    }
+
+    static JSValue watchingVar = JS_NULL ;
+    JSValue Process::ref(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if(argc>0) {
+            if( !JS_IsObject(argv[0]) ) {
+                return JS_NewUint32(ctx, 0) ;
+            }
+            watchingVar = argv[0] ;
+            return JS_NewUint32(ctx, ((JSRefCountHeader *)JS_VALUE_GET_PTR(watchingVar))->ref_count - 1)  ;
+        }
+        else {
+            if( !JS_IsObject(watchingVar) ) {
+                return JS_NewUint32(ctx, 0) ;
+            }
+            return JS_NewUint32(ctx, ((JSRefCountHeader *)JS_VALUE_GET_PTR(watchingVar))->ref_count)  ;
+        }
+    }
 }

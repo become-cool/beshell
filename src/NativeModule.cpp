@@ -112,6 +112,12 @@ namespace be {
         if(!nevent_queue) {
             return false ;
         }
+        
+        // uint32_t cnt = uxQueueMessagesWaiting((QueueHandle_t)nevent_queue) ;
+        // if(cnt>5) {
+        //     printf("message in queue num: %d\n", cnt) ;
+        // }
+
         return xQueueSend((QueueHandle_t)nevent_queue, param, 0)==pdTRUE ;
     }
     

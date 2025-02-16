@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BE_NATIVECLASS_HPP
+#define BE_NATIVECLASS_HPP
 
 #include "deps/quickjs/quickjs-libc.h"
 #include <map>
@@ -16,10 +17,6 @@ namespace be {
 	typedef void (*NClassFinalizerFunc)(JSRuntime *rt, JSValue val) ;
 
     class NativeClass {
-    private:
-        bool printOnDestruct = false ;
-        static JSValue printOnDestructGetter(JSContext *ctx, JSValueConst this_val) ;
-        static JSValue printOnDestructSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) ;
 
 
     protected:
@@ -36,15 +33,20 @@ namespace be {
         NativeClass(JSContext * ctx, JSValue jsobj) ;
 
         static std::map<JSContext*, std::map<JSClassID, JSValue>> mapCtxClassID2Constructor ;
-        static const JSClassID classID ;
 
     public:
+    
+        static JSClassID classID ;
+        static const char * className ;
         JSValue jsobj ;
 
         virtual ~NativeClass() ;
         const std::shared_ptr<NativeClass> & shared() ;
 
         static NativeClass * fromJS(JSValue jsObj) ;
+        
+        static JSValue build(JSContext * ctx) ;
+        static JSValue build(JSContext * ctx, JSValue jsobj) ;
 
         static JSValue defineClass(
                 JSContext * ctx
@@ -68,6 +70,11 @@ namespace be {
             JSValue cotr = JS_GetPropertyStr(ctx, proto, "constructor") ;
             return JS_IsInstanceOf(ctx, jsobj, cotr) ;
         }
+        
+        static JSValue setDestructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+    private:
+            JSValue destructor = JS_NULL ;
     } ;    
 }
 
@@ -147,3 +154,6 @@ namespace be {
 
 #define THIS_NCLASS(CLASS,var)                                          \
     JSVALUE_TO_NCLASS(CLASS,this_val,var)
+
+
+#endif

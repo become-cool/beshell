@@ -1,17 +1,24 @@
 #include "NativeClass.hpp"
 #include <string.h>
+#include "JSEngine.hpp"
 
 using namespace std;
 namespace be {
 
-    const JSClassID NativeClass::classID = 0 ;
     std::map<JSContext*, std::map<JSClassID, JSValue>> NativeClass::mapCtxClassID2Constructor ;
-    std::vector<JSCFunctionListEntry> NativeClass::methods ;
-    std::vector<JSCFunctionListEntry> NativeClass::staticMethods ;
 
-    NativeClass::NativeClass(JSContext * _ctx, JSValue jsobj)
+    DEFINE_NCLASS_META_STATIC(NativeClass)
+    DEFINE_NCLASS_META_BUILD(NativeClass)
+
+    std::vector<JSCFunctionListEntry> NativeClass::methods = {
+        JS_CFUNC_DEF("setDestructor", 0, NativeClass::setDestructor),
+    };
+    std::vector<JSCFunctionListEntry> NativeClass::staticMethods = {
+    } ;
+
+    NativeClass::NativeClass(JSContext * _ctx, JSValue _jsobj)
         : ctx(_ctx)
-        , jsobj(jsobj)
+        , jsobj(build(_ctx, _jsobj))
     {
         assert(JS_IsObject(jsobj)) ;
         JS_SetOpaque(jsobj, this) ;
@@ -22,9 +29,8 @@ namespace be {
             JS_SetOpaque(jsobj, nullptr) ;
             JS_FreeValue(ctx,jsobj) ;
         }
-        if(printOnDestruct) {
-            printf("NativeClass destructor called\n") ;
-        }
+        JS_FreeValue(ctx, destructor) ;
+
     }
 
     NativeClass * NativeClass::fromJS(JSValue jsObj) {
@@ -64,10 +70,10 @@ namespace be {
         if(methods.size()) {
             JS_SetPropertyFunctionList(ctx, proto, methods.data(), methods.size());
         }
-        JSCFunctionListEntry settergetters[] = {
-            JS_CGETSET_DEF("printOnDestruct",printOnDestructGetter,printOnDestructSetter) ,
-        } ;
-        JS_SetPropertyFunctionList(ctx, proto, settergetters, sizeof(settergetters)/sizeof(JSCFunctionListEntry));
+        // JSCFunctionListEntry settergetters[] = {
+        //     JS_CGETSET_DEF("printOnDestruct",printOnDestructGetter,printOnDestructSetter) ,
+        // } ;
+        // JS_SetPropertyFunctionList(ctx, proto, settergetters, sizeof(settergetters)/sizeof(JSCFunctionListEntry));
 
 
         JSValue jscotr = JS_NewCFunction2(ctx, constructor, className, 1, JS_CFUNC_constructor, 0) ;
@@ -94,18 +100,38 @@ namespace be {
 
         return jscotr ;
     }
-    JSValue NativeClass::defineClass(JSContext * ctx){
-        return JS_UNDEFINED ;
+
+    JSValue NativeClass::defineClass(JSContext * ctx) {
+        JSValue jscotr = NativeClass::defineClass(
+            ctx,NativeClass::classID,NativeClass::className
+            , NativeClass::methods, NativeClass::staticMethods
+            , NativeClass::constructor
+            , NativeClass::finalizer
+            , NativeClass::classID
+        ) ;
+        return jscotr ;
     }
 
     JSValue NativeClass::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_UNDEFINED ;
+        auto obj = new NativeClass(ctx, this_val) ;
+        obj->shared() ;
+        return obj->jsobj ;
     }
 
     void NativeClass::finalizer(JSRuntime *rt, JSValue val) {
         NativeClass * obj = fromJS(val) ;
         if(obj) {
             if( JS_VALUE_GET_PTR(obj->jsobj)==JS_VALUE_GET_PTR(val) ) {
+
+                // 调用 JS destructor
+                if(JS_IsFunction(obj->ctx, obj->destructor)) {
+                    JSValue ret = JS_Call(obj->ctx, obj->destructor, obj->jsobj, 0, nullptr) ;
+                    if(JS_IsException(ret)) {
+                        JSEngine::fromJSContext(obj->ctx)->dumpError() ;
+                    }
+                    JS_FreeValue(obj->ctx, ret) ;
+                }
+
                 obj->jsobj = JS_UNDEFINED ;
             }
             obj->self = nullptr ;
@@ -143,13 +169,16 @@ namespace be {
         }
     }
     
-    JSValue NativeClass::printOnDestructGetter(JSContext *ctx, JSValueConst this_val) {
+    JSValue NativeClass::setDestructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(NativeClass, that) ;
-        return that->printOnDestruct? JS_TRUE : JS_FALSE ;
-    }
-    JSValue NativeClass::printOnDestructSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
-        THIS_NCLASS(NativeClass, that) ;
-        that->printOnDestruct = JS_ToBool(ctx, value) ;
+        CHECK_ARGC(1)
+
+        if(!JS_IsFunction(ctx, argv[0])) {
+            JSTHROW("arg must be a function")
+        }
+        JS_FreeValue(ctx, that->destructor) ;
+        that->destructor = JS_DupValue(ctx, argv[0]) ;
+        
         return JS_UNDEFINED ;
     }
 }

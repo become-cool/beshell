@@ -12,6 +12,11 @@ Added:
 * NativeClass::emitSyncFree()
 * spi eth ic driver W5500
 * lcd ic driver ST7789
+* 在主循环中自动调用 gc
+* process.gc()
+* process.ref()
+* export NativeClass to global ns
+* NativeClass.setDestructor()
 
 Fixed:
 
