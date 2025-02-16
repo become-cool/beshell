@@ -23,10 +23,9 @@ namespace be::mg {
         JS_CFUNC_DEF("disconnect", 0, MQTTClient::disconnect),
     } ;
 
-    MQTTClient::MQTTClient(JSContext * ctx, struct mg_connection * conn, JSValue callback)
+    MQTTClient::MQTTClient(JSContext * ctx, struct mg_connection * conn)
             : EventEmitter(ctx,build(ctx))
             , conn(conn)
-            , callback(JS_DupValue(ctx,callback))
     {
         if(conn) {
             conn->fn_data = this ;
@@ -35,16 +34,19 @@ namespace be::mg {
     }
 
     MQTTClient::~MQTTClient() {
+
+        // conn 尚未断开时 delete js 或 c++ 对象
         if(conn) {
             if( conn->fn_data == this ){
+                conn->is_closing = 1 ;
                 conn->fn_data = nullptr ;
             }
         }
-        JS_FreeValue(ctx, callback) ;
     }
 
     #define FREE_MG_STR(mgstr)      \
-            free( mgstr.ptr ) ;     \
+            if(mgstr.ptr)           \
+                free( mgstr.ptr ) ; \
             mgstr.ptr = nullptr ;   \
             mgstr.len = 0 ;
     #define FREE_MG_MSG(msg)        \
@@ -53,9 +55,10 @@ namespace be::mg {
             FREE_MG_STR(msg.dgram)
 
     void MQTTClient::eventHandler(struct mg_connection * c, int ev, void * ev_data) {
-
+        if(ev==MG_EV_POLL) {
+            return ;
+        }
         if(!c->fn_data) {
-            printf("fn_data is null\n") ;
             return ;
         }
         MQTTClient * nobj = (MQTTClient *)c->fn_data ;
@@ -76,14 +79,16 @@ namespace be::mg {
             ev_wrapper.data.msg.ack = msg->ack ;
             break ;
         }
-        case MG_EV_CLOSE:
-            nobj->conn = nullptr ;
-            break;
 
         case MG_EV_ERROR:
             if (ev_data) {
                 printf("mg error: %p %s\n", c->fd, (char *) ev_data);
             }
+            break;
+
+        case MG_EV_CLOSE:
+            nobj->conn = nullptr ;
+            c->fn_data = nullptr ;
             break;
         
         default:
@@ -100,10 +105,12 @@ namespace be::mg {
     void MQTTClient::onNativeEvent(JSContext *ctx, void * param) {
         
         mg_event_wrapper_t * event = ((mg_event_wrapper_t*)param) ;
-
+        // if(event->ev!=MG_EV_POLL) {
+        //     printf("onNativeEvent() event: %d\n", event->ev) ;
+        // }
         switch (event->ev) {
             case MG_EV_OPEN:
-                emitCallback("open", {}) ;
+                emitSync("open") ;
                 break;
             case MG_EV_CONNECT:
                 if (is_tls) {
@@ -111,13 +118,14 @@ namespace be::mg {
                     memset(& opts, 0, sizeof(struct mg_tls_opts)) ;
                     mg_tls_init(conn, &opts);
                 }
-                emitCallback("connect", {}) ;
+                emitSync("connect") ;
+                // emitCallback("connect", {}) ;
                 break;
             case MG_EV_ERROR:
-                emitCallback("error", {}) ;
+                emitSync("error") ;
                 break;
             case MG_EV_MQTT_OPEN:
-                emitCallback("mqtt.open", {}) ;
+                emitSync("mqtt.open") ;
                 break;
             case MG_EV_MQTT_MSG: {
                 JSValue msg = JS_NewObject(ctx) ;
@@ -129,51 +137,24 @@ namespace be::mg {
                 JS_SetPropertyStr(ctx, msg, "qos", JS_NewUint32(ctx, event->data.msg.qos));
                 JS_SetPropertyStr(ctx, msg, "ack", JS_NewUint32(ctx, event->data.msg.ack));
                 FREE_MG_MSG((event->data.msg)) ;
-                emitCallback("msg", {msg});
+                emitSync("msg", {msg});
                 break;
             }
             case MG_EV_CLOSE:
-                emitCallback("close", {}) ;
+            dd
+                emitSync("close") ;
                 break;
             default:
                 break;
         }
     }
-    
-    void MQTTClient::emitCallback(const char * eventName, std::initializer_list<JSValue> args) {
-
-        JSValue name = JS_NewString(ctx, eventName) ;
-
-        int arglen = args.size() + 1;
-        JSValue * jsargv = new JSValue[arglen] ;
-        jsargv[0] = name ;
-        int i = 0 ;
-        for(auto arg : args) {
-            jsargv[i+1] = arg ;
-            ++ i ;
-        }
-        JSValue ret = JS_Call(ctx, callback, jsobj, arglen, jsargv) ;
-        if(JS_IsException(ret)) {
-            JSEngine::fromJSContext(ctx)->dumpError() ;
-        }
-        JS_FreeValue(ctx, ret) ;
-
-        for(auto arg : args) {
-            JS_FreeValue(ctx, arg) ;
-        }
-        delete[] jsargv ;
-
-    }
 
     JSValue MQTTClient::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         
-        ASSERT_ARGC(2)
-        if( !JS_IsFunction(ctx, argv[1]) ) {
-            JSTHROW("arg callback must be a function")
-        }
+        ASSERT_ARGC(1)
         ARGV_TO_CSTRING_LEN_E(0, url, urlLen, "arg url must be a string")
 
-        MQTTClient * client = new MQTTClient(ctx, nullptr, argv[1]) ;
+        MQTTClient * client = new MQTTClient(ctx, nullptr) ;
 
         struct mg_mqtt_opts opts = {.clean = true};
         struct mg_connection * conn = mg_mqtt_connect(&Mg::mgr, url, &opts, (mg_event_handler_t)eventHandler, (void*)client);
@@ -187,6 +168,7 @@ namespace be::mg {
         }
 
         client->conn = conn ;
+        client->shared() ;
         return client->jsobj ;
     }
 

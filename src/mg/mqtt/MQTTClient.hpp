@@ -26,11 +26,10 @@ namespace be::mg{
         static std::vector<JSCFunctionListEntry> methods ;
         
         struct mg_connection * conn ;
-        JSValue callback ;
         uint16_t poll_times = 0 ;
         bool is_tls = false ;
 
-        MQTTClient(JSContext * ctx, struct mg_connection * conn, JSValue callback) ;
+        MQTTClient(JSContext * ctx, struct mg_connection * conn) ;
         ~MQTTClient() ;
 
         static void eventHandler(struct mg_connection * c, int ev, void * ev_data) ;

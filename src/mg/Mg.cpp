@@ -50,6 +50,8 @@ namespace be::mg {
         exportClass<Client>() ;
         exportClass<HTTPRequest>() ;
         exportClass<Response>() ;
+        exportClass<MQTTClient>() ;
+        exportClass<NativeClass>() ;
 
         exportName("get") ;
         exportName("download") ;
