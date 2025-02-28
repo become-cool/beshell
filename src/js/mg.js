@@ -59,7 +59,7 @@ function request(url, handle) {
           reject(reason||event)
           break
         case 'close':
-          tick.stop()
+          timeTick.stop()
           break
         case 'http.msg':
         case 'http.chunk':
@@ -95,7 +95,6 @@ async function download(url, localPath, progress_cb) {
 
         let data = (event == 'http.msg') ? msg.body() : msg.chunk()
         let chunk = data.slice(wroten, data.byteLength)
-
         fs.write(fhandle, chunk)
         wroten += chunk.byteLength
 
