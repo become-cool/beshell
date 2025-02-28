@@ -2,6 +2,7 @@
 #include "BeShell.hpp"
 #include "JSEngine.hpp"
 #include "qjs_utils.h"
+#include "quickjs/quickjs.h"
 #include <cassert>
 
 using namespace std;
@@ -63,6 +64,7 @@ namespace be {
         JS_SetPropertyStr(ctx, global, "clearInterval", JS_NewCFunction(ctx, jsClearTimeout, "clearInterval", 1));
         JS_SetPropertyStr(ctx, global, "clearImmediate", JS_NewCFunction(ctx, jsClearTimeout, "clearImmediate", 1));
         JS_SetPropertyStr(ctx, global, "resetTimeout", JS_NewCFunction(ctx, jsResetTimeout, "resetTimeout", 2));
+        JS_SetPropertyStr(ctx, global, "peekTimeout", JS_NewCFunction(ctx, jsPeekTimeout, "peekTimeout", 2));
 
         JS_FreeValue(ctx,global) ;
     }
@@ -167,6 +169,17 @@ namespace be {
         return JS_UNDEFINED ;
     }
     
+    JSValue JSTimer::jsPeekTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+        CHECK_ENGINE
+        ASSERT_ARGC(1)
+        ARGV_TO_UINT32(0, id)
+        JSTimerEvent * event = engine->timer.findWithId(id) ;
+        if(!event) {
+            JSTHROW("timer event not found")
+        }
+        return JS_NewInt64(ctx, event->deadline) ;
+    }
+
     JSValue JSTimer::jsResetTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         CHECK_ENGINE
         ASSERT_ARGC(2)
