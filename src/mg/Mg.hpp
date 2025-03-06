@@ -12,17 +12,11 @@
 
 namespace be::mg {
     class Mg: public be::NativeModule {
-    private :
-        static struct mg_mgr mgr ;
-        static char dns4[28] ;
+
     public:
         static const char * name ;
 
         Mg(JSContext * ctx, const char * name) ;
-
-        static std::string ca_path ;
-        static std::string cert_path ;
-        static std::string certkey_path ;
 
         static void loop(const BeShell & beshell, void * data) ;
 
@@ -44,6 +38,18 @@ namespace be::mg {
         static JSValue parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setCA(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue startCaptivePortal(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+    private :
+        static struct mg_mgr mgr ;
+        static char dns4[28] ;
+
+        static std::string ca_path ;
+
+        
+        static void captivePortalHandler(struct mg_connection *c, int ev, void *ev_data, void *fn_data) ;
+        static struct mg_connection * connCaptiveProtal ;
 
     friend class Server ;
     friend class Client ;

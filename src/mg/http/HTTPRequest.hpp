@@ -29,6 +29,7 @@ namespace be::mg {
         static JSValue raw(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue rawHead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue match_uri(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isCaptivePortalRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     
     } ;

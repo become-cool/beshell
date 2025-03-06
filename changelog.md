@@ -18,6 +18,8 @@ Added:
 * process.ref()
 * export NativeClass to global ns
 * NativeClass.setDestructor()
+* mg.startCaptivePortal()
+* mg.Request.isCaptivePortalRequest()
 
 Fixed:
 

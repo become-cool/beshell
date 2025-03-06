@@ -25,7 +25,7 @@ namespace be::mg {
         
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        // static JSValue initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connectWS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -31,6 +31,7 @@ namespace be::mg {
         JS_CFUNC_DEF("raw", 0, HTTPRequest::raw),
         JS_CFUNC_DEF("rawHead", 0, HTTPRequest::rawHead),
         JS_CFUNC_DEF("matchURI", 0, HTTPRequest::match_uri),
+        JS_CFUNC_DEF("isCaptivePortalRequest", 0, HTTPRequest::isCaptivePortalRequest),
     } ;
 
     HTTPRequest::HTTPRequest(JSContext * ctx, struct mg_http_message * mg_msg)
@@ -214,5 +215,50 @@ namespace be::mg {
         bool ret = mg_http_match_uri(req->mg_msg, uri) ;
         JS_FreeCString(ctx, uri) ;
         return ret? JS_TRUE: JS_FALSE ;
+    }
+    
+    
+    // www.msftconnecttest.com
+    // ipv6.msftconnecttest.com
+    // http://captive.apple.com/hotspot-detect.html
+    // http://connectivitycheck.android.com/generate_204
+    // http://connectivitycheck.smartisan.com/wifi.html
+    // ****/generate_204
+    
+    /**
+     * 检查是否是 Captive Portal 请求
+     * 
+     * @method isCaptivePortalRequest
+     * @return bool
+     */
+    JSValue HTTPRequest::isCaptivePortalRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(HTTPRequest,req)
+
+        struct mg_str * host = mg_http_get_header(req->mg_msg, "Host") ;
+        if(!host) {
+            printf("unknow host for captive_portal\n") ;
+            return JS_FALSE ;
+        }
+        printf("%.*s\n",host->len,host->ptr) ;
+    
+        if(mg_strcmp(*host, mg_str("captive.apple.com"))==0) {
+            return JS_TRUE ;
+        }
+        // http://connectivitycheck.android.com/generate_204
+        // http://connectivitycheck.smartisan.com/wifi.html
+        else if( host->len>=18 && strncmp(host->ptr, "connectivitycheck.", 18)==0 ) {
+            return JS_TRUE ;
+        }
+        else if(mg_http_match_uri(req->mg_msg,"/generate_204")) {
+            return JS_TRUE ;
+        }
+        else if(mg_strcmp(*host, mg_str("www.msftconnecttest.com"))==0) {
+            return JS_TRUE ;
+        }
+    
+        // printf("%.*s/%.*s\n", host->len, host->ptr, hm->uri.len, hm->uri.ptr) ;
+    
+
+        return JS_FALSE ;
     }
 }

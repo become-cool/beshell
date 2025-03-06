@@ -37,11 +37,12 @@ namespace be::mg {
     const char * Mg::name = "mg" ;
 
     struct mg_mgr Mg::mgr ;
-    std::string Mg::ca_path ;
-    std::string Mg::cert_path ;
-    std::string Mg::certkey_path ;
 
     char Mg::dns4[28] ;
+
+    std::string Mg::ca_path = "" ;
+    
+    struct mg_connection * Mg::connCaptiveProtal = nullptr ;
 
     Mg::Mg(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
@@ -69,6 +70,7 @@ namespace be::mg {
 
         exportFunction("listenHttp",Server::listenHttp,0) ;
         exportFunction("connect",connect,0) ;
+        exportFunction("startCaptivePortal",startCaptivePortal,0) ;
     }
 
     void Mg::exports(JSContext *ctx) {
@@ -83,7 +85,6 @@ namespace be::mg {
         if (!mg_aton(mg_url_host(url), &addr)) {
             return false ;
         }
-
         for(struct mg_connection * c = mgr.conns; c != NULL; c = c->next) {
             if(c->peer.ip==addr.ip && c->peer.port==addr.port){
                 return false ;
@@ -103,10 +104,6 @@ namespace be::mg {
         beshell->use<WiFi>() ;
 
         beshell->addLoopFunction(loop, NULL) ;
-
-        ca_path = FS::toVFSPath("/var/ca.pem") ;
-        cert_path = FS::toVFSPath("/var/cert.pem") ;
-        certkey_path = FS::toVFSPath("/var/key.pem") ;
     }
 
     const char * Mg::eventName(int ev) {
@@ -451,4 +448,65 @@ namespace be::mg {
         JS_FreeCString(ctx, url) ;
         JSTHROW("url not support")
     }
+
+
+    JSValue Mg::setCA(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        ARGV_TO_CSTRING_E(0, path, "arg path must be a string")
+        Mg::ca_path = path ;
+        JS_FreeCString(ctx, path) ;
+        return JS_UNDEFINED ;
+    }
+
+
+    
+
+    // DNS answer section. We response with IP 1.2.3.4 - you can change it
+    //  in the last 4 bytes of this array
+    uint8_t answer[] = {
+        0xc0, 0x0c,          // Point to the name in the DNS question
+        0,    1,             // 2 bytes - record type, A
+        0,    1,             // 2 bytes - address class, INET
+        0,    0,    0, 120,  // 4 bytes - TTL
+        0,    4,             // 2 bytes - address length
+        192,    168,    4, 1     // 4 bytes - IP address
+    };
+
+    void Mg::captivePortalHandler(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
+        if (ev == MG_EV_OPEN) {
+            c->is_hexdumping = 1;
+        } else if (ev == MG_EV_READ) {
+            struct mg_dns_rr rr;  // Parse first question, offset 12 is header size
+            size_t n = mg_dns_parse_rr(c->recv.buf, c->recv.len, 12, true, &rr);
+            // MG_INFO(("DNS request parsed, result=%d", (int) n));
+            if (n > 0) {
+            char buf[512];
+            struct mg_dns_header *h = (struct mg_dns_header *) buf;
+            memset(buf, 0, sizeof(buf));  // Clear the whole datagram
+            h->txnid = ((struct mg_dns_header *) c->recv.buf)->txnid;  // Copy tnxid
+            h->num_questions = mg_htons(1);  // We use only the 1st question
+            h->num_answers = mg_htons(1);    // And only one answer
+            h->flags = mg_htons(0x8400);     // Authoritative response
+            memcpy(buf + sizeof(*h), c->recv.buf + sizeof(*h), n);  // Copy question
+            memcpy(buf + sizeof(*h) + n, answer, sizeof(answer));   // And answer
+            mg_send(c, buf, 12 + n + sizeof(answer));               // And send it!
+            }
+            mg_iobuf_del(&c->recv, 0, c->recv.len);
+        }
+        (void) fn_data;
+        (void) ev_data;
+    }
+
+
+    JSValue Mg::startCaptivePortal(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        if(connCaptiveProtal) {
+            JSTHROW("captive portal already started")
+        }
+
+        connCaptiveProtal = mg_listen(&mgr, "udp://0.0.0.0:53", captivePortalHandler, NULL);
+
+        return JS_UNDEFINED ;
+    }
+
 }

@@ -11,7 +11,7 @@ namespace be::mg {
     std::vector<JSCFunctionListEntry> Client::methods = {
         JS_CFUNC_DEF("send", 0, Client::send),
         JS_CFUNC_DEF("close", 0, Client::close),
-        JS_CFUNC_DEF("initTLS", 0, Client::initTLS),
+        // JS_CFUNC_DEF("initTLS", 0, Client::initTLS),
     } ;
 
     Client::Client(JSContext * ctx, struct mg_connection * conn, JSValue callback)
@@ -103,18 +103,18 @@ namespace be::mg {
      * @param host:string 主机名
      * @return undefined
      */
-    JSValue Client::initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        ASSERT_ARGC(1)
-        ARGV_TO_CSTRING_E(0, host, "arg host must be a string")
+    // JSValue Client::initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    //     ASSERT_ARGC(1)
+    //     ARGV_TO_CSTRING_E(0, host, "arg host must be a string")
 
-        THIS_NCLASS(Client,client)
+    //     THIS_NCLASS(Client,client)
 
-        struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str(), .srvname = mg_str(host) };
-        mg_tls_init(client->conn, &opts);
+    //     struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str(), .srvname = mg_str(host) };
+    //     mg_tls_init(client->conn, &opts);
         
-        JS_FreeCString(ctx, host) ;
-        return JS_UNDEFINED ;
-    }
+    //     JS_FreeCString(ctx, host) ;
+    //     return JS_UNDEFINED ;
+    // }
 
 
 
@@ -146,6 +146,19 @@ namespace be::mg {
         }
         Client * client = (Client *)fnd ;
         switch(ev) {
+
+            case MG_EV_CONNECT: {
+
+                if(client && client->is_tls) {
+                    struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str() };
+                    mg_tls_init(conn, &opts);
+                }
+
+                JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+                JS_CALL_ARG1(client->ctx, client->callback, evname)
+                JS_FreeValue(client->ctx, evname) ;
+                break ;
+            }
 
             // 大文件下载时会分批触发 MG_EV_HTTP_CHUNK , 只到下载完 最后触发一个 hm->chunk.len 为 0 的 MG_EV_HTTP_MSG 事件
             case MG_EV_HTTP_CHUNK:

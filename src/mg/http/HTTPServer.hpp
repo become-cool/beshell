@@ -15,6 +15,9 @@ namespace be::mg {
         bool ssl: 1;
         void * ssl_cert_path;
         void * ssl_key_path;
+        
+        std::string cert_path ;
+        std::string certkey_path ;
 
         static void eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) ;
 

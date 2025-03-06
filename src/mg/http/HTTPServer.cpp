@@ -139,11 +139,11 @@ namespace be::mg {
 
         if(ev==MG_EV_ACCEPT && SERVER->ssl) {
             struct mg_tls_opts opts = {
-                .cert = Mg::cert_path.c_str(),    // Certificate file
-                .certkey = Mg::certkey_path.c_str(),  // Private key file
+                .cert = SERVER->cert_path.c_str(),          // Certificate file
+                .certkey = SERVER->certkey_path.c_str(),    // Private key file
             };
             mg_tls_init(conn, &opts);
-            printf("mg_tls_init()\n") ;
+            // printf("mg_tls_init()\n") ;
             return ;
         }
 
