@@ -1804,7 +1804,7 @@ static void mg_log_stdout(const void *buf, size_t len, void *userdata) {
   fwrite(buf, 1, len, stdout);
 }
 
-static const char *s_spec = "2";
+static const char *s_spec = "1";
 static void (*s_fn)(const void *, size_t, void *) = mg_log_stdout;
 static void *s_fn_param = NULL;
 
