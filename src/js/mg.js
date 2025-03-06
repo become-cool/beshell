@@ -23,7 +23,7 @@ function WatchDog (ms, cbTimeout){
 function request(url, handle) {
   return new Promise((resolve, reject) => {
     let conn = null
-    let timeTick = WatchDog(3000,()=>{
+    let timeTick = WatchDog(10000,()=>{
       conn && conn.close()
       conn = null
       reject("timeout")
