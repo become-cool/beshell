@@ -1,0 +1,123 @@
+#include "QMI8658.hpp"
+#include "qmi8658-driver.hpp"
+#include "imualgo_axis9.h"
+#include "quickjs/quickjs.h"
+#include <cmath>
+
+using namespace std ;
+
+static be::I2C * i2cbus = nullptr ;
+    
+int mx_i2c1_write(uint8_t addr, uint8_t reg, uint8_t value) {
+
+    int ret = i2cbus->write<uint8_t,uint8_t>(addr>>1, reg, value) ;
+
+    // printf("mx_i2c1_write(addr:%d, reg: %d, value: %d)\n", ret, addr, reg, value) ;
+
+    return ret? 0: 1  ;
+}
+int mx_i2c1_read(uint8_t addr, uint8_t reg, uint8_t * buffer, int len) {
+
+    int ret = i2cbus->read<uint8_t>(addr>>1, reg, buffer, len) ;
+
+    // printf("mx_i2c1_read(addr:%d, reg: %d, len: %d, value[0]=%d)\n", addr, reg, len, buffer[0]) ;
+
+    return ret? 0: 1  ;
+}
+
+static QST_Filter gyro_filter;
+static QST_Filter accel_filter;
+
+namespace be::driver::sensor {
+
+
+    DEFINE_NCLASS_META(QMI8658, I2CDevice)
+    std::vector<JSCFunctionListEntry> QMI8658::methods = {
+        JS_CFUNC_DEF("setup", 0, QMI8658::setup),
+        JS_CFUNC_DEF("readXYZ", 0, QMI8658::readXYZ),
+        JS_CFUNC_DEF("startReceive", 0, QMI8658::startReceive),
+        JS_CFUNC_DEF("stopReceive", 0, QMI8658::stopReceive),
+    } ;
+
+    QMI8658::QMI8658(JSContext * ctx, JSValue _jsobj)
+        : I2CDevice(ctx,build(ctx,_jsobj))
+    {}
+
+    JSValue QMI8658::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        auto obj = new QMI8658(ctx) ;
+        obj->shared() ;
+        return obj->jsobj ;
+    }
+
+    JSValue QMI8658::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if( I2CDevice::setup(ctx, this_val, argc, argv)==JS_EXCEPTION ){
+            return JS_EXCEPTION ;
+        }
+        THIS_NCLASS(QMI8658, that)
+
+        i2cbus = that->i2c ;
+
+        if( !qmi8658_init() ) {
+            JSTHROW("QMI8658 init failed") ;
+        }
+        
+        // set_cutoff_frequency(100, 1, &gyro_filter);      //第一个参数为频率100hz，与算法库调用周期有关，如例程中算法库调用周期为10ms 
+        // set_cutoff_frequency(100, 2, &accel_filter);
+        
+        return JS_UNDEFINED ;
+    }
+    JSValue QMI8658::readXYZ(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        float acc[3], gyro[3] ;
+        qmi8658_read_xyz(acc,gyro) ;
+
+        JSValue arr = JS_NewArray(ctx) ;
+        JS_SetPropertyUint32(ctx,arr,0,JS_NewFloat64(ctx,acc[0])) ;
+        JS_SetPropertyUint32(ctx,arr,1,JS_NewFloat64(ctx,acc[1])) ;
+        JS_SetPropertyUint32(ctx,arr,2,JS_NewFloat64(ctx,acc[2])) ;
+        JS_SetPropertyUint32(ctx,arr,3,JS_NewFloat64(ctx,gyro[0])) ;
+        JS_SetPropertyUint32(ctx,arr,4,JS_NewFloat64(ctx,gyro[1])) ;
+        JS_SetPropertyUint32(ctx,arr,5,JS_NewFloat64(ctx,gyro[2])) ;
+
+        return arr ;
+    }
+
+
+    void QMI8658::task_listen(QMI8658 * that) {
+        printf("task_listen()\n");
+        float accl[3],gyro[3];
+        float euler_angle[3] = {0, 0, 0};
+    
+        TickType_t lastWakeTime = xTaskGetTickCount();
+        while(1) {    
+            // 读取原始传感器数据
+            qmi8658_read_xyz(accl, gyro);
+            printf("%f, %f, %f, %f, %f, %f\n", accl[0], accl[1], accl[2], gyro[0], gyro[1], gyro[2]) ;
+            
+            
+            // @tdodo 互补滤波数据融合
+
+            printf("pitch:%.2f, roll:%.2f, yaw:%.2f \n", 
+                  euler_angle[1], euler_angle[0], euler_angle[2]);
+                  
+            vTaskDelay(10/portTICK_PERIOD_MS);
+        }
+    
+    }
+    
+    JSValue QMI8658::startReceive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(QMI8658, that)
+        if(that->taskListenerHandle == nullptr) {
+            xTaskCreatePinnedToCore((TaskFunction_t)task_listen, "task-listen", 5*1024, that, 5, &that->taskListenerHandle, 1);
+        }
+        return JS_UNDEFINED ;
+    }
+    JSValue QMI8658::stopReceive(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(QMI8658, that)
+        if(that->taskListenerHandle == nullptr) {
+            vTaskDelete(that->taskListenerHandle) ;
+            that->taskListenerHandle = nullptr ;
+        }
+        return JS_UNDEFINED ;
+    }
+}
