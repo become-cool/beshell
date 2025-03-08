@@ -17,7 +17,11 @@
 #include <sys/fcntl.h>
 #include <sys/lock.h>
 #include <sys/param.h>
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 4, 0)
+#include "rom/spi_flash.h"
+#else
 #include "esp32/rom/spi_flash.h"
+#endif
 #include "esp_system.h"
 #include "esp_vfs.h"
 #include "esp_partition.h"
