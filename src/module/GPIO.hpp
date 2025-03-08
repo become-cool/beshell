@@ -23,16 +23,16 @@ namespace be {
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
         static JSValue writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue readPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static JSValue adcUnitInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue adcChannelInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     

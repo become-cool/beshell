@@ -8,13 +8,21 @@
 #include "GPIO.hpp"
 #include "driver/adc.h"
 #include "driver/gpio.h"
+#include "hal/adc_types.h"
+#include <cstddef>
 #include <map>
 #include <vector>
+#include "esp_adc/adc_oneshot.h"
+#include "soc/gpio_num.h"
 
 using namespace std ;
 
+
+    
 namespace be {
     
+    static adc_oneshot_unit_handle_t adc_handles[2] = {NULL} ;
+
     /**
      * bit1:   未触发的 isr
      * bit2:   前次电平值
@@ -34,6 +42,10 @@ namespace be {
 
     static map< uint8_t, pair< vector<JSValue>, vector<JSValue> > > watching_callbacks ;
 
+    static map<gpio_num_t, adc_channel_t> adc_channels ;
+    static map<gpio_num_t, adc_unit_t> adc_units ;
+    static map<gpio_num_t, bool> adc_channel_configured ;
+
     bool GPIO::isr_installed=false ;
 
     GPIO::GPIO(JSContext * ctx, const char * name)
@@ -43,16 +55,33 @@ namespace be {
         exportFunction("pull",pull,2) ;
         exportFunction("write",write,2) ;
         exportFunction("read",read,1) ;
-        // exportFunction("adcSetBits",adcSetBits,2) ;
-        // exportFunction("adcSetChannelAtten",adcSetChannelAtten,2) ;
-        // exportFunction("readAnalog",readAnalog,0) ;
-        // exportFunction("writeAnalog",writeAnalog,0) ;
         exportFunction("writePWM",writePWM,0) ;
         exportFunction("readPWM",readPWM,0) ;
         exportFunction("watch",watch,0) ;
         exportFunction("unwatch",unwatch,0) ;
+        exportFunction("adcUnitInit",adcUnitInit,1) ;
+        exportFunction("adcChannelInit",adcChannelInit,1) ;
+        exportFunction("adcRead",adcRead,1) ;
+        exportFunction("readAnalog",adcRead,1) ;
+        exportFunction("adcInfo",adcInfo,0) ;
         exportName("blink") ;
         EXPORT_FUNCTION(test) ;
+
+
+        // 反射 gpio -> adc unit/通道
+        gpio_num_t pin ;
+        for(int c=0;c<ADC1_CHANNEL_MAX;c++) {
+            adc_channel_t channel = (adc_channel_t)c ;
+            adc1_pad_get_io_num((adc1_channel_t)channel, &pin) ;
+            adc_channels[pin] = channel ;
+            adc_units[pin] = ADC_UNIT_1 ;
+        }
+        for(int c=0;c<ADC2_CHANNEL_MAX;c++) {
+            adc_channel_t channel = (adc_channel_t)c ;
+            adc2_pad_get_io_num((adc2_channel_t)channel, &pin) ;
+            adc_channels[pin] = channel ;
+            adc_units[pin] = ADC_UNIT_2 ;
+        }
     }
 
     void GPIO::exports(JSContext *ctx) {
@@ -386,7 +415,7 @@ function (gpio,time) {
         //gpio_state[pin] &= (~12) ;
         gpio_state[pin] |= mode << 2 ;
         mode = gpio_state[pin] >> 2 & 3 ;
-        dn(mode)
+        // dn(mode)
 
         if(gpio_get_level((gpio_num_t)pin)) {
             gpio_state[pin] |= 2 ;
@@ -450,6 +479,132 @@ function (gpio,time) {
     JSValue GPIO::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_NewInt32(ctx, gpio_state[7]) ;
     }
+
+    static int _initADCUnit(adc_unit_t uint_num) {
+        if(adc_handles[uint_num]!=NULL) {
+            return -1 ;
+        }
+
+        // adc_oneshot_unit_init_cfg_t init_config = {
+        //     .unit_id = uint_num,
+        //     .clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+        //     .ulp_mode = ADC_ULP_MODE_DISABLE,
+        // };
+        
+        // return adc_oneshot_new_unit(&init_config, &adc_handles[uint_num]) ;
+        return 0 ;
+    }
+    
+    static int _initADCChannel(adc_unit_t uint_num, adc_channel_t channel, gpio_num_t pin) {
+
+        esp_err_t err ;
+        if(!adc_handles[uint_num]) {
+            err = _initADCUnit(uint_num) ;
+            if(err!=ESP_OK) {
+                return err ;
+            }
+        }
+
+        // 通道配置
+        // adc_oneshot_chan_cfg_t config = {
+        //     .atten = ADC_ATTEN_DB_12,  // Use ADC_ATTEN_DB_0 as ADC_ATTEN_DB_11 is deprecated
+        //     .bitwidth = ADC_BITWIDTH_12,
+        // };
+        
+        // err = adc_oneshot_config_channel(adc_handles[uint_num], channel, &config) ;
+        // if(err!=ESP_OK) {
+        //     return err ;
+        // }
+
+        adc_channel_configured[pin] = true ;
+
+        return ESP_OK ;
+    }
+
+    JSValue GPIO::adcUnitInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        uint32_t uint_num = 1 ;
+        if( JS_ToUint32(ctx, &uint_num, argv[0])!=0 ) {
+            JSTHROW("Invalid param type")
+        }
+        if(uint_num<1 || uint_num>2) {
+            JSTHROW("Invalid param value")
+        }
+        int err = _initADCUnit((adc_unit_t)uint_num) ;
+        if(err==-1) {
+            JSTHROW("unit already inited")
+        }
+        if(err!=ESP_OK) {
+            JSTHROW("init adc unit failed, err:%d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+
+    JSValue GPIO::adcChannelInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_GPIO(0, pin)
+
+        if(!adc_units.count(pin) || !adc_channels.count(pin)) {
+            JSTHROW("pin is not a valid adc pin.")
+        }
+        adc_unit_t uint_num = adc_units[pin] ;
+        adc_channel_t channel = adc_channels[pin] ;
+        
+        if(!adc_handles[uint_num]) {
+            esp_err_t err = _initADCUnit(uint_num) ;
+            if(err!=ESP_OK) {
+                JSTHROW("init adc unit failed, err:%d", err)
+            }
+        }
+        
+        esp_err_t err = _initADCChannel(uint_num, (adc_channel_t)channel, pin) ;
+        if(err!=ESP_OK) {
+            JSTHROW("init adc channel failed, err:%d", err)
+        }
+
+        return JS_UNDEFINED ;
+    }
+
+    JSValue GPIO::adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_GPIO(0, pin)
+
+        if(!adc_units.count(pin) || !adc_channels.count(pin)) {
+            JSTHROW("pin is not a valid adc pin.")
+        }
+        adc_unit_t uint_num = adc_units[pin] ;
+        adc_channel_t channel = adc_channels[pin] ;
+
+        if(!adc_channel_configured.count(pin) || !adc_channel_configured[pin]) {
+            esp_err_t err = _initADCChannel(uint_num, (adc_channel_t)channel, pin) ;
+            if(err!=ESP_OK) {
+                JSTHROW("init adc channel failed, err:%d", err)
+            }
+        }
+
+        int value = 0 ;
+
+        // esp_err_t err = adc_oneshot_read(adc_handles[uint_num], (adc_channel_t)channel, &value) ;
+        // if(err!=ESP_OK) {
+        //     JSTHROW("read adc failed, err:%d", err)
+        // }
+
+        return JS_NewInt32(ctx, value) ;
+    }
+
+    JSValue GPIO::adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        JSValue obj = JS_NewObject(ctx) ;
+        int i = 0 ;
+        for(auto &kv: adc_channels) {
+
+            JSValue item = JS_NewObject(ctx) ;
+            JS_SetPropertyStr(ctx, item, "channel", JS_NewInt32(ctx, kv.second)) ;
+            JS_SetPropertyStr(ctx, item, "unit", JS_NewInt32(ctx, adc_units[kv.first])) ;
+            JS_SetPropertyUint32(ctx, obj, JS_NewInt32(ctx, kv.first), item) ;
+        }
+        return obj ;
+    }
+
 }
 
 
