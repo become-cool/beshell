@@ -3,7 +3,7 @@
 using namespace std ;
 
 namespace be::driver {
-    DEFINE_NCLASS_META(I2CDevice, NativeClass)
+    DEFINE_NCLASS_META(I2CDevice, EventEmitter)
     std::vector<JSCFunctionListEntry> I2CDevice::methods = {
         JS_CFUNC_DEF("setup", 2, I2CDevice::setup),
         JS_CFUNC_DEF("readReg", 2, I2CDevice::readReg),
@@ -11,7 +11,7 @@ namespace be::driver {
     } ;
 
     I2CDevice::I2CDevice(JSContext * ctx, JSValue jsobj, uint8_t regSize, uint8_t regAddrSize, uint8_t addr)
-        : NativeClass(ctx,build(ctx,jsobj))
+        : EventEmitter(ctx,build(ctx,jsobj))
         , addr(addr)
         , regSize(regSize)
         , regAddrSize(regAddrSize)

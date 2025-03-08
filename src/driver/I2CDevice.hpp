@@ -1,11 +1,11 @@
 #pragma once
 
-#include <NativeClass.hpp>
+#include "EventEmitter.hpp"
 #include "module/serial/I2C.hpp"
 
 
 namespace be::driver {
-    class I2CDevice: public be::NativeClass {
+    class I2CDevice: public be::EventEmitter {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;

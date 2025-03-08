@@ -12,7 +12,7 @@ namespace be::driver {
         for(auto providerFunc : providers) {
             providerFunc(this) ;
         }
-        exportClass<I2CDevice>() ;
+        // exportClass<I2CDevice>() ;
 
         for (const auto& pair : extProviders) {
             exportName(pair.first.c_str()) ;
