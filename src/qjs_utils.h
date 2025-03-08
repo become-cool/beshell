@@ -84,11 +84,11 @@ extern "C" {
 
 
 #define ARGV_TO_INT(i, var, ctype, tmp_type, api)           \
-	ctype var = 0 ;                                         \
+	ctype var = (ctype)0 ;                                  \
     {                                                       \
         tmp_type tmp ;                                      \
         if( api(ctx, &tmp, argv[i])!=0 ) {                  \
-            JSTHROW("Invalid param type")           \
+            JSTHROW("Invalid param type")                   \
         }                                                   \
         var = (ctype)tmp ;                                  \
     }
@@ -101,6 +101,11 @@ extern "C" {
 #define ARGV_TO_INT32(i,var)    ARGV_TO_INT(i, var, int32_t,  int32_t,   JS_ToInt32)
 #define ARGV_TO_INT64(i,var)    ARGV_TO_INT(i, var, int64_t,  int64_t,   JS_ToInt64)
 #define ARGV_TO_DOUBLE(i,var)   ARGV_TO_INT(i, var, double,    double,   JS_ToFloat64)
+
+#define ARGV_TO_GPIO(i,var)     ARGV_TO_INT(i, var, gpio_num_t,uint32_t, JS_ToUint32) \
+    if(var>=GPIO_NUM_MAX) {                             \
+        JSTHROW("Invalid GPIO pin")                     \
+    }
 
 
 #define ARGV_TO_INT_OPT(i, var, ctype, tmp_type, api, def)  \
@@ -350,7 +355,7 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, default)
 #define GET_UINT16_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, default)
 #define GET_UINT32_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, default)
-#define GET_GPIO_PROP_OPT(obj, propName, cvar, default)       GET_INT_PROP_OPT(obj, propName, cvar, gpio_num_t, default)
+#define GET_GPIO_PROP_OPT(obj, propName, cvar, default)         GET_INT_PROP_OPT(obj, propName, cvar, gpio_num_t, default)
 
 
 #define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \
