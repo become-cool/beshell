@@ -134,6 +134,12 @@ namespace be{
                                     esp_gatt_if_t gattc_if,
                                     esp_ble_gattc_cb_param_t *param)
     {
+        be_bt_event event_msg = {
+            .event = static_cast<uint16_t>(100 + event) ,
+            .gattc_if = gattc_if,
+            .gatt = *param ,
+            .data = {NULL,0}
+        } ;
         switch (event) {
         case ESP_GATTC_REG_EVT:
             gattc_if_global = gattc_if ;
@@ -146,18 +152,32 @@ namespace be{
             // printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
             break;
 
+        case ESP_GATTC_READ_CHAR_EVT: {
+            // printf("ESP_GATTC_READ_CHAR_EVT\n") ;
+
+            event_msg.data.ptr = (uint8_t *)malloc(param->read.value_len) ;
+            if(event_msg.data.ptr) {
+                memcpy(event_msg.data.ptr, param->read.value, param->read.value_len) ;
+                event_msg.data.len = param->read.value_len ;
+            } else {
+                printf("malloc failed\n") ;
+            }
+            break;
+        }
+
         default:
             break;
         }
 
         if(BT::singleton){
-            be_bt_event event_msg = {
-                .event = static_cast<uint16_t>(100 + event) ,
-                .gattc_if = gattc_if,
-                .gatt = *param ,
-            } ;
             if( !BT::singleton->emitNativeEvent(&event_msg) ){
                 printf("bt queue full\n") ;
+
+                if(event_msg.data.ptr) {
+                    free(event_msg.data.ptr) ;
+                    event_msg.data.ptr = NULL ;
+                    event_msg.data.len = 0 ;
+                }
             }
         }
     }
@@ -283,12 +303,27 @@ namespace be{
                 break;
             }
             case ESP_GATTC_WRITE_DESCR_EVT: {
-                printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
+                // printf("ESP_GATTC_WRITE_DESCR_EVT\n") ;
                 emitSyncFree("write-desc", {
                     JS_NewInt32(ctx, msg->gatt.write.status) ,
                     JS_NewInt32(ctx, msg->gatt.write.handle) ,
                     JS_NewInt32(ctx, msg->gatt.write.offset)
                 }) ;
+                break;
+            }
+
+            case ESP_GATTC_READ_CHAR_EVT: {
+                
+                emitSyncFree("read-char", {
+                    JS_NewInt32(ctx, msg->gatt.read.status) ,
+                    JS_NewInt32(ctx, msg->gatt.read.handle) ,
+                    JS_NewArrayBufferCopy(ctx, msg->data.ptr, msg->data.len)
+                }) ;
+                
+                free(msg->data.ptr) ;
+                msg->data.ptr = NULL ;
+                msg->data.len = 0 ;
+
                 break;
             }
 
@@ -603,6 +638,15 @@ namespace be{
     }
     JSValue BT::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_GATTC_IF
+        CHECK_ARGC(2)
+        ARGV_TO_UINT16(0, conn_id)
+        ARGV_TO_UINT16(1, handle)
+
+        esp_err_t err = esp_ble_gattc_read_char(gattc_if_global, conn_id, handle,ESP_GATT_AUTH_REQ_NONE);
+        if (err != ESP_OK) {
+            JSTHROW("esp_ble_gattc_read_char() failed, error = %x")
+        }
+
         return JS_UNDEFINED ;
     }
     JSValue BT::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

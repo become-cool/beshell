@@ -17,6 +17,10 @@ namespace be{
             esp_ble_gap_cb_param_t gap ;
             esp_ble_gattc_cb_param_t gatt ;
         };
+        struct {
+            void * ptr ;
+            uint16_t len ;
+        } data ;
     } ;
     
 

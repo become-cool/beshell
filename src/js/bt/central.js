@@ -155,6 +155,10 @@ class Characteristic extends EventEmitter {
       if (this.desc["0x2902"] != handle) return
       this.emit("subscribe", status, offset)
     })
+    bt.on("read-char", (status, handle, data) => {
+      if (this.handle != handle) return
+      this.emit("read-char", status, data)
+    })
   }
   write(data,rsp) {
     bt.write(this.connid, this.handle, data, !!rsp)
@@ -170,7 +174,17 @@ class Characteristic extends EventEmitter {
     })
   }
   read() {
-    JSTHROW("not implements")
+    bt.read(this.connid, this.handle)
+    return new Promise((resolve, reject) => {
+      this.once("read-char", (status, data) => {
+        if (status) {
+          console.log("write failed with error: " + status)
+          reject(new Error("write failed with error: " + status))
+        } else {
+          resolve(data)
+        }
+      })
+    })
   }
   subscribe() {
     if (!this.desc["0x2902"]) {
