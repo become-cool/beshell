@@ -1,5 +1,6 @@
 #include "MQTTClient.hpp"
 #include "../Mg.hpp"
+#include "mongoose/mongoose.h"
 #include <cstring>
 
 using namespace std ;
@@ -148,14 +149,53 @@ namespace be::mg {
         }
     }
 
+    #define PROP_TO_MGSTR(obj, propName, cvar)                          \
+        {                                                               \
+            JSValue jsvar = JS_GetPropertyStr(ctx,obj, propName) ;      \
+            if(JS_IsString(jsvar)) {                                    \
+                size_t len = 0 ;                                        \
+                const char * val = JS_ToCStringLen(ctx, &len, jsvar) ;  \
+                cvar = mg_strdup(mg_str_n(val, len)) ;                  \
+                JS_FreeCString(ctx, val) ;                              \
+            }                                                           \
+            JS_FreeValue(ctx, jsvar) ;                                  \
+        }
+
     JSValue MQTTClient::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         
         ASSERT_ARGC(1)
         ARGV_TO_CSTRING_LEN_E(0, url, urlLen, "arg url must be a string")
 
+        struct mg_mqtt_opts opts = {.clean = true};
+        if(argc>1) {
+            if( !JS_IsObject(argv[1]) ) {
+                JSTHROW("arg opts must be an object") ;
+            }
+
+            PROP_TO_MGSTR(argv[1], "user", opts.user)
+            PROP_TO_MGSTR(argv[1], "pass", opts.pass)
+            PROP_TO_MGSTR(argv[1], "client_id", opts.client_id)
+            PROP_TO_MGSTR(argv[1], "will_topic", opts.will_topic)
+            PROP_TO_MGSTR(argv[1], "will_message", opts.will_message)
+
+            GET_BOOL_PROP_OPT(argv[1], "will_retain", opts.will_retain, false)
+            GET_BOOL_PROP_OPT(argv[1], "clean", opts.clean, true)
+            GET_UINT8_PROP_OPT(argv[1], "qos", opts.qos, 0)
+            GET_UINT16_PROP_OPT(argv[1], "keepalive", opts.keepalive, 0)
+        }
+
+        // ds(opts.user.ptr)
+        // ds(opts.pass.ptr)
+        // ds(opts.client_id.ptr)
+        // ds(opts.will_topic.ptr)
+        // ds(opts.will_message.ptr)
+        // dn(opts.will_retain)
+        // dn(opts.clean)
+        // dn(opts.qos)
+        // dn(opts.keepalive)
+
         MQTTClient * client = new MQTTClient(ctx, nullptr) ;
 
-        struct mg_mqtt_opts opts = {.clean = true};
         struct mg_connection * conn = mg_mqtt_connect(&Mg::mgr, url, &opts, (mg_event_handler_t)eventHandler, (void*)client);
         
         JS_FreeCString(ctx, url) ;
