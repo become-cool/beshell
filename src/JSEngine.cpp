@@ -5,6 +5,7 @@
 #include <string.h>
 #include "debug.h"
 #include "js/json.c"
+#include "js/misc.c"
 #include "ModuleLoader.hpp"
 #include "EventEmitter.hpp"
 #include "module/Process.hpp"
@@ -142,6 +143,7 @@ namespace be {
         setGlobalValue(ctx, "console", engine->console->jsobj) ;
 
         JSEngineEvalEmbeded(ctx, json)
+        JSEngineEvalEmbeded(ctx, misc)
         
 
         NativeClass::defineClass(ctx) ;

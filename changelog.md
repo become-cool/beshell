@@ -20,6 +20,7 @@ Added:
 * NativeClass.setDestructor()
 * mg.startCaptivePortal()
 * mg.Request.isCaptivePortalRequest()
+* global function delay
 
 Fixed:
 
