@@ -23,6 +23,7 @@ static const char *TAG = "bt";
 // 全局变量，用于记录连接相关信息
 static esp_gatt_if_t      gattc_if_global     = 0;
 
+
 namespace be{
     const char * const BT::name = "bt" ;
     BT * BT::singleton = nullptr ;
@@ -39,6 +40,9 @@ namespace be{
         EXPORT_FUNCTION(startScan)
         EXPORT_FUNCTION(stopScan)
         EXPORT_FUNCTION(isScanning)
+        EXPORT_FUNCTION(setAdvName)
+        EXPORT_FUNCTION(setAdvData)
+        EXPORT_FUNCTION(startAdv)
         EXPORT_FUNCTION(setMTU)
         EXPORT_FUNCTION(requestMTU)
         EXPORT_FUNCTION(connect)
@@ -116,6 +120,16 @@ namespace be{
                 BT::bScanning = false ;
                 break;
             }
+            // 广播
+            case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
+                printf("start adv\n");
+                break;
+            case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
+                printf("start completed: %d\n",param->adv_start_cmpl.status);
+                if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+                    printf("Advertising start failed\n");
+                }
+                break;
         }
         if(BT::singleton){
             be_bt_event event_msg = {
@@ -612,6 +626,81 @@ namespace be{
         }
         return JS_UNDEFINED ;
     }
+    
+    JSValue BT::setAdvName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
+        CHECK_ARGC(1)
+
+        ARGV_TO_CSTRING(0, name)
+        ds(name)
+        esp_err_t err = esp_ble_gap_set_device_name(name);
+        JS_FreeCString(ctx, name) ;
+
+        if(err!=ESP_OK) {
+            JSTHROW("esp_ble_gap_set_device_name failed, err = %d", err)
+        }
+
+        return JS_UNDEFINED ;
+    }
+
+    JSValue BT::setAdvData(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
+        CHECK_ARGC(1)
+        ARGV_TO_ARRAYBUFFER(0, data, datalen)
+        esp_err_t err = esp_ble_gap_config_adv_data_raw(data, datalen);
+        if(err!=ESP_OK) {
+            JSTHROW("esp_ble_gap_config_adv_data_raw failed, err = %d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+
+    uint16_t                adv_int_min;        /*!< Minimum advertising interval for
+                                                  undirected and low duty cycle directed advertising.
+                                                  Range: 0x0020 to 0x4000 Default: N = 0x0800 (1.28 second)
+                                                  Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec */
+    uint16_t                adv_int_max;        /*!< Maximum advertising interval for
+                                                  undirected and low duty cycle directed advertising.
+                                                  Range: 0x0020 to 0x4000 Default: N = 0x0800 (1.28 second)
+                                                  Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec Advertising max interval */
+    esp_ble_adv_type_t      adv_type;           /*!< Advertising type */
+    esp_ble_addr_type_t     own_addr_type;      /*!< Owner bluetooth device address type */
+    esp_bd_addr_t           peer_addr;          /*!< Peer device bluetooth device address */
+    esp_ble_addr_type_t     peer_addr_type;     /*!< Peer device bluetooth device address type, only support public address type and random address type */
+    esp_ble_adv_channel_t   channel_map;        /*!< Advertising channel map */
+    esp_ble_adv_filter_t    adv_filter_policy;  /*!< Advertising filter policy */
+    JSValue BT::startAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_GATTC_IF
+        esp_ble_adv_params_t adv_params = {
+            .adv_int_min       = 0xA0,                              // 最小广播间隔 0xA0*0.625ms=250ms
+            .adv_int_max       = 0xB0,                              // 最大广播间隔 0xB0*0.625ms=300ms
+            .adv_type          = ADV_TYPE_IND,                      // 可连接的非定向广播
+            .own_addr_type     = BLE_ADDR_TYPE_PUBLIC,              // 公共地址
+            .channel_map       = ADV_CHNL_ALL,                      // 使用所有频道
+            .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY, // 允许扫描和连接
+        };
+        if(argc>0) {
+            GET_INT32_PROP_OPT( argv[0], "min",                 adv_params.adv_int_min,         0xA0 )
+            GET_INT32_PROP_OPT( argv[0], "max",                 adv_params.adv_int_max,         0xB0 )
+            GET_INT32_PROP_OPT( argv[0], "type",                adv_params.adv_type,            ADV_TYPE_IND )
+            GET_INT16_PROP_OPT( argv[0], "own_addr_type",       adv_params.own_addr_type,       BLE_ADDR_TYPE_PUBLIC )
+            GET_INT16_PROP_OPT( argv[0], "channel_map",         adv_params.channel_map,         ADV_CHNL_ALL )
+            GET_INT32_PROP_OPT( argv[0], "adv_filter_policy",   adv_params.adv_filter_policy,   ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY )
+        }
+
+        dn(adv_params.adv_int_min)
+        dn(adv_params.adv_int_max)
+        dn(adv_params.adv_type)
+        dn(adv_params.own_addr_type)
+        dn(adv_params.channel_map)
+        dn(adv_params.adv_filter_policy)
+
+        esp_err_t err = esp_ble_gap_start_advertising(&adv_params);
+        if(err!=ESP_OK) {
+            JSTHROW("esp_ble_gap_start_advertising failed, err = %d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+    
 
     JSValue BT::setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
