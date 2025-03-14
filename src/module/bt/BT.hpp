@@ -46,6 +46,7 @@ namespace be{
         static JSValue setAdvName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setAdvData(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue startAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue stopAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
