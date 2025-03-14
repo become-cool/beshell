@@ -36,7 +36,7 @@ Refactored:
 * wifi.conenct()  auto call startStaDeamon() when retry==-1
 * EventEmitter::emitNativeEvent() 返回 bool
 * 修改了 dt.device 中驱动对象的存放结构
-
+* rename process.delay() to process.sleep()
 
 ## v0.3.6   2024-11-27
 

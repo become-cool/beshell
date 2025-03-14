@@ -26,7 +26,7 @@ namespace be {
             : NativeModule(ctx, name, flagGlobal) {
 
         exportFunction("reboot", reboot);
-        exportFunction("delay", delay);
+        exportFunction("sleep", sleep);
         exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
@@ -269,11 +269,11 @@ namespace be {
     /**
      * 延时函数
      * 
-     * @function delay
+     * @function sleep
      * @param ms:number 延时时间，单位为毫秒
      * @return undefined
      */
-    JSValue Process::delay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Process::sleep(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_UINT32(0, ms)
         vTaskDelay(ms/portTICK_PERIOD_MS) ;

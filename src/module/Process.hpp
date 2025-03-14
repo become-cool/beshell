@@ -9,7 +9,7 @@ namespace be {
         void exports(JSContext *ctx) ;
         
         static JSValue reboot(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue delay(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue sleep(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
