@@ -1,7 +1,7 @@
 import { exportValue } from "loader"
 import * as mg from "mg"
 
-;[get, download].map(func => exportValue(mg, func.name, func))
+;[get, download, post].map(func => exportValue(mg, func.name, func))
 
 
 function WatchDog (ms, cbTimeout){
@@ -31,26 +31,10 @@ function request(url, handle) {
     conn = mg.connect(url, (event, data) => {
       if(!conn) return
       switch (event) {
-        case 'connect':
-          
-          let info = mg.parseUrl(url)
-          try {
-            if (url.match(/^https:\/\//i)) {
-              conn.initTLS(info.host)
-            }
-          } catch (e) {
-            console.log(e)
-          }
-          conn.send(`GET ${info.uri} HTTP/1.0\r\n`)
-          conn.send(`Host: ${info.host}\r\n`)
-          conn.send(`User-Agent: BeShell\r\n`)
-          conn.send(`\r\n`)
-
-          break
         case 'timeout':
         case 'error':
-        console.log("mg timeout/error",reason)
-          reject(reason||event)
+          // console.log("mg timeout/error")
+          reject(event)
           break
         case 'close':
           timeTick.stop()
@@ -61,21 +45,40 @@ function request(url, handle) {
           timeTick()
           // 这里没有break
         default:
-          handle(conn,event,data)
+          handle(conn,event,data,timeTick)
           break
       }
     })
   })
 }
 
-async function get(url) {
+async function get(url,handle) {
   let body = null
   let received = false
-  await request(url, (conn,event,msg)=>{
+  await request(url, (conn,event,msg,wdg)=>{
     if(event=='http.msg'){
       body = msg.body()
       received = true
     }
+    else if(event=='http.chunk'){
+        body = msg.chunk()
+      received = true
+    }
+    else if(event=='connect') {
+      let info = mg.parseUrl(url)
+      try {
+        if (url.match(/^https:\/\//i)) {
+          conn.initTLS(info.host)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      conn.send(`GET ${info.uri} HTTP/1.0\r\n`)
+      conn.send(`Host: ${info.host}\r\n`)
+      conn.send(`User-Agent: BeShell\r\n`)
+      conn.send(`\r\n`)
+    }
+    handle && handle(conn,event,msg)
   })
   if(!received) {
     throw new Error("the connection was unexpectedly disconnected.")
@@ -90,7 +93,7 @@ async function download(url, localPath, progress_cb) {
   let done = false
   try{
     let t = Date.now()
-    await request(url, (conn,event,msg)=>{
+    await get(url, (conn,event,msg)=>{
       if(event=='http.msg'||event=='http.chunk'){
 
         let data = (event == 'http.msg') ? msg.body() : msg.chunk()
@@ -120,4 +123,42 @@ async function download(url, localPath, progress_cb) {
     }
     throw e
   }
+}
+
+async function post(url, ab) {
+  let body = null
+  let received = false
+  await request(url, (conn,event,msg)=>{
+    if(event=='http.msg'){
+      body = msg.body()
+      received = true
+    }
+    else if(event=='http.chunk'){
+      body = msg.chunk()
+      received = true
+    }
+    else if(event=='connect') {
+      let info = mg.parseUrl(url)
+      try {
+        if (url.match(/^https:\/\//i)) {
+          conn.initTLS(info.host)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      conn.send(`POST ${info.uri} HTTP/1.0\r\n`)
+      conn.send(`Host: ${info.host}\r\n`)
+      conn.send(`User-Agent: BeShell\r\n`)
+      conn.send(`Content-Type: application/octet-stream\r\n`)
+      conn.send(`Content-Length: ${ab.byteLength}\r\n`)
+      conn.send(`\r\n`)
+
+      // @todo use timeTick
+      conn.send(ab)
+    }
+  })
+  if(!received) {
+    throw new Error("the connection was unexpectedly disconnected.")
+  }
+  return body
 }

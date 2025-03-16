@@ -53,31 +53,30 @@ namespace be::mg {
 
         // ws/wss
         if(client->is_ws) {
-            size_t size ;
-
-            JSValue except = JS_GetException(ctx) ;
-            JS_FreeValue(ctx, except) ;
-
-            char * buff = (char *)JS_GetArrayBuffer(ctx, &size, argv[0]) ;
-
-            except = JS_GetException(ctx) ;
-            JS_FreeValue(ctx, except) ;
-
-            if(buff) {
+            if( JS_IsArrayBuffer(argv[0]) ){
+                size_t size ;
+                char * buff = (char *)JS_GetArrayBuffer(ctx, &size, argv[0]) ;
                 res = mg_ws_send(client->conn, buff, size, WEBSOCKET_OP_BINARY);
             }
             else {
                 ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
                 res = mg_ws_send(client->conn, data, len, WEBSOCKET_OP_TEXT);
-                JS_FreeCString(client->ctx, buff) ;
+                JS_FreeCString(client->ctx, data) ;
             }
         }
 
         // http/https
         else {
-            ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
-            res = mg_send(client->conn, data, len) ;
-            JS_FreeCString(ctx, data) ;
+            if( JS_IsArrayBuffer(argv[0]) ){
+                size_t datalen = 0;
+                uint8_t * data = (uint8_t *)JS_GetArrayBuffer(ctx, &datalen, argv[0]) ;
+                res = mg_send(client->conn, data, datalen) ;
+            }
+            else {
+                ARGV_TO_CSTRING_LEN_E(0, data, len, "arg data must be a string")
+                res = mg_send(client->conn, data, len) ;
+                JS_FreeCString(ctx, data) ;
+            }
         }
 
         return res? JS_TRUE : JS_FALSE;

@@ -7,7 +7,10 @@ Added:
 * wifi.stopStaDeamon()
 * wifi.isStaDeamonRunning()
 * fs.tell()
+* mg.startCaptivePortal()
+* mg.Request.isCaptivePortalRequest()
 * mg.sntpRequest()
+* mg.post()
 * mongoose 支持 mqtt
 * NativeClass::emitSyncFree()
 * spi eth ic driver W5500
@@ -18,9 +21,8 @@ Added:
 * process.ref()
 * export NativeClass to global ns
 * NativeClass.setDestructor()
-* mg.startCaptivePortal()
-* mg.Request.isCaptivePortalRequest()
 * global function delay
+* JS_IsArrayBuffer()
 
 Fixed:
 

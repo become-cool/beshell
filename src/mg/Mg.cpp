@@ -56,6 +56,7 @@ namespace be::mg {
 
         exportName("get") ;
         exportName("download") ;
+        exportName("post") ;
 
         // exportFunction("isListening",isListening,0) ;
         exportFunction("sntpRequest",sntpRequest,0) ;
