@@ -1058,6 +1058,7 @@ void JS_SetModuleDefOpaque(JSModuleDef *m, void *opaque) ;
 
 
 JSModuleDef * JS_FindModuleWithNS(JSContext *ctx, JSValue ns) ;
+JS_BOOL JS_IsArrayBuffer(JSValue obj) ;
 
 #ifdef __cplusplus
 } /* extern "C" { */

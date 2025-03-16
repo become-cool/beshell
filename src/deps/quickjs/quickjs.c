@@ -53725,3 +53725,12 @@ JSModuleDef * JS_FindModuleWithNS(JSContext *ctx, JSValue ns) {
     }
     return NULL;
 }
+
+JS_BOOL JS_IsArrayBuffer(JSValue obj) {
+    JSObject *p;
+    if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
+        return false ;
+    p = JS_VALUE_GET_OBJ(obj);
+    return p->class_id == JS_CLASS_ARRAY_BUFFER ||
+        p->class_id == JS_CLASS_SHARED_ARRAY_BUFFER ;
+}
