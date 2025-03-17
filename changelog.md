@@ -23,6 +23,7 @@ Added:
 * NativeClass.setDestructor()
 * global function delay
 * JS_IsArrayBuffer()
+* console.block()
 
 Fixed:
 

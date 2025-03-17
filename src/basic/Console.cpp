@@ -90,10 +90,61 @@ function() {
             return ;
         })
 
+        JSValue DEF_JS_FUNC(jsBlock, R"(
+function block(buffer, columns, separator, numSys) {
+    numSys = typeof numSys !== 'undefined' ? numSys : 16;
+    columns = typeof columns !== 'undefined' ? columns : 16;
+    separator = typeof separator !== 'undefined' ? separator : ', ';
+
+    if (![2, 8, 10, 16].includes(numSys)) {
+        throw new Error('numSys must be 2, 8, 10, or 16');
+    }
+
+    var bytes;
+    if (buffer instanceof Uint8Array) {
+        bytes = buffer;
+    } else if (buffer instanceof ArrayBuffer) {
+        bytes = new Uint8Array(buffer);
+    } else {
+        throw new Error('buffer must be an ArrayBuffer or Uint8Array');
+    }
+
+    var formatNumber = function(num) {
+        switch (numSys) {
+            case 2:
+                return '0b' + num.toString(2).padStart(8, '0');
+            case 8:
+                return '0o' + num.toString(8).padStart(3, '0');
+            case 10:
+                return num.toString(10);
+            case 16:
+                return '0x' + num.toString(16).padStart(2, '0');
+            default:
+                return '';
+        }
+    };
+
+    var formattedBytes = Array.prototype.map.call(bytes, formatNumber);
+
+    var lines = [];
+    for (var i = 0; i < formattedBytes.length; i += columns) {
+        var line = formattedBytes.slice(i, i + columns).join(separator);
+        lines.push(line);
+    }
+
+    console.log(lines.join('\n'))
+}
+    )", "console.js", {
+            engine->dumpError() ;
+            return ;
+        })
+
         JS_SetPropertyStr(ctx, jsobj, "stringify", jsStringify) ;
         JS_SetPropertyStr(ctx, jsobj, "log", jsLog) ;
         JS_SetPropertyStr(ctx, jsobj, "error", jsLog) ;
         JS_SetPropertyStr(ctx, jsobj, "emit", jsEmit) ;
+        JS_SetPropertyStr(ctx, jsobj, "block", jsBlock) ;
+        
     }
 
     JSValue Console::jsWrite(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
