@@ -33,6 +33,7 @@
 #include "module/Path.hpp"
 #include "module/Process.hpp"
 #include "module/WiFi.hpp"
+#include "module/Flash.hpp"
 #if CONFIG_BT_BLUEDROID_ENABLED
 #include "module/bt/BT.hpp"
 #elif CONFIG_BT_NIMBLE_ENABLED

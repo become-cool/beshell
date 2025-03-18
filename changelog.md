@@ -24,6 +24,7 @@ Added:
 * global function delay
 * JS_IsArrayBuffer()
 * console.block()
+* flash module
 
 Fixed:
 
