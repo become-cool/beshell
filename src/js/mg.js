@@ -1,7 +1,7 @@
 import { exportValue } from "loader"
 import * as mg from "mg"
 
-;[get, download, post].map(func => exportValue(mg, func.name, func))
+;[request, get, download, post].map(func => exportValue(mg, func.name, func))
 
 
 function WatchDog (ms, cbTimeout){
