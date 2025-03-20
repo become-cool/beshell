@@ -8,7 +8,7 @@ namespace be {
         void exports(JSContext *ctx) ;
     public:
 
-        static const char *name ;
+        static char const * const name ;
 
         Serial(JSContext * ctx, const char * name) ;
         ~Serial() ;

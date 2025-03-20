@@ -10,7 +10,7 @@ namespace be{
         static const char * deviceJsonPath ;
 
     public:
-        static const char * name ;
+        static char const * const name ;
         DeviceTree(JSContext * ctx, const char * name) ;
 
         void exports(JSContext *ctx) ;

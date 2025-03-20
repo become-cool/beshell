@@ -37,7 +37,7 @@ namespace be {
         virtual void exports(JSContext *ctx) ;
 
     public:
-        static const char * name ;
+        static char const * const name ;
 
         uint8_t flagGlobal = 0 ;
         

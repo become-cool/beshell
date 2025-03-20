@@ -4,7 +4,7 @@
 
 namespace be{
 
-    const char * DeviceTree::name = "dt" ;
+    char const * const DeviceTree::name = "dt" ;
 
     const char * DeviceTree::deviceJsonPath = nullptr ;
 

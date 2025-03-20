@@ -25,7 +25,7 @@ static esp_gatt_if_t      gattc_if_global     = 0;
 
 
 namespace be{
-    const char * const BT::name = "bt" ;
+    char const * const BT::name = "bt" ;
     BT * BT::singleton = nullptr ;
     bool BT::bScanning = false ;
 

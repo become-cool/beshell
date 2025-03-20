@@ -35,7 +35,7 @@ namespace be {
     map<std::string, FSPartition *> FS::partitions;
     std::string FS::pwd = "/" ;
     std::string FS::prefix = "/fs";
-    const char * FS::name = "fs" ;
+    char const * const FS::name = "fs" ;
 
     inline static bool isDir(const char * path) {
         struct stat statbuf;

@@ -309,7 +309,7 @@ void be::WiFi::onNativeEvent(JSContext *ctx, void * param) {
 
 namespace be {
 
-    const char * const WiFi::name = "wifi" ;
+    char const * const WiFi::name = "wifi" ;
     WiFi * WiFi::singleton = nullptr ;
     
     WiFi::WiFi(JSContext * ctx, const char * name)

@@ -23,7 +23,7 @@ namespace be::nimble {
 
     class NimBLE: public be::EventModule {
     public:
-        static const char * const name ;
+        static char const * const name ;
 
         NimBLE(JSContext * ctx, const char * name) ;
 

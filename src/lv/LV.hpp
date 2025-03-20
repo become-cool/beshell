@@ -21,7 +21,7 @@ namespace lv {
 
     public:
 
-        static const char * const name ;
+        static char const * const name ;
         
         LV(JSContext * ctx, const char * name) ;
 

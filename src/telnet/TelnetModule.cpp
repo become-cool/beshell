@@ -2,7 +2,7 @@
 
 namespace be{
 
-    const char * const TelnetModule::name = "telnet" ;
+    char const * const TelnetModule::name = "telnet" ;
 
     std::vector<NativeModuleExportorFunc> TelnetModule::exportors ;
 

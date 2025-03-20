@@ -88,7 +88,7 @@ using namespace std ;
 
 namespace be {
     
-    const char * NVS::name = "nvs" ;
+    char const * const NVS::name = "nvs" ;
 
     void NVS::use(BeShell * beshell) {
 #ifdef ESP_PLATFORM

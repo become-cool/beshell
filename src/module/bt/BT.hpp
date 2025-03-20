@@ -27,7 +27,7 @@ namespace be{
     class BT: public be::EventModule {
 
     public:
-        static const char * const name ;
+        static char const * const name ;
         static BT * singleton ;
         static bool bScanning ;
 

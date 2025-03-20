@@ -14,7 +14,7 @@ namespace be::mg {
     class Mg: public be::NativeModule {
 
     public:
-        static const char * name ;
+        static char const * const name ;
 
         Mg(JSContext * ctx, const char * name) ;
 

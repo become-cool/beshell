@@ -5,7 +5,7 @@
 namespace be::sqlite{
     class SQLite3: public be::NativeModule {
     public:
-        static const char * name ;
+        static char const * const name ;
         SQLite3(JSContext * ctx, const char * name) ;
 
         // void exports(JSContext *ctx) ;

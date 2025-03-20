@@ -11,7 +11,7 @@ namespace be {
     private:
     protected:
     public:
-        static const char * name ;
+        static char const * const name ;
         static void use(BeShell * beshell) ;
 
         NVS(JSContext * ctx, const char * name,uint8_t flagGlobal=0);

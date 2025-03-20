@@ -13,7 +13,7 @@ namespace be{
         static void exportBT(JSContext *ctx, NativeModule * module) ;
 
     public:
-        static const char * const name ;
+        static char const * const name ;
 
         TelnetModule(JSContext * ctx, const char * name) ;
 

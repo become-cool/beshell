@@ -25,7 +25,7 @@ namespace be {
         static std::map<std::string, FSPartition *> partitions;
         static std::string pwd ;
 #endif
-        static const char * name ;
+        static char const * const name ;
 
         // for JS
         FS(JSContext * ctx, const char * name,uint8_t flagGlobal=1);

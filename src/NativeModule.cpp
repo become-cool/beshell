@@ -15,7 +15,7 @@ using namespace std ;
 
 namespace be {
 
-    const char * NativeModule::name = nullptr ;
+    char const * const NativeModule::name = nullptr ;
 
     NativeModule::NativeModule(JSContext * _ctx, const char * name, uint8_t _flagGlobal)
         : ctx(_ctx)

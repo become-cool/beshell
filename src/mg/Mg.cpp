@@ -34,7 +34,7 @@
 
 namespace be::mg {
 
-    const char * Mg::name = "mg" ;
+    char const * const Mg::name = "mg" ;
 
     struct mg_mgr Mg::mgr ;
 

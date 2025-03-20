@@ -7,7 +7,7 @@ using namespace std ;
 
 namespace be::sqlite{
 
-    const char * SQLite3::name = "sqlite3" ;
+    char const * const SQLite3::name = "sqlite3" ;
 
     SQLite3::SQLite3(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)

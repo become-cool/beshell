@@ -31,7 +31,7 @@
 
 namespace be::nimble {
 
-    const char * const NimBLE::name = "nimble" ;
+    char const * const NimBLE::name = "nimble" ;
 
     static int mtu_def = 512;
     

@@ -8,7 +8,7 @@ namespace be {
 
     class WiFi: public be::EventModule {
     public:
-        static const char * const name ;
+        static char const * const name ;
         static WiFi * singleton ;
 
         WiFi(JSContext * ctx, const char * name) ;

@@ -9,7 +9,7 @@ using namespace be::driver::disp ;
 
 namespace be::lv {
 
-    const char * const LV::name = "lv" ;
+    char const * const LV::name = "lv" ;
     esp_timer_handle_t LV::tickTimer = nullptr ;
     bool LV::used = false ;
     bool LV::dispReady = false ;
