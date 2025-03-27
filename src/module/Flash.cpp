@@ -84,8 +84,10 @@ namespace be{
         switch(self->partition->type) {
             case ESP_PARTITION_TYPE_APP: return JS_NewString(ctx, "app") ;
             case ESP_PARTITION_TYPE_DATA: return JS_NewString(ctx, "data") ;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 4, 0)
             case ESP_PARTITION_TYPE_BOOTLOADER: return JS_NewString(ctx, "bootloader") ;
             case ESP_PARTITION_TYPE_PARTITION_TABLE: return JS_NewString(ctx, "partition_table") ;
+#endif
             default: return JS_NewString(ctx, "UNKNOWN") ;
         }
     }
