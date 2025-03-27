@@ -187,13 +187,13 @@ namespace be{
             }
             // 广播
             case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
-                printf("start adv\n");
+                // printf("start adv\n");
                 break;
             case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
-                printf("start completed: %d\n",param->adv_start_cmpl.status);
-                if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-                    printf("Advertising start failed\n");
-                }
+                // printf("start completed: %d\n",param->adv_start_cmpl.status);
+                // if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+                //     printf("Advertising start failed\n");
+                // }
                 break;
         }
         if(BT::singleton){
