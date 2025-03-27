@@ -78,7 +78,11 @@ async function get(url,handle) {
       conn.send(`User-Agent: BeShell\r\n`)
       conn.send(`\r\n`)
     }
-    handle && handle(conn,event,msg)
+    try{
+      handle && handle(conn,event,msg)
+    }catch(e) {
+      console.error(e)
+    }
   })
   if(!received) {
     throw new Error("the connection was unexpectedly disconnected.")
@@ -88,7 +92,10 @@ async function get(url,handle) {
 
 
 async function download(url, localPath, progress_cb) {
-  let fhandle = fs.open(localPath, "w")
+  let fhandle = null
+  if(localPath) {
+    fhandle = fs.open(localPath, "w")
+  }
   let wroten = 0
   let done = false
   try{
@@ -96,23 +103,29 @@ async function download(url, localPath, progress_cb) {
     await get(url, (conn,event,msg)=>{
       if(event=='http.msg'||event=='http.chunk'){
 
-        let data = (event == 'http.msg') ? msg.body() : msg.chunk()
-        let chunk = data.slice(wroten, data.byteLength)
-        fs.write(fhandle, chunk)
+        let chunk = (event == 'http.msg') ? msg.body() : msg.chunk()
+        // let chunk = data //data.slice(wroten, data.byteLength)
+        if(fhandle) {
+          fs.write(fhandle, chunk)
+        }
         wroten += chunk.byteLength
 
-        progress_cb && progress_cb(msg.bodyLength(), wroten)
+        try{
+          progress_cb && progress_cb(msg.bodyLength(), wroten, chunk)
+        } catch(e) {
+          console.error(e)
+        }
 
         if (wroten == msg.bodyLength()) {
-          fs.close(fhandle)
-          fhandle = 0
+          fhandle && fs.close(fhandle)
+          fhandle = null
           done = true
           conn.close()
         }
       }
     })
     if(!done) {
-        fs.close(fhandle)
+        fhandle && fs.close(fhandle)
         fhandle = 0
         throw new Error("the connection was unexpectedly disconnected.")
     }
