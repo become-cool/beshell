@@ -180,6 +180,8 @@ namespace be::mg {
                 JS_FreeValue(client->ctx, req->jsobj) ;
                 JS_FreeValue(client->ctx, evname) ;
 
+                mg_http_delete_chunk(conn, hm) ;
+
                 break ;
             }
 
