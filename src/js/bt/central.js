@@ -11,7 +11,7 @@ class Central {
 
   init() {
 
-    bt.init()
+    bt.initCentral()
 
     bt.on("open", (status, connid, addr) => {
       if (status == 0) {
@@ -276,5 +276,6 @@ function waitScanning(ms) {
 
 export const central = new Central
 exportValue(bt,"central",central)
+exportValue(bt,"cent",central)
 exportValue(bt,"parseAdv",parseAdv)
 exportValue(bt,"waitScanning",waitScanning)
