@@ -140,6 +140,17 @@ namespace be {
     NVS_INT_SETTER(Uint16, u16, uint16_t)
     NVS_INT_SETTER(Uint32, u32, uint32_t)
     
+    int NVS::erase(const char * key, const char * ns) {
+        nvs_handle_t handle;
+        esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
+        if(err!=ESP_OK) {
+            return (int)err ;
+        }
+        err = nvs_erase_key(handle, key) ;
+        nvs_close(handle) ;
+        return (int)err ;
+    }
+
     bool NVS::readFloat(const char * key, float & value, const char * ns) {
         int32_t ival = * (int32_t*)&value ;
         if(readInt32(key, ival, ns)){
@@ -168,6 +179,28 @@ namespace be {
     bool NVS::writeDouble(const char * key, double value, const char * ns) {
         int64_t ival = * (int64_t*)&value ;
         return writeInt64(key, ival, ns) ;
+    }
+
+    
+    int NVS::readString(const char * key, char * buff, size_t buffsize, const char * ns) {
+        nvs_handle_t handle;
+        esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
+        if(err!=ESP_OK) {
+            return (int)err ;
+        }
+        err = nvs_get_str(handle, key, buff, & buffsize);
+        nvs_close(handle) ;
+        return (int)err ;
+    }
+    int NVS::writeString(const char * key, const char * value, const char * ns) {
+        nvs_handle_t handle;
+        esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
+        if(err!=ESP_OK) {
+            return (int)err ;
+        }
+        err = nvs_set_str(handle, key, value);
+        nvs_close(handle) ;
+        return (int)err ;
     }
 
     // js api
@@ -241,6 +274,9 @@ namespace be {
         }
 
         esp_err_t res = nvs_get_str(handle, key.c_str(), value, (size_t*)&buff_size);
+        if(res==ESP_ERR_NVS_NOT_FOUND) {
+            return JS_NULL ;
+        }
         if(res!= ESP_OK) {
             free(value) ;
             nvs_close(handle) ;

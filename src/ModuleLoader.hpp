@@ -52,6 +52,19 @@ namespace be {
         static char * normalize(JSContext *ctx, const char *module_base_name, const char * module_name, void *opaque) ;
         static JSModuleDef * load(JSContext *ctx, const char *path, void *opaque) ;
 
+
+        /**
+         * 返回被 import 后的 ns 对象
+         * 需要调用者 JS_FreeValue
+         */
+        template <typename M>
+        static JSValue nsObject(JSContext * ctx) {
+            NativeModule * nm = ModuleLoader::moduleByName(ctx, M::name) ;
+            if(!nm) {
+                return JS_NULL ;
+            }
+            return nm->nsObject() ;
+        }
     friend class JSLoader ;
     } ;
 }

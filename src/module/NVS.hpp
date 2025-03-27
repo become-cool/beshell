@@ -18,6 +18,7 @@ namespace be {
 
         void readOneTime(const char * key, uint8_t * value) const ;
         
+        static int erase(const char * key, const char * ns="beshell") ;
         static bool readInt8(const char * key, int8_t & value, const char * ns="beshell") ;
         static bool readInt16(const char * key, int16_t & value, const char * ns="beshell") ;
         static bool readInt32(const char * key, int32_t & value, const char * ns="beshell") ;
@@ -34,7 +35,9 @@ namespace be {
         static bool writeUint16(const char * key, uint16_t value, const char * ns="beshell") ;
         static bool writeUint32(const char * key, uint32_t value, const char * ns="beshell") ;
 
-        
+        static int readString(const char * key, char * buff, size_t buffsize, const char * ns="beshell") ;
+        static int writeString(const char * key, const char * value, const char * ns="beshell") ;
+
         static bool readFloat(const char * key, float & value, const char * ns="beshell") ;
         static bool writeFloat(const char * key, float value, const char * ns="beshell") ;
         

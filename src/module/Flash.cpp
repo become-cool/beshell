@@ -1,112 +1,11 @@
 #include "Flash.hpp"
-#include "esp_partition.h"
 
 
 namespace be{
-
-    
-    class Partition: public be::NativeClass {
-        DECLARE_NCLASS_META
-    private:
-        static std::vector<JSCFunctionListEntry> methods ;
-        const esp_partition_t * partition ; 
-    public:
-
-        Partition(const esp_partition_t * partition, JSContext * ctx, JSValue _jsobj=JS_NULL)
-            : NativeClass(ctx,build(ctx,_jsobj))
-            , partition(partition)
-        {
-            shared() ;
-        }
-
-        static JSValue erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Partition, self)
-            CHECK_ARGC(2)
-            ARGV_TO_UINT32(0, offset)
-            ARGV_TO_UINT32(1, length)
-            esp_err_t err = esp_partition_erase_range(self->partition, offset, length) ;
-            if(err!=ESP_OK) {
-                JSTHROW("erase failed: %d", err)
-            }
-            return JS_UNDEFINED ;
-        }
-        static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Partition, self)
-            CHECK_ARGC(2)
-            ARGV_TO_UINT32(0, offset)
-            ARGV_TO_UINT32(1, length)
-
-            if(length>1024*1024) {
-                JSTHROW("read length too long, max 1M")
-            }
-            if(offset+length>self->partition->size) {
-                JSTHROW("out of partition range")
-            }
-
-            uint8_t * buffer = (uint8_t*) malloc(length) ;
-            esp_err_t err = esp_partition_read(self->partition, offset, buffer, length) ;
-            if(err!=ESP_OK) {
-                free(buffer) ;
-                JSTHROW("read failed: %d", err)
-            }
-
-            return JS_NewArrayBuffer(ctx, buffer, length, freeArrayBuffer, NULL, false) ;  
-        }
-        static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-            THIS_NCLASS(Partition, self)
-            CHECK_ARGC(2)
-            ARGV_TO_UINT32(0, offset)
-            ARGV_TO_ARRAYBUFFER(1, data, datalen)
-
-            esp_err_t err = esp_partition_write(self->partition, offset, data, datalen) ;
-            if(err!=ESP_OK) {
-                JSTHROW("write failed: %d", err)
-            }
-            return JS_UNDEFINED ;
-        }
-    
-        static JSValue label(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewString(ctx, self->partition->label) ;
-        }
-        static JSValue type(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            switch(self->partition->type) {
-                case ESP_PARTITION_TYPE_APP: return JS_NewString(ctx, "app") ;
-                case ESP_PARTITION_TYPE_DATA: return JS_NewString(ctx, "data") ;
-                case ESP_PARTITION_TYPE_BOOTLOADER: return JS_NewString(ctx, "bootloader") ;
-                case ESP_PARTITION_TYPE_PARTITION_TABLE: return JS_NewString(ctx, "partition_table") ;
-                default: return JS_NewString(ctx, "UNKNOWN") ;
-            }
-        }
-        static JSValue subtype(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewInt32(ctx, self->partition->subtype) ;
-        }
-        static JSValue address(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewInt32(ctx, self->partition->address) ;
-        }
-        static JSValue size(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewInt32(ctx, self->partition->size) ;
-        }
-        static JSValue readonly(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewBool(ctx, self->partition->readonly) ;
-        }
-        static JSValue encrypted(JSContext *ctx, JSValueConst this_val) {
-            THIS_NCLASS(Partition, self)
-            return JS_NewBool(ctx, self->partition->encrypted) ;
-        }
-        static JSValue invalidSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
-            JSTHROW("property is readonly") ;
-        }
-
-    } ;
-
     
     DEFINE_NCLASS_META(Partition, NativeClass)
+
+    char const * const Flash::name = "flash" ;
 
     std::vector<JSCFunctionListEntry> Partition::methods = {
         JS_CFUNC_DEF("erase", 0, Partition::erase),
@@ -122,7 +21,99 @@ namespace be{
         JS_CGETSET_DEF("encrypted",Partition::encrypted,Partition::invalidSetter),
     } ;
 
-    const char * Flash::name = "flash" ;
+
+    Partition::Partition(const esp_partition_t * partition, JSContext * ctx, JSValue _jsobj)
+        : NativeClass(ctx,build(ctx,_jsobj))
+        , partition(partition)
+    {
+        shared() ;
+    }
+
+    JSValue Partition::erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Partition, self)
+        CHECK_ARGC(2)
+        ARGV_TO_UINT32(0, offset)
+        ARGV_TO_UINT32(1, length)
+        esp_err_t err = esp_partition_erase_range(self->partition, offset, length) ;
+        if(err!=ESP_OK) {
+            JSTHROW("erase failed: %d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+    JSValue Partition::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Partition, self)
+        CHECK_ARGC(2)
+        ARGV_TO_UINT32(0, offset)
+        ARGV_TO_UINT32(1, length)
+
+        if(length>1024*1024) {
+            JSTHROW("read length too long, max 1M")
+        }
+        if(offset+length>self->partition->size) {
+            JSTHROW("out of partition range")
+        }
+
+        uint8_t * buffer = (uint8_t*) malloc(length) ;
+        esp_err_t err = esp_partition_read(self->partition, offset, buffer, length) ;
+        if(err!=ESP_OK) {
+            free(buffer) ;
+            JSTHROW("read failed: %d", err)
+        }
+
+        return JS_NewArrayBuffer(ctx, buffer, length, freeArrayBuffer, NULL, false) ;  
+    }
+    JSValue Partition::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Partition, self)
+        CHECK_ARGC(2)
+        ARGV_TO_UINT32(0, offset)
+        ARGV_TO_ARRAYBUFFER(1, data, datalen)
+
+        esp_err_t err = esp_partition_write(self->partition, offset, data, datalen) ;
+        if(err!=ESP_OK) {
+            JSTHROW("write failed: %d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+
+    JSValue Partition::label(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewString(ctx, self->partition->label) ;
+    }
+    JSValue Partition::type(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        switch(self->partition->type) {
+            case ESP_PARTITION_TYPE_APP: return JS_NewString(ctx, "app") ;
+            case ESP_PARTITION_TYPE_DATA: return JS_NewString(ctx, "data") ;
+            case ESP_PARTITION_TYPE_BOOTLOADER: return JS_NewString(ctx, "bootloader") ;
+            case ESP_PARTITION_TYPE_PARTITION_TABLE: return JS_NewString(ctx, "partition_table") ;
+            default: return JS_NewString(ctx, "UNKNOWN") ;
+        }
+    }
+    JSValue Partition::subtype(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewInt32(ctx, self->partition->subtype) ;
+    }
+    JSValue Partition::address(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewInt32(ctx, self->partition->address) ;
+    }
+    JSValue Partition::size(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewInt32(ctx, self->partition->size) ;
+    }
+    JSValue Partition::readonly(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewBool(ctx, self->partition->readonly) ;
+    }
+    JSValue Partition::encrypted(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Partition, self)
+        return JS_NewBool(ctx, self->partition->encrypted) ;
+    }
+    JSValue Partition::invalidSetter(JSContext *ctx, JSValueConst this_val, JSValueConst value) {
+        JSTHROW("property is readonly") ;
+    }
+
+
 
     Flash::Flash(JSContext * ctx, const char * name)
         : NativeModule(ctx, name, 0)
