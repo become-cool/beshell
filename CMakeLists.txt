@@ -104,6 +104,9 @@ idf_component_register(
             esp_netif
             esp_ringbuf
             esp_lcd
+            app_update
+            esp_http_client
+            esp_https_ota
             bt
             ${requires}
 )
