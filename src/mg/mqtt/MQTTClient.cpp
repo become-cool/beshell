@@ -217,24 +217,44 @@ namespace be::mg {
         if(!that->conn){
             JSTHROW("mqtt client is not connected")
         }
-    
+
         ARGV_TO_CSTRING(0, url)
-        ARGV_TO_CSTRING(1, payload)
+        
+        struct mg_str topic = mg_str(url);
+        struct mg_str msg;
+        
+        // Handle payload as string or ArrayBuffer
+        if (JS_IsString(argv[1])) {
+            ARGV_TO_CSTRING(1, payload)
+            msg = mg_str(payload);
+            JS_FreeCString(ctx, payload);
+        } 
+        else if (JS_IsArrayBuffer(argv[1])) {
+            size_t length = 0;
+            uint8_t* buffer = JS_GetArrayBuffer(ctx, &length, argv[1]);
+            if (!buffer) {
+                JS_FreeCString(ctx, url);
+                JSTHROW("Failed to get ArrayBuffer data");
+            }
+            msg = mg_str_n((const char*)buffer, length);
+        } 
+        else {
+            JS_FreeCString(ctx, url);
+            JSTHROW("payload must be a string or ArrayBuffer");
+        }
+        
         ARGV_TO_UINT8_OPT(2, qos, 1)
 
-        bool retain = false ;
-        if(argc>3) {
-            JS_ToBool(ctx, argv[3]) ;
+        bool retain = false;
+        if (argc > 3) {
+            retain = JS_ToBool(ctx, argv[3]);
         }
-    
-        struct mg_str topic = mg_str(url), msg = mg_str(payload);
-    
-        JS_FreeCString(ctx, url) ;
-        JS_FreeCString(ctx, payload) ;
-    
+
+        JS_FreeCString(ctx, url);
+        
         mg_mqtt_pub(that->conn, &topic, &msg, qos, retain);
 
-        return JS_UNDEFINED ;
+        return JS_UNDEFINED;
     }
 
     JSValue MQTTClient::sub(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
