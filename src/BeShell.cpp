@@ -58,7 +58,7 @@ namespace be {
 |____.'_  |______              .''      |_________||______     |       |       
 |       ~.|                 ..'         |         ||           |       |       
 |_______.'|___________....''            |         ||___________|_______|_______
- (c) 2020-2024 https://become.cool
+ (c) 2020-2025 https://become.cool
 
 )" ;
         cout    << "version BeShell: " << BESHELL_VERSION 
