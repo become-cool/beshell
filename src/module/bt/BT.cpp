@@ -55,6 +55,9 @@ namespace be{
         EXPORT_FUNCTION(write)
         EXPORT_FUNCTION(subscribe)
 
+        EXPORT_FUNCTION(setPower)
+        EXPORT_FUNCTION(power)
+
         // peripheral
         EXPORT_FUNCTION(setAdvName)
         EXPORT_FUNCTION(setAdvData)
@@ -329,6 +332,19 @@ namespace be{
     }
     void BT::setGattsHandler(gatts_handler_t handler) {
         gattsHandler = handler ;
+    }
+
+    JSValue BT::setPower(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT32(0, level)
+        if(level<ESP_PWR_LVL_N24 || level>ESP_PWR_LVL_P21) {
+            JSTHROW("Invalid power level")
+        }
+        esp_err_t ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, level) ;
+        return JS_NewInt32(ctx, ret) ;
+    }
+    JSValue BT::power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_NewInt32(ctx, esp_ble_tx_power_get(ESP_BLE_PWR_TYPE_DEFAULT)) ;
     }
 }
 

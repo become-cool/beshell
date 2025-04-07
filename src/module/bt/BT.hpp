@@ -66,6 +66,9 @@ namespace be{
         static JSValue addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendNotify(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
+        static JSValue setPower(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
         static char * bt_uuid_to_string(const esp_bt_uuid_t *uuid, char *str, size_t str_size) ;
         static esp_bt_uuid_t bt_string_to_uuid(char *str, size_t str_size) ;
 
