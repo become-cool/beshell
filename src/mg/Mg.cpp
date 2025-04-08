@@ -40,7 +40,7 @@ namespace be::mg {
 
     char Mg::dns4[28] ;
 
-    std::string Mg::ca_path = "" ;
+    std::string Mg::ca = "" ;
     
     struct mg_connection * Mg::connCaptiveProtal = nullptr ;
 
@@ -72,6 +72,7 @@ namespace be::mg {
 
         exportFunction("listenHttp",Server::listenHttp,0) ;
         exportFunction("connect",connect,0) ;
+        exportFunction("setCA",setCA,0) ;
         exportFunction("startCaptivePortal",startCaptivePortal,0) ;
     }
 
@@ -158,7 +159,7 @@ namespace be::mg {
     }
 
     void Mg::loop(const BeShell & beshell, void * data) {
-        mg_mgr_poll(&mgr, 0);
+        mg_mgr_poll(&mgr, 10);
     }
     
     typedef struct  {
@@ -452,14 +453,23 @@ namespace be::mg {
     }
 
 
+    /**
+     * tls 需要较大 ram ，通常启用 WiFi 后剩余 ram 不足，此时会打印错误 `mg_error   4  setup err 0x7f00` 。
+     * 可以尝试将 mbedtls 的内容放在 psram 中( CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC=y )
+     * 
+     * @function setCA
+     * @param cert:ArrayBuffer TLS证书数据
+     * @return undefined
+     */
     JSValue Mg::setCA(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
-        ARGV_TO_CSTRING_E(0, path, "arg path must be a string")
-        Mg::ca_path = path ;
-        JS_FreeCString(ctx, path) ;
-        return JS_UNDEFINED ;
+        ARGV_TO_STRING(0, Mg::ca)
+        return JS_UNDEFINED;
     }
 
+    void Mg::setCA(const char * _ca) {
+        ca = _ca ;
+    }
 
     
 

@@ -15,6 +15,7 @@ namespace be::mg {
         uint16_t poll_times = 0 ;
         bool is_ws = false ;
         bool is_tls = false ;
+        std::string host ; // 用于 tls
 
         static void eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fnd) ;
         static void wsEventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fnd) ;
@@ -25,7 +26,6 @@ namespace be::mg {
         
         static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue close(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        // static JSValue initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connectWS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

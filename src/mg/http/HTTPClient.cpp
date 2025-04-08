@@ -11,7 +11,6 @@ namespace be::mg {
     std::vector<JSCFunctionListEntry> Client::methods = {
         JS_CFUNC_DEF("send", 0, Client::send),
         JS_CFUNC_DEF("close", 0, Client::close),
-        // JS_CFUNC_DEF("initTLS", 0, Client::initTLS),
     } ;
 
     Client::Client(JSContext * ctx, struct mg_connection * conn, JSValue callback)
@@ -95,29 +94,6 @@ namespace be::mg {
     }
 
 
-    /**
-     * 初始化连接的 TLS 
-     * 
-     * @method initTLS
-     * @param host:string 主机名
-     * @return undefined
-     */
-    // JSValue Client::initTLS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    //     ASSERT_ARGC(1)
-    //     ARGV_TO_CSTRING_E(0, host, "arg host must be a string")
-
-    //     THIS_NCLASS(Client,client)
-
-    //     struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str(), .srvname = mg_str(host) };
-    //     mg_tls_init(client->conn, &opts);
-        
-    //     JS_FreeCString(ctx, host) ;
-    //     return JS_UNDEFINED ;
-    // }
-
-
-
-
     // enum {
     //   MG_EV_ERROR,       // Error                         char *error_message
     //   MG_EV_OPEN,        // Client created           NULL
@@ -140,6 +116,7 @@ namespace be::mg {
     //   MG_EV_USER,        // Starting ID for user events
     // };
     void Client::eventHandler(struct mg_connection * conn, int ev, void * ev_data, void *fnd) {
+
         if(!conn->fn_data || !fnd || conn->fn_data!=fnd) {
             return ;
         }
@@ -149,7 +126,10 @@ namespace be::mg {
             case MG_EV_CONNECT: {
 
                 if(client && client->is_tls) {
-                    struct mg_tls_opts opts = {.ca = Mg::ca_path.c_str() };
+                    struct mg_tls_opts opts = {
+                        .ca = Mg::ca.c_str(),
+                        .srvname = mg_str(client->host.c_str())
+                    };
                     mg_tls_init(conn, &opts);
                 }
 
@@ -220,7 +200,7 @@ namespace be::mg {
             }
         }
     }
-    
+
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(2)
@@ -253,6 +233,11 @@ namespace be::mg {
             delete client ;
             JS_FreeCString(ctx, url) ;
             JSTHROW("not support url protocol")
+        }
+
+        if(client->is_tls) {
+            struct mg_str host = mg_url_host(url) ;
+            client->host = string(host.ptr, host.len) ;
         }
 
         client->conn = conn ;

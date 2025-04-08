@@ -26,6 +26,7 @@ namespace be::mg {
         static const char * eventName(int ev) ;
         static int eventConst(const char * evname) ;
 
+        static void setCA(const char * _ca) ;
         static bool isListening(const char * url) ;
 
         static JSValue sntpRequest(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -45,9 +46,8 @@ namespace be::mg {
         static struct mg_mgr mgr ;
         static char dns4[28] ;
 
-        static std::string ca_path ;
+        static std::string ca ;
 
-        
         static void captivePortalHandler(struct mg_connection *c, int ev, void *ev_data, void *fn_data) ;
         static struct mg_connection * connCaptiveProtal ;
 

@@ -66,13 +66,6 @@ async function get(url,handle) {
     }
     else if(event=='connect') {
       let info = mg.parseUrl(url)
-      try {
-        if (url.match(/^https:\/\//i)) {
-          conn.initTLS(info.host)
-        }
-      } catch (e) {
-        console.log(e)
-      }
       conn.send(`GET ${info.uri} HTTP/1.0\r\n`)
       conn.send(`Host: ${info.host}\r\n`)
       conn.send(`User-Agent: BeShell\r\n`)
@@ -152,13 +145,6 @@ async function post(url, ab) {
     }
     else if(event=='connect') {
       let info = mg.parseUrl(url)
-      try {
-        if (url.match(/^https:\/\//i)) {
-          conn.initTLS(info.host)
-        }
-      } catch (e) {
-        console.log(e)
-      }
       conn.send(`POST ${info.uri} HTTP/1.0\r\n`)
       conn.send(`Host: ${info.host}\r\n`)
       conn.send(`User-Agent: BeShell\r\n`)
