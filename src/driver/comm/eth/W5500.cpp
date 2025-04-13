@@ -125,16 +125,16 @@ namespace be::driver::comm {
         if(event_wrapper->type==1) {
             switch (event_wrapper->event_id) {
             case ETHERNET_EVENT_CONNECTED:
-                name = "connected" ;
+                name = (char*)"connected" ;
                 break;
             case ETHERNET_EVENT_DISCONNECTED:
-                name = "disconnected" ;
+                name = (char*)"disconnected" ;
                 break;
             case ETHERNET_EVENT_START:
-                name = "start" ;
+                name = (char*)"start" ;
                 break;
             case ETHERNET_EVENT_STOP:
-                name = "stop" ;
+                name = (char*)"stop" ;
                 break;
             default:
                 break;
