@@ -126,21 +126,21 @@ namespace be::mg {
     //   MG_EV_USER,        // Starting ID for user events
     // };
 
-    void Server::eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) {
+    void Server::eventHandler(struct mg_connection * conn, int ev, void *ev_data) {
 
-        if(ev== MG_EV_POLL || !fn_data) {
+        if(ev== MG_EV_POLL || !conn->fn_data) {
             return ;
         }
 
-        #define SERVER ((Server *)fn_data)
-        // be_http_server_t * server = (be_http_server_t *)fn_data ;
+        #define SERVER ((Server *)conn->fn_data)
+        // be_http_server_t * server = (be_http_server_t *)fconn->n_data ;
         // printf("\nevent:%s, conn:%p, server:%p, server->conn:%p, \n", mg_event_const_to_name(ev), conn, server, server->conn) ;
         // printf("%s %s \n", ((server->conn==NULL || server->conn==conn)?"server":"client"), mg_event_const_to_name(ev)) ;
 
         if(ev==MG_EV_ACCEPT && SERVER->ssl) {
             struct mg_tls_opts opts = {
-                .cert = SERVER->cert_path.c_str(),          // Certificate file
-                .certkey = SERVER->certkey_path.c_str(),    // Private key file
+                .cert = (char*)SERVER->cert_path.c_str(),          // Certificate file
+                .key =  (char*)SERVER->certkey_path.c_str(),    // Private key file
             };
             mg_tls_init(conn, &opts);
             // printf("mg_tls_init()\n") ;
@@ -150,7 +150,7 @@ namespace be::mg {
 
         // @todo 未实现
         // if(SERVER->telweb) {
-        //     if( telnet_ws_response(conn, ev, ev_data, fn_data) ) {
+        //     if( telnet_ws_response(conn, ev, ev_data, conn->fn_data) ) {
         //         return ;
         //     }
         //     // c telweb 函数没有处理的请求, 由 js 函数接着处理
@@ -201,7 +201,8 @@ namespace be::mg {
                     return ;
 
                 case MG_EV_HTTP_MSG:
-                case MG_EV_HTTP_CHUNK: {
+                // case MG_EV_HTTP_CHUNK: 
+                {
                     if(!conn->userdata) {
                         printf("conn->userdata == NULL ??") ;
                         return ;
@@ -227,11 +228,11 @@ namespace be::mg {
                 case MG_EV_WS_CTL: 
                 case MG_EV_WS_MSG: {
 
-                    if(!conn->userdata) {
+                    if(!conn->pfn_data) {
                         printf("conn->userdata == NULL ??") ;
                         return ;
                     }
-                    Response * rspn = (Response *)conn->userdata ;
+                    Response * rspn = (Response *)conn->pfn_data ;
 
                     struct mg_ws_message * msg = (struct mg_ws_message *)ev_data ;
 
@@ -240,10 +241,10 @@ namespace be::mg {
                     JS_SetPropertyStr(SERVER->ctx, jsmsg, "type", JS_NewUint32(SERVER->ctx, op)) ;
 
                     if(op == WEBSOCKET_OP_TEXT) {
-                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewStringLen(SERVER->ctx, msg->data.ptr, msg->data.len)) ;
+                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewStringLen(SERVER->ctx, msg->data.buf, msg->data.len)) ;
                     }
                     else if(op == WEBSOCKET_OP_BINARY) {
-                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewArrayBuffer(SERVER->ctx,(uint8_t*)msg->data.ptr, msg->data.len,NULL,NULL,false)) ;
+                        JS_SetPropertyStr(SERVER->ctx, jsmsg, "data", JS_NewArrayBuffer(SERVER->ctx,(uint8_t*)msg->data.buf, msg->data.len,NULL,NULL,false)) ;
                     }
 
                     MAKE_ARGV3(cbargv, JS_NewString(SERVER->ctx, Mg::eventName(ev)), jsmsg, rspn->jsobj)
@@ -302,7 +303,7 @@ namespace be::mg {
             JSTHROW("addr %s has listened", addr)
         }
 
-        struct mg_connection * conn = mg_http_listen(&Mg::mgr, addr.c_str(), eventHandler, NULL) ;
+        struct mg_connection * conn = mg_http_listen(&Mg::mgr, addr.c_str(), (mg_event_handler_t)eventHandler, NULL) ;
         if(conn==NULL) {
             JSTHROW("could not listen addr: %s", addr) ;
         }

@@ -3,7 +3,11 @@
 #include <EventEmitter.hpp>
 #include "deps/mongoose/mongoose.h"
 
-namespace be::mg{
+namespace be::mg {
+
+    class MQTTClient ;
+
+    typedef bool (*MQTTClientHandler) (MQTTClient * client, struct mg_connection *, int ev, void *ev_data, void *fn_data) ;
 
     class MQTTClient: public be::EventEmitter {
         DECLARE_NCLASS_META
@@ -15,6 +19,8 @@ namespace be::mg{
         static JSValue sub(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsub(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static void setHandler(MQTTClientHandler handler) ;
 
     protected:
 
@@ -35,5 +41,8 @@ namespace be::mg{
         static void eventHandler(struct mg_connection * c, int ev, void * ev_data) ;
         
         void emitCallback(const char * eventName, std::initializer_list<JSValue> args) ;
+
+        static MQTTClientHandler handler ;
+
     } ;
-}
+} 

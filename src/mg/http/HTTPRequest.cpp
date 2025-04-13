@@ -53,7 +53,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::method(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, (const char*)req->mg_msg->method.ptr, (size_t)req->mg_msg->method.len) ;
+        return JS_NewStringLen(ctx, (const char*)req->mg_msg->method.buf, (size_t)req->mg_msg->method.len) ;
     }
     
     /**
@@ -64,7 +64,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::uri(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, (const char*)req->mg_msg->uri.ptr, (size_t)req->mg_msg->uri.len) ;
+        return JS_NewStringLen(ctx, (const char*)req->mg_msg->uri.buf, (size_t)req->mg_msg->uri.len) ;
     }
     
     /**
@@ -75,7 +75,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::query(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, (const char*)req->mg_msg->query.ptr, (size_t)req->mg_msg->query.len) ;
+        return JS_NewStringLen(ctx, (const char*)req->mg_msg->query.buf, (size_t)req->mg_msg->query.len) ;
     }
 
     /**
@@ -88,7 +88,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::proto(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, (const char*)req->mg_msg->proto.ptr, (size_t)req->mg_msg->proto.len) ;
+        return JS_NewStringLen(ctx, (const char*)req->mg_msg->proto.buf, (size_t)req->mg_msg->proto.len) ;
     }
 
     /**
@@ -104,7 +104,7 @@ namespace be::mg {
         ARGV_TO_CSTRING_E(0,name, "arg headerName must be a string")
         struct mg_str * val = mg_http_get_header(req->mg_msg, name) ;
         JS_FreeCString(ctx, name) ;
-        return JS_NewStringLen(ctx, val->ptr, val->len) ;
+        return JS_NewStringLen(ctx, val->buf, val->len) ;
     }
 
     /**
@@ -120,8 +120,8 @@ namespace be::mg {
         for (int i = 0; i < max && req->mg_msg->headers[i].name.len > 0; i++) {
             JS_SetPropertyStr(
                 ctx, jsheaders,
-                req->mg_msg->headers[i].name.ptr ,
-                JS_NewStringLen(ctx, req->mg_msg->headers[i].value.ptr, req->mg_msg->headers[i].value.len)
+                req->mg_msg->headers[i].name.buf ,
+                JS_NewStringLen(ctx, req->mg_msg->headers[i].value.buf, req->mg_msg->headers[i].value.len)
             ) ;
         }
         return jsheaders ;
@@ -135,7 +135,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::body(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->body.ptr, req->mg_msg->body.len) ;
+        return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->body.buf, req->mg_msg->body.len) ;
     }
     
     /**
@@ -158,8 +158,12 @@ namespace be::mg {
      * @return ArrayBuffer
      */
     JSValue HTTPRequest::chunk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(HTTPRequest,req)
-        return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->chunk.ptr, req->mg_msg->chunk.len) ;
+        
+        JSTHROW("not support chunk()") ;
+        
+        // THIS_NCLASS(HTTPRequest,req)
+        // return JS_NewArrayBufferCopy(ctx, (const uint8_t*)req->mg_msg->chunk.buf, req->mg_msg->chunk.len) ;
+        // return JS_NULL ;
     }
 
     
@@ -172,8 +176,12 @@ namespace be::mg {
      * @return number
      */
     JSValue HTTPRequest::chunkLength(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(HTTPRequest,req)
-        return JS_NewUint32(ctx, req->mg_msg->chunk.len) ;
+        
+        JSTHROW("not support chunkLength()") ;
+        
+        // THIS_NCLASS(HTTPRequest,req)
+        // return JS_NewUint32(ctx, req->mg_msg->chunk.len) ;
+        // return JS_NewUint32(ctx, 0) ;
     }
 
     
@@ -185,7 +193,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::raw(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, req->mg_msg->message.ptr, req->mg_msg->message.len) ;
+        return JS_NewStringLen(ctx, req->mg_msg->message.buf, req->mg_msg->message.len) ;
     }
     
     /**
@@ -196,7 +204,7 @@ namespace be::mg {
      */
     JSValue HTTPRequest::rawHead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(HTTPRequest,req)
-        return JS_NewStringLen(ctx, req->mg_msg->head.ptr, req->mg_msg->head.len) ;
+        return JS_NewStringLen(ctx, req->mg_msg->head.buf, req->mg_msg->head.len) ;
     }
     
     /**
@@ -212,7 +220,8 @@ namespace be::mg {
         ASSERT_ARGC(1)
         THIS_NCLASS(HTTPRequest,req)
         ARGV_TO_CSTRING(0, uri) ;
-        bool ret = mg_http_match_uri(req->mg_msg, uri) ;
+
+        bool ret = mg_match(req->mg_msg->uri, mg_str(uri),NULL) ;
         JS_FreeCString(ctx, uri) ;
         return ret? JS_TRUE: JS_FALSE ;
     }
@@ -239,24 +248,24 @@ namespace be::mg {
             printf("unknow host for captive_portal\n") ;
             return JS_FALSE ;
         }
-        printf("%.*s\n",host->len,host->ptr) ;
+        printf("%.*s\n",host->len,host->buf) ;
     
         if(mg_strcmp(*host, mg_str("captive.apple.com"))==0) {
             return JS_TRUE ;
         }
         // http://connectivitycheck.android.com/generate_204
         // http://connectivitycheck.smartisan.com/wifi.html
-        else if( host->len>=18 && strncmp(host->ptr, "connectivitycheck.", 18)==0 ) {
+        else if( host->len>=18 && strncmp(host->buf, "connectivitycheck.", 18)==0 ) {
             return JS_TRUE ;
         }
-        else if(mg_http_match_uri(req->mg_msg,"/generate_204")) {
+        else if(mg_match(req->mg_msg->uri,mg_str("/generate_204"), NULL)) {
             return JS_TRUE ;
         }
         else if(mg_strcmp(*host, mg_str("www.msftconnecttest.com"))==0) {
             return JS_TRUE ;
         }
     
-        // printf("%.*s/%.*s\n", host->len, host->ptr, hm->uri.len, hm->uri.ptr) ;
+        // printf("%.*s/%.*s\n", host->len, host->buf, hm->uri.len, hm->uri.buf) ;
     
 
         return JS_FALSE ;

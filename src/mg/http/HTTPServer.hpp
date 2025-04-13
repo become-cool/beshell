@@ -19,7 +19,7 @@ namespace be::mg {
         std::string cert_path ;
         std::string certkey_path ;
 
-        static void eventHandler(struct mg_connection * conn, int ev, void *ev_data, void *fn_data) ;
+        static void eventHandler(struct mg_connection * conn, int ev, void *ev_data) ;
 
     public:
         Server(JSContext * ctx, struct mg_connection * conn, JSValue callback=JS_NULL) ;

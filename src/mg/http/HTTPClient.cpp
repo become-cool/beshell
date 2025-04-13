@@ -11,17 +11,20 @@ namespace be::mg {
     std::vector<JSCFunctionListEntry> Client::methods = {
         JS_CFUNC_DEF("send", 0, Client::send),
         JS_CFUNC_DEF("close", 0, Client::close),
+        JS_CFUNC_DEF("enableChunkEvent", 0, Client::enableChunkEvent),
     } ;
 
     Client::Client(JSContext * ctx, struct mg_connection * conn, JSValue callback)
         : EventEmitter(ctx,build(ctx))
-        , conn(conn)
         , callback(JS_DupValue(ctx,callback))
+        , conn(conn)
     {
         if(conn) {
             conn->fn_data = this ;
         }
     }
+    
+    HTTPClientHandler Client::handler = nullptr ;
 
     Client::~Client(){
         if(conn) {
@@ -95,40 +98,51 @@ namespace be::mg {
 
 
     // enum {
-    //   MG_EV_ERROR,       // Error                         char *error_message
-    //   MG_EV_OPEN,        // Client created           NULL
-    //   MG_EV_POLL,        // mg_mgr_poll iteration        unsigned long *millis
-    //   MG_EV_RESOLVE,     // Host name is resolved        NULL
-    //   MG_EV_CONNECT,     // Client established       NULL
-    //   MG_EV_ACCEPT,      // Client accepted          NULL
-    //   MG_EV_READ,        // Data received from socket    struct mg_str *
-    //   MG_EV_WRITE,       // Data written to socket       long *bytes_written
-    //   MG_EV_CLOSE,       // Client closed            NULL
-    //   MG_EV_HTTP_MSG,    // HTTP request/response        struct mg_http_message *
-    //   MG_EV_HTTP_CHUNK,  // HTTP chunk (partial msg)     struct mg_http_message *
-    //   MG_EV_WS_OPEN,     // Websocket handshake done     struct mg_http_message *
-    //   MG_EV_WS_MSG,      // Websocket msg, text or bin   struct mg_ws_message *
-    //   MG_EV_WS_CTL,      // Websocket control msg        struct mg_ws_message *
-    //   MG_EV_MQTT_CMD,    // MQTT low-level command       struct mg_mqtt_message *
-    //   MG_EV_MQTT_MSG,    // MQTT PUBLISH received        struct mg_mqtt_message *
-    //   MG_EV_MQTT_OPEN,   // MQTT CONNACK received        int *connack_status_code
-    //   MG_EV_SNTP_TIME,   // SNTP time received           struct timeval *
-    //   MG_EV_USER,        // Starting ID for user events
+    // MG_EV_ERROR,      // Error                        char *error_message
+    // MG_EV_OPEN,       // Connection created           NULL
+    // MG_EV_POLL,       // mg_mgr_poll iteration        uint64_t *uptime_millis
+    // MG_EV_RESOLVE,    // Host name is resolved        NULL
+    // MG_EV_CONNECT,    // Connection established       NULL
+    // MG_EV_ACCEPT,     // Connection accepted          NULL
+    // MG_EV_TLS_HS,     // TLS handshake succeeded      NULL
+    // MG_EV_READ(7),       // Data received from socket    long *bytes_read
+    // MG_EV_WRITE,      // Data written to socket       long *bytes_written
+    // MG_EV_CLOSE,      // Connection closed            NULL
+    // MG_EV_HTTP_HDRS(10),  // HTTP headers                 struct mg_http_message *
+    // MG_EV_HTTP_MSG,   // Full HTTP request/response   struct mg_http_message *
+    // MG_EV_WS_OPEN,    // Websocket handshake done     struct mg_http_message *
+    // MG_EV_WS_MSG,     // Websocket msg, text or bin   struct mg_ws_message *
+    // MG_EV_WS_CTL,     // Websocket control msg        struct mg_ws_message *
+    // MG_EV_MQTT_CMD,   // MQTT low-level command       struct mg_mqtt_message *
+    // MG_EV_MQTT_MSG,   // MQTT PUBLISH received        struct mg_mqtt_message *
+    // MG_EV_MQTT_OPEN,  // MQTT CONNACK received        int *connack_status_code
+    // MG_EV_SNTP_TIME,  // SNTP time received           uint64_t *epoch_millis
+    // MG_EV_WAKEUP,     // mg_wakeup() data received    struct mg_str *data
+    // MG_EV_USER        // Starting ID for user events
     // };
-    void Client::eventHandler(struct mg_connection * conn, int ev, void * ev_data, void *fnd) {
+    void Client::eventHandler(struct mg_connection * conn, int ev, void * ev_data) {
+        
+        // if(ev!=MG_EV_POLL) {
+        //     printf("Client::eventHandler() event: %d\n", ev) ;
+        // }
 
-        if(!conn->fn_data || !fnd || conn->fn_data!=fnd) {
+        if(!conn->fn_data) {
             return ;
         }
-        Client * client = (Client *)fnd ;
+        Client * client = (Client *)conn->fn_data ;
+        
+        if(handler && client && handler(client, conn, ev, ev_data, conn->fn_data)) {
+            return ;
+        }
+
         switch(ev) {
 
             case MG_EV_CONNECT: {
 
-                if(client && client->is_tls) {
+                if(client && client->is_tls && Mg::ca.length()>0) {
                     struct mg_tls_opts opts = {
-                        .ca = Mg::ca.c_str(),
-                        .srvname = mg_str(client->host.c_str())
+                        .ca = mg_str(Mg::ca.c_str()),
+                        .name = mg_str(client->_host.c_str())
                     };
                     mg_tls_init(conn, &opts);
                 }
@@ -139,15 +153,54 @@ namespace be::mg {
                 break ;
             }
 
-            // 大文件下载时会分批触发 MG_EV_HTTP_CHUNK , 只到下载完 最后触发一个 hm->chunk.len 为 0 的 MG_EV_HTTP_MSG 事件
-            case MG_EV_HTTP_CHUNK:
+            case MG_EV_HTTP_HDRS: {
+                // 
+                if( client->headerLength==0 ){
+                    const char *header_end = strnstr((char *)conn->recv.buf, "\r\n\r\n", conn->recv.len) ;
+                    if(header_end) {
+                        struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+                        HTTPRequest * req = new HTTPRequest(client->ctx, hm) ;
+                        req->shared() ; // 智能回收模式 (jsobj gc 回收时自动 delete req)
+
+                        JSValue evname = JS_NewString(client->ctx, "http.head") ;
+                        
+                        JS_CALL_ARG2(client->ctx, client->callback, evname, req->jsobj)
+
+                        JS_FreeValue(client->ctx, evname) ;
+                        JS_FreeValue(client->ctx, req->jsobj) ;
+
+                        client->headerLength = header_end - (char *)conn->recv.buf + 4 ; // 4 = "\r\n\r\n" 的长度
+                    }
+                }
+                
+                if (client->_enableChunkEvent && client->headerLength) {
+
+                    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+
+                    // Found the end of the header
+                    size_t bodyLength = conn->recv.len - client->headerLength;
+
+                    size_t chunkLenght = bodyLength - client->receivedBodyLength ;
+                    uint8_t * chunk = conn->recv.buf + client->headerLength + client->receivedBodyLength ;
+
+                    client->receivedBodyLength = bodyLength ;
+
+                    JSValue evname = JS_NewString(client->ctx, "http.chunk") ;
+                    JSValue ab = JS_NewArrayBuffer(client->ctx, chunk, chunkLenght, nofreeArrayBuffer, nullptr, false) ;
+                    JS_CALL_ARG2(client->ctx, client->callback, evname, ab)
+                    JS_FreeValue(client->ctx, evname) ;
+                    JS_FreeValue(client->ctx, ab) ;
+                }
+                
+                break;
+            }
+            
             case MG_EV_HTTP_MSG: 
             {
                 // moogose https 协议，会在 close 事件以后触发 msg 事件
                 if(!client || !client->ctx) {
                     break ;
                 }
-                client->poll_times = 0 ;
 
                 struct mg_http_message *hm = (struct mg_http_message *) ev_data;
                 HTTPRequest * req = new HTTPRequest(client->ctx, hm) ;
@@ -160,7 +213,7 @@ namespace be::mg {
                 JS_FreeValue(client->ctx, req->jsobj) ;
                 JS_FreeValue(client->ctx, evname) ;
 
-                mg_http_delete_chunk(conn, hm) ;
+                // mg_http_delete_chunk(conn, hm) ;
 
                 break ;
             }
@@ -177,7 +230,7 @@ namespace be::mg {
 
                     delete client ;
                     client = NULL ;
-                    fnd = NULL ;
+                    conn->fn_data = NULL ;
                 }
                 break ;
             }
@@ -199,6 +252,12 @@ namespace be::mg {
                 break ;
             }
         }
+    }
+
+    JSValue Client::enableChunkEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Client,client)
+        client->_enableChunkEvent = true ;
+        return JS_UNDEFINED ;
     }
 
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -237,7 +296,7 @@ namespace be::mg {
 
         if(client->is_tls) {
             struct mg_str host = mg_url_host(url) ;
-            client->host = string(host.ptr, host.len) ;
+            client->_host = string(host.buf, host.len) ;
         }
 
         client->conn = conn ;
@@ -252,4 +311,18 @@ namespace be::mg {
         return client->jsobj ;
     }
 
+    void Client::setHandler(HTTPClientHandler _handler) {
+        handler = _handler ;
+    }
+
+    
+    bool Client::isTLS() const {
+        return is_tls ;
+    }
+    bool Client::isWS() const {
+        return is_ws ;
+    }
+    std::string Client::host() const {
+        return _host ;
+    }
 }

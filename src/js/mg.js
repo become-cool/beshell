@@ -49,6 +49,7 @@ function request(url, handle) {
           break
       }
     })
+    handle && handle(conn,'new',null,timeTick)
   })
 }
 
@@ -58,10 +59,6 @@ async function get(url,handle) {
   await request(url, (conn,event,msg,wdg)=>{
     if(event=='http.msg'){
       body = msg.body()
-      received = true
-    }
-    else if(event=='http.chunk'){
-        body = msg.chunk()
       received = true
     }
     else if(event=='connect') {
@@ -93,28 +90,31 @@ async function download(url, localPath, progress_cb) {
   let done = false
   try{
     let t = Date.now()
-    await get(url, (conn,event,msg)=>{
-      if(event=='http.msg'||event=='http.chunk'){
-
-        let chunk = (event == 'http.msg') ? msg.body() : msg.chunk()
-        // let chunk = data //data.slice(wroten, data.byteLength)
+    let total = 0
+    await get(url, (conn,event,data)=>{
+      if(event=='http.head'){
+        total = parseInt(data.header("Content-Length"))
+        if(isNaN(total)) {
+          total = 0
+        }
+      }
+      else if(event=='http.chunk'){
         if(fhandle) {
-          fs.write(fhandle, chunk)
+          fs.write(fhandle, data)
         }
-        wroten += chunk.byteLength
+        wroten += data.byteLength
+        
+        progress_cb && progress_cb(total, wroten, data)
 
-        try{
-          progress_cb && progress_cb(msg.bodyLength(), wroten, chunk)
-        } catch(e) {
-          console.error(e)
-        }
-
-        if (wroten == msg.bodyLength()) {
+        if (wroten == total) {
           fhandle && fs.close(fhandle)
           fhandle = null
           done = true
           conn.close()
         }
+      }
+      else if(event=="new") {
+        conn.enableChunkEvent()
       }
     })
     if(!done) {
@@ -137,10 +137,6 @@ async function post(url, ab) {
   await request(url, (conn,event,msg)=>{
     if(event=='http.msg'){
       body = msg.body()
-      received = true
-    }
-    else if(event=='http.chunk'){
-      body = msg.chunk()
       received = true
     }
     else if(event=='connect') {

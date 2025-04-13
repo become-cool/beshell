@@ -55,4 +55,8 @@ namespace be::mg {
     friend class Client ;
     friend class MQTTClient ;
     } ;
+
+    
+    bool mg_addr_ip_eq(const struct mg_addr & a, const struct mg_addr & b) ;
+    char *mg_ntoa(const struct mg_addr *addr, char *buf, size_t len) ;
 }

@@ -24,6 +24,8 @@ namespace be::mg {
         JS_CFUNC_DEF("disconnect", 0, MQTTClient::disconnect),
     } ;
 
+    MQTTClientHandler MQTTClient::handler = nullptr ;
+
     MQTTClient::MQTTClient(JSContext * ctx, struct mg_connection * conn)
             : EventEmitter(ctx,build(ctx))
             , conn(conn)
@@ -46,9 +48,9 @@ namespace be::mg {
     }
 
     #define FREE_MG_STR(mgstr)      \
-            if(mgstr.ptr)           \
-                free( mgstr.ptr ) ; \
-            mgstr.ptr = nullptr ;   \
+            if(mgstr.buf)           \
+                free( mgstr.buf ) ; \
+            mgstr.buf = nullptr ;   \
             mgstr.len = 0 ;
     #define FREE_MG_MSG(msg)        \
             FREE_MG_STR(msg.topic)  \
@@ -56,13 +58,18 @@ namespace be::mg {
             FREE_MG_STR(msg.dgram)
 
     void MQTTClient::eventHandler(struct mg_connection * c, int ev, void * ev_data) {
+
+        MQTTClient * nobj = (MQTTClient *)c->fn_data ;
+        if(handler && nobj && handler(nobj, c, ev, ev_data, c->fn_data)) {
+            return ;
+        }
+
         if(ev==MG_EV_POLL) {
             return ;
         }
-        if(!c->fn_data) {
+        if(!nobj) {
             return ;
         }
-        MQTTClient * nobj = (MQTTClient *)c->fn_data ;
 
         mg_event_wrapper_t ev_wrapper = { ev } ;
         memset(&ev_wrapper.data, 0, sizeof(ev_wrapper.data)) ;
@@ -130,9 +137,9 @@ namespace be::mg {
                 break;
             case MG_EV_MQTT_MSG: {
                 JSValue msg = JS_NewObject(ctx) ;
-                JS_SetPropertyStr(ctx, msg, "topic", JS_NewStringLen(ctx, event->data.msg.topic.ptr, event->data.msg.topic.len));
-                JS_SetPropertyStr(ctx, msg, "data", JS_NewStringLen(ctx, event->data.msg.data.ptr, event->data.msg.data.len));
-                // JS_SetPropertyStr(ctx, msg, "dgram", JS_NewStringLen(ctx, event->data.msg.dgram.ptr, event->data.msg.dgram.len));
+                JS_SetPropertyStr(ctx, msg, "topic", JS_NewStringLen(ctx, event->data.msg.topic.buf, event->data.msg.topic.len));
+                JS_SetPropertyStr(ctx, msg, "data", JS_NewStringLen(ctx, event->data.msg.data.buf, event->data.msg.data.len));
+                // JS_SetPropertyStr(ctx, msg, "dgram", JS_NewStringLen(ctx, event->data.msg.dgram.buf, event->data.msg.dgram.len));
                 JS_SetPropertyStr(ctx, msg, "id", JS_NewUint32(ctx, event->data.msg.id));
                 JS_SetPropertyStr(ctx, msg, "cmd", JS_NewUint32(ctx, event->data.msg.cmd));
                 JS_SetPropertyStr(ctx, msg, "qos", JS_NewUint32(ctx, event->data.msg.qos));
@@ -175,20 +182,20 @@ namespace be::mg {
             PROP_TO_MGSTR(argv[1], "user", opts.user)
             PROP_TO_MGSTR(argv[1], "pass", opts.pass)
             PROP_TO_MGSTR(argv[1], "client_id", opts.client_id)
-            PROP_TO_MGSTR(argv[1], "will_topic", opts.will_topic)
-            PROP_TO_MGSTR(argv[1], "will_message", opts.will_message)
+            PROP_TO_MGSTR(argv[1], "will_topic", opts.topic)
+            PROP_TO_MGSTR(argv[1], "will_message", opts.message)
 
-            GET_BOOL_PROP_OPT(argv[1], "will_retain", opts.will_retain, false)
+            GET_BOOL_PROP_OPT(argv[1], "will_retain", opts.retain, false)
             GET_BOOL_PROP_OPT(argv[1], "clean", opts.clean, true)
             GET_UINT8_PROP_OPT(argv[1], "qos", opts.qos, 0)
             GET_UINT16_PROP_OPT(argv[1], "keepalive", opts.keepalive, 0)
         }
 
-        // ds(opts.user.ptr)
-        // ds(opts.pass.ptr)
-        // ds(opts.client_id.ptr)
-        // ds(opts.will_topic.ptr)
-        // ds(opts.will_message.ptr)
+        // ds(opts.user.buf)
+        // ds(opts.pass.buf)
+        // ds(opts.client_id.buf)
+        // ds(opts.will_topic.buf)
+        // ds(opts.will_message.buf)
         // dn(opts.will_retain)
         // dn(opts.clean)
         // dn(opts.qos)
@@ -252,7 +259,13 @@ namespace be::mg {
 
         JS_FreeCString(ctx, url);
         
-        mg_mqtt_pub(that->conn, &topic, &msg, qos, retain);
+        struct mg_mqtt_opts pub_opts = {
+            .topic = topic,
+            .message = msg,
+            .qos = qos,
+            .retain = retain
+        };
+        mg_mqtt_pub(that->conn, &pub_opts);
 
         return JS_UNDEFINED;
     }
@@ -267,8 +280,11 @@ namespace be::mg {
         std::string ARGV_TO_STRING(0, ctopic)
         ARGV_TO_UINT8_OPT(1, qos, 1)
 
-        struct mg_str topic = mg_str(ctopic.c_str()) ;
-        mg_mqtt_sub(that->conn, &topic, qos) ;
+        struct mg_mqtt_opts sub_opts = {
+            .topic = mg_str(ctopic.c_str()),
+            .qos = qos
+        };
+        mg_mqtt_sub(that->conn, &sub_opts) ;
 
         return JS_UNDEFINED ;
     }
@@ -300,7 +316,11 @@ namespace be::mg {
         if(!that->conn){
             JSTHROW("mqtt client is not connected")
         }
-        mg_mqtt_disconnect(that->conn) ;
+        mg_mqtt_disconnect(that->conn, NULL) ;
         return JS_UNDEFINED ;
+    }
+
+    void MQTTClient::setHandler(MQTTClientHandler _handler) {
+        handler = _handler ;
     }
 }

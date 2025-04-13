@@ -28,8 +28,8 @@ namespace be::mg {
     //   MG_EV_SNTP_TIME,   // SNTP time received           struct timeval *
     //   MG_EV_USER,        // Starting ID for user events
     // };
-    void Client::wsEventHandler(struct mg_connection * conn, int ev, void * ev_data, void *fnd) {
-        Client * client = (Client *)fnd ;
+    void Client::wsEventHandler(struct mg_connection * conn, int ev, void * ev_data) {
+        Client * client = (Client *)conn->fn_data ;
         
         if (ev == MG_EV_WS_OPEN) { // WebSocket 连接成功
             // printf("WebSocket connection established\n");
@@ -53,12 +53,12 @@ namespace be::mg {
             JSValue message = JS_UNDEFINED ;
             JSValue isBinary = JS_FALSE ;
             if (wm->flags & WEBSOCKET_OP_TEXT) {
-                // printf("Received TEXT message: %.*s\n", (int) wm->data.len, wm->data.ptr);
-                message = JS_NewStringLen(client->ctx, wm->data.ptr, wm->data.len) ;
+                // printf("Received TEXT message: %.*s\n", (int) wm->data.len, wm->data.buf);
+                message = JS_NewStringLen(client->ctx, wm->data.buf, wm->data.len) ;
             }
 
             else if (wm->flags & WEBSOCKET_OP_BINARY) {
-                message = JS_NewArrayBufferCopy(client->ctx, (const uint8_t*)wm->data.ptr, wm->data.len) ;
+                message = JS_NewArrayBufferCopy(client->ctx, (const uint8_t*)wm->data.buf, wm->data.len) ;
                 isBinary = JS_TRUE ;
             }
 
@@ -84,7 +84,7 @@ namespace be::mg {
 
                 delete client ;
                 client = NULL ;
-                fnd = NULL ;
+                conn->fn_data = NULL ;
         }
         else if (ev == MG_EV_ERROR) {
             if(ev_data) {

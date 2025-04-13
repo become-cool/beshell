@@ -89,7 +89,7 @@ namespace be::mg {
             return false ;
         }
         for(struct mg_connection * c = mgr.conns; c != NULL; c = c->next) {
-            if(c->peer.ip==addr.ip && c->peer.port==addr.port){
+            if(mg_addr_ip_eq(c->loc, addr) && c->loc.port==addr.port){
                 return false ;
             }
         }
@@ -107,6 +107,8 @@ namespace be::mg {
         beshell->use<WiFi>() ;
 
         beshell->addLoopFunction(loop, NULL) ;
+
+        mg_log_set(MG_LL_NONE);  // 禁用日志
     }
 
     const char * Mg::eventName(int ev) {
@@ -120,8 +122,8 @@ namespace be::mg {
             case MG_EV_READ: return "read" ;
             case MG_EV_WRITE: return "write" ;
             case MG_EV_CLOSE: return "close" ;
+            case MG_EV_HTTP_HDRS: return "http.chunk" ;
             case MG_EV_HTTP_MSG: return "http.msg" ;
-            case MG_EV_HTTP_CHUNK: return "http.chunk" ;
             case MG_EV_WS_OPEN: return "ws.open" ;
             case MG_EV_WS_MSG: return "ws.msg" ;
             case MG_EV_WS_CTL: return "ws.ctl" ;
@@ -146,7 +148,7 @@ namespace be::mg {
         else if(strcmp(evname,"write")==0) { return MG_EV_WRITE ;}
         else if(strcmp(evname,"close")==0) { return MG_EV_CLOSE ;}
         else if(strcmp(evname,"http.msg")==0) { return MG_EV_HTTP_MSG ;}
-        else if(strcmp(evname,"http.chunk")==0) { return MG_EV_HTTP_CHUNK ;}
+        // else if(strcmp(evname,"http.chunk")==0) { return MG_EV_HTTP_CHUNK ;}
         else if(strcmp(evname,"ws.open")==0) { return MG_EV_WS_OPEN ;}
         else if(strcmp(evname,"ws.msg")==0) { return MG_EV_WS_MSG ;}
         else if(strcmp(evname,"ws.ctl")==0) { return MG_EV_WS_CTL ;}
@@ -167,7 +169,7 @@ namespace be::mg {
         JSContext * ctx ;
     } sntp_callback_t ;
 
-    static void sntp_event_handler(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
+    static void sntp_event_handler(struct mg_connection *c, int ev, void *ev_data) {
         if (ev == MG_EV_SNTP_TIME) {
             struct timeval *tv = (struct timeval *) ev_data;
             if(c->fn_data) {
@@ -217,7 +219,7 @@ namespace be::mg {
         ARGV_TO_CSTRING(0, url) ;
 
         // 连接到SNTP服务器（例如pool.ntp.org的UDP 123端口， "udp://pool.ntp.org:123"）
-        struct mg_connection *c = mg_sntp_connect(&mgr, url, sntp_event_handler, &mgr);
+        struct mg_connection *c = mg_sntp_connect(&mgr, url, (mg_event_handler_t)sntp_event_handler, &mgr);
         JS_FreeCString(ctx, url);
 
         if (c == NULL) {
@@ -231,7 +233,7 @@ namespace be::mg {
             c->fn_data = cb ;
         }
 
-        mg_sntp_send(c, 0);  // 发送SNTP请求（参数0表示立即请求）
+        mg_sntp_request(c);  // 发送SNTP请求
 
         return JS_UNDEFINED ;
     }
@@ -311,7 +313,7 @@ namespace be::mg {
         }
 
         char addr[30] ;
-        mg_straddr(conn,addr,sizeof(addr)) ;
+        mg_ntoa(&conn->rem,addr,sizeof(addr)) ;
 
         return JS_NewString(ctx, addr) ;
     }
@@ -410,7 +412,7 @@ namespace be::mg {
         JSValue obj = JS_NewObject(ctx) ;
 
         struct mg_str host = mg_url_host(url) ;
-        JS_SetPropertyStr(ctx, obj, "host", JS_NewStringLen(ctx,host.ptr,host.len)) ;
+        JS_SetPropertyStr(ctx, obj, "host", JS_NewStringLen(ctx,host.buf,host.len)) ;
         JS_SetPropertyStr(ctx, obj, "port", JS_NewUint32(ctx,mg_url_port(url))) ;
         JS_SetPropertyStr(ctx, obj, "uri", JS_NewString(ctx,mg_url_uri(url))) ;
 
@@ -422,17 +424,26 @@ namespace be::mg {
     /**
      * 设置 mg 的日志级别
      * 
+     * * 0: none
+     * * 1: error
+     * * 2: info
+     * * 3: debug
+     * * 4: verbose
+     * 
      * @function setLog
-     * @param log:string 日志级别
+     * @param log:number
      * @return undefined
      */
     JSValue Mg::setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
-        ARGV_TO_CSTRING_E(0, log, "arg loglevel must be a string")
+        
+        ARGV_TO_UINT32(0, log)
+        if(log>4 || log<0) {
+            JSTHROW("log level must be 0-4") ;
+        }
 
         mg_log_set(log) ;
 
-        JS_FreeCString(ctx, log) ;
         return JS_UNDEFINED ;
     }
     
@@ -521,4 +532,24 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+
+    bool mg_addr_ip_eq(const struct mg_addr & a, const struct mg_addr & b) {
+        if (a.is_ip6 != b.is_ip6) return false;  // 类型不同直接返回 false
+        if (a.is_ip6) {
+            return memcmp(a.ip, b.ip, 16) == 0;  // IPv6 比较 16 字节
+        } else {
+            return memcmp(a.ip, b.ip, 4) == 0;   // IPv4 比较 4 字节
+        }
+    }
+
+    char *mg_ntoa(const struct mg_addr *addr, char *buf, size_t len) {
+        if (addr->is_ip6) {
+            snprintf(buf, len, "[%x:%x:%x:%x:%x:%x:%x:%x]:%d",
+                    addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->ip[4], addr->ip[5], addr->ip[6], addr->ip[7], addr->port);
+        } else {
+            snprintf(buf, len, "%d.%d.%d.%d:%d",
+                    addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3], addr->port);
+        }
+        return buf;
+    }
 }
