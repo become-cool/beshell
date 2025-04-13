@@ -112,7 +112,7 @@ namespace be{
 
         // dn3(baudrate,stopbits,parity)
 
-        esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, NULL);
+        esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)
         }

@@ -224,7 +224,7 @@ namespace be{
                     switch(msg->gap.scan_rst.search_evt) {
                         case ESP_GAP_SEARCH_INQ_RES_EVT: {
                             uint8_t addr[18] ;
-                            sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+                            sprintf((char *)addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
                                 msg->gap.scan_rst.bda[0] ,
                                 msg->gap.scan_rst.bda[1] ,
                                 msg->gap.scan_rst.bda[2] ,
@@ -237,7 +237,7 @@ namespace be{
                             JS_SetPropertyStr(ctx, obj, "evt", JS_NewUint32(ctx, msg->gap.scan_rst.ble_evt_type)) ;
                             JS_SetPropertyStr(ctx, obj, "devType", JS_NewUint32(ctx, msg->gap.scan_rst.dev_type)) ;
                             JS_SetPropertyStr(ctx, obj, "addrType", JS_NewUint32(ctx, msg->gap.scan_rst.ble_addr_type)) ;
-                            JS_SetPropertyStr(ctx, obj, "addr", JS_NewString(ctx, addr)) ;
+                            JS_SetPropertyStr(ctx, obj, "addr", JS_NewString(ctx, (const char *)addr)) ;
                             JS_SetPropertyStr(ctx, obj, "rssi", JS_NewInt32(ctx, msg->gap.scan_rst.rssi)) ;
                             JS_SetPropertyStr(ctx, obj, "flag", JS_NewInt32(ctx, msg->gap.scan_rst.flag)) ;
                             JS_SetPropertyStr(ctx, obj, "num_resps", JS_NewInt32(ctx, msg->gap.scan_rst.num_resps)) ;
@@ -340,7 +340,7 @@ namespace be{
         if(level<ESP_PWR_LVL_N24 || level>ESP_PWR_LVL_P21) {
             JSTHROW("Invalid power level")
         }
-        esp_err_t ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, level) ;
+        esp_err_t ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, (esp_power_level_t)level) ;
         return JS_NewInt32(ctx, ret) ;
     }
     JSValue BT::power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

@@ -195,7 +195,7 @@ namespace be {
                 emitSyncFree("read-char", {
                     JS_NewInt32(ctx, msg->gattc.read.status) ,
                     JS_NewInt32(ctx, msg->gattc.read.handle) ,
-                    JS_NewArrayBufferCopy(ctx, msg->data.ptr, msg->data.len)
+                    JS_NewArrayBufferCopy(ctx, (const uint8_t*)msg->data.ptr, msg->data.len)
                 }) ;
                 
                 if(msg->data.ptr) {
@@ -236,7 +236,7 @@ namespace be {
                                 gattc_if,
                                 conn_id,
                                 ESP_GATT_DB_CHARACTERISTIC,
-                                start_handle, end_handle, NULL, &count);
+                                start_handle, end_handle, 0, &count);
         if (ret_status != ESP_GATT_OK) {
             JSTHROW("esp_ble_gattc_get_attr_count error: %d", ret_status) ;
         }
@@ -501,7 +501,7 @@ namespace be {
         }
 
         esp_err_t err = esp_ble_gattc_write_char(
-            gattc_if_global, conn_id, handle, size, buff ,
+            gattc_if_global, conn_id, handle, size, (uint8_t *)buff ,
             ( rsp? ESP_GATT_WRITE_TYPE_RSP: ESP_GATT_WRITE_TYPE_NO_RSP ) ,
             ESP_GATT_AUTH_REQ_NONE
         ) ;

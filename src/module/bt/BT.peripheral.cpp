@@ -240,7 +240,7 @@ namespace be {
                 // Keep this one uppercase
                 emitSyncFree("WRITE", {
                     JS_NewInt32(ctx, event->gatts.write.handle),
-                    JS_NewArrayBufferCopy(ctx, event->data.ptr, event->data.len),
+                    JS_NewArrayBufferCopy(ctx, (const uint8_t*)event->data.ptr, event->data.len),
                     JS_NewInt32(ctx, event->gatts.write.conn_id),
                     JS_NewBool(ctx, event->gatts.write.is_prep),
                     JS_NewBool(ctx, event->gatts.write.need_rsp)
@@ -363,12 +363,12 @@ namespace be {
             .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY, // 允许扫描和连接
         };
         if(argc>0) {
-            GET_INT32_PROP_OPT( argv[0], "min",                 adv_params.adv_int_min,         0xA0 )
-            GET_INT32_PROP_OPT( argv[0], "max",                 adv_params.adv_int_max,         0xB0 )
-            GET_INT32_PROP_OPT( argv[0], "type",                adv_params.adv_type,            ADV_TYPE_IND )
-            GET_INT16_PROP_OPT( argv[0], "own_addr_type",       adv_params.own_addr_type,       BLE_ADDR_TYPE_PUBLIC )
-            GET_INT16_PROP_OPT( argv[0], "channel_map",         adv_params.channel_map,         ADV_CHNL_ALL )
-            GET_INT32_PROP_OPT( argv[0], "adv_filter_policy",   adv_params.adv_filter_policy,   ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY )
+            GET_INT16_PROP_OPT  ( argv[0], "min",                 adv_params.adv_int_min,         0xA0 )
+            GET_INT16_PROP_OPT  ( argv[0], "max",                 adv_params.adv_int_max,         0xB0 )
+            GET_INTEGER_PROP_OPT( argv[0], "type",                adv_params.adv_type,            esp_ble_adv_type_t,       int32_t, JS_ToInt32, ADV_TYPE_IND )
+            GET_INTEGER_PROP_OPT( argv[0], "own_addr_type",       adv_params.own_addr_type,       esp_ble_addr_type_t,      int32_t, JS_ToInt32, BLE_ADDR_TYPE_PUBLIC )
+            GET_INTEGER_PROP_OPT( argv[0], "channel_map",         adv_params.channel_map,         esp_ble_adv_channel_t,    int32_t, JS_ToInt32, ADV_CHNL_ALL )
+            GET_INTEGER_PROP_OPT( argv[0], "adv_filter_policy",   adv_params.adv_filter_policy,   esp_ble_adv_filter_t,     int32_t, JS_ToInt32, ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY )
         }
 
         // dn(adv_params.adv_int_min)
@@ -409,7 +409,7 @@ namespace be {
         }
         
         // Convert UUID string to esp_bt_uuid_t
-        esp_bt_uuid_t uuid = bt_string_to_uuid(uuid_str, strlen(uuid_str));
+        esp_bt_uuid_t uuid = bt_string_to_uuid((char *)uuid_str, strlen(uuid_str));
         if (uuid.len == ESP_UUID_LEN_16 && uuid.uuid.uuid16 == 0) {
             JS_FreeCString(ctx, uuid_str);
             JSTHROW("Invalid UUID format")
@@ -454,7 +454,7 @@ namespace be {
         ARGV_TO_CSTRING(1, uuid_str)
         
         // Convert UUID string to esp_bt_uuid_t
-        esp_bt_uuid_t uuid = bt_string_to_uuid(uuid_str, strlen(uuid_str));
+        esp_bt_uuid_t uuid = bt_string_to_uuid((char *)uuid_str, strlen(uuid_str));
         if (uuid.len == ESP_UUID_LEN_16 && uuid.uuid.uuid16 == 0) {
             JS_FreeCString(ctx, uuid_str);
             JSTHROW("Invalid UUID format")
