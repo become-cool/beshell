@@ -41,6 +41,7 @@ Refactored:
 * EventEmitter::emitNativeEvent() 返回 bool
 * 修改了 dt.device 中驱动对象的存放结构
 * rename process.delay() to process.sleep()
+* 升级 mongoose 库到 7.17
 
 ## v0.3.6   2024-11-27
 
