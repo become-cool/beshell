@@ -1,5 +1,4 @@
 #include "OTA.hpp"
-#include "esp_flash_partitions.h"
 #include "ota.hpp"
 #include "esp_ota_ops.h"
 #include "esp_http_client.h"
@@ -28,6 +27,8 @@ typedef struct OTAEvent {
 namespace be{
 
     char const * const OTA::name = "ota" ;
+
+    static const char * runningFSPart = nullptr ;
 
     OTA::OTA(JSContext * ctx, const char * name)
         : EventModule(ctx, name, 0)
@@ -77,13 +78,50 @@ namespace be{
     }
 
     JSValue OTA::getRunningPartition(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        const esp_partition_t * partition = esp_ota_get_running_partition() ;
-        if(!partition) {
-            JSTHROW("get running partition failed")
+        const char* type = "bin";
+        
+        if (argc > 0 && JS_IsString(argv[0])) {
+            const char* typeArg = JS_ToCString(ctx, argv[0]);
+            if (typeArg) {
+                if (strcmp(typeArg, "bin") == 0 || strcmp(typeArg, "fs") == 0) {
+                    type = typeArg;
+                } else {
+                    JS_FreeCString(ctx, typeArg);
+                    JSTHROW("Invalid type. Must be 'bin' or 'fs'");
+                }
+            }
         }
-        auto p = new Partition(partition, ctx) ;
-        return p->jsobj ;
+
+        if (strcmp(type, "bin") == 0) {
+            const esp_partition_t* partition = esp_ota_get_running_partition();
+            if (!partition) {
+                if (argc > 0 && JS_IsString(argv[0])) {
+                    JS_FreeCString(ctx, type);
+                }
+                JSTHROW("get running partition failed");
+            }
+            auto p = new Partition(partition, ctx);
+            if (argc > 0 && JS_IsString(argv[0])) {
+                JS_FreeCString(ctx, type);
+            }
+            return p->jsobj;
+        } else { // type == "fs"
+            char buff[128];
+                const esp_partition_t* partition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, runningFSPart);
+                if (!partition) {
+                    if (argc > 0 && JS_IsString(argv[0])) {
+                        JS_FreeCString(ctx, type);
+                    }
+                    JSTHROW("get running fs partition failed");
+                }
+                auto p = new Partition(partition, ctx);
+                if (argc > 0 && JS_IsString(argv[0])) {
+                    JS_FreeCString(ctx, type);
+                }
+                return p->jsobj;
+        }
     }
+
     JSValue OTA::getNextUpdatePartition(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         const esp_partition_t * partition = esp_ota_get_next_update_partition(NULL) ;
         if(!partition) {
@@ -92,8 +130,6 @@ namespace be{
         auto p = new Partition(partition, ctx) ;
         return p->jsobj ;
     }
-
-    static const char * runningFSPart = nullptr ;
 
     JSValue OTA::markValid(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         NVS::writeString("fsroot.boot", runningFSPart) ;
@@ -125,9 +161,11 @@ namespace be{
             NVS::erase("fsroot.boot.try") ;
         }
         else if( NVS::readString("fsroot.boot", buff, sizeof(buff))==ESP_OK ) {
-            fsPartName = buff ;
+            runningFSPart = buff ;
         }
-        runningFSPart = fsPartName ;
-        return fsPartName ;
+        else {
+            runningFSPart = fsPartName ;
+        }
+        return runningFSPart ;
     }
 }
