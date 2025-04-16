@@ -33,7 +33,6 @@ function request(url, handle) {
       switch (event) {
         case 'timeout':
         case 'error':
-          // console.log("mg timeout/error")
           reject(event)
           break
         case 'close':
@@ -56,7 +55,7 @@ function request(url, handle) {
 async function get(url,handle) {
   let body = null
   let received = false
-  await request(url, (conn,event,msg,wdg)=>{
+  await request(url, (conn,event,msg)=>{
     if(event=='http.msg'){
       body = msg.body()
       received = true
@@ -74,6 +73,7 @@ async function get(url,handle) {
       console.error(e)
     }
   })
+  console.log("request() in get() over", received)
   if(!received) {
     throw new Error("the connection was unexpectedly disconnected.")
   }
@@ -91,14 +91,21 @@ async function download(url, localPath, progress_cb) {
   try{
     let t = Date.now()
     let total = 0
-    await get(url, (conn,event,data)=>{
-      if(event=='http.head'){
-        total = parseInt(data.header("Content-Length"))
-        if(isNaN(total)) {
-          total = 0
-        }
+    await request(url, (conn,event,data)=>{
+      if(event=='connect') {
+        let info = mg.parseUrl(url)
+        conn.send(`GET ${info.uri} HTTP/1.0\r\n`)
+        conn.send(`Host: ${info.host}\r\n`)
+        conn.send(`User-Agent: BeShell\r\n`)
+        conn.send(`\r\n`)
+      }
+      else if (event=='http.head'){
+        total = data.bodyLength() || 0
       }
       else if(event=='http.chunk'){
+        if(!data) {
+          return
+        }
         if(fhandle) {
           fs.write(fhandle, data)
         }

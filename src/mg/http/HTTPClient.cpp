@@ -6,6 +6,42 @@
 
 using namespace std ;
 
+
+extern "C" {
+    
+    static bool mg_is_chunked(struct mg_http_message *hm) {
+        struct mg_str *te = mg_http_get_header(hm, "Transfer-Encoding");
+        return te != NULL && te->len>=7 && strnstr(te->buf, "chunked", 7) != NULL;
+    }
+    static void mg_http_delete_chunk(struct mg_connection *c, struct mg_http_message *hm) {
+
+        dn2(hm->body.len, c->recv.len) ;
+
+        // c->recv.len = client->headerLength;
+
+        return ;
+
+        struct mg_str ch = hm->body;
+        if (mg_is_chunked(hm)) {
+            ch.len += 4;  // \r\n before and after the chunk
+            ch.buf -= 2;
+            while (ch.buf > hm->body.buf && *ch.buf != '\n') ch.buf--, ch.len++;
+        }
+        {
+            const char *end = &ch.buf[ch.len];
+            size_t n = (size_t) (end - (char *) c->recv.buf);
+            if (c->recv.len > n) {
+                memmove((char *) ch.buf, end, (size_t) (c->recv.len - n));
+            }
+            // LOG(LL_INFO, ("DELETING CHUNK: %zu %zu %zu\n%.*s", c->recv.len, n,
+            // ch.len, (int) ch.len, ch.ptr));
+        }
+        c->recv.len -= ch.len;
+    }
+}
+
+
+
 namespace be::mg {
     DEFINE_NCLASS_META(Client, EventEmitter)
     std::vector<JSCFunctionListEntry> Client::methods = {
@@ -153,50 +189,92 @@ namespace be::mg {
                 break ;
             }
 
+            case MG_EV_READ: {
+                if(!client->_enableChunkEvent || !client->headerLength){
+                    break ;
+                }
+                long read_len = *(long *)ev_data ;
+                
+                if(read_len>conn->recv.size) {
+                    printf("recv buf overflow %ld > %d\n", read_len, conn->recv.size) ;
+                    break ;
+                }
+
+                // printf("[headerLength=%d,recv.len=%d, n=%d]"
+                //     // "----------\n%.*s---------------------"
+                //     "\n", client->headerLength, conn->recv.len, read_len
+                //     // , conn->recv.len, (char *)conn->recv.buf
+                // ) ;
+
+                if(conn->recv.len) {
+                    JSValue evname = JS_NewString(client->ctx, "http.chunk") ;
+                    JSValue ab = JS_NewArrayBuffer(client->ctx, conn->recv.buf, conn->recv.len, nofreeArrayBuffer, nullptr, false) ;
+                    JS_CALL_ARG2(client->ctx, client->callback, evname, ab)
+                    JS_FreeValue(client->ctx, evname) ;
+                    JS_FreeValue(client->ctx, ab) ;
+                }
+                else {
+                    printf("chunk len 0?\n") ;
+                    // abort() ;
+                }
+                conn->recv.len = 0;
+                
+                break;
+            }
+
             case MG_EV_HTTP_HDRS: {
-                // 
-                if( client->headerLength==0 ){
+                if( client->_enableChunkEvent ){
+
+                    // MG_EV_HTTP_HDRS 会重复触发
+                    if(client->headerLength) {
+                        break ;
+                    }
+                    
                     const char *header_end = strnstr((char *)conn->recv.buf, "\r\n\r\n", conn->recv.len) ;
                     if(header_end) {
+
+                        client->headerLength = header_end - (char *)conn->recv.buf + 4 ; // 4 = "\r\n\r\n" 的长度
+                        // dn2(client->headerLength, conn->recv.len)
+                        // printf("%.*s", conn->recv.len, (char *)conn->recv.buf) ;
+
+                        // http.head 事件
                         struct mg_http_message *hm = (struct mg_http_message *) ev_data;
                         HTTPRequest * req = new HTTPRequest(client->ctx, hm) ;
                         req->shared() ; // 智能回收模式 (jsobj gc 回收时自动 delete req)
 
                         JSValue evname = JS_NewString(client->ctx, "http.head") ;
-                        
                         JS_CALL_ARG2(client->ctx, client->callback, evname, req->jsobj)
-
                         JS_FreeValue(client->ctx, evname) ;
                         JS_FreeValue(client->ctx, req->jsobj) ;
 
-                        client->headerLength = header_end - (char *)conn->recv.buf + 4 ; // 4 = "\r\n\r\n" 的长度
+                        // http.chunk 事件
+                        if( conn->recv.len > client->headerLength ){
+
+                            uint8_t * chunk = conn->recv.buf + client->headerLength ;
+                            JSValue evname = JS_NewString(client->ctx, "http.chunk") ;
+
+                            // 使用 nofreeArrayBuffer 避免数据拷贝，回调函数里不应该保留这个 ArrayBuffer 的引用
+                            JSValue ab = JS_NewArrayBuffer(client->ctx, chunk, conn->recv.len-client->headerLength, nofreeArrayBuffer, nullptr, false) ;
+                            JS_CALL_ARG2(client->ctx, client->callback, evname, ab)
+                            JS_FreeValue(client->ctx, evname) ;
+                            JS_FreeValue(client->ctx, ab) ;
+                        }
+                        
+                        conn->recv.len = 0 ;
+                    }
+                    else{
+                        printf("header not end ???\n") ;
                     }
                 }
-                
-                if (client->_enableChunkEvent && client->headerLength) {
-
-                    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-
-                    // Found the end of the header
-                    size_t bodyLength = conn->recv.len - client->headerLength;
-
-                    size_t chunkLenght = bodyLength - client->receivedBodyLength ;
-                    uint8_t * chunk = conn->recv.buf + client->headerLength + client->receivedBodyLength ;
-
-                    client->receivedBodyLength = bodyLength ;
-
-                    JSValue evname = JS_NewString(client->ctx, "http.chunk") ;
-                    JSValue ab = JS_NewArrayBuffer(client->ctx, chunk, chunkLenght, nofreeArrayBuffer, nullptr, false) ;
-                    JS_CALL_ARG2(client->ctx, client->callback, evname, ab)
-                    JS_FreeValue(client->ctx, evname) ;
-                    JS_FreeValue(client->ctx, ab) ;
-                }
-                
-                break;
             }
             
             case MG_EV_HTTP_MSG: 
             {
+                // 如果是 chunked 的数据，已经在 MG_EV_READ 事件中处理了
+                if(client->_enableChunkEvent) {
+                    break ;
+                }
+
                 // moogose https 协议，会在 close 事件以后触发 msg 事件
                 if(!client || !client->ctx) {
                     break ;
@@ -219,7 +297,6 @@ namespace be::mg {
             }
 
             case MG_EV_CLOSE : {
-            
                 JSValue evname = JS_NewString(client->ctx, "close") ;
                 JS_CALL_ARG1(client->ctx, client->callback, evname)
                 JS_FreeValue(client->ctx, evname) ;
