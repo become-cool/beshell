@@ -47,7 +47,7 @@ namespace be {
         loopFunctions.push_back( std::pair<LoopFunction,void *>(func,opaque) ) ;
     }
 
-    void BeShell::setup(const char * mainScriptPath, bool ignoreCrash) {
+    void BeShell::setup() {
         telnet->setup() ;
         engine->setup() ;
 
@@ -68,26 +68,6 @@ namespace be {
         cout    << "build: " << __DATE__ << " " << __TIME__ << "\r\n" ;
         cout    << "type JavaScript code to run, or 'help' for more information\r\n\r\n" ;
 
-        if(mainScriptPath) {
-#ifdef ESP_PLATFORM
-            bool run = true ;
-            esp_reset_reason_t reset_reason = esp_reset_reason();
-            if(reset_reason==ESP_RST_PANIC) {
-                printf("BeShell was rebooted due to a crash\n") ;
-                run = false ;
-            }
-            else if(reset_reason==ESP_RST_INT_WDT) {
-                printf("BeShell was rebooted due to an interrupt watchdog timeout\n") ;
-                run = false ;
-            }
-            if(ignoreCrash||run) {
-                engine->evalScript(mainScriptPath) ;
-            }
-#else
-            engine->evalScript(mainScriptPath) ;
-#endif
-        }
-
         vTaskPrioritySet(NULL, 10) ;
     }
 
@@ -104,8 +84,59 @@ namespace be {
         }
     }
 
-    void BeShell::main(const char * mainScriptPath, bool ignoreCrash) {
-        setup(mainScriptPath, ignoreCrash) ;
+    void BeShell::main(const char * mainScriptPath) {
+        setup() ;
+
+        if(mainScriptPath) {
+#ifdef ESP_PLATFORM
+            bool delayRunScript = false ;
+            esp_reset_reason_t reset_reason = esp_reset_reason();
+            if(reset_reason==ESP_RST_PANIC) {
+                printf("\nBeShell was rebooted due to a crash\n") ;
+                delayRunScript = true ;
+            }
+            else if(reset_reason==ESP_RST_INT_WDT) {
+                printf("\nBeShell was rebooted due to an interrupt watchdog timeout\n") ;
+                delayRunScript = true ;
+            }
+            
+            #define BESHELL_CRASH_RECOVERY_DELAY_SEC 30
+
+            if(delayRunScript) {
+                printf("Waiting %d seconds before executing main script...\n", BESHELL_CRASH_RECOVERY_DELAY_SEC);
+                
+                // Use the existing loop structure for timing
+                uint32_t startTick = xTaskGetTickCount();
+                uint32_t lastLoopTime = 0;
+                uint32_t lastPrintTime = 0;
+                
+                // Wait using existing loop timing
+                while((xTaskGetTickCount() - startTick) < (BESHELL_CRASH_RECOVERY_DELAY_SEC * 1000 / portTICK_PERIOD_MS)) {
+                    // Run the regular loop
+                    loop();
+                    
+                    // Print countdown approximately once per second
+                    uint32_t currentTick = xTaskGetTickCount();
+                    uint32_t elapsedSec = (currentTick - startTick) / (1000 / portTICK_PERIOD_MS);
+                    uint32_t remainingSec = BESHELL_CRASH_RECOVERY_DELAY_SEC - elapsedSec;
+                    
+                    if(currentTick - lastPrintTime >= (5000 / portTICK_PERIOD_MS)) {
+                        printf("Starting in %d seconds...\n", remainingSec);
+                        fflush(stdout);
+                        lastPrintTime = currentTick;
+                    }
+                    
+                    // Maintain original loop timing
+                    vTaskDelay((lastLoopTime++%10)==0? 0: 1);
+                }
+                
+                printf("\nResuming normal operation\n");
+            }
+#endif
+
+            engine->evalScript(mainScriptPath) ;
+        }
+
         run() ;
     }
 }

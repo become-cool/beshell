@@ -31,7 +31,7 @@ namespace be {
 
         BeShell() ;
         ~BeShell() ;
-        void setup(const char * mainScriptPath=nullptr, bool ignoreCrash=false) ;
+        void setup() ;
         inline void loop() {
             telnet->loop() ;
             engine->loop() ;
@@ -40,7 +40,7 @@ namespace be {
             }
         }
         void run() ;
-        void main(const char * mainScriptPath=nullptr, bool ignoreCrash=false) ;
+        void main(const char * mainScriptPath=nullptr) ;
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
         

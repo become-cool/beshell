@@ -36,7 +36,7 @@ Removed:
 
 Refactored:
 
-* BeShell::main() 增加参数 core
+* BeShell::main() 如果发生崩溃，等待30秒后再执行 main 脚本
 * wifi.conenct()  auto call startStaDeamon() when retry==-1
 * EventEmitter::emitNativeEvent() 返回 bool
 * 修改了 dt.device 中驱动对象的存放结构
