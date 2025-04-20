@@ -318,8 +318,8 @@ namespace be {
 #ifdef ESP_PLATFORM
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
-            uint8_t CPU_RunInfo[400];
-            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+            uint8_t CPU_RunInfo[1024];
+            memset(CPU_RunInfo, 0, sizeof(CPU_RunInfo)); /* 信息缓冲区清零 */
     
             vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
 
@@ -328,13 +328,49 @@ namespace be {
             buff+= (char *)CPU_RunInfo;
             buff+= "----------------------------------------------------\r\n";
 
-            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+            memset(CPU_RunInfo, 0, sizeof(CPU_RunInfo)); /* 信息缓冲区清零 */
 
             vTaskGetRunTimeStats((char *)&CPU_RunInfo);
 
             buff+= "task_name      run_cnt                 usage_rate   \r\n";
             buff+= (char *)CPU_RunInfo;
             buff+= "----------------------------------------------------\r\n";
+
+            TaskStatus_t *pxTaskStatusArray;
+            UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
+            pxTaskStatusArray = malloc(uxArraySize * sizeof(TaskStatus_t));
+        
+            if (pxTaskStatusArray != NULL) {
+                uxArraySize = uxTaskGetSystemState(
+                    pxTaskStatusArray,
+                    uxArraySize,
+                    NULL
+                );
+        
+                printf("------------------------------\n");
+                printf("CPU Core0 Task:\n");
+                for (UBaseType_t i = 0; i < uxArraySize; i++) {
+                    TaskHandle_t xTask = pxTaskStatusArray[i].xHandle;
+                    BaseType_t xCoreID = xTaskGetCoreID(xTask);
+                    if (xCoreID == 0) {
+                        printf("%s\n", pxTaskStatusArray[i].pcTaskName);
+                    }
+                }
+
+                if(configNUMBER_OF_CORES>1) {
+                    printf("------------------------------\n");
+                    printf("CPU Core1 Task:\n");
+                    for (UBaseType_t i = 0; i < uxArraySize; i++) {
+                        TaskHandle_t xTask = pxTaskStatusArray[i].xHandle;
+                        BaseType_t xCoreID = xTaskGetCoreID(xTask);
+                        if (xCoreID == 1) {
+                            printf("%s\n", pxTaskStatusArray[i].pcTaskName);
+                        }
+                    }
+                }
+            
+                free(pxTaskStatusArray);
+            }
 #endif
 #endif
 #endif
