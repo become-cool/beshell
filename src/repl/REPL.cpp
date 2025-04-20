@@ -318,23 +318,23 @@ namespace be {
 #ifdef ESP_PLATFORM
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
 #ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
-            // uint8_t CPU_RunInfo[400];
-            // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+            uint8_t CPU_RunInfo[400];
+            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
     
-            // vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
+            vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
 
-            // buff = "----------------------------------------------------\r\n";
-            // buff+= "task_name     task_status     priority stack task_id\r\n";
-            // buff+= (char *)CPU_RunInfo;
-            // buff+= "----------------------------------------------------\r\n";
+            buff = "----------------------------------------------------\r\n";
+            buff+= "task_name     task_status     priority stack task_id\r\n";
+            buff+= (char *)CPU_RunInfo;
+            buff+= "----------------------------------------------------\r\n";
 
-            // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
+            memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
 
-            // vTaskGetRunTimeStats((char *)&CPU_RunInfo);
+            vTaskGetRunTimeStats((char *)&CPU_RunInfo);
 
-            // buff+= "task_name      run_cnt                 usage_rate   \r\n";
-            // buff+= (char *)CPU_RunInfo;
-            // buff+= "----------------------------------------------------\r\n";
+            buff+= "task_name      run_cnt                 usage_rate   \r\n";
+            buff+= (char *)CPU_RunInfo;
+            buff+= "----------------------------------------------------\r\n";
 #endif
 #endif
 #endif

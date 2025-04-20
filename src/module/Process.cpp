@@ -27,7 +27,6 @@ namespace be {
 
         exportFunction("reboot", reboot);
         exportFunction("sleep", sleep);
-        exportFunction("top", top);
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
         exportFunction("setTimezoneOffset", setTimezone);
@@ -277,38 +276,6 @@ namespace be {
         CHECK_ARGC(1)
         ARGV_TO_UINT32(0, ms)
         vTaskDelay(ms/portTICK_PERIOD_MS) ;
-        return JS_UNDEFINED ;
-    }
-
-    /**
-     * 打印系统任务运行状态，包括任务名称、状态、优先级、栈大小、任务ID、运行次数、运行时间等信息。
-     * 
-     * @function top
-     * @return undefined
-     */
-    JSValue Process::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
-#ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
-        // uint8_t CPU_RunInfo[400];
-        // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
- 
-        // vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
-
-        // printf("----------------------------------------------------\r\n");
-        // printf("task_name     task_status     priority stack task_id\r\n");
-        // printf("%s", CPU_RunInfo);
-        // printf("----------------------------------------------------\r\n");
-
-        // memset(CPU_RunInfo, 0, 400); /* 信息缓冲区清零 */
-
-        // vTaskGetRunTimeStats((char *)&CPU_RunInfo);
-
-        // printf("task_name      run_cnt                 usage_rate   \r\n");
-        // printf("%s", CPU_RunInfo);
-        // printf("----------------------------------------------------\r\n");
-#endif
-#endif
-
         return JS_UNDEFINED ;
     }
 
