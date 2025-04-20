@@ -11,6 +11,7 @@ namespace be{
         JS_CFUNC_DEF("erase", 0, Partition::erase),
         JS_CFUNC_DEF("read", 0, Partition::read),
         JS_CFUNC_DEF("write", 0, Partition::write),
+        JS_CFUNC_DEF("checksum", 0, Partition::checksum),
         JS_CGETSET_DEF("label", Partition::label,Partition::invalidSetter),
         JS_CGETSET_DEF("name", Partition::label,Partition::invalidSetter),
         JS_CGETSET_DEF("type", Partition::type,Partition::invalidSetter),
@@ -73,6 +74,50 @@ namespace be{
             JSTHROW("write failed: %d", err)
         }
         return JS_UNDEFINED ;
+    }
+
+    JSValue Partition::checksum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Partition, self)
+        CHECK_ARGC(1)
+        ARGV_TO_UINT32(0, length)
+        ARGV_TO_UINT32_OPT(1, offset, 0)
+
+        // Validate parameters
+        if (offset + length > self->partition->size) {
+            JSTHROW("checksum range exceeds partition size")
+        }
+
+        // Allocate a buffer for reading in chunks (64KB chunks to balance memory usage and performance)
+        const size_t BUFFER_SIZE = 64 * 1024;
+        uint8_t* buffer = (uint8_t*)malloc(BUFFER_SIZE);
+        if (!buffer) {
+            JSTHROW("failed to allocate memory for checksum calculation")
+        }
+
+        uint32_t checksum = 0;
+        uint32_t remaining = length;
+        uint32_t current_offset = offset;
+
+        while (remaining > 0) {
+            uint32_t read_size = (remaining > BUFFER_SIZE) ? BUFFER_SIZE : remaining;
+            
+            esp_err_t err = esp_partition_read(self->partition, current_offset, buffer, read_size);
+            if (err != ESP_OK) {
+                free(buffer);
+                JSTHROW("checksum read failed: %d", err)
+            }
+
+            // Calculate checksum by summing all bytes
+            for (uint32_t i = 0; i < read_size; i++) {
+                checksum += buffer[i];
+            }
+            
+            remaining -= read_size;
+            current_offset += read_size;
+        }
+
+        free(buffer);
+        return JS_NewInt32(ctx, checksum);
     }
 
     JSValue Partition::label(JSContext *ctx, JSValueConst this_val) {

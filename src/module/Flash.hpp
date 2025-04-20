@@ -19,6 +19,7 @@ namespace be{
         static JSValue erase(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue checksum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue label(JSContext *ctx, JSValueConst this_val) ;
         static JSValue type(JSContext *ctx, JSValueConst this_val) ;
         static JSValue subtype(JSContext *ctx, JSValueConst this_val) ;
