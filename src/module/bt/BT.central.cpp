@@ -22,6 +22,10 @@ namespace be {
     // 全局变量，用于记录连接相关信息
     static esp_gatt_if_t gattc_if_global = 0;
 
+    // Add these global variables for synchronization
+    static SemaphoreHandle_t reg_semaphore = NULL;
+    static bool reg_success = false;
+    static bool reg_completed = false;
 
     // 处理GATT client事件
     void BT::gattc_event_handler(esp_gattc_cb_event_t event,
@@ -41,7 +45,15 @@ namespace be {
         } ;
         switch (event) {
         case ESP_GATTC_REG_EVT:
-            gattc_if_global = gattc_if ;
+            // Store gattc_if as before
+            gattc_if_global = gattc_if;
+            
+            // Handle registration synchronization
+            if (reg_semaphore != NULL) {
+                reg_success = (param->reg.status == ESP_GATT_OK);
+                reg_completed = true;
+                xSemaphoreGive(reg_semaphore);
+            }
             break;
 
         case ESP_GATTC_WRITE_CHAR_EVT: 
@@ -87,22 +99,54 @@ namespace be {
         if(inited) {
             return true ;
         }
-        inited = true ;
-        
         
         init() ;
 
-        esp_err_t err = esp_ble_gattc_register_callback(gattc_event_handler);
-        if(err!=ESP_OK) {
-            printf("esp_ble_gattc_register_callback failed, err = %d\n", err);
-            return false ;
-        }
-        err = esp_ble_gattc_app_register(0); // 注册应用ID
-        if (err!=ESP_OK) {
-            printf("esp_ble_gattc_app_register failed, err = %d\n", err);
-            return false ;
+        // Create semaphore for synchronization
+        reg_semaphore = xSemaphoreCreateBinary();
+        if (reg_semaphore == NULL) {
+            printf("Failed to create semaphore for BT registration\n");
+            return false;
         }
         
+        reg_completed = false;
+        reg_success = false;
+
+        // Register callback
+        esp_err_t err = esp_ble_gattc_register_callback(gattc_event_handler);
+        if (err != ESP_OK) {
+            printf("esp_ble_gattc_register_callback failed, err = %d\n", err);
+            reg_semaphore = NULL;
+            return false;
+        }
+        
+        // Register app
+        err = esp_ble_gattc_app_register(0);
+        if (err != ESP_OK) {
+            printf("esp_ble_gattc_app_register failed, err = %d\n", err);
+            reg_semaphore = NULL;
+            return false;
+        }
+
+        // Wait for registration event with timeout (1000ms)
+        if (xSemaphoreTake(reg_semaphore, pdMS_TO_TICKS(1000)) != pdTRUE) {
+            printf("BT registration timed out after 1000ms\n");
+            reg_semaphore = NULL;
+            return false;
+        }
+
+        // Check registration result
+        if (!reg_completed || !reg_success) {
+            printf("BT registration failed\n");
+            reg_semaphore = NULL;
+            return false;
+        }
+
+        // Clean up semaphore
+        vSemaphoreDelete(reg_semaphore);
+        reg_semaphore = NULL;
+        
+        inited = true;
         return true ;
     }
     

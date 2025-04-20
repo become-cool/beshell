@@ -24,6 +24,7 @@ function downloadFirmware(p, opt, type, onProgress, onComplete, step) {
             console.log("write to partition", p.label, p.size, "bytes")
             console.log("start download ...")
 
+            let totalBytes = 0
             await mg.download(opt.url, null, (total,wrote,chunk)=>{
                 let prog = Math.round(wrote*100/total)
                 if(printProg==prog) {
@@ -34,23 +35,27 @@ function downloadFirmware(p, opt, type, onProgress, onComplete, step) {
                 writer+= chunk.byteLength
 
                 onProgress && onProgress(type, total, wrote)
+
+                totalBytes = total
             })
             console.log("download and flash", (Date.now()-t)+"ms")
 
-            if(type=="bin") {
-                ota.setBootPartition(p)
-            }
-            else if(type=="fs") {
-                nvs.writeString("fsroot.boot", p.label)
+            if( Number.isInteger(opt.checksum) ){
+                console.log("calculate checksum ...", opt.checksum.toString(16).toUpperCase())
+                let flashChecksum = p.checksum(totalBytes)
+                if( opt.checksum != flashChecksum ) {
+                    throw new Error("Checksum error, expected "+opt.checksum+", got "+flashChecksum)
+                }
             }
 
             onComplete && onComplete(type, null)
+
+            resolve()
 
         } catch(e) {
             reject(e)
             onComplete && onComplete(type, e)
         }
-
     })
 }
 
@@ -85,9 +90,12 @@ function findOTAPartitions(){
 */
 export async function start(opt) {
 
+    let bootBinPart = null
+    let bootFSPart = null
+
     if(opt.bin) {
         let parts = opt.bin.partitions || findOTAPartitions()
-        let bootBinPart = ota.getBootPartition()
+        bootBinPart = ota.getBootPartition()
         console.log("boot bin partition:", bootBinPart.label)
 
         parts = parts.filter(p => p.label !== bootBinPart.label);
@@ -114,10 +122,10 @@ export async function start(opt) {
             throw new Error("Missing alternative OTA partition for fs")
         }
 
-        let bootPart = ota.getRunningPartition("fs")
-        console.log("boot fs partition:", bootPart.label)
+        bootFSPart = ota.getRunningPartition("fs")
+        console.log("boot fs partition:", bootFSPart.label)
 
-        let parts = opt.fs.partitions.filter(p => p.label !== bootPart.label)
+        let parts = opt.fs.partitions.filter(p => p.label !== bootFSPart.label)
         console.log("alternative fs partitions:", parts.map(p=>p.label))
 
         if(parts.length<1){
@@ -125,5 +133,12 @@ export async function start(opt) {
         }
         console.log("write bin firmware to partition:", parts[0].label)
         await downloadFirmware(parts[0], opt.fs, "fs", opt.onProgress, opt.onComplete, opt.step||5)
+    }
+
+    if(bootBinPart) {
+        ota.setBootPartition(bootBinPart)
+    }
+    if(bootFSPart) {
+        nvs.writeString("fsroot.boot", bootFSPart.label)
     }
 }
