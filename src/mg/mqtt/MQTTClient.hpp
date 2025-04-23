@@ -33,6 +33,7 @@ namespace be::mg {
         
         struct mg_connection * conn ;
         uint16_t poll_times = 0 ;
+        std::string _host = ""; // 用于 tls
         bool is_tls = false ;
 
         MQTTClient(JSContext * ctx, struct mg_connection * conn) ;

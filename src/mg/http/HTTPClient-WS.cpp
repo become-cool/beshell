@@ -30,11 +30,29 @@ namespace be::mg {
     // };
     void Client::wsEventHandler(struct mg_connection * conn, int ev, void * ev_data) {
         Client * client = (Client *)conn->fn_data ;
-        
-        if (ev == MG_EV_WS_OPEN) { // WebSocket 连接成功
+                
+        if(handler && client && handler(client, conn, ev, ev_data, conn->fn_data)) {
+            return ;
+        }
+
+        if (ev == MG_EV_CONNECT) {
+            if(client && client->is_tls && Mg::ca.length()>0) {
+                struct mg_tls_opts opts = {
+                    .ca = mg_str(Mg::ca.c_str()),
+                    .name = mg_str(client->_host.c_str())
+                };
+                mg_tls_init(conn, &opts);
+            }
+
+            JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
+            JS_CALL_ARG1(client->ctx, client->callback, evname)
+            JS_FreeValue(client->ctx, evname) ;
+        }
+
+        else if (ev == MG_EV_WS_OPEN) { // WebSocket 连接成功
             // printf("WebSocket connection established\n");
 
-            JSValue eventName = JS_NewString(client->ctx, "connect") ;
+            JSValue eventName = JS_NewString(client->ctx, "ws.open") ;
             JS_CALL_ARG1(client->ctx, client->callback, eventName)
             JS_FreeValue(client->ctx, eventName) ;
                 

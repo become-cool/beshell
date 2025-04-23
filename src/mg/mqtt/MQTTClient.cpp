@@ -76,6 +76,15 @@ namespace be::mg {
 
         switch (ev)
         {
+        case MG_EV_CONNECT:
+            
+            if (nobj->is_tls) {
+                struct mg_tls_opts opts = {
+                    .ca = mg_str(Mg::ca.c_str()),
+                    .name = mg_str(nobj->_host.c_str())
+                };
+                mg_tls_init(c, &opts);
+            }
         case MG_EV_MQTT_MSG: {
             struct mg_mqtt_message * msg = (struct mg_mqtt_message *) ev_data;
             ev_wrapper.data.msg.topic = mg_strdup(msg->topic) ;
@@ -116,16 +125,12 @@ namespace be::mg {
         // if(event->ev!=MG_EV_POLL) {
         //     printf("onNativeEvent() event: %d\n", event->ev) ;
         // }
+
         switch (event->ev) {
             case MG_EV_OPEN:
                 emitSync("open") ;
                 break;
             case MG_EV_CONNECT:
-                if (is_tls) {
-                    struct mg_tls_opts opts ;
-                    memset(& opts, 0, sizeof(struct mg_tls_opts)) ;
-                    mg_tls_init(conn, &opts);
-                }
                 emitSync("connect") ;
                 // emitCallback("connect", {}) ;
                 break;
@@ -205,6 +210,13 @@ namespace be::mg {
 
         struct mg_connection * conn = mg_mqtt_connect(&Mg::mgr, url, &opts, (mg_event_handler_t)eventHandler, (void*)client);
         
+        if(url[4]=='s') {
+            client->is_tls = true ;
+            
+            struct mg_str host = mg_url_host(url) ;
+            client->_host = string(host.buf, host.len) ;
+        }
+
         JS_FreeCString(ctx, url) ;
 
         if(conn==NULL) {
