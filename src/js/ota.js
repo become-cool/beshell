@@ -102,8 +102,9 @@ export async function start(opt) {
         if(parts.length<1){
             throw new Error("Aalternative OTA partition not found")
         }
-        console.log("write bin firmware to partition:", parts[0].label)
-        await downloadFirmware(parts[0], opt.bin, "bin", opt.onProgress, opt.onComplete, opt.step||5)
+        bootBinPart = parts[0]
+        console.log("write bin firmware to partition:", bootBinPart.label)
+        await downloadFirmware(bootBinPart, opt.bin, "bin", opt.onProgress, opt.onComplete, opt.step||5)
     }
 
     if(opt.fs) {
@@ -131,8 +132,9 @@ export async function start(opt) {
         if(parts.length<1){
             throw new Error("Aalternative OTA FS partition not found")
         }
-        console.log("write bin firmware to partition:", parts[0].label)
-        await downloadFirmware(parts[0], opt.fs, "fs", opt.onProgress, opt.onComplete, opt.step||5)
+        bootFSPart = parts[0]
+        console.log("write bin firmware to partition:", bootFSPart.label)
+        await downloadFirmware(bootFSPart, opt.fs, "fs", opt.onProgress, opt.onComplete, opt.step||5)
     }
 
     if(bootBinPart) {
