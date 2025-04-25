@@ -10,6 +10,8 @@ namespace be {
 
     DEFINE_NCLASS_META(Console,NativeClass)
 
+    char const  * Console::channelName = nullptr ;
+
     std::vector<JSCFunctionListEntry> Console::methods = {
         JS_CFUNC_DEF("write", 1, jsWrite),
     };
@@ -160,7 +162,12 @@ function block(buffer, columns, separator, numSys) {
         assert(engine->beshell) ;
         assert(engine->beshell->telnet) ;
 
-        engine->beshell->telnet->output(str.c_str(), str.length()) ;
+        if(channelName) {
+            engine->beshell->telnet->channel(channelName)->send(str.c_str(), str.length()) ;
+        }
+        else {
+            engine->beshell->telnet->output(str.c_str(), str.length()) ;
+        }
 
         return JS_UNDEFINED ;
     }
@@ -192,4 +199,10 @@ function block(buffer, columns, separator, numSys) {
 
         return str ;
     }
+
+    
+    void Console::setChannel(const char * channelName) {
+        Console::channelName = channelName ;
+    }
+
 }
