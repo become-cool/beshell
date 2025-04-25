@@ -30,7 +30,6 @@ namespace be {
             JS_FreeValue(ctx,jsobj) ;
         }
         JS_FreeValue(ctx, destructor) ;
-
     }
 
     NativeClass * NativeClass::fromJS(JSValue jsObj) {

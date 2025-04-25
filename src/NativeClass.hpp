@@ -134,6 +134,12 @@ namespace be {
     DEFINE_NCLASS_META_BUILD(CLASS)                                     \
     DEFINE_NCLASS_META_DEFINECLASS(CLASS,PARENT_CLASS)
 
+#define DEFINE_NCLASS_META_NAME(CLASS,PARENT_CLASS, name)               \
+    const char * CLASS::className = name ;                              \
+    JSClassID CLASS::classID = 0 ;                                      \
+    DEFINE_NCLASS_META_BUILD(CLASS)                                     \
+    DEFINE_NCLASS_META_DEFINECLASS(CLASS,PARENT_CLASS)
+
 #define CHECK_NCLASS_ARGV(CLASS,jsval)                                  \
     if( !be::NativeClass::instanceOf<CLASS>(ctx,jsval) ) {              \
         JSTHROW("value is not a %s object", #CLASS)                     \
