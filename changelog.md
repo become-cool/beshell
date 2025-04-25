@@ -1,4 +1,4 @@
-## Next Version Plan （not now）
+## v0.3.7   2025-04-26
 
 Added: 
 
