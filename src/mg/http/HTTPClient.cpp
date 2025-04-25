@@ -47,6 +47,7 @@ namespace be::mg {
     std::vector<JSCFunctionListEntry> Client::methods = {
         JS_CFUNC_DEF("send", 0, Client::send),
         JS_CFUNC_DEF("close", 0, Client::close),
+        JS_CFUNC_DEF("isConnected", 0, Client::isConnected),
         JS_CFUNC_DEF("enableChunkEvent", 0, Client::enableChunkEvent),
     } ;
 
@@ -183,6 +184,8 @@ namespace be::mg {
                     mg_tls_init(conn, &opts);
                 }
 
+                client->is_connected = true ;
+
                 JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
                 JS_CALL_ARG1(client->ctx, client->callback, evname)
                 JS_FreeValue(client->ctx, evname) ;
@@ -297,6 +300,9 @@ namespace be::mg {
             }
 
             case MG_EV_CLOSE : {
+                
+                client->is_connected = false ;
+
                 JSValue evname = JS_NewString(client->ctx, "close") ;
                 JS_CALL_ARG1(client->ctx, client->callback, evname)
                 JS_FreeValue(client->ctx, evname) ;
@@ -313,6 +319,9 @@ namespace be::mg {
             }
 
             case MG_EV_ERROR:
+            
+                client->is_connected = false ;
+
                 if(ev_data) {
                     JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
                     JSValue msg = JS_NewString(client->ctx, (const char *)ev_data) ;
@@ -335,6 +344,11 @@ namespace be::mg {
         THIS_NCLASS(Client,client)
         client->_enableChunkEvent = true ;
         return JS_UNDEFINED ;
+    }
+
+    JSValue Client::isConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Client,client)
+        return client->is_connected? JS_TRUE: JS_FALSE ;
     }
 
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

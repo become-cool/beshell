@@ -19,6 +19,7 @@ namespace be::mg {
         std::string _host = ""; // 用于 tls
         bool is_ws: 1 = false ;
         bool is_tls:1  = false ;
+        bool is_connected = false ;
         bool _enableChunkEvent:1  = false ;
         size_t headerLength = 0 ;
         size_t receivedBodyLength = 0 ;
@@ -37,6 +38,7 @@ namespace be::mg {
         
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connectWS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue enableChunkEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
