@@ -399,7 +399,7 @@ namespace be::mg {
 
         JS_FreeCString(ctx, url) ;
         
-        return client->jsobj ;
+        return JS_DupValue(ctx, client->jsobj) ;
     }
 
     void Client::setHandler(HTTPClientHandler _handler) {

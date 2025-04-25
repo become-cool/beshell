@@ -1,6 +1,7 @@
 #include "./HTTPClient.hpp"
 #include "./HTTPRequest.hpp"
 #include "../Mg.hpp"
+#include "debug.h"
 #include "quickjs/quickjs.h"
 
 using namespace std ;
@@ -51,18 +52,12 @@ namespace be::mg {
 
         else if (ev == MG_EV_WS_OPEN) { // WebSocket 连接成功
             // printf("WebSocket connection established\n");
+            
+            client->is_connected = true ;
 
             JSValue eventName = JS_NewString(client->ctx, "ws.open") ;
             JS_CALL_ARG1(client->ctx, client->callback, eventName)
             JS_FreeValue(client->ctx, eventName) ;
-                
-            // // 发送文本消息
-            // const char *text_message = "Hello, this is a text message!";
-            // mg_ws_send(c, text_message, strlen(text_message), WEBSOCKET_OP_TEXT);
-
-            // // 发送二进制消息
-            // uint8_t binary_message[] = {0x01, 0x02, 0x03, 0x04};
-            // mg_ws_send(c, binary_message, sizeof(binary_message), WEBSOCKET_OP_BINARY);
 
         } else if (ev == MG_EV_WS_MSG) { // 收到 WebSocket 消息
             struct mg_ws_message *wm = (struct mg_ws_message *) ev_data;
@@ -91,20 +86,24 @@ namespace be::mg {
         
         else if (ev == MG_EV_CLOSE) { // WebSocket 连接关闭
 
-                // moogose https 协议，会在 close 事件以后触发 msg 事件
-                // if(conn->fn_data==client) {
-                //     conn->fn_data = NULL ;
-                // }
-                
-                JSValue eventName = JS_NewString(client->ctx, "close") ;
-                JS_CALL_ARG1(client->ctx, client->callback, eventName)
-                JS_FreeValue(client->ctx, eventName) ;
+            client->is_connected = false ;
+            
+            JSValue eventName = JS_NewString(client->ctx, "close") ;
+            JS_CALL_ARG1(client->ctx, client->callback, eventName)
+            JS_FreeValue(client->ctx, eventName) ;
 
+
+            // moogose https 协议，会在 close 事件以后触发 msg 事件
+            if(conn->fn_data==client) {
+                conn->fn_data = NULL ;
                 delete client ;
                 client = NULL ;
-                conn->fn_data = NULL ;
+            }
         }
         else if (ev == MG_EV_ERROR) {
+            
+            client->is_connected = false ;
+            
             if(ev_data) {
                 JSValue evname = JS_NewString(client->ctx, "error") ;
                 JSValue msg = JS_NewString(client->ctx, (const char *)ev_data) ;
