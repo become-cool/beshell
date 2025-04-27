@@ -151,7 +151,7 @@ namespace be::driver::comm {
                 JS_SetPropertyStr(ctx, jsipinfo, "ip", JS_NewString(ctx, ip_str)) ;
 
                 sprintf(ip_str, IPSTR, IP2STR(&ipinfo.netmask));
-                JS_SetPropertyStr(ctx, jsipinfo, "mask", JS_NewString(ctx, ip_str)) ;
+                JS_SetPropertyStr(ctx, jsipinfo, "netmask", JS_NewString(ctx, ip_str)) ;
 
                 sprintf(ip_str, IPSTR, IP2STR(&ipinfo.gw));
                 JS_SetPropertyStr(ctx, jsipinfo, "gw", JS_NewString(ctx, ip_str)) ;

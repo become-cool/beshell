@@ -294,7 +294,7 @@ void be::WiFi::onNativeEvent(JSContext *ctx, void * param) {
     }
     else if(nevent->event_base==IP_EVENT) {
         switch(nevent->event_id) {
-            MAP_EVENT(IP_EVENT_STA_GOT_IP, "ip.got")
+            MAP_EVENT(IP_EVENT_STA_GOT_IP, "IP.GOT")
             MAP_EVENT(IP_EVENT_STA_LOST_IP, "ip.lost")
             default: break;
         }
