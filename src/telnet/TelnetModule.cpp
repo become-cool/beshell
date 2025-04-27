@@ -1,5 +1,6 @@
 #include "TelnetModule.hpp"
 #include "TelnetChannelNClass.hpp"
+#include "../js/telnet.c"
 
 namespace be{
 
@@ -18,6 +19,8 @@ namespace be{
         for(auto func : exportors) {
             func(ctx, this) ;
         }
+
+        JSEngineEvalEmbeded(ctx, telnet)
     }
 
 }
