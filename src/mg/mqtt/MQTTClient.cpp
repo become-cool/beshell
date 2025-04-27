@@ -77,7 +77,6 @@ namespace be::mg {
         switch (ev)
         {
         case MG_EV_CONNECT:
-            
             if (nobj->is_tls) {
                 struct mg_tls_opts opts = {
                     .ca = mg_str(Mg::ca.c_str()),
@@ -85,6 +84,8 @@ namespace be::mg {
                 };
                 mg_tls_init(c, &opts);
             }
+            break ;
+
         case MG_EV_MQTT_MSG: {
             struct mg_mqtt_message * msg = (struct mg_mqtt_message *) ev_data;
             ev_wrapper.data.msg.topic = mg_strdup(msg->topic) ;
