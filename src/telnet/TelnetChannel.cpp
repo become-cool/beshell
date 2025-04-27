@@ -1,4 +1,5 @@
 #include "TelnetChannel.hpp"
+#include "Telnet.hpp"
 #include <cstring>
 #include "mallocf.h"
 #include "debug.h"

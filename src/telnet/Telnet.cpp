@@ -32,9 +32,11 @@ namespace be {
 
 #ifdef ESP_PLATFORM
         channelSeiral.setup() ;
+        addChannel(&channelSeiral) ;
 #endif
 #ifdef LINUX_PLATFORM
         channelStdIO.setup() ;
+        addChannel(&channelStdIO) ;
 #endif
     }
 
@@ -81,26 +83,23 @@ namespace be {
     }
 
     void Telnet::output(const char * data, size_t datalen, int pkgid, uint8_t cmd) {
-        if(pkgid<0) {
-            channelSeiral.send(data,datalen) ;
-        }
-        else {
+        // if(pkgid<0) {
+            // channelSeiral.send(data,datalen) ;
+        // }
+        // else {
             pkgid%= 255 ;
 
             Package pkg((uint8_t)pkgid,cmd,(uint8_t*)data,datalen) ;
             pkg.pack() ;
-
-#ifdef ESP_PLATFORM
-            channelSeiral.send(pkg) ;
-            if(channelBLE) {
-                channelBLE->send(pkg) ;
+            
+            for(auto ch: channels) {
+                ch->send(pkg) ;
             }
-#endif
-        }
+        // }
 
-#ifdef LINUX_PLATFORM
-        channelStdIO.send(data,datalen) ;
-#endif
+// #ifdef LINUX_PLATFORM
+//         channelStdIO.send(data,datalen) ;
+// #endif
     }
 
     void Telnet::output(const std::string & data, int pkgid, uint8_t cmd) {
@@ -192,7 +191,7 @@ namespace be {
         int pathlen = strlen(cpath) + 1 ;
         
         if( pathlen+6 != (int)pkg->body_len ) {
-            dn2(pathlen, pkg->body_len)
+            // dn2(pathlen, pkg->body_len)
             ch->sendError(pkg->head.fields.pkgid, "body length invalid") ;
             return ;
         }
@@ -255,10 +254,10 @@ namespace be {
         ch->sendData((const char *)&verifysum,1) ;
     }
 
-    void Telnet::useBLE() {
-#ifdef ESP_PLATFORM
-        channelBLE = new TelnetBLE(this) ;
-        TelnetModule::useBLE() ;
-#endif
+    void Telnet::addChannel(TelnetChannel * ch) {
+        channels.push_back(ch) ;
+    }
+    void Telnet::removeChannel(TelnetChannel * ch) {
+        channels.erase(std::remove(channels.begin(), channels.end(), ch), channels.end()) ;
     }
 }

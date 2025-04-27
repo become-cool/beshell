@@ -52,6 +52,7 @@ namespace be {
     Package::~Package() {
         if(!sharedBody && _body) {
             delete _body ;
+            _body = NULL ;
         }
     }
 
@@ -68,6 +69,35 @@ namespace be {
         body_len = bodylen ;
         encodeBodyLength() ;
         verifysum = 0 ;
+    }
+    
+    void Package::copyBody(uint8_t * data, size_t datalen) {
+        if(_body && !sharedBody) {
+            delete _body ;
+            _body = nullptr ;
+        }
+
+        body_len = datalen ;
+
+        if(!body_len) {
+            _body = nullptr ;
+            sharedBody = false ;
+            return ;
+        }
+
+        // quickjs 的 eval 要求字符串以 0 结尾
+        // 这里的 0 是为了自动兼容 quickjs 的 eval 函数
+        if((head.fields.cmd==LINE || head.fields.cmd==RUN || head.fields.cmd==CALL || head.fields.cmd==CALL_ASYNC) && data[datalen-1]!=0) {
+            body_len++ ;
+        }
+
+        _body = new uint8_t[body_len] ;
+        std::memcpy(_body, data, datalen) ;
+        sharedBody = false ;
+
+        if(body_len!=datalen) {
+            _body[body_len-1] = 0 ;
+        }
     }
     
     void Package::encodeBodyLength() {
@@ -117,6 +147,17 @@ namespace be {
     void Package::pack() {
         encodeBodyLength() ;
         verifysum = calculateVerifysum() ;
+    }
+
+    uint8_t * Package::toStream(size_t * len) {
+        *len = head_len + body_len + 1 ;
+        uint8_t * data = (uint8_t *)malloc(*len) ;
+        memcpy(data, head.raw, head_len) ;
+        if(body_len) {
+            memcpy(data+head_len, _body, body_len) ;
+        }
+        data[*len-1] = this->verifysum ;
+        return data ;
     }
 
     State::State(Parser * parser): parser(parser) {}
@@ -250,7 +291,7 @@ namespace be {
 
                     chunk->head.fields.cmd &= 0x7F ;
 
-                    parser->handler(std::unique_ptr<Package>(chunk)) ;
+                    parser->handler(std::unique_ptr<Package>(chunk), parser->opaque) ;
                 }
             }
 
@@ -286,13 +327,14 @@ namespace be {
 
 
     // context class
-    Parser::Parser(PackageProcFunc _handler, uint8_t _H1,uint8_t _H2)
+    Parser::Parser(PackageProcFunc _handler, void * opaque, uint8_t _H1,uint8_t _H2)
         : pkg( new Package(0,0, nullptr, 0, _H1, _H2) )
         , stateLine(new StateLine(this))
         , statePkgHeadFields(new StatePkgHeadFields(this))
         , statePkgBodyLength(new StatePkgBodyLength(this))
         , statePkgBody(new StatePkgBody(this))
-        , handler(_handler)
+        , handler(std::move(_handler))
+        , opaque(opaque)
         , H1(_H1), H2(_H2)
     {
         current = stateLine ;
@@ -331,12 +373,12 @@ namespace be {
     void Parser::commitPackage() {
         if(handler){
             pkg->head.fields.cmd &= 0x7F ;
-            handler(std::unique_ptr<Package>(pkg)) ;
+            handler(std::unique_ptr<Package>(pkg), opaque) ;
             pkg = new Package(0,0,nullptr,0,H1,H2) ;
         }
     }
 
-    void defaultPkgProcFunc(std::unique_ptr<Package> pkg) {
+    void defaultPkgProcFunc(std::unique_ptr<Package> pkg, void * opaque) {
         printf("receive package, pkgid:%d, cmd:%d, length:%zu\n",pkg->head.fields.pkgid,pkg->head.fields.cmd,pkg->body_len) ;
     }
 }

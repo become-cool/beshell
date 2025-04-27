@@ -7,10 +7,9 @@ namespace be{
     
 	typedef void (*NativeModuleExportorFunc)(JSContext * ctx, NativeModule * module) ;
 
-    class TelnetModule: public be::NativeModule {
+    class TelnetModule: public be::EventModule {
 
         static std::vector<NativeModuleExportorFunc> exportors ;
-        static void exportBT(JSContext *ctx, NativeModule * module) ;
 
     public:
         static char const * const name ;
@@ -18,10 +17,6 @@ namespace be{
         TelnetModule(JSContext * ctx, const char * name) ;
 
         void exports(JSContext *ctx) ;
-
-        static void useBLE() {
-            exportors.push_back(exportBT) ;
-        }
 
     } ;
 }

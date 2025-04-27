@@ -8,8 +8,6 @@
 namespace be {
     
     class Telnet ;
-    // class TelnetChannel ;
-	// typedef std::function<void(TelnetChannel * ch, Package & pkg)> TelnetPkgProcFunc;
 
     class TelnetChannel {
     private:

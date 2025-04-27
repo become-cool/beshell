@@ -22,7 +22,6 @@
 #include "telnet/TelnetBLE.hpp"
 #include "telnet/TelnetSerial.hpp"
 #include "telnet/TelnetStdIO.hpp"
-#include "telnet/TelnetWS.hpp"
 #include "telnet/Telnet.hpp"
 #include "repl/REPL.hpp"
 

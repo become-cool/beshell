@@ -96,6 +96,8 @@ namespace be {
 		void mallocBody(uint16_t len, bool endZero=false) ;
 		void reset(uint8_t pkgid=0, uint8_t cmd=0,size_t bodylen=0);
 		void freeBody() ;
+		void copyBody(uint8_t * data, size_t datalen) ;
+		uint8_t * toStream(size_t * len) ;
 	} ;
 
 	class UniquePackage: public Package {
@@ -154,8 +156,8 @@ namespace be {
 		void enter() ;
 	} ;
 
-	typedef std::function<void(std::unique_ptr<Package> pkg)> PackageProcFunc;
-	void defaultPkgProcFunc(std::unique_ptr<Package> pkg) ;
+	typedef std::function<void(std::unique_ptr<Package> pkg, void * opaque)> PackageProcFunc;
+	void defaultPkgProcFunc(std::unique_ptr<Package> pkg, void * opaque) ;
 
 	// 上下文类
     class Parser {
@@ -169,6 +171,7 @@ namespace be {
 			StatePkgBody * statePkgBody ;
 
 			PackageProcFunc handler = nullptr ;
+			void * opaque = nullptr ;
 
 			Package * newPackage(uint8_t _cmd=0, uint8_t _pkgid=0, size_t _data_len=0) ;
 			void commitPackage() ;
@@ -178,7 +181,7 @@ namespace be {
 		public:
 			uint8_t H1 = HEAD1 ;
 			uint8_t H2 = HEAD2 ;
-			Parser(PackageProcFunc handler=defaultPkgProcFunc,uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
+			Parser(PackageProcFunc handler=defaultPkgProcFunc, void * opaque=NULL, uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;
 			~Parser() ;
 			void parse(uint8_t * bytes, size_t len) ;
 			void setPkgHead(uint8_t H1=HEAD1,uint8_t H2=HEAD2) ;

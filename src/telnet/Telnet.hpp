@@ -32,6 +32,8 @@ namespace be {
         TelnetStdIO channelStdIO ;
 #endif
 
+        std::vector<TelnetChannel *> channels ;
+
         uint8_t autoIncreasePkgId = 0 ;
         QueueHandle_t pkg_queue;
 
@@ -61,8 +63,9 @@ namespace be {
         static std::unique_ptr<std::ostream> createStream(Package & pkg) ;
 
         TelnetChannel * channel(const char * name) ;
-        
-        void useBLE() ;
+
+        void addChannel(TelnetChannel * ch) ;
+        void removeChannel(TelnetChannel * ch) ;
 
     protected:
         void openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) ;

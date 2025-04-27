@@ -22,7 +22,7 @@ namespace be {
 
 
     // forwarding received package to telnet
-    static Parser parser([](std::unique_ptr<Package> pkg){
+    static Parser parser([](std::unique_ptr<Package> pkg,void * opaque) {
         assert(global_telnet) ;
         pkg->channle = global_telnet_ble ;
         global_telnet->execPackage(pkg) ;

@@ -32,7 +32,7 @@ namespace be {
 
 
         // forwarding received package to telnet
-        Parser parser([argv](std::unique_ptr<Package> pkg){
+        Parser parser([argv](std::unique_ptr<Package> pkg, void * opaque) {
             assert(((TelnetSerial*)argv)->telnet) ;
 
             // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
