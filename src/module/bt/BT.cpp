@@ -340,7 +340,16 @@ namespace be{
         if(level<ESP_PWR_LVL_N24 || level>ESP_PWR_LVL_P21) {
             JSTHROW("Invalid power level")
         }
-        esp_err_t ret = esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, (esp_power_level_t)level) ;
+        esp_ble_power_type_t type = ESP_BLE_PWR_TYPE_DEFAULT ;
+        if(argc>1) {
+            if( JS_ToUint32(ctx, (uint32_t*)&type, argv[1])!=0 ) {
+                JSTHROW("Invalid power type")
+            }
+            if(type<0 || type>=ESP_BLE_PWR_TYPE_NUM) {
+                JSTHROW("Invalid power type")
+            }
+        }
+        esp_err_t ret = esp_ble_tx_power_set(type, (esp_power_level_t)level) ;
         return JS_NewInt32(ctx, ret) ;
     }
     JSValue BT::power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
