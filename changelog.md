@@ -1,3 +1,13 @@
+
+New Feature:
+
+* bt.setPower() add arg `type`
+* reboot 命令增加可选参数 path 
+* source 命令可以使用参数
+
+Fix issure:
+
+
 ## v0.3.7   2025-04-26
 
 Added: 

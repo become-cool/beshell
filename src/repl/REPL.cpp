@@ -185,17 +185,24 @@ namespace be {
         ) ;
 
         registerCommand("source", 
-            "Usage: source <filepath>"
+            "Usage: source <filepath> <arg?> ..."
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
                 ARGS_TO_FILE(0, path)
-                JSValue ret = beshell->engine->evalScript(path.c_str()) ;
-                if(JS_IsException(ret)) {
-                    beshell->engine->dumpError(-1,ch) ;
+
+                JSValue argv = JS_NewArray(beshell->engine->ctx) ;
+                for(int i=1;i<args.length();i++) {
+                    JSValue arg = JS_NewString(beshell->engine->ctx, args[i].c_str()) ;
+                    JS_SetPropertyUint32(beshell->engine->ctx, argv, i-1, arg) ;
                 }
-                JS_FreeValue(beshell->engine->ctx,ret) ;
+
+                NativeModule * process = JSEngine::fromJSContext(beshell->engine->ctx)->mloader.moduleByName(beshell->engine->ctx, "process") ;
+                process->exportValue("argv",argv) ;
+
+                beshell->engine->evalScript(path.c_str()) ;
             }
         ) ;
         alias(".","source") ;
+        alias("run","source") ;
 
 
         registerCommand("touch", 
@@ -240,8 +247,17 @@ namespace be {
 
 #ifdef ESP_PLATFORM
         registerCommand("reboot", 
-            "Usage: reboot"
+            "Usage: reboot <path?>"
         , [this](BeShell * beshell, TelnetChannel * ch, Options & args){
+            if(args.length()>0) {
+                string path = FS::resolve(args[0]) ;
+                if( !FS::exist(path.c_str()) ){
+                    ch->send("path is not a exists\n") ;
+                    return ;
+                }
+                NVS::writeString("main-run", path.c_str()) ;
+            }
+
             esp_restart() ;
         }) ;
 #endif

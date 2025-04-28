@@ -38,6 +38,7 @@ namespace be {
         // JS_ComputeMemoryUsage
         exportName("versions") ;
         exportName("platform") ;
+        exportName("argv") ;
     }
 
     void Process::exports(JSContext *ctx) {
@@ -60,6 +61,7 @@ namespace be {
         sprintf(buff, "%s %s", __DATE__, __TIME__) ;
         JS_SetPropertyStr(ctx, versions, "build", JS_NewString(ctx, buff));
 
+        exportValue("argv", JS_NewArray(ctx)) ;
         exportValue("versions", versions) ;
 
 #ifdef ESP_PLATFORM

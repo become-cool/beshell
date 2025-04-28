@@ -86,8 +86,14 @@ namespace be {
 
     void BeShell::main(const char * mainScriptPath) {
         setup() ;
+        
+        char mainRunPath[256] = {0} ;
+        if( NVS::readString("main-run", mainRunPath, sizeof(mainRunPath)-1)==0 ){
+            NVS::erase("main-run") ;
+            engine->evalScript(mainRunPath) ;
+        }
 
-        if(mainScriptPath) {
+        else if(mainScriptPath) {
 #ifdef ESP_PLATFORM
             bool delayRunScript = false ;
             esp_reset_reason_t reset_reason = esp_reset_reason();
