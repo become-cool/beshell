@@ -202,7 +202,6 @@ namespace be {
             }
         ) ;
         alias(".","source") ;
-        alias("run","source") ;
 
 
         registerCommand("touch", 
@@ -260,6 +259,7 @@ namespace be {
 
             esp_restart() ;
         }) ;
+        alias("run","reboot") ;
 #endif
 
         registerCommand("cp", 
