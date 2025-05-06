@@ -11,7 +11,7 @@ class Central {
 
   init() {
 
-    bt.initCentral()
+    bt._initCentral()
 
     bt.on("open", (status, connid, addr) => {
       if (status == 0) {

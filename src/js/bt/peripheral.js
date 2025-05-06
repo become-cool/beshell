@@ -80,7 +80,7 @@ function charGetter(uuid) {
 const peripheral = {
 
   init() {
-    bt.initPeripheral()
+    bt._initPeripheral()
 
     bt.on("CONNECT", (connId, addr) => {
       peerConnId = connId

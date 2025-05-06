@@ -38,8 +38,8 @@ namespace be{
             singleton = this ;
         }
         
-        EXPORT_FUNCTION(initCentral)
-        EXPORT_FUNCTION(initPeripheral)
+        exportFunction("_initCentral", initCentral, 0) ;
+        exportFunction("_initPeripheral",initPeripheral, 0) ;
 
         // central
         EXPORT_FUNCTION(setScanParam)
@@ -310,8 +310,8 @@ namespace be{
             return false ;
         }
 
-        initCentral() ;
-        initPeripheral() ;
+        // initCentral() ;
+        // initPeripheral() ;
         
         // 注册GAP回调函数
         ret = esp_ble_gap_register_callback(gap_event_handler);

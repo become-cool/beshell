@@ -29,9 +29,8 @@ namespace be {
     static uint16_t last_char_handle = 0xFFFF;
     static uint16_t last_descr_handle = 0xFFFF;
     static uint16_t last_conn_id = 0xFFFF;
-    static bool gatts_register_completed = false;
-    static bool gatts_register_success = false;
-    static SemaphoreHandle_t gatts_reg_sem = NULL;
+    static SemaphoreHandle_t gatts_sem = NULL;
+    static bool gatts_sem_success = false;
 
     void BT::gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
         if(gattsHandler && gattsHandler(event, gatts_if, param)){
@@ -47,34 +46,52 @@ namespace be {
             case ESP_GATTS_REG_EVT:
                 ESP_LOGI(GATTS_TAG, "ESP_GATTS_REG_EVT, status %d, app_id %d", param->reg.status, param->reg.app_id);
                 gatts_if_global = gatts_if;
-                gatts_register_completed = true;
-                gatts_register_success = (param->reg.status == ESP_GATT_OK);
+                gatts_sem_success = (param->reg.status == ESP_GATT_OK);
                 
-                if (gatts_reg_sem != NULL) {
-                    xSemaphoreGive(gatts_reg_sem);
+                if (gatts_sem != NULL) {
+                    xSemaphoreGive(gatts_sem);
                 }
                 break;
 
             case ESP_GATTS_CREATE_EVT:
-                if(ESP_GATT_OK==param->create.status) {
-                    last_service_handle = param->create.service_handle ;
+                gatts_sem_success = (param->create.status == ESP_GATT_OK);
+                if(gatts_sem_success) {
+                    last_service_handle = param->create.service_handle;
                 }
+                
+                if (gatts_sem != NULL) {
+                    xSemaphoreGive(gatts_sem);
+                }
+                break;
+                
+            case ESP_GATTS_START_EVT:
+                gatts_sem_success = (param->start.status == ESP_GATT_OK);
+                if (gatts_sem != NULL) {
+                    xSemaphoreGive(gatts_sem);
+                }
+                break;
+            case ESP_GATTS_STOP_EVT:
                 break;
 
             case ESP_GATTS_ADD_CHAR_EVT:
-                if(ESP_GATT_OK==param->add_char.status) {
+                gatts_sem_success = (param->add_char.status == ESP_GATT_OK);
+                if(gatts_sem_success) {
                     last_char_handle = param->add_char.attr_handle;
+                }
+                if (gatts_sem != NULL) {
+                    xSemaphoreGive(gatts_sem);
                 }
                 break ;
 
             case ESP_GATTS_ADD_CHAR_DESCR_EVT:
-                last_descr_handle = param->add_char_descr.attr_handle ;
+                gatts_sem_success = (param->add_char_descr.status == ESP_GATT_OK);
+                if(gatts_sem_success) {
+                    last_descr_handle = param->add_char_descr.attr_handle;
+                }
+                if (gatts_sem != NULL) {
+                    xSemaphoreGive(gatts_sem);
+                }
                 break ;
-                
-            case ESP_GATTS_START_EVT:
-                break;
-            case ESP_GATTS_STOP_EVT:
-                break;
 
             case ESP_GATTS_READ_EVT:
                 break;
@@ -147,12 +164,11 @@ namespace be {
             return true;
         }
         
-        gatts_register_completed = false;
-        gatts_register_success = false;
+        gatts_sem_success = false;
         
-        if (gatts_reg_sem == NULL) {
-            gatts_reg_sem = xSemaphoreCreateBinary();
-            if (gatts_reg_sem == NULL) {
+        if (gatts_sem == NULL) {
+            gatts_sem = xSemaphoreCreateBinary();
+            if (gatts_sem == NULL) {
                 ESP_LOGE(GATTS_TAG, "Failed to create gatts registration semaphore");
                 return false;
             }
@@ -172,12 +188,12 @@ namespace be {
             return false;
         }
         
-        if (xSemaphoreTake(gatts_reg_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
+        if (xSemaphoreTake(gatts_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
             ESP_LOGE(GATTS_TAG, "BT peripheral registration timed out after 1000ms");
             return false;
         }
         
-        if (gatts_register_success) {
+        if (gatts_sem_success) {
             inited = true;
             return true;
         } else {
@@ -188,7 +204,7 @@ namespace be {
     
     JSValue BT::initPeripheral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if(!initPeripheral()) {
-            JSTHROW("bt peripheralinit failed")
+            JSTHROW("bt peripheral init failed")
         }
         return JS_UNDEFINED ;
     }
@@ -211,6 +227,13 @@ namespace be {
                 });
                 break;
                 
+            case ESP_GATTS_START_EVT:
+                emitSyncFree("start", {
+                    JS_NewInt32(ctx, event->gatts.start.status),
+                    JS_NewInt32(ctx, event->gatts.start.service_handle)
+                });
+                break;
+                
             case ESP_GATTS_ADD_CHAR_EVT:
                 emitSyncFree("add-char", {
                     JS_NewInt32(ctx, event->gatts.add_char.status),
@@ -224,13 +247,6 @@ namespace be {
                     JS_NewInt32(ctx, event->gatts.add_char_descr.status),
                     JS_NewInt32(ctx, event->gatts.add_char_descr.attr_handle),
                     JS_NewInt32(ctx, event->gatts.add_char_descr.service_handle)
-                });
-                break;
-                
-            case ESP_GATTS_START_EVT:
-                emitSyncFree("start", {
-                    JS_NewInt32(ctx, event->gatts.start.status),
-                    JS_NewInt32(ctx, event->gatts.start.service_handle)
                 });
                 break;
                 
@@ -405,6 +421,10 @@ namespace be {
             JSTHROW("Invalid UUID format")
         }
         
+        // Reset status flags
+        gatts_sem_success = false;
+        last_service_handle = 0xFFFF;
+        
         esp_gatt_srvc_id_t srvc_id = {
             .id = {
                 .uuid = uuid,
@@ -413,18 +433,38 @@ namespace be {
             .is_primary = true
         };
         
-        last_service_handle = 0xFFFF ;
         esp_err_t err = esp_ble_gatts_create_service(gatts_if_global, &srvc_id, num_handle);
-        JS_FreeCString(ctx, uuid_str);
+        dn2(err, last_service_handle)
+        
         if (err != ESP_OK) {
+            JS_FreeCString(ctx, uuid_str);
             JSTHROW("esp_ble_gatts_create_service failed, err = %d", err)
         }
+        
+        // Wait for the create event
+        if (xSemaphoreTake(gatts_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
+            JS_FreeCString(ctx, uuid_str);
+            JSTHROW("Service creation timed out after 1000ms")
+        }
+        
+        if (!gatts_sem_success) {
+            JS_FreeCString(ctx, uuid_str);
+            JSTHROW("Service creation failed")
+        }
+        
+        JS_FreeCString(ctx, uuid_str);
         
         err = esp_ble_gatts_start_service(last_service_handle);
         if(err!=ESP_OK) {
             JSTHROW("esp_ble_gatts_start_service failed, err = %d", err)
         }
         
+        // Wait for the create event
+        if (xSemaphoreTake(gatts_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
+            JS_FreeCString(ctx, uuid_str);
+            JSTHROW("Service start timed out after 1000ms")
+        }
+
         return JS_NewUint32(ctx, last_service_handle);
     }
 
@@ -524,6 +564,12 @@ namespace be {
             JSTHROW("esp_ble_gatts_add_char failed, err = %d", err)
         }
         
+        // Wait for the create event
+        if (xSemaphoreTake(gatts_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
+            JS_FreeCString(ctx, uuid_str);
+            JSTHROW("esp_ble_gatts_add_char() timed out after 1000ms")
+        }
+        
         if (property & (ESP_GATT_CHAR_PROP_BIT_NOTIFY | ESP_GATT_CHAR_PROP_BIT_INDICATE)) {
             esp_bt_uuid_t desc_uuid = {
                 .len = ESP_UUID_LEN_16,
@@ -542,6 +588,13 @@ namespace be {
 
             if (err != ESP_OK) {
                 printf("Failed to add CCCD descriptor, err = %d\n", err);
+            }
+            else {
+                // Wait for the create event
+                if (xSemaphoreTake(gatts_sem, pdMS_TO_TICKS(1000)) != pdTRUE) {
+                    JS_FreeCString(ctx, uuid_str);
+                    JSTHROW("esp_ble_gatts_add_char_descr() timed out after 1000ms")
+                }
             }
         }
 

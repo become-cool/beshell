@@ -42,8 +42,14 @@ namespace be{
         
         static void use(be::BeShell * beshell) ;
 
-        static JSValue initCentral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue initPeripheral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static char * bt_uuid_to_string(const esp_bt_uuid_t *uuid, char *str, size_t str_size) ;
+        static esp_bt_uuid_t bt_string_to_uuid(char *str, size_t str_size) ;
+
+        // hardware
+        static JSValue setPower(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        // GAP
         static JSValue startScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stopScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setScanParam(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -53,8 +59,15 @@ namespace be{
         static JSValue setAdvData(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue startAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stopAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        static void setGapHandler(gap_handler_t handler) ;
+
+        // GATT
         static JSValue setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
+        // GATT: as central
+        static JSValue initCentral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue search(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -62,18 +75,15 @@ namespace be{
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue subscribe(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static void setGattcHandler(gattc_handler_t handler) ;
+
+        // GATT: as peripheral
+        static JSValue initPeripheral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue addService(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setCharValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendNotify(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
-        static JSValue setPower(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue power(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static char * bt_uuid_to_string(const esp_bt_uuid_t *uuid, char *str, size_t str_size) ;
-        static esp_bt_uuid_t bt_string_to_uuid(char *str, size_t str_size) ;
-
-        static void setGapHandler(gap_handler_t handler) ;
-        static void setGattcHandler(gattc_handler_t handler) ;
         static void setGattsHandler(gatts_handler_t handler) ;
 
 
