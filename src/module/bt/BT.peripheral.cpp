@@ -434,7 +434,6 @@ namespace be {
         };
         
         esp_err_t err = esp_ble_gatts_create_service(gatts_if_global, &srvc_id, num_handle);
-        dn2(err, last_service_handle)
         
         if (err != ESP_OK) {
             JS_FreeCString(ctx, uuid_str);
