@@ -2,6 +2,7 @@
 #include "qjs_utils.h"
 #include "JSEngine.hpp"
 #include "BeShell.hpp"
+#include "quickjs/quickjs.h"
 #include <assert.h>
 
 using namespace std ;
@@ -162,11 +163,24 @@ function block(buffer, columns, separator, numSys) {
         assert(engine->beshell) ;
         assert(engine->beshell->telnet) ;
 
-        if(channelName) {
-            engine->beshell->telnet->channel(channelName)->send(str.c_str(), str.length()) ;
+        char * cname = Console::channelName ;
+
+        if(argc>1) {
+            ARGV_AS_CSTRING(1, cname)
+        }
+
+        if(cname) {
+            TelnetChannel * channel = engine->beshell->telnet->channel(cname) ;
+            if(channel) {
+                channel->send(str.c_str(), str.length()) ;
+            }
         }
         else {
             engine->beshell->telnet->output(str.c_str(), str.length()) ;
+        }
+
+        if(argc>1) {
+            JS_FreeCString(ctx, cname) ;
         }
 
         return JS_UNDEFINED ;
@@ -200,7 +214,6 @@ function block(buffer, columns, separator, numSys) {
         return str ;
     }
 
-    
     void Console::setChannel(const char * channelName) {
         Console::channelName = channelName ;
     }
