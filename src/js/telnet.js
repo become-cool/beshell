@@ -36,7 +36,7 @@ let bleStarted = false
 let bleChannel = null
 
 const ble = {
-  start(advName=null, serviceId="0B0C", charId="0518") {
+  start(advName=null, serviceId="0B0C", charId="0512") {
     if(!bt) {
       throw new Error("bt module not used, call `beshell.use<BT>()` in C++ first")
     }
