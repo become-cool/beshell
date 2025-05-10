@@ -73,7 +73,6 @@ async function get(url,handle) {
       console.error(e)
     }
   })
-  console.log("request() in get() over", received)
   if(!received) {
     throw new Error("the connection was unexpectedly disconnected.")
   }
