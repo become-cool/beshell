@@ -7,41 +7,6 @@
 using namespace std ;
 
 
-extern "C" {
-    
-    static bool mg_is_chunked(struct mg_http_message *hm) {
-        struct mg_str *te = mg_http_get_header(hm, "Transfer-Encoding");
-        return te != NULL && te->len>=7 && strnstr(te->buf, "chunked", 7) != NULL;
-    }
-    static void mg_http_delete_chunk(struct mg_connection *c, struct mg_http_message *hm) {
-
-        dn2(hm->body.len, c->recv.len) ;
-
-        // c->recv.len = client->headerLength;
-
-        return ;
-
-        struct mg_str ch = hm->body;
-        if (mg_is_chunked(hm)) {
-            ch.len += 4;  // \r\n before and after the chunk
-            ch.buf -= 2;
-            while (ch.buf > hm->body.buf && *ch.buf != '\n') ch.buf--, ch.len++;
-        }
-        {
-            const char *end = &ch.buf[ch.len];
-            size_t n = (size_t) (end - (char *) c->recv.buf);
-            if (c->recv.len > n) {
-                memmove((char *) ch.buf, end, (size_t) (c->recv.len - n));
-            }
-            // LOG(LL_INFO, ("DELETING CHUNK: %zu %zu %zu\n%.*s", c->recv.len, n,
-            // ch.len, (int) ch.len, ch.ptr));
-        }
-        c->recv.len -= ch.len;
-    }
-}
-
-
-
 namespace be::mg {
     DEFINE_NCLASS_META(Client, EventEmitter)
     std::vector<JSCFunctionListEntry> Client::methods = {
