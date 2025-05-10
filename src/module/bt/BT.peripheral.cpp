@@ -1,4 +1,5 @@
 #include "BT.hpp"
+#include "debug.h"
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
@@ -31,6 +32,7 @@ namespace be {
     static uint16_t last_conn_id = 0xFFFF;
     static SemaphoreHandle_t gatts_sem = NULL;
     static bool gatts_sem_success = false;
+    static uint16_t peripheral_mtu = 23 ;
 
     void BT::gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
         if(gattsHandler && gattsHandler(event, gatts_if, param)){
@@ -117,6 +119,8 @@ namespace be {
                 break;
 
             case ESP_GATTS_MTU_EVT:
+                // printf("gatts_if: %d, MTU size: %d\n", gatts_if, param->mtu.mtu);
+                peripheral_mtu = param->mtu.mtu;
                 break;
             case ESP_GATTS_UNREG_EVT:
                 break;
@@ -533,9 +537,11 @@ namespace be {
                     }
                     else if (strcmp(perm_item, "notify") == 0) {
                         property |= ESP_GATT_CHAR_PROP_BIT_NOTIFY;
+                        perm |= ESP_GATT_PERM_WRITE;
                     }
                     else if (strcmp(perm_item, "indicate") == 0) {
                         property |= ESP_GATT_CHAR_PROP_BIT_INDICATE;
+                        perm |= ESP_GATT_PERM_WRITE;
                     }
                     JS_FreeCString(ctx, perm_item);
                 }
@@ -630,6 +636,7 @@ namespace be {
 
         uint8_t* data = NULL;
         size_t data_len = 0;
+        bool is_string = false;
 
         if (JS_IsString(argv[1])) {
             const char* str = JS_ToCString(ctx, argv[1]);
@@ -638,6 +645,7 @@ namespace be {
             }
             data_len = strlen(str);
             data = (uint8_t*)str;
+            is_string = true;
         }
         else if (JS_IsArrayBuffer(argv[1])) {
             size_t offset;
@@ -650,16 +658,53 @@ namespace be {
             JSTHROW("Data must be string or ArrayBuffer")
         }
 
-        esp_err_t err = esp_ble_gatts_send_indicate(
-            gatts_if_global,
-            conn_id,
-            (uint16_t)char_handle,
-            data_len,
-            data,
-            is_indication
-        );
+        // dn5(gatts_if_global, conn_id, char_handle, is_indication, data_len)
 
-        if (JS_IsString(argv[1])) {
+        // Calculate effective MTU size for payload (3 bytes are used for ATT header)
+        // ATT_MTU = 3 + ATT_PAYLOAD_SIZE
+        size_t max_chunk_size = peripheral_mtu > 3 ? peripheral_mtu - 3 : 20;
+        esp_err_t err = ESP_OK;
+
+        if (data_len <= max_chunk_size) {
+            // If data fits in a single packet, send it directly
+            err = esp_ble_gatts_send_indicate(
+                gatts_if_global,
+                conn_id,
+                (uint16_t)char_handle,
+                data_len,
+                data,
+                is_indication
+            );
+        } else {
+            // Split data into multiple chunks and send each chunk
+            size_t remaining = data_len;
+            size_t offset = 0;
+            
+            while (remaining > 0 && err == ESP_OK) {
+                size_t chunk_size = (remaining > max_chunk_size) ? max_chunk_size : remaining;
+                
+                err = esp_ble_gatts_send_indicate(
+                    gatts_if_global,
+                    conn_id,
+                    (uint16_t)char_handle,
+                    chunk_size,
+                    data + offset,
+                    is_indication
+                );
+                
+                if (err != ESP_OK) {
+                    break;
+                }
+                
+                // Add a small delay between chunks to avoid overwhelming the BLE stack
+                vTaskDelay(pdMS_TO_TICKS(10));
+                
+                offset += chunk_size;
+                remaining -= chunk_size;
+            }
+        }
+
+        if (is_string) {
             JS_FreeCString(ctx, (const char*)data);
         }
 
@@ -668,6 +713,23 @@ namespace be {
         }
 
         return JS_UNDEFINED;
+    }
+
+    JSValue BT::setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT16(0, mtu)
+        if ((mtu < ESP_GATT_DEF_BLE_MTU_SIZE) || (mtu > ESP_GATT_MAX_MTU_SIZE)) {
+            JSTHROW("Invalid MTU size, must be between %d and %d", ESP_GATT_DEF_BLE_MTU_SIZE, ESP_GATT_MAX_MTU_SIZE)
+        }
+        esp_err_t res = esp_ble_gatt_set_local_mtu(mtu) ;
+        peripheral_mtu = mtu ;
+        if(res!=ESP_OK) {
+            JSTHROW("esp_ble_gatt_set_local_mtu failed, err = %d", res)
+        }
+        return JS_UNDEFINED ;
+    }
+    JSValue BT::getMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_NewUint32(ctx, peripheral_mtu) ;
     }
 }
 #endif

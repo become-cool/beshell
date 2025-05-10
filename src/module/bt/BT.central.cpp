@@ -492,15 +492,6 @@ namespace be {
     }
     
 
-    JSValue BT::setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
-        ARGV_TO_UINT16(0, mtu)
-        esp_err_t res = esp_ble_gatt_set_local_mtu(mtu) ;
-        if(res!=ESP_OK) {
-            JSTHROW("esp_ble_gatt_set_local_mtu failed, err = %d", res)
-        }
-        return JS_UNDEFINED ;
-    }
     JSValue BT::requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_GATTC_IF
         CHECK_ARGC(1)

@@ -62,10 +62,6 @@ namespace be{
 
         static void setGapHandler(gap_handler_t handler) ;
 
-        // GATT
-        static JSValue setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-
         // GATT: as central
         static JSValue initCentral(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -74,6 +70,7 @@ namespace be{
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue subscribe(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue requestMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static void setGattcHandler(gattc_handler_t handler) ;
 
@@ -83,6 +80,8 @@ namespace be{
         static JSValue addChar(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setCharValue(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendNotify(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getMTU(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static void setGattsHandler(gatts_handler_t handler) ;
 

@@ -13,6 +13,7 @@ namespace be{
     {
         exportClass<TelnetChannelNClass>() ;
         exportName("ws") ;
+        exportName("ble") ;
     }
 
     void TelnetModule::exports(JSContext *ctx) {

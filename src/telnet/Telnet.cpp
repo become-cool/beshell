@@ -149,12 +149,10 @@ namespace be {
         ch->sendError(pkg->head.fields.pkgid, "cmd not implements") ;
     }
     void Telnet::closeFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        
         if(ch->openedFile) {
             fclose(ch->openedFile) ;
             ch->openedFile = nullptr ;
         }
-
         ch->send(nullptr,0,pkg->head.fields.pkgid,RSPN) ;
     }
     

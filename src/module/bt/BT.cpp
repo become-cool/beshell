@@ -46,7 +46,6 @@ namespace be{
         EXPORT_FUNCTION(startScan)
         EXPORT_FUNCTION(stopScan)
         EXPORT_FUNCTION(isScanning)
-        EXPORT_FUNCTION(setMTU)
         EXPORT_FUNCTION(requestMTU)
         EXPORT_FUNCTION(connect)
         EXPORT_FUNCTION(disconnect)
@@ -66,6 +65,8 @@ namespace be{
         EXPORT_FUNCTION(addService)
         EXPORT_FUNCTION(addChar)
         EXPORT_FUNCTION(sendNotify)
+        EXPORT_FUNCTION(setMTU)
+        EXPORT_FUNCTION(getMTU)
 
         exportName("central") ;
         exportName("peripheral") ;

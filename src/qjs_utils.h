@@ -185,6 +185,10 @@ extern "C" {
         err_code                                            \
     }                                                       \
     var = (char *)JS_ToCString(ctx, argv[i]) ;
+
+#define ARGV_AS_CSTRING(i, var)                             \
+    var = (char *)JS_ToCString(ctx, argv[i]) ;
+
 #define ARGV_TO_CSTRING_C(i, var, err_code)  char * ARGV_AS_CSTRING_C(i, var, err_code)
     
 #define ARGV_TO_ARRAYBUFFER(i, var, varlen)                                         \
