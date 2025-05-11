@@ -4,6 +4,7 @@
 #include <cassert>
 #include <string.h>
 #include <sys/stat.h>
+#include "mbedtls/aes.h"
 
 #ifdef ESP_PLATFORM
 #include "TelnetModule.hpp"
@@ -45,7 +46,50 @@ namespace be {
         xQueueSend(pkg_queue, &ptr, 0) ;
     }
 
+    void Telnet::defaultTelnetDecryptFunc(Package & pkg) {
+
+        if(!pkg.body_len) {
+            return ;
+        }
+        
+        uint8_t decrypted_data[pkg.body_len] ;
+        uint8_t counter[sizeof(cryptoVI)] ;
+        memcpy(counter, cryptoVI, sizeof(cryptoVI)) ;
+
+        mbedtls_aes_context aes_ctx;
+        unsigned char stream_block[16]; // Block size for AES
+        size_t nc_off = 0; // Offset in the current stream block
+
+        // Initialize AES context
+        mbedtls_aes_init(&aes_ctx);
+
+        // Set encryption key (CTR mode uses the same key for encryption and decryption)
+        if (mbedtls_aes_setkey_enc(&aes_ctx, cryptoKey, 128) != 0) {
+            return ;
+        }
+
+        // Perform AES-CTR decryption
+        if (mbedtls_aes_crypt_ctr(&aes_ctx, pkg.body_len, &nc_off, counter, stream_block, pkg.body(), decrypted_data) != 0) {
+            return ;
+        }
+
+        // Free AES context
+        mbedtls_aes_free(&aes_ctx);
+
+        memcpy(pkg.body(), decrypted_data, pkg.body_len) ;
+    }
+
     void Telnet::onReceived(TelnetChannel * ch, std::unique_ptr<Package> pkg){
+
+        if(enableCrypto) {
+            if(decryptFunc) {
+                decryptFunc(*pkg) ;
+            }
+            else {
+                defaultTelnetDecryptFunc(*pkg) ;
+            }
+        }
+
         switch (pkg->head.fields.cmd)
         {
         case LINE:
@@ -80,6 +124,10 @@ namespace be {
             ch->sendError(pkg->head.fields.pkgid, "cmd %d not implements", pkg->head.fields.cmd) ;
             break;
         }
+    }
+
+    void Telnet::setCryptoFunction(TelnetDecryptFunc decryptFunc) {
+        this->decryptFunc = decryptFunc ;
     }
 
     void Telnet::output(const char * data, size_t datalen, int pkgid, uint8_t cmd) {

@@ -18,7 +18,10 @@
 
 namespace be {
 
+    typedef void (*TelnetDecryptFunc)(Package & pkg) ;
+
     class BeShell ;
+    // class TelnetModule ;
     class Telnet {
     private:
 
@@ -36,6 +39,12 @@ namespace be {
 
         uint8_t autoIncreasePkgId = 0 ;
         QueueHandle_t pkg_queue;
+
+        TelnetDecryptFunc decryptFunc = nullptr ;
+
+        bool enableCrypto = false ;
+        unsigned char cryptoKey[16] = {0} ;
+        unsigned char cryptoVI[16] = {0} ;
 
     public:
         Telnet(BeShell * beshell) ;
@@ -67,11 +76,16 @@ namespace be {
         void addChannel(TelnetChannel * ch) ;
         void removeChannel(TelnetChannel * ch) ;
 
+        void setCryptoFunction(TelnetDecryptFunc decryptFunc) ;
+        void defaultTelnetDecryptFunc(Package & pkg) ;
+
     protected:
         void openFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg, bool append) ;
         void offsetFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) ;
         void closeFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) ;
         void pushFile(TelnetChannel * , std::unique_ptr<Package> &) ;
         void pullFile(TelnetChannel * , std::unique_ptr<Package> &) ;
+
+    friend class TelnetModule ;
     } ;
 }

@@ -16,6 +16,10 @@ namespace be{
 
         TelnetModule(JSContext * ctx, const char * name) ;
 
+        static JSValue enableCrypto(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue disableCrypto(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setCryptoKey(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
         void exports(JSContext *ctx) ;
 
     } ;

@@ -2,10 +2,11 @@
 New Feature:
 
 * bt.setPower() add arg `type`
-* add bt.getMTU()
+* bt.getMTU()
 * reboot 命令增加可选参数 path 
 * source 命令可以使用参数
 * telnet.ble
+* telnet 接收数据对称加密
 
 Fix issure:
 
