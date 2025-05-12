@@ -88,7 +88,6 @@ async function download(url, localPath, progress_cb) {
   let wroten = 0
   let done = false
   try{
-    let t = Date.now()
     let total = 0
     await request(url, (conn,event,data)=>{
       if(event=='connect') {

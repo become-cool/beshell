@@ -19,6 +19,9 @@ namespace be::mg {
         static JSValue sub(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unsub(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setClientKey(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue enableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue disableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static void setHandler(MQTTClientHandler handler) ;
 
@@ -32,9 +35,13 @@ namespace be::mg {
         static std::vector<JSCFunctionListEntry> methods ;
         
         struct mg_connection * conn ;
-        uint16_t poll_times = 0 ;
         std::string _host = ""; // 用于 tls
-        bool is_tls = false ;
+        bool isTLS = false ;
+
+        // client auth (双向认证)
+        bool useClientCert = false ;
+        std::string clientCert = "" ;
+        std::string clientKey = "" ;
 
         MQTTClient(JSContext * ctx, struct mg_connection * conn) ;
         ~MQTTClient() ;

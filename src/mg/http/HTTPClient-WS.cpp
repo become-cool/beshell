@@ -37,7 +37,7 @@ namespace be::mg {
         }
 
         if (ev == MG_EV_CONNECT) {
-            if(client && client->is_tls && Mg::ca.length()>0) {
+            if(client && client->_isTLS && Mg::ca.length()>0) {
                 struct mg_tls_opts opts = {
                     .ca = mg_str(Mg::ca.c_str()),
                     .name = mg_str(client->_host.c_str())
@@ -53,7 +53,7 @@ namespace be::mg {
         else if (ev == MG_EV_WS_OPEN) { // WebSocket 连接成功
             // printf("WebSocket connection established\n");
             
-            client->is_connected = true ;
+            client->_isConnected = true ;
 
             JSValue eventName = JS_NewString(client->ctx, "ws.open") ;
             JS_CALL_ARG1(client->ctx, client->callback, eventName)
@@ -86,7 +86,7 @@ namespace be::mg {
         
         else if (ev == MG_EV_CLOSE) { // WebSocket 连接关闭
 
-            client->is_connected = false ;
+            client->_isConnected = false ;
             
             JSValue eventName = JS_NewString(client->ctx, "close") ;
             JS_CALL_ARG1(client->ctx, client->callback, eventName)
@@ -102,7 +102,7 @@ namespace be::mg {
         }
         else if (ev == MG_EV_ERROR) {
             
-            client->is_connected = false ;
+            client->_isConnected = false ;
             
             if(ev_data) {
                 JSValue evname = JS_NewString(client->ctx, "error") ;

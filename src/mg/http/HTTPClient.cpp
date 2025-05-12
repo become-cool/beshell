@@ -14,6 +14,9 @@ namespace be::mg {
         JS_CFUNC_DEF("close", 0, Client::close),
         JS_CFUNC_DEF("isConnected", 0, Client::isConnected),
         JS_CFUNC_DEF("enableChunkEvent", 0, Client::enableChunkEvent),
+        JS_CFUNC_DEF("setClientKey", 0, Client::setClientKey),
+        JS_CFUNC_DEF("enableClientAuth", 0, Client::enableClientAuth),
+        JS_CFUNC_DEF("disableClientAuth", 0, Client::disableClientAuth),
     } ;
 
     Client::Client(JSContext * ctx, struct mg_connection * conn, JSValue callback)
@@ -56,7 +59,7 @@ namespace be::mg {
         bool res = false ;
 
         // ws/wss
-        if(client->is_ws) {
+        if(client->_isWS) {
             if( JS_IsArrayBuffer(argv[0]) ){
                 size_t size ;
                 char * buff = (char *)JS_GetArrayBuffer(ctx, &size, argv[0]) ;
@@ -141,15 +144,22 @@ namespace be::mg {
 
             case MG_EV_CONNECT: {
 
-                if(client && client->is_tls && Mg::ca.length()>0) {
+                if(client && client->_isTLS && Mg::ca.length()>0) {
                     struct mg_tls_opts opts = {
                         .ca = mg_str(Mg::ca.c_str()),
                         .name = mg_str(client->_host.c_str())
                     };
+
+                    // 双向认证证书
+                    if(client->useClientCert){
+                        opts.cert = mg_str(client->clientCert.c_str());
+                        opts.key = mg_str(client->clientKey.c_str());
+                    }
+
                     mg_tls_init(conn, &opts);
                 }
 
-                client->is_connected = true ;
+                client->_isConnected = true ;
 
                 JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
                 JS_CALL_ARG1(client->ctx, client->callback, evname)
@@ -266,7 +276,7 @@ namespace be::mg {
 
             case MG_EV_CLOSE : {
                 
-                client->is_connected = false ;
+                client->_isConnected = false ;
 
                 JSValue evname = JS_NewString(client->ctx, "close") ;
                 JS_CALL_ARG1(client->ctx, client->callback, evname)
@@ -285,7 +295,7 @@ namespace be::mg {
 
             case MG_EV_ERROR:
             
-                client->is_connected = false ;
+                client->_isConnected = false ;
 
                 if(ev_data) {
                     JSValue evname = JS_NewString(client->ctx, Mg::eventName(ev)) ;
@@ -313,7 +323,7 @@ namespace be::mg {
 
     JSValue Client::isConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Client,client)
-        return client->is_connected? JS_TRUE: JS_FALSE ;
+        return client->_isConnected? JS_TRUE: JS_FALSE ;
     }
 
     JSValue Client::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -328,19 +338,19 @@ namespace be::mg {
         struct mg_connection * conn = NULL ;
         if ( strncmp(url,"http://", 7)==0 || strncmp(url,"https://", 8)==0 ) {
             conn = mg_http_connect(&Mg::mgr, url, Client::eventHandler, client) ;
-            client->is_ws = false ;
+            client->_isWS = false ;
 
             if(url[4]=='s') {
-                client->is_tls = true ;
+                client->_isTLS = true ;
             }
         }
 
         else if( strncmp(url,"ws://", 5)==0 || strncmp(url,"wss://", 6)==0 ) {
             conn = mg_ws_connect(&Mg::mgr, url, Client::wsEventHandler, client, NULL) ;
-            client->is_ws = true ;
+            client->_isWS = true ;
             
             if(url[2]=='s') {
-                client->is_tls = true ;
+                client->_isTLS = true ;
             }
         }
 
@@ -350,7 +360,7 @@ namespace be::mg {
             JSTHROW("not support url protocol")
         }
 
-        if(client->is_tls) {
+        if(client->_isTLS) {
             struct mg_str host = mg_url_host(url) ;
             client->_host = string(host.buf, host.len) ;
         }
@@ -366,6 +376,23 @@ namespace be::mg {
         
         return JS_DupValue(ctx, client->jsobj) ;
     }
+    JSValue Client::setClientKey(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Client, that)
+        CHECK_ARGC(2)
+        ARGV_TO_STRING(0, that->clientKey)
+        ARGV_TO_STRING(1, that->clientCert)
+        return JS_UNDEFINED ;
+    }
+    JSValue Client::enableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Client, that)
+        that->useClientCert = true ;
+        return JS_UNDEFINED ;
+    }
+    JSValue Client::disableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Client, that)
+        that->useClientCert = false ;
+        return JS_UNDEFINED ;
+    }
 
     void Client::setHandler(HTTPClientHandler _handler) {
         handler = _handler ;
@@ -373,10 +400,10 @@ namespace be::mg {
 
     
     bool Client::isTLS() const {
-        return is_tls ;
+        return _isTLS ;
     }
     bool Client::isWS() const {
-        return is_ws ;
+        return _isWS ;
     }
     std::string Client::host() const {
         return _host ;

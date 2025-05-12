@@ -22,6 +22,9 @@ namespace be::mg {
         JS_CFUNC_DEF("sub", 0, MQTTClient::sub),
         JS_CFUNC_DEF("unsub", 0, MQTTClient::unsub),
         JS_CFUNC_DEF("disconnect", 0, MQTTClient::disconnect),
+        JS_CFUNC_DEF("setClientKey", 0, MQTTClient::setClientKey),
+        JS_CFUNC_DEF("enableClientAuth", 0, MQTTClient::enableClientAuth),
+        JS_CFUNC_DEF("disableClientAuth", 0, MQTTClient::disableClientAuth),
     } ;
 
     MQTTClientHandler MQTTClient::handler = nullptr ;
@@ -77,11 +80,18 @@ namespace be::mg {
         switch (ev)
         {
         case MG_EV_CONNECT:
-            if (nobj->is_tls) {
+            if (nobj->isTLS) {
                 struct mg_tls_opts opts = {
                     .ca = mg_str(Mg::ca.c_str()),
                     .name = mg_str(nobj->_host.c_str())
                 };
+
+                // 双向认证证书
+                if(nobj->useClientCert){
+                    opts.cert = mg_str(nobj->clientCert.c_str());
+                    opts.key = mg_str(nobj->clientKey.c_str());
+                }
+
                 mg_tls_init(c, &opts);
             }
             break ;
@@ -212,7 +222,7 @@ namespace be::mg {
         struct mg_connection * conn = mg_mqtt_connect(&Mg::mgr, url, &opts, (mg_event_handler_t)eventHandler, (void*)client);
         
         if(url[4]=='s') {
-            client->is_tls = true ;
+            client->isTLS = true ;
             
             struct mg_str host = mg_url_host(url) ;
             client->_host = string(host.buf, host.len) ;
@@ -335,5 +345,22 @@ namespace be::mg {
 
     void MQTTClient::setHandler(MQTTClientHandler _handler) {
         handler = _handler ;
+    }
+    JSValue MQTTClient::setClientKey(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(MQTTClient, that)
+        CHECK_ARGC(2)
+        ARGV_TO_STRING(0, that->clientKey)
+        ARGV_TO_STRING(1, that->clientCert)
+        return JS_UNDEFINED ;
+    }
+    JSValue MQTTClient::enableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(MQTTClient, that)
+        that->useClientCert = true ;
+        return JS_UNDEFINED ;
+    }
+    JSValue MQTTClient::disableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(MQTTClient, that)
+        that->useClientCert = false ;
+        return JS_UNDEFINED ;
     }
 }
