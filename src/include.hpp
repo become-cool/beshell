@@ -45,6 +45,7 @@
 #include "module/serial/I2C.hpp"
 #include "module/serial/SPI.hpp"
 #include "module/serial/I2S.hpp"
+#include "module/serial/CDC.hpp"
 
 // mg
 #include "mg/Mg.hpp"

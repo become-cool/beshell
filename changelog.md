@@ -8,6 +8,7 @@ New Feature:
 * telnet.ble
 * telnet 接收数据对称加密
 * mg.https/mqtts support client cert/key
+* cdc module
 
 Fix issure:
 
