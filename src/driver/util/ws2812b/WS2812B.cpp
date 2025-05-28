@@ -76,9 +76,27 @@ namespace be::driver::light{
     
     JSValue WS2812B::setPixel(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(WS2812B, that)
+        CHECK_ARGC(4)
         if(!that->led_strip) {
             JSTHROW("Please call setup() first")
         }
+
+        int32_t idx, red, green, blue;
+        if (JS_ToInt32(ctx, &idx, argv[0]) || idx < 0 || idx >= that->length) {
+            JSTHROW("Invalid pixel index (must be between 0 and length-1)")
+        }
+        if (JS_ToInt32(ctx, &red, argv[1]) || red < 0 || red > 255) {
+            JSTHROW("Invalid red value (must be between 0 and 255)")
+        }
+        if (JS_ToInt32(ctx, &green, argv[2]) || green < 0 || green > 255) {
+            JSTHROW("Invalid green value (must be between 0 and 255)")
+        }
+        if (JS_ToInt32(ctx, &blue, argv[3]) || blue < 0 || blue > 255) {
+            JSTHROW("Invalid blue value (must be between 0 and 255)")
+        }
+dn4(idx, red, green, blue)
+        led_strip_set_pixel(that->led_strip, idx, red, green, blue);
+
         return JS_UNDEFINED ;
     }
     

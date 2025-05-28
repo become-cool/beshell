@@ -12,6 +12,7 @@ New Feature:
 * cdc telnet
 * process.getTimerCallback(), process.getTimerCount()
 * login / logout cmd
+* driver wb2812b
 
 Fix issure:
 

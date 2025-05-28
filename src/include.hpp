@@ -82,3 +82,4 @@
 #include "driver/disp/ST7789.hpp"
 #include "driver/comm/nfc/PN532.hpp"
 #include "driver/comm/eth/W5500.hpp"
+#include "driver/util/ws2812b/WS2812B.hpp"
