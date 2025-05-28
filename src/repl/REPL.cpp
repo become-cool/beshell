@@ -37,6 +37,27 @@ using namespace std ;
         return ;                                \
     }
 
+
+void __attribute__((weak)) vTaskList(char *pcWriteBuffer) {
+    printf("[ERROR] vTaskList is not available!\n");
+    printf("[SOLUTION] Enable CONFIG_FREERTOS_USE_TRACE_FACILITY and CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS in sdkconfig.\n");
+}
+
+UBaseType_t __attribute__((weak)) uxTaskGetSystemState(
+    TaskStatus_t *pxTaskStatusArray,
+    UBaseType_t uxArraySize,
+    uint32_t *pulTotalRunTime
+) {
+    printf("[ERROR] uxTaskGetSystemState is not available!\n");
+    printf("[SOLUTION] Enable CONFIG_FREERTOS_USE_TRACE_FACILITY in sdkconfig.\n");
+    return 0;
+}
+
+void __attribute__((weak)) vTaskGetRunTimeStats(char *pcWriteBuffer) {
+    printf("[ERROR] vTaskGetRunTimeStats is not available!\n");
+    printf("[SOLUTION] Enable CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS in sdkconfig.\n");
+}
+
 namespace be {
 
 
@@ -333,17 +354,21 @@ namespace be {
             string buff ;
 #ifdef ESP_PLATFORM
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
-#ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
             uint8_t CPU_RunInfo[1024];
             memset(CPU_RunInfo, 0, sizeof(CPU_RunInfo)); /* 信息缓冲区清零 */
-    
+
+            
+
+#ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
             vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
 
             buff = "----------------------------------------------------\r\n";
             buff+= "task_name     task_status     priority stack task_id\r\n";
             buff+= (char *)CPU_RunInfo;
             buff+= "----------------------------------------------------\r\n";
+#endif
 
+#ifdef CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
             memset(CPU_RunInfo, 0, sizeof(CPU_RunInfo)); /* 信息缓冲区清零 */
 
             vTaskGetRunTimeStats((char *)&CPU_RunInfo);
@@ -351,6 +376,7 @@ namespace be {
             buff+= "task_name      run_cnt                 usage_rate   \r\n";
             buff+= (char *)CPU_RunInfo;
             buff+= "----------------------------------------------------\r\n";
+#endif
 
             TaskStatus_t *pxTaskStatusArray;
             UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
@@ -387,7 +413,6 @@ namespace be {
             
                 free(pxTaskStatusArray);
             }
-#endif
 #endif
 #endif
             ch->send(buff) ;
