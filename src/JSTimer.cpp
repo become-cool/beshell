@@ -328,4 +328,27 @@ namespace be {
         return nullptr ;
     }
 #endif
+
+    JSValue JSTimer::getTimerCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ENGINE
+        if(argc>0) {
+            JSTHROW("too many arguments")
+        }
+        return JS_NewInt32(ctx, engine->timer.events.size()) ;
+    }
+    JSValue JSTimer::getTimerCallback(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ENGINE
+        ASSERT_ARGC(1)
+        ARGV_TO_UINT32(0, idx)
+        if(idx>=engine->timer.events.size()) {
+            JSTHROW("timer event not found")
+        }
+        JSTimerEvent * event = engine->timer.events[idx] ;
+        if(!event) {
+            JSTHROW("timer event not found")
+        }
+        return JS_DupValue(ctx, event->func) ;
+    }
+
+
 }

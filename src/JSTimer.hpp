@@ -36,7 +36,9 @@ namespace be {
         static JSValue jsClearTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsResetTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue jsPeekTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        
+        static JSValue getTimerCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getTimerCallback(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
         JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, int argc=0, JSValueConst *argv=nullptr) ;
         JSTimerEvent * setTimerAsync(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, int argc=0, JSValueConst *argv=nullptr, bool fromISR=false) ;
         // JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, std::initializer_list<JSValue> argv={}) ;

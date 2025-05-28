@@ -34,6 +34,8 @@ namespace be {
         exportFunction("readMac", readMac);
         exportFunction("gc", gc);
         exportFunction("ref", ref);
+        exportFunction("getTimerCount", JSTimer::getTimerCount);
+        exportFunction("getTimerCallback", JSTimer::getTimerCallback);
 
         // JS_ComputeMemoryUsage
         exportName("versions") ;
