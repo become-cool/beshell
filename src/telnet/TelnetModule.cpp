@@ -15,10 +15,12 @@ namespace be{
         exportClass<TelnetChannelNClass>() ;
         exportName("ws") ;
         exportName("ble") ;
+        exportName("cdc") ;
         
         EXPORT_FUNCTION(enableCrypto) ;
         EXPORT_FUNCTION(disableCrypto) ;
         EXPORT_FUNCTION(setCryptoKey) ;
+        EXPORT_FUNCTION(setPassword) ;
     }
 
     void TelnetModule::exports(JSContext *ctx) {
@@ -61,6 +63,14 @@ namespace be{
         memcpy( telnet->cryptoKey, key, 16) ;
         memcpy( telnet->cryptoVI, vi, 16) ;
 
+        return JS_UNDEFINED ;
+    }
+
+    JSValue TelnetModule::setPassword(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        const char * pwd = JS_ToCString(ctx, argv[0]) ;
+        JSEngine::fromJSContext(ctx)->beshell->repl->setPassword(pwd) ;
+        JS_FreeCString(ctx, pwd) ;
         return JS_UNDEFINED ;
     }
 }

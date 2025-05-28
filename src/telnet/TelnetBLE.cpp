@@ -33,7 +33,9 @@ namespace be {
         // print_block(data, size, 8) ;
         parser.parse(data, size) ;
     }
-
+    void TelnetBLE::setup() {
+        setup("BeShell", 0x0512, 0x0B0C, 0) ;
+    }
     bool TelnetBLE::setup(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) {
         if(setuped) {
             return false ;

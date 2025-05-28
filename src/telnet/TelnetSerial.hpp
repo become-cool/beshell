@@ -10,7 +10,7 @@ namespace be {
     private:
         TaskHandle_t taskHandle = nullptr ;
         QueueHandle_t uart_queue;
-        QueueHandle_t pkg_queue;
+        // QueueHandle_t pkg_queue;
 
         static void task(void * argv) ;
 

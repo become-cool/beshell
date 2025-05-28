@@ -32,6 +32,8 @@ namespace be {
 
         virtual bool mutexTake();
         virtual void mutexGive();
+        
+        virtual void setup() ;
 
         friend class Telnet ;
     } ;

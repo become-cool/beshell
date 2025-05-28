@@ -37,7 +37,7 @@ namespace be {
                 return ;
             }
             if(factories.count(name)>0) {
-                printf("ModuleLoader::add(): module '%s' already registered\n", name) ;
+                // printf("ModuleLoader::add(): module '%s' already registered\n", name) ;
                 return ;
             }
             factories[name] = factory<M> ;

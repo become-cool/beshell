@@ -26,19 +26,19 @@ namespace be {
         , channelStdIO(this)
 #endif
     {
+#ifdef ESP_PLATFORM
+        addChannel(&channelSeiral) ;
+#endif
+#ifdef LINUX_PLATFORM
+        addChannel(&channelStdIO) ;
+#endif
     }
 
     void Telnet::setup() {
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
-
-#ifdef ESP_PLATFORM
-        channelSeiral.setup() ;
-        addChannel(&channelSeiral) ;
-#endif
-#ifdef LINUX_PLATFORM
-        channelStdIO.setup() ;
-        addChannel(&channelStdIO) ;
-#endif
+        for(auto ch: channels) {
+            ch->setup() ;
+        }
     }
 
     void Telnet::execPackage(std::unique_ptr<Package> & pkg) {

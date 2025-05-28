@@ -27,6 +27,8 @@ const ws = {
   }
 }
 
+exportValue(telnet, "ws", ws)
+
 // BLE
 try {
   var bt = importSync("bt")
@@ -89,5 +91,24 @@ const ble = {
   }
 }
 
-exportValue(telnet, "ws", ws)
 exportValue(telnet, "ble", ble)
+
+// USB CDC
+try {
+  var cdc = importSync("cdc")
+} catch (e) {}
+exportValue(telnet, "cdc", {
+  start() {
+    if(!cdc) {
+      throw new Error("cdc module not used, call `beshell.use<CDC>()` in C++ first")
+    }
+    try{ cdc.setup() }catch(e){}
+    cdc.on("data", (data) => {
+      cdcChannel && cdcChannel.process(data)
+    })
+    let cdcChannel = new telnet.TelnetChannel()
+    cdcChannel.on("output-stream", (data) => {
+      cdc && cdc.write(data)
+    })
+  }
+})

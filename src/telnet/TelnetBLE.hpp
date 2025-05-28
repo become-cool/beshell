@@ -10,7 +10,8 @@ namespace be {
     public:
         using TelnetChannel::TelnetChannel ;
         
-        bool setup(const char * name="BeShell", uint16_t characteristicID=0x0512, uint16_t serviceID=0x0B0C, uint16_t appID=0) ;
+        void setup() ;
+        bool setup(const char * name, uint16_t characteristicID, uint16_t serviceID, uint16_t appID) ;
         void unsetup() ;
         
         void send (Package & pkg) ;

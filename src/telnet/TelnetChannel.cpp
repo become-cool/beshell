@@ -69,4 +69,7 @@ namespace be {
         xSemaphoreGive(mutex);
 #endif
     }
+    void TelnetChannel::setup() {
+        // Default setup does nothing, can be overridden by subclasses
+    }
 }

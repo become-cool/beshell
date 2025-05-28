@@ -18,7 +18,8 @@ namespace be {
         virtual void onNativeEvent(JSContext *ctx, void * param) ;
     
     private :
-        static void CDC::taskListen(CDC* cdc) ;
+        static void taskListen(CDC* cdc) ;
+        static bool setuped ;
     } ;
 }
 #endif

@@ -5,6 +5,7 @@
 namespace be {
 
     char const * const CDC::name = "cdc" ;
+    bool CDC::setuped = false ;
 
     typedef struct {
         int len ;
@@ -59,6 +60,10 @@ namespace be {
 
     JSValue CDC::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
+        if(setuped) {
+            JSTHROW("CDC already setup") ;
+        }
+
         NativeModule * nmodule = ModuleLoader::moduleByName(ctx, CDC::name) ;
         if(!nmodule) {
             JSTHROW("CDC module not found") ;
@@ -94,6 +99,7 @@ namespace be {
         // 创建持续运行的 USB 任务
         xTaskCreatePinnedToCore((TaskFunction_t)taskListen, "usb_cdc_task", 4096, (void *)nmodule, 5, NULL, 1);
         
+        setuped = true ;
         return JS_UNDEFINED;
     }
     
