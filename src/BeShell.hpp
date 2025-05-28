@@ -43,22 +43,25 @@ namespace be {
         void main(const char * mainScriptPath=nullptr) ;
 
         void addLoopFunction(LoopFunction func, void * opaque=nullptr, bool ignoreRepeat=true) ;
+
         
-        template <typename ModuleClass>
+        // NativeModule 类
+        template <typename CLASS, typename std::enable_if<std::is_base_of<NativeModule, CLASS>::value, int>::type = 0>
         void use() {
-            static_assert(std::is_base_of<NativeModule, ModuleClass>::value, "ModuleClass must be a subclass of NativeModule") ;
-            engine->mloader.add<ModuleClass>(this, nullptr) ;
+            engine->mloader.add<CLASS>(this, nullptr) ;
         }
 
-        template <typename ModuleClass>
-        void useModule(const char * name=nullptr) {
-            static_assert(std::is_base_of<NativeModule, ModuleClass>::value, "ModuleClass must be a subclass of NativeModule") ;
-            engine->mloader.add<ModuleClass>(this, name) ;
+        // driver (NativeClass 类)
+        template <typename CLASS, typename std::enable_if<std::is_base_of<NativeClass, CLASS>::value, int>::type = 0>
+        void use() {
+            be::driver::DriverModule::useDriver<CLASS>() ;
         }
 
-        template <typename DriverClass>
-        void useDriver() {
-            be::driver::DriverModule::useDriver<DriverClass>() ;
+        // TelnetChannel 类
+        template <typename CLASS, typename std::enable_if<std::is_base_of<TelnetChannel, CLASS>::value, int>::type = 0>
+        void use() {
+            CLASS * channel = new CLASS(telnet) ;
+            telnet->addChannel(channel) ;
         }
     } ;
 
