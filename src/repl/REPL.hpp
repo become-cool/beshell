@@ -19,6 +19,7 @@ namespace be {
         REPLCommandHandler handler = nullptr ;
         std::unique_ptr<Options> args ;
         std::set<std::string> alias ;
+        bool ignoreLogin = false ;
     } REPLCommand ;
 
     class REPL {
@@ -26,12 +27,15 @@ namespace be {
         BeShell * beshell ;
         std::map<std::string, std::shared_ptr<REPLCommand> > commands ;
         std::map<std::string, std::shared_ptr<REPLCommand> > commandAlias ;
+        std::string password = "" ;
+        bool logined = true ; // setPassword() 时设置为 false
     public:
         REPL(BeShell * beshell) ;
         void input(Package & pkg, TelnetChannel * ch) ;
 
         bool execCommand(TelnetChannel *, const char * input, int iptLen=-1) ;
-        void registerCommand(const char * name, const char * usage, REPLCommandHandler handler) ;
+        std::shared_ptr<REPLCommand> registerCommand(const char * name, const char * usage, REPLCommandHandler handler) ;
         void alias(const char * alias, const char * origin) ;
+        void setPassword(const std::string & pwd) ;
     } ;
 }

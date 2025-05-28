@@ -399,6 +399,7 @@ namespace be {
         , [](BeShell * beshell, TelnetChannel * ch, Options & args){
             if(args.length()<1) {
                 ch->send("missing module name") ;
+                return ;
             }
             const char * moduleName = args[0].c_str() ;
             const char * varName = moduleName ;
@@ -416,6 +417,25 @@ namespace be {
             JS_FreeValue(beshell->engine->ctx,ret) ;
         }) ;
 
+
+        registerCommand("login", 
+            "Usage: login <password>"
+        , [](BeShell * beshell, TelnetChannel * ch, Options & args){
+            if(args.length()<1) {
+                return ;
+            }
+            if(beshell->repl->password==args[0]) {
+                ch->send("login success\n") ;
+                beshell->repl->logined = true ;
+            }
+        })->ignoreLogin = true ;
+        
+        registerCommand("logout", 
+            "Usage: logout"
+        , [](BeShell * beshell, TelnetChannel * ch, Options & args){
+            ch->send("bye\n") ;
+            beshell->repl->logined = false ;
+        }) ;
 
         registerCommand("compile", 
             "Usage: compile <path>"
@@ -508,11 +528,17 @@ namespace be {
 
         else {
 
+            if(!logined) {
+                return ;
+            }
+
             size_t content_len = pkg.body_len ;
             // 不含字符串末尾的 0
             if(pkg.body()[pkg.body_len-1] == 0){
                 content_len -- ;
             } ;
+
+            // printf("eval: %.*s\n", (int)content_len, pkg.body()) ;
 
             JSValue ret = beshell->engine->eval((char *)pkg.body(), content_len,"eval") ;
 
@@ -588,6 +614,10 @@ namespace be {
             return false ;
         }
 
+        if( !cmd->ignoreLogin && !logined ) {
+            return true ;
+        }
+
         if(res==-1) {
             ch->send("unexpected occurrence of '\\' at end of string\n") ;
             return true ;
@@ -611,6 +641,10 @@ namespace be {
         return true ;
     }
 
+    void REPL::setPassword(const std::string & pwd) {
+        password = pwd ;
+        logined = false ;
+    }
 
     // "Usage: test [options...]",
     // "Test program for the header `ParallelRadixSort.h`",
@@ -626,7 +660,7 @@ namespace be {
     // "Examples:",
     // "  ./test -t=4 --range 100 200",
     // "  ./test -t 2 --range 1 10000 -n=100000000",
-    void REPL::registerCommand(const char * name, const char * cusage, REPLCommandHandler handler) {
+    std::shared_ptr<REPLCommand> REPL::registerCommand(const char * name, const char * cusage, REPLCommandHandler handler) {
 
         std::vector<std::string> usageLines ;
         if(cusage) {
@@ -638,6 +672,8 @@ namespace be {
         commands[name] = std::shared_ptr<REPLCommand>(new REPLCommand()) ;
         commands[name]->handler = handler ;
         commands[name]->args.reset(opts) ;
+
+        return commands[name] ;
     }
 
     void REPL::alias(const char * alias, const char * origin) {
