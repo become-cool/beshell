@@ -163,7 +163,7 @@ function block(buffer, columns, separator, numSys) {
         assert(engine->beshell) ;
         assert(engine->beshell->telnet) ;
 
-        char * cname = Console::channelName ;
+        char const * cname = Console::channelName ;
 
         if(argc>1) {
             ARGV_AS_CSTRING(1, cname)

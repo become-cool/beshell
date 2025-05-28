@@ -121,7 +121,7 @@ namespace be::driver::comm {
     
     void W5500::onNativeEvent(JSContext *ctx, void * param) {
         w5500_event_t * event_wrapper = (w5500_event_t *) param ;
-        char * name = nullptr ;
+        char const * name = nullptr ;
         if(event_wrapper->type==1) {
             switch (event_wrapper->event_id) {
             case ETHERNET_EVENT_CONNECTED:
