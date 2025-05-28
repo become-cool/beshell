@@ -9,6 +9,9 @@ New Feature:
 * telnet 接收数据对称加密
 * mg.https/mqtts support client cert/key
 * cdc module
+* cdc telnet
+* process.getTimerCallback(), process.getTimerCount()
+* login / logout cmd
 
 Fix issure:
 
