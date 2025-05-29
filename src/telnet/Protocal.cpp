@@ -262,7 +262,7 @@ namespace be {
     // body
     void StatePkgBody::enter() {
         received = 0 ;
-        if(parser->pkg->body_len>0 && parser->pkg->body_len<=0xFF) {
+        if(parser->pkg->body_len>0 /*&& parser->pkg->body_len<=0xFF*/) {
             parser->pkg->mallocBody(parser->pkg->body_len+1, true) ;
         }
         else {
@@ -281,21 +281,25 @@ namespace be {
             }
             // body length greater than 0xff
             if( parser->pkg->body_len>0xFF ) {
-                if(parser->handler){
-                    // commit sub packet (body is only partial data)
-                    Package * chunk = new Package(parser->pkg) ;
+                
+                parser->pkg->head.fields.cmd &= 0x7F ;
 
-                    chunk->mallocBody(n,false) ;
-                    chunk->chunk_len = n ;
-                    std::memcpy(chunk->_body, bytes, n);
+                // if(parser->handler){
+                //     // commit sub packet (body is only partial data)
+                //     Package * chunk = new Package(parser->pkg) ;
 
-                    chunk->head.fields.cmd &= 0x7F ;
+                //     chunk->mallocBody(n,false) ;
+                //     chunk->chunk_len = n ;
+                //     std::memcpy(chunk->_body, bytes, n);
 
-                    parser->handler(std::unique_ptr<Package>(chunk), parser->opaque) ;
-                }
+                //     chunk->head.fields.cmd &= 0x7F ;
+
+                //     parser->handler(std::unique_ptr<Package>(chunk), parser->opaque) ;
+                // }
             }
 
-            else if(parser->pkg->body()) {
+            // else 
+            if(parser->pkg->body()) {
                 memcpy(parser->pkg->body()+received, bytes, n) ;
             }
             

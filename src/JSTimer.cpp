@@ -81,7 +81,7 @@ namespace be {
             auto event = *it ;
             if(event->deadline <= now) {
                 if(!JS_IsFunction(ctx, event->func)) {
-                    printf("timer callback is not a function\n") ;
+                    printf("timer callback is not a function, event:%p, total event: %d\n",events,events.size()) ;
                     removeTimer(ctx, event) ;
                     continue ;
                 }

@@ -51,8 +51,10 @@ namespace be {
         if(!pkg.body_len) {
             return ;
         }
+
+        int datalen = pkg.chunk_len ? pkg.chunk_len : pkg.body_len ;
         
-        uint8_t decrypted_data[pkg.body_len] ;
+        uint8_t decrypted_data[datalen] ;
         uint8_t counter[sizeof(cryptoVI)] ;
         memcpy(counter, cryptoVI, sizeof(cryptoVI)) ;
 
@@ -69,18 +71,17 @@ namespace be {
         }
 
         // Perform AES-CTR decryption
-        if (mbedtls_aes_crypt_ctr(&aes_ctx, pkg.body_len, &nc_off, counter, stream_block, pkg.body(), decrypted_data) != 0) {
+        if (mbedtls_aes_crypt_ctr(&aes_ctx, datalen, &nc_off, counter, stream_block, pkg.body(), decrypted_data) != 0) {
             return ;
         }
 
         // Free AES context
         mbedtls_aes_free(&aes_ctx);
 
-        memcpy(pkg.body(), decrypted_data, pkg.body_len) ;
+        memcpy(pkg.body(), decrypted_data, datalen) ;
     }
 
     void Telnet::onReceived(TelnetChannel * ch, std::unique_ptr<Package> pkg){
-
         if(enableCrypto) {
             if(decryptFunc) {
                 decryptFunc(*pkg) ;
@@ -89,7 +90,7 @@ namespace be {
                 defaultTelnetDecryptFunc(*pkg) ;
             }
         }
-
+        
         switch (pkg->head.fields.cmd)
         {
         case LINE:
@@ -205,7 +206,6 @@ namespace be {
     }
     
     void Telnet::pushFile(TelnetChannel * ch, std::unique_ptr<Package> & pkg) {
-        
         if(!ch->openedFile) {
             ch->sendError(pkg->head.fields.pkgid, "file not opened") ;
             return ;
@@ -213,7 +213,7 @@ namespace be {
 
         if(pkg->body()) {
             // 分段数据包
-            if(pkg->chunk_len && pkg->body_len>0xFF) {
+            if(pkg->chunk_len) {
                 necho_time("write file",{
                     fwrite(pkg->body(),1,pkg->chunk_len,ch->openedFile) ;
                 })
