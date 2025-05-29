@@ -77,20 +77,30 @@ function charGetter(uuid) {
   return mapUUIDChars[uuid] || null
 }
 
-const peripheral = {
 
+class Peripheral extends EventEmitter {
+  constructor() {
+    super()
+    this.char = charGetter
+  }
   init() {
     bt._initPeripheral()
 
-    bt.on("CONNECT", (connId, addr) => {
+    bt.on("periph.connect", (connId, addr) => {
       peerConnId = connId
-      bt.emit("connect", connId)
+      this.emit("connect", connId)
     })
-    bt.on("DISCONNECT", (connId, addr, reason) => {
+    bt.on("periph.disconnect", (connId, addr, reason) => {
       if( peerConnId == connId ){
         peerConnId = null
       }
-      bt.emit("disconnect", connId, reason)
+      this.emit("disconnect", connId, reason)
+    })
+    bt.on("periph.open", (status) => {
+      this.emit("open", status)
+    })
+    bt.on("periph.close", (status) => {
+      this.emit("close", status)
     })
     bt.on("WRITE", (handle, data, connId) => {
       let char = mapHandleChars[handle]
@@ -98,15 +108,15 @@ const peripheral = {
         char.emit("write", data, connId)
       }
     })
-  },
+  }
 
   addService(opt) {
     let svr = new Service(opt)
     return svr
-  },
-
-  char: charGetter
+  }
 }
+
+const peripheral = new Peripheral()
 
 exportValue(bt, "peripheral", peripheral)
 exportValue(bt, "periph", peripheral)

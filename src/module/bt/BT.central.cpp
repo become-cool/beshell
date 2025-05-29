@@ -32,7 +32,6 @@ namespace be {
                                     esp_gatt_if_t gattc_if,
                                     esp_ble_gattc_cb_param_t *param)
     {
-        
         if( gattcHandler && gattcHandler(event, gattc_if, param) ){
             return ;
         }
@@ -83,7 +82,6 @@ namespace be {
         if(BT::singleton){
             if( !BT::singleton->emitNativeEvent(&event_msg) ){
                 printf("bt queue full\n") ;
-
                 if(event_msg.data.ptr) {
                     free(event_msg.data.ptr) ;
                     event_msg.data.ptr = NULL ;
@@ -121,7 +119,7 @@ namespace be {
         }
         
         // Register app
-        err = esp_ble_gattc_app_register(0);
+        err = esp_ble_gattc_app_register(1);
         if (err != ESP_OK) {
             printf("esp_ble_gattc_app_register failed, err = %d\n", err);
             reg_semaphore = NULL;
@@ -156,27 +154,55 @@ namespace be {
         }
         return JS_UNDEFINED ;
     }
+
+    #define MAC_TO_STR(str,mac)  \
+                char str [18] ;  \
+                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5] ) ;
+    
     
     void BT::onNativeCentralEvent(JSContext *ctx, bt_event * msg) {
         // dn(msg->event-100)
         switch(msg->event-100) {
-            case ESP_GATTC_CONNECT_EVT:
-                break;
+            case ESP_GATTC_CONNECT_EVT: {
+                if(connect_type==1){
+                    connect_type = 0 ;
+                    MAC_TO_STR(addr, msg->gattc.connect.remote_bda)
+                    emitSyncFree("central.connect", {
+                        JS_NewUint32(ctx, msg->gattc.connect.conn_id) ,
+                        JS_NewString(ctx, (const char *)addr) ,
+                    }) ;
+                }
+                break ;
+            }
+            case ESP_GATTC_DISCONNECT_EVT: {
+                if(disconnect_type==1){
+                    disconnect_type = 0 ;
+                    MAC_TO_STR(addr, msg->gattc.disconnect.remote_bda)
+                    emitSyncFree("central.disconnect", {
+                        JS_NewUint32(ctx, msg->gattc.disconnect.conn_id) ,
+                        JS_NewString(ctx, (const char *)addr) ,
+                        JS_NewUint32(ctx, msg->gattc.disconnect.reason) ,
+                    }) ;
+                }
+                break ;
+            }
             case ESP_GATTC_OPEN_EVT: {
-                char addr [18] ;
-                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
-                            msg->gattc.open.remote_bda[0],
-                            msg->gattc.open.remote_bda[1],
-                            msg->gattc.open.remote_bda[2],
-                            msg->gattc.open.remote_bda[3],
-                            msg->gattc.open.remote_bda[4],
-                            msg->gattc.open.remote_bda[5]
-                );
-                emitSyncFree("open", {
+                MAC_TO_STR(addr, msg->gattc.open.remote_bda)
+                emitSyncFree("central.open", {
                     JS_NewUint32(ctx, msg->gattc.open.status) ,
                     JS_NewUint32(ctx, msg->gattc.open.conn_id) ,
                     JS_NewString(ctx, (const char *)addr) ,
                     JS_NewUint32(ctx, msg->gattc.open.mtu) ,
+                }) ;
+                break ;
+            }
+            case ESP_GATTC_CLOSE_EVT: {
+                MAC_TO_STR(addr, msg->gattc.close.remote_bda)
+                emitSyncFree("central.close", {
+                    JS_NewUint32(ctx, msg->gattc.close.status) ,
+                    JS_NewUint32(ctx, msg->gattc.close.conn_id) ,
+                    JS_NewString(ctx, (const char *)addr) ,
+                    JS_NewUint32(ctx, msg->gattc.close.reason) ,
                 }) ;
                 break ;
             }
@@ -456,6 +482,9 @@ namespace be {
         }
 
     JSValue BT::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if(connect_type!=0) {
+            JSTHROW("connecting not finished, please wait")
+        }
         CHECK_GATTC_IF
         esp_bd_addr_t addr = {0} ;
 
@@ -469,6 +498,7 @@ namespace be {
         sscanf(caddr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", (char *)addr+0, (char *)addr+1, (char *)addr+2, (char *)addr+3, (char *)addr+4, (char *)addr+5);
         JS_FreeCString(ctx, caddr) ;
 
+        connect_type = 1 ;
         esp_err_t err = esp_ble_gattc_open(
             gattc_if_global,
             addr,                       // 目标设备的 MAC 地址
@@ -476,16 +506,22 @@ namespace be {
             true                        // 是否开启重连特性（若连接断开，是否自动重连）
         );
         if (err != ESP_OK) {
+            connect_type = 0 ;
             JSTHROW("esp_ble_gattc_open failed, err = %d", err)
         }
         return JS_UNDEFINED ;
     }
     JSValue BT::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if(disconnect_type!=0) {
+            JSTHROW("disconnecting not finished, please wait")
+        }
         CHECK_GATTC_IF
         CHECK_ARGC(1)
         ARGV_TO_UINT16(0, conn_id)
+        disconnect_type = 1 ;
         esp_err_t res = esp_ble_gattc_close(gattc_if_global,conn_id) ;
         if (res != ESP_OK) {
+            disconnect_type = 0 ;
             JSTHROW("esp_ble_gattc_close failed, err = %d", res)
         }
         return JS_UNDEFINED ;

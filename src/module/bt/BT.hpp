@@ -95,7 +95,6 @@ namespace be{
         static bool initCentral() ;
         static bool initPeripheral() ;
 
-        
         static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) ;
         static void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param) ;
         static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) ;
@@ -106,6 +105,9 @@ namespace be{
         static gap_handler_t gapHandler ;
         static gattc_handler_t gattcHandler ;
         static gatts_handler_t gattsHandler ;
+        
+        static int connect_type ;       // 1: central, 2: peripheral, 0：not connected
+        static int disconnect_type ;    // 1: central, 2: peripheral，0: not disconnecting
     } ;
 }
 

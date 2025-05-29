@@ -26,6 +26,9 @@ namespace be{
     char const * const BT::name = "bt" ;
     BT * BT::singleton = nullptr ;
     bool BT::bScanning = false ;
+    int BT::connect_type = 0 ;
+    int BT::disconnect_type = 0 ;
+    
     
     gap_handler_t   BT::gapHandler = nullptr ;
     gattc_handler_t BT::gattcHandler = nullptr ;

@@ -126,6 +126,10 @@ namespace be {
                 break;
                 
             case ESP_GATTS_CONNECT_EVT: {
+                // 忽略 central 触发的连接事件
+                if(connect_type == 1) {
+                    return ;
+                }
                 esp_ble_conn_update_params_t conn_params = {0};
                 memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
                 conn_params.latency = 0;
@@ -138,6 +142,10 @@ namespace be {
                 break;
             }
             case ESP_GATTS_DISCONNECT_EVT:
+                // 忽略 central 触发的断开连接事件
+                if(disconnect_type == 1) {
+                    return ;
+                }
                 last_conn_id = 0xFFFF ;
                 break;
 
@@ -186,7 +194,7 @@ namespace be {
             return false;
         }
         
-        err = esp_ble_gatts_app_register(0);
+        err = esp_ble_gatts_app_register(2);
         if (err != ESP_OK) {
             ESP_LOGE(GATTS_TAG, "esp_ble_gatts_app_register failed, err = %d", err);
             return false;
@@ -213,6 +221,9 @@ namespace be {
         return JS_UNDEFINED ;
     }
     
+    #define MAC_TO_STR(str,mac)  \
+                char str [18] ;  \
+                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5] ) ;
     void BT::onNativePeripheralEvent(JSContext *ctx, bt_event * event) {
         esp_gatts_cb_event_t gatts_event = static_cast<esp_gatts_cb_event_t>(event->event - 200);
         
@@ -276,13 +287,8 @@ namespace be {
             }
                 
             case ESP_GATTS_CONNECT_EVT: {
-                char addr[18];
-                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X",
-                    event->gatts.connect.remote_bda[0], event->gatts.connect.remote_bda[1],
-                    event->gatts.connect.remote_bda[2], event->gatts.connect.remote_bda[3],
-                    event->gatts.connect.remote_bda[4], event->gatts.connect.remote_bda[5]);
-                    
-                emitSyncFree("CONNECT", {
+                MAC_TO_STR(addr, event->gatts.connect.remote_bda)
+                emitSyncFree("periph.connect", {
                     JS_NewInt32(ctx, event->gatts.connect.conn_id),
                     JS_NewString(ctx, addr),
                     JS_NewInt32(ctx, event->gatts.connect.conn_params.interval),
@@ -293,16 +299,24 @@ namespace be {
             }
                 
             case ESP_GATTS_DISCONNECT_EVT: {
-                char addr[18];
-                sprintf(addr, "%02X:%02X:%02X:%02X:%02X:%02X",
-                    event->gatts.disconnect.remote_bda[0], event->gatts.disconnect.remote_bda[1],
-                    event->gatts.disconnect.remote_bda[2], event->gatts.disconnect.remote_bda[3],
-                    event->gatts.disconnect.remote_bda[4], event->gatts.disconnect.remote_bda[5]);
-                    
-                emitSyncFree("DISCONNECT", {
+                MAC_TO_STR(addr, event->gatts.disconnect.remote_bda)
+                emitSyncFree("periph.disconnect", {
                     JS_NewInt32(ctx, event->gatts.disconnect.conn_id),
                     JS_NewString(ctx, addr),
                     JS_NewInt32(ctx, event->gatts.disconnect.reason)
+                });
+                break;
+            }
+                
+            case ESP_GATTS_OPEN_EVT: {
+                emitSyncFree("periph.open", {
+                    JS_NewUint32(ctx, event->gattc.open.status) ,
+                });
+                break;
+            }
+            case ESP_GATTS_CLOSE_EVT: {
+                emitSyncFree("periph.close", {
+                    JS_NewUint32(ctx, event->gattc.open.status) ,
                 });
                 break;
             }

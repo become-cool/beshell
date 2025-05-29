@@ -1,9 +1,10 @@
 import * as bt from "bt"
 import { exportValue } from "loader"
 
-class Central {
+class Central extends EventEmitter {
 
   constructor() {
+    super()
     this._mapConnectResolves = {}
     this._mapConnId = {}
     this._mapAddr = {}
@@ -13,7 +14,14 @@ class Central {
 
     bt._initCentral()
 
-    bt.on("open", (status, connid, addr) => {
+    bt.on("central.connect", (connid, addr) => {
+      this.emit("connect", connid, addr)
+    })
+    bt.on("central.disconnect", (connid, addr) => {
+      this.emit("disconnect", connid, addr)
+    })
+    bt.on("central.open", (status, connid, addr) => {
+      console.log("central.open", status, connid, addr)
       if (status == 0) {
         this._mapConnId[connid] = new Peer(addr, connid)
         this._mapAddr[addr] = this._mapConnId[connid]
@@ -21,6 +29,9 @@ class Central {
         this._mapConnectResolves[addr](status, addr)
         delete this._mapConnectResolves[addr]
       }
+    })
+    bt.on("central.close", (connid, addr, reason) => {
+      this.emit("close", connid, addr, reason)
     })
     bt.on("dis-srvc-cmpl", (status, connid) => {
       let peer = this._mapConnId[connid]
