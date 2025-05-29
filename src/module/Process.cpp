@@ -30,6 +30,7 @@ namespace be {
         exportFunction("usage", usage);
         exportFunction("setTime", setTime);
         exportFunction("setTimezoneOffset", setTimezone);
+        exportFunction("getRunningTime", getRunningTime);
         exportFunction("readEFUSE", readEFUSE);
         exportFunction("readMac", readMac);
         exportFunction("gc", gc);
@@ -350,5 +351,16 @@ namespace be {
             }
             return JS_NewUint32(ctx, ((JSRefCountHeader *)JS_VALUE_GET_PTR(watchingVar))->ref_count)  ;
         }
+    }
+
+    /**
+     * 获取系统运行时间（毫秒）
+     * 
+     * @function getRunningTime
+     * @return number
+     */
+    static JSValue Process::getRunningTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        int64_t boot_time_us = esp_timer_get_time();
+        return JS_NewUint32(ctx, boot_time_us / 1000); // 返回毫秒
     }
 }
