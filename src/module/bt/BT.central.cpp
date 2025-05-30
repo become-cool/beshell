@@ -164,18 +164,18 @@ namespace be {
         // dn(msg->event-100)
         switch(msg->event-100) {
             case ESP_GATTC_CONNECT_EVT: {
-                if(connect_type==1){
+                // if(connect_type==1){
                     connect_type = 0 ;
                     MAC_TO_STR(addr, msg->gattc.connect.remote_bda)
                     emitSyncFree("central.connect", {
                         JS_NewUint32(ctx, msg->gattc.connect.conn_id) ,
                         JS_NewString(ctx, (const char *)addr) ,
                     }) ;
-                }
+                // }
                 break ;
             }
             case ESP_GATTC_DISCONNECT_EVT: {
-                if(disconnect_type==1){
+                // if(disconnect_type==1){
                     disconnect_type = 0 ;
                     MAC_TO_STR(addr, msg->gattc.disconnect.remote_bda)
                     emitSyncFree("central.disconnect", {
@@ -183,7 +183,7 @@ namespace be {
                         JS_NewString(ctx, (const char *)addr) ,
                         JS_NewUint32(ctx, msg->gattc.disconnect.reason) ,
                     }) ;
-                }
+                // }
                 break ;
             }
             case ESP_GATTC_OPEN_EVT: {
@@ -482,9 +482,9 @@ namespace be {
         }
 
     JSValue BT::connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        if(connect_type!=0) {
-            JSTHROW("connecting not finished, please wait")
-        }
+        // if(connect_type!=0) {
+        //     JSTHROW("connecting not finished, please wait")
+        // }
         CHECK_GATTC_IF
         esp_bd_addr_t addr = {0} ;
 
@@ -512,9 +512,9 @@ namespace be {
         return JS_UNDEFINED ;
     }
     JSValue BT::disconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        if(disconnect_type!=0) {
-            JSTHROW("disconnecting not finished, please wait")
-        }
+        // if(disconnect_type!=0) {
+        //     JSTHROW("disconnecting not finished, please wait")
+        // }
         CHECK_GATTC_IF
         CHECK_ARGC(1)
         ARGV_TO_UINT16(0, conn_id)
