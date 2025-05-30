@@ -1,6 +1,7 @@
 #include <BeShell.hpp>
 #include <JSEngine.hpp>
 #include "module/Process.hpp"
+#include "esp_err.h"
 
 #ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
@@ -9,6 +10,7 @@
 #include "soc/soc.h"
 #include "esp_efuse.h"
 #include "esp_mac.h"
+#include "driver/temperature_sensor.h"
 #endif
 
 using namespace std;
@@ -37,6 +39,7 @@ namespace be {
         exportFunction("ref", ref);
         exportFunction("getTimerCount", JSTimer::getTimerCount);
         exportFunction("getTimerCallback", JSTimer::getTimerCallback);
+        exportFunction("getChipTemperature", getChipTemperature);
 
         // JS_ComputeMemoryUsage
         exportName("versions") ;
@@ -362,5 +365,48 @@ namespace be {
     static JSValue Process::getRunningTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         int64_t boot_time_us = esp_timer_get_time();
         return JS_NewUint32(ctx, boot_time_us / 1000); // 返回毫秒
+    }
+
+    /**
+     * 芯片温度
+     * 
+     * @function getChipTemperature
+     * @return number
+     */
+    static JSValue Process::getChipTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+
+        esp_err_t err ;
+        static bool temp_sensor_initialized = false;
+        static temperature_sensor_handle_t temp_handle = NULL;
+        if(!temp_sensor_initialized) {
+            temperature_sensor_config_t temp_sensor = {
+                .range_min = -10,  // 最小测量范围
+                .range_max = 80    // 最大测量范围
+            };
+            // 初始化并启用传感器
+            err = temperature_sensor_install(&temp_sensor, &temp_handle) ;
+            if(err != ESP_OK) {
+                JSTHROW("Failed to install temperature sensor, error = %d", err);
+            }
+            temp_sensor_initialized = true ;
+        }
+        err = temperature_sensor_enable(temp_handle);
+        if(err != ESP_OK) {
+            temperature_sensor_uninstall(temp_handle);
+            JSTHROW("Failed to enable temperature sensor, error = %d", err);
+        }
+        
+        float temp_c;
+        err = temperature_sensor_get_celsius(temp_handle, &temp_c);
+        if(err != ESP_OK) {
+            temperature_sensor_disable(temp_handle);
+            temperature_sensor_uninstall(temp_handle);
+            JSTHROW("Failed to get temperature, error = %d", err);
+        }
+        
+        // 禁用以省电
+        temperature_sensor_disable(temp_handle);
+
+        return JS_NewFloat64(ctx, temp_c); // 返回摄氏度温度值
     }
 }
