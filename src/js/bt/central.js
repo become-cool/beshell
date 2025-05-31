@@ -36,15 +36,15 @@ class Central extends EventEmitter {
     bt.on("dis-srvc-cmpl", (status, connid) => {
       let peer = this._mapConnId[connid]
       if (!peer) {
-        // console.log("unknow conn id for event dis-srvc-cmpl", connid)
+        console.log("unknow conn id for event dis-srvc-cmpl", connid)
         return
       }
       if (this._mapConnectResolves[peer.addr]) {
-        this._mapConnectResolves[peer.addr](0, peer)
+        this._mapConnectResolves[peer.addr](status, peer)
         delete this._mapConnectResolves[peer.addr]
       }
       else {
-        // console.log("dis-srvc-cmpl",peer.addr,connid,status)
+        console.log("dis-srvc-cmpl not found callback",peer.addr,connid,status)
       }
     })
     bt.on("search-res", (connid, service) => {
