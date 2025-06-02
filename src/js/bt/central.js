@@ -66,11 +66,31 @@ class Central extends EventEmitter {
     })
   }
 
-  connect(addr) {
-    addr = addr.toUpperCase()
-    bt.connect(addr)
+  connect(addr,ms=0) {
+    let timeout = false
+    let timer = -1
     return new Promise((resolve, reject) => {
+
+      if(ms>0) {
+        setTimeout(()=>{
+            timeout = true
+            reject(new Error('Connection timed out after ' + ms + 'ms'));
+        }, ms)
+      }
+
+      addr = addr.toUpperCase()
+      bt.connect(addr)
+
       this._mapConnectResolves[addr] = (status, peer) => {
+        // 在连接成功之前触发了超时，主动断开，放弃连接
+        if(timeout) {
+          peer.disconnect()
+          return
+        }
+        // 清除定时器
+        if(timer>-1) {
+          clearTimeout(timer)
+        }
         if (status == 0)
           resolve(peer)
         else
