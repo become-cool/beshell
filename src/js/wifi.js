@@ -28,7 +28,7 @@ wifi.on(["sta.stop","ap.stop"],()=>{
   }
 })
 wifi.on('IP.GOT',()=>{
-  console.log("IP.GOT:", wifi.status("sta"))
+  // console.log("IP.GOT:", wifi.status("sta"))
   let {ip,netmask,gw} = wifi.status("sta")
   wifi.emit("ip.got", {ip,netmask,gw})
 })

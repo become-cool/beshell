@@ -15,6 +15,9 @@ New Feature:
 * process.getChipTemperature()
 * login / logout cmd
 * driver wb2812b
+* wifi.setStaIP()
+* wifi.dhcpStaStart()
+* wifi.dhcpStaStop()
 
 Fix issure:
 

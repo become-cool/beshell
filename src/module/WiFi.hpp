@@ -32,8 +32,12 @@ namespace be {
         static JSValue config(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue peripheralConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue peripheralDisconnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue connectEAP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getIpInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setHostname(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue dhcpStaStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue dhcpStaStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setStaIP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue scanStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

@@ -19,6 +19,8 @@
 #include "../js/wifi.c"
 #include "NativeModule.hpp"
 #include "platform.hpp"
+#include "esp_eap_client.h"
+
 
 using namespace be ;
 
@@ -341,6 +343,9 @@ namespace be {
         exportFunction("mode",mode,0) ;
         exportFunction("setAPConfig",setAPConfig,0) ;
         exportFunction("setStaConfig",setStaConfig,0) ;
+        exportFunction("dhcpStaStart",dhcpStaStart,0) ;
+        exportFunction("dhcpStaStop",dhcpStaStop,0) ;
+        exportFunction("setStaIP",setStaIP,0) ;
         exportFunction("config",config,0) ;
         exportFunction("peripheralConnect",peripheralConnect,0) ;
         exportFunction("peripheralDisconnect",peripheralDisconnect,0) ;
@@ -864,6 +869,52 @@ namespace be {
         return jsconf ;
     }
 
+    JSValue WiFi::dhcpStaStart(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        esp_netif_dhcpc_start(netif_sta);
+        return JS_UNDEFINED ;
+    }
+
+    JSValue WiFi::dhcpStaStop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        esp_netif_dhcpc_stop(netif_sta);
+        return JS_UNDEFINED ;
+    }
+
+    /**
+     * 设置 WiFi STA 的 static IP 地址
+     * 
+     * 会先停止 DHCP 客户端，如果需要重新改为 DHCP，可使用 `dhcpStaStart()` 函数。
+     * 
+     * 成功返回 undefined , 否则抛出异常
+     * 
+     * @function setStaIP
+     * @param ip:string IP 地址
+     * @param netmask:string 子网掩码
+     * @param gw:string 网关地址
+     * @return undefined
+     */
+    JSValue WiFi::setStaIP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_WIFI_INITED
+        ASSERT_ARGC(3)
+
+        std::string ARGV_TO_STRING(0, ip)
+        std::string ARGV_TO_STRING(1, netmask)
+        std::string ARGV_TO_STRING(2, gw)
+
+        esp_netif_ip_info_t ip_info;
+        memset(&ip_info, 0, sizeof(esp_netif_ip_info_t));
+        ip_info.ip.addr = ipaddr_addr(ip.c_str());
+        ip_info.netmask.addr = ipaddr_addr(netmask.c_str());
+        ip_info.gw.addr = ipaddr_addr(gw.c_str());
+
+        esp_netif_dhcpc_stop(netif_sta); // 必须先停止DHCP客户端
+        esp_err_t err = esp_netif_set_ip_info(netif_sta, &ip_info) ;
+        if(err != ESP_OK) {
+            JSTHROW("esp_netif_set_ip_info() failed: %d", err)
+        }
+
+        return JS_UNDEFINED ;
+    }
+    
     JSValue WiFi::peripheralConnect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         if(singleton){
@@ -871,6 +922,50 @@ namespace be {
         }
         return JS_NewInt32(ctx, esp_wifi_connect()) ;
     }
+    
+    
+    JSValue WiFi::connectEAP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        // CHECK_WIFI_INITED
+        // ASSERT_ARGC(3)
+        // std::string ARGV_TO_STRING(0, ssid)
+        // std::string ARGV_TO_STRING(1, username)
+        // std::string ARGV_TO_STRING(2, password)
+        
+        
+        // wifi_config_t wifi_config ;
+        // memset(&wifi_config, 0, sizeof(wifi_config_t)) ;
+        
+        // // SET_MEMBER_STRING(ap, ssid, MAX_SSID_CHARLEN)
+        // // wifi_config_t wifi_config = {
+        // //     .sta = {
+        // //         .password = "",  // 企业认证通常不需要此字段
+        // //         .threshold = {
+        // //             .authmode = WIFI_AUTH_WPA2_ENTERPRISE,
+        // //         },
+        // //     },
+        // // };
+        // strncpy((char *)wifi_config.sta.ssid, ssid.c_str(), 32) ;
+        // wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_ENTERPRISE ;
+
+        // ds(wifi_config.sta.ssid)
+
+        // esp_wifi_set_config(WIFI_IF_STA, &wifi_config) ;
+
+        // // 使用新的 EAP 客户端 API 配置企业认证
+        // esp_eap_client_set_identity((const uint8_t *)ssid.c_str(), ssid.length());
+        // esp_eap_client_set_username((const uint8_t *)username.c_str(), username.length());
+        // esp_eap_client_set_password((const uint8_t *)password.c_str(), password.length());
+
+        // dstr(ssid)
+        // dstr(username)
+        // dstr(password)
+        
+        // // 启用企业认证
+        // esp_wifi_sta_enterprise_enable());
+
+        return JS_UNDEFINED ;
+    }
+
     /**
      * WiFi STA 断开连接
      * 
