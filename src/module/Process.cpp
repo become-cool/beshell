@@ -33,13 +33,13 @@ namespace be {
         exportFunction("setTime", setTime);
         exportFunction("setTimezoneOffset", setTimezone);
         exportFunction("getRunningTime", getRunningTime);
+        exportFunction("getChipTemperature", getChipTemperature);
         exportFunction("readEFUSE", readEFUSE);
         exportFunction("readMac", readMac);
         exportFunction("gc", gc);
         exportFunction("ref", ref);
         exportFunction("getTimerCount", JSTimer::getTimerCount);
         exportFunction("getTimerCallback", JSTimer::getTimerCallback);
-        exportFunction("getChipTemperature", getChipTemperature);
 
         // JS_ComputeMemoryUsage
         exportName("versions") ;
