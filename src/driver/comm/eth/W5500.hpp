@@ -18,6 +18,7 @@ namespace be::driver::comm {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setIP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
     protected:
         virtual void onNativeEvent(JSContext *ctx, void * param) ;

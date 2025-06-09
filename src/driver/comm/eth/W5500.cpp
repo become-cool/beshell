@@ -25,6 +25,7 @@ namespace be::driver::comm {
 
     std::vector<JSCFunctionListEntry> W5500::methods = {
         JS_CFUNC_DEF("setup", 0, W5500::setup),
+        JS_CFUNC_DEF("setIP", 0, W5500::setIP),
     } ;
 
     W5500::W5500(JSContext * ctx, JSValue _jsobj)
@@ -265,5 +266,28 @@ namespace be::driver::comm {
 #else
         JSTHROW("SPI Ethernet driver not enabled, please set \"CONFIG_ETH_USE_SPI_ETHERNET=y\" in sdkconfig")
 #endif
+    }
+
+    JSValue W5500::setIP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(3)
+        THIS_NCLASS(W5500, that)
+
+        std::string ARGV_TO_STRING(0, ip)
+        std::string ARGV_TO_STRING(1, netmask)
+        std::string ARGV_TO_STRING(2, gw)
+
+        esp_netif_ip_info_t ip_info;
+        memset(&ip_info, 0, sizeof(esp_netif_ip_info_t));
+        ip_info.ip.addr = ipaddr_addr(ip.c_str());
+        ip_info.netmask.addr = ipaddr_addr(netmask.c_str());
+        ip_info.gw.addr = ipaddr_addr(gw.c_str());
+
+        esp_netif_dhcpc_stop(that->eth_netif); // 必须先停止DHCP客户端
+        esp_err_t err = esp_netif_set_ip_info(that->eth_netif, &ip_info) ;
+        if(err != ESP_OK) {
+            JSTHROW("esp_netif_set_ip_info() failed: %d", err)
+        }
+
+        return JS_UNDEFINED ;
     }
 }
