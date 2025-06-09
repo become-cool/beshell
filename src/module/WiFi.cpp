@@ -19,7 +19,7 @@
 #include "../js/wifi.c"
 #include "NativeModule.hpp"
 #include "platform.hpp"
-#include "esp_eap_client.h"
+// #include "esp_eap_client.h"
 
 
 using namespace be ;
