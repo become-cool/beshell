@@ -65,8 +65,60 @@ function blink(gpio,time) {
     }, time||1000)
 }
 
+
+const mapPinToWatchings = {}
+gpio.apiSetHandler(function(pin,level){
+    let edge = level? "rising" : "falling"
+    if(!mapPinToWatchings[pin] || !mapPinToWatchings[pin][edge]) {
+        return
+    }
+    for(let callback of mapPinToWatchings[pin][edge]) {
+        callback(pin,level)
+    }
+    for(let callback of mapPinToWatchings[pin].both) {
+        callback(pin,level)
+    }
+})
+
+function watch(pin, edge, callback) {
+    if(!["rising","falling","both"].includes(edge)){
+        throw new Error(`Invalid edge type: ${edge}. Must be 'rising', 'falling', or 'both'.`)
+    }
+    if(typeof callback !== "function") {
+        throw new Error("Arg callback must be a function")
+    }
+    if(!mapPinToWatchings[pin]) {
+        mapPinToWatchings[pin] = {rising:[], falling:[], both:[]}
+        gpio.apiAddISR(pin)
+    }
+    mapPinToWatchings[pin][edge].push(callback)
+    console.log(mapPinToWatchings)
+}
+
+function unwatch(gpio, edge, callback) {
+    if(!mapPinToWatchings[pin]) {
+        return
+    }
+    if(!["rising","falling","both"].includes(edge)){
+        throw new Error(`Invalid edge type: ${edge}. Must be 'rising', 'falling', or 'both'.`)
+    }
+    if(typeof callback !== "function") {
+        throw new Error("Arg callback must be a function")
+    }
+    const index = mapPinToWatchings[pin][edge].indexOf(callback)
+    if(index>-1) {
+        mapPinToWatchings[pin][edge].splice(index, 1)
+    }
+    if(mapPinToWatchings[pin].rising.length === 0 && mapPinToWatchings[pin].falling.length === 0 && mapPinToWatchings[pin].both.length === 0) {
+        delete mapPinToWatchings[pin]
+        gpio.apiRemoveISR(pin)
+    }
+}
+
 exportValue(gpio, "configPWM", configPWM)
 exportValue(gpio, "writePWM", writePWM)
 exportValue(gpio, "updatePWM", updatePWM)
 exportValue(gpio, "stopPWM", stopPWM)
 exportValue(gpio, "blink", blink)
+exportValue(gpio, "watch", watch)
+exportValue(gpio, "unwatch", unwatch)

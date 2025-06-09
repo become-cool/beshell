@@ -29,6 +29,9 @@ namespace be {
         static JSValue apiStopPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pwmMaxSpeedMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
+        static JSValue apiSetHandler(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiAddISR(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiRemoveISR(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 

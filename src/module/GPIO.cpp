@@ -9,9 +9,11 @@
 #include "driver/gpio.h"
 #include "hal/adc_types.h"
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <vector>
 #include "esp_adc/adc_oneshot.h"
+#include "quickjs/quickjs.h"
 #include "soc/gpio_num.h"
 #include "driver/ledc.h"
 #include "../js/gpio.c"
@@ -24,24 +26,10 @@ namespace be {
     
     static adc_oneshot_unit_handle_t adc_handles[2] = {NULL} ;
 
-    /**
-     * bit1:   未触发的 isr
-     * bit2:   前次电平值
-     * bit3:   监听下降沿
-     * bit4:   监听上升沿
-     */
-    static uint8_t gpio_state[56] = {
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,
-    } ;
-    static bool pending_event = false ;
+    static JSValue jsHandler = JS_NULL ;
+    static vector<uint8_t> pending_level_changes ;
 
-    static map< uint8_t, pair< vector<JSValue>, vector<JSValue> > > watching_callbacks ;
+    // static map< uint8_t, pair< vector<JSValue>, vector<JSValue> > > watching_callbacks ;
 
     static map<gpio_num_t, adc_channel_t> adc_channels ;
     static map<gpio_num_t, adc_unit_t> adc_units ;
@@ -56,8 +44,6 @@ namespace be {
         exportFunction("pull",pull,2) ;
         exportFunction("write",write,2) ;
         exportFunction("read",read,1) ;
-        exportFunction("watch",watch,0) ;
-        exportFunction("unwatch",unwatch,0) ;
         exportFunction("adcUnitInit",adcUnitInit,1) ;
         exportFunction("adcChannelInit",adcChannelInit,1) ;
         exportFunction("adcRead",adcRead,1) ;
@@ -65,7 +51,15 @@ namespace be {
         exportFunction("adcInfo",adcInfo,0) ;
         exportFunction("resetPin",resetPin,0) ;
         exportName("blink") ;
+
+        // for watch
+        exportFunction("apiSetHandler",apiSetHandler,0) ;
+        exportFunction("apiAddISR",apiAddISR,0) ;
+        exportFunction("apiRemoveISR",apiRemoveISR,0) ;
+        exportName("watch") ;
+        exportName("unwatch") ;
         
+        // for PWM
         exportFunction("apiConfigPWM",apiConfigPWM,0) ;
         exportFunction("apiWritePWM",apiWritePWM,0) ;
         exportFunction("apiUpdatePWM",apiUpdatePWM,0) ;
@@ -93,6 +87,9 @@ namespace be {
             adc_channels[pin] = channel ;
             adc_units[pin] = ADC_UNIT_2 ;
         }
+
+        
+        JSEngine::fromJSContext(ctx)->addLoopFunction(GPIO::loop, nullptr, true, 0) ;
     }
 
     void GPIO::exports(JSContext *ctx) {
@@ -636,30 +633,10 @@ namespace be {
     }
     
     static void /*IRAM_ATTR*/ gpio_isr_handler(void* arg) {
-
         gpio_num_t pin = (gpio_num_t) (uint32_t) arg ;
         uint8_t val = gpio_get_level( pin ) ;
-
-        if( ((gpio_state[pin] >> 1) & 1) == val ) {
-            return ;
-        }
-
-        if(
-            (val && (gpio_state[pin]&8) )       // 上升沿
-            || (!val && (gpio_state[pin]&4) )   // 下降沿
-        ) {
-            gpio_state[pin] |= 1 ;
-        }
-
-        // 更新前值
-        if(val) {
-            gpio_state[pin] |= 2 ;
-        }
-        else {
-            gpio_state[pin] &= (~2) ;
-        }
-
-        pending_event = true ;
+        uint8_t event = pin | (val<<7) ;
+        pending_level_changes.push_back(event) ;
     }
 
     
@@ -683,108 +660,73 @@ namespace be {
         gpio_uninstall_isr_service() ;
         isr_installed = false ;
     }
-
-
-    /**
-     * 监听 gpio 外部电平变化
-     * 
-     * @function watch
-     * @param pin:number mcu可用的gpio编号
-     * @param mode:string 监听模式， 可选值为: "rising"|"falling"|"both"
-     * @param callback:function 回调函数，callback 的原型为 `function(pin, value)`
-     * @return bool
-     */
-    JSValue GPIO::watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(3)
-        ARGV_TO_UINT8(0, pin)
-        string ARGV_TO_STRING(1, edge)
-        if(!JS_IsFunction(ctx, argv[2])) {
-            JSTHROW("watch() arg callback must be a function")
+    
+    JSValue GPIO::apiSetHandler(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        if(!JS_IsFunction(ctx, argv[0])) {
+            JSTHROW("apiSetHandler() arg callback must be a function")
         }
-
-        int mode = 0 ;
-        if(edge=="rising") {
-            mode = 1 ;
-        } else if(edge=="falling") {
-            mode = 2 ;
-        } else if(edge=="both") {
-            mode = 3 ;
-        } else {
-            JSTHROW("watch() arg edge must be rising|falling|both")
-        }
-
-        if(!installISR(0)){
-            JSTHROW("install gpio isr failed")
-        }
-
-        gpio_isr_handler_remove((gpio_num_t)pin);
-
-        //gpio_state[pin] &= (~12) ;
-        gpio_state[pin] |= mode << 2 ;
-        mode = gpio_state[pin] >> 2 & 3 ;
-        // dn(mode)
-
-        if(gpio_get_level((gpio_num_t)pin)) {
-            gpio_state[pin] |= 2 ;
-        }
-        else {
-            gpio_state[pin] &= (~2) ;
-        }
-
-        //gpio_set_intr_type((gpio_num_t)pin, (gpio_int_type_t)mode);
-        if(mode>0){
-            gpio_isr_handler_add((gpio_num_t)pin, gpio_isr_handler, (void *)pin);
-        }
-        gpio_set_intr_type((gpio_num_t)pin, GPIO_INTR_ANYEDGE);
-        gpio_intr_enable((gpio_num_t)pin) ;
-
-        if(mode&1) {
-            watching_callbacks[pin].first.push_back( JS_DupValue(ctx,argv[2]) ) ;
-        }
-        if(mode&2) {
-            watching_callbacks[pin].second.push_back( JS_DupValue(ctx,argv[2]) ) ;
-        }
-
-        JSEngine::fromJSContext(ctx)->addLoopFunction(GPIO::loop, nullptr, true, 0) ;
-
+        JS_FreeValue(ctx, jsHandler) ;
+        jsHandler = JS_DupValue(ctx, argv[0]) ;
         return JS_UNDEFINED ;
     }
-    JSValue GPIO::unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue GPIO::apiAddISR(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_GPIO(0, pin)
+
+        installISR(0) ;
+        
+        esp_err_t err = gpio_isr_handler_add((gpio_num_t)pin, gpio_isr_handler, (void *)pin) ;
+        if(err!=ESP_OK) {
+            JSTHROW("gpio_isr_handler_add() failed, err:%d", err)
+        }
+
+        err = gpio_set_intr_type((gpio_num_t)pin, GPIO_INTR_ANYEDGE);
+        if(err!=ESP_OK) {
+            JSTHROW("gpio_set_intr_type() failed, err:%d", err)
+        }
+        err = gpio_intr_enable((gpio_num_t)pin) ;
+        if(err!=ESP_OK) {
+            JSTHROW("gpio_intr_enable() failed, err:%d", err)
+        }
+        return JS_UNDEFINED ;
+    }
+    JSValue GPIO::apiRemoveISR(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_GPIO(0, pin)
+        esp_err_t err = gpio_isr_handler_remove((gpio_num_t)pin);
+        if(err!=ESP_OK) {
+            JSTHROW("gpio_isr_handler_remove() failed, err:%d", err)
+        }
         return JS_UNDEFINED ;
     }
 
     void GPIO::loop(JSContext * ctx, void * arg) {
 
-        if(!pending_event) {
+        if( !pending_level_changes.size() ){
+            return ;
+        }
+        if( !JS_IsFunction(ctx, jsHandler) ) {
             return ;
         }
 
-        pending_event = false ;
-
         JSValueConst argv[2] ;
 
-        for(uint8_t p=0; p<sizeof(gpio_state); p++) {
-            if( gpio_state[p] & 1 ) {
-                gpio_state[p] &= ~1;
-                
-                uint8_t level = (gpio_state[p]>>1) & 0x01 ;
-
-                argv[0] = JS_NewInt32(ctx, p) ;
-                argv[1] = JS_NewInt32(ctx, gpio_state[p]) ;
-
-
-                for(auto callback: level? watching_callbacks[p].first : watching_callbacks[p].second) {
-                    JS_Call(ctx, callback, JS_UNDEFINED, 2, argv) ;
-                }
-
-                JS_FreeValue(ctx, argv[0]) ;
-                JS_FreeValue(ctx, argv[1]) ;
+        for(auto event: pending_level_changes) {
+            argv[0] = JS_NewInt32(ctx, event & 0x7F) ;      // pin number
+            argv[1] = JS_NewInt32(ctx, (event>>7) & 0x01) ; // level
+            JSValue ret = JS_Call(ctx, jsHandler, JS_UNDEFINED, 2, argv) ;
+            if(JS_IsException(ret)) {
+                JSEngine::fromJSContext(ctx)->dumpError() ;
             }
+            JS_FreeValue(ctx, ret) ;
         }
+        
+        pending_level_changes.clear() ;
     }
     
     JSValue GPIO::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        return JS_NewInt32(ctx, gpio_state[7]) ;
+        return JS_UNDEFINED ;
     }
 
     static int _initADCUnit(adc_unit_t uint_num) {
