@@ -92,7 +92,6 @@ function watch(pin, edge, callback) {
         gpio.apiAddISR(pin)
     }
     mapPinToWatchings[pin][edge].push(callback)
-    console.log(mapPinToWatchings)
 }
 
 function unwatch(gpio, edge, callback) {
