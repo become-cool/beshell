@@ -18,9 +18,9 @@ New Feature:
 * wifi.setStaIP()
 * wifi.dhcpStaStart()
 * wifi.dhcpStaStop()
+* gpio pwm function
 
 Fix issure:
-
 
 ## v0.3.7   2025-04-26
 

@@ -23,8 +23,11 @@ namespace be {
         static JSValue write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue writePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue readPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiConfigPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiWritePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiUpdatePWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue apiStopPWM(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue pwmMaxSpeedMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -34,6 +37,8 @@ namespace be {
         static JSValue adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
+        static JSValue resetPin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
         static JSValue test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     
     private:
