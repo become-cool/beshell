@@ -48,6 +48,8 @@ namespace be {
         static JSValue staStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue staConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue setMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     } ;
 }

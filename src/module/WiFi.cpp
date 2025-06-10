@@ -18,6 +18,7 @@
 #include <lwip/sockets.h>
 #include "../js/wifi.c"
 #include "NativeModule.hpp"
+#include "esp_interface.h"
 #include "platform.hpp"
 // #include "esp_eap_client.h"
 
@@ -359,6 +360,8 @@ namespace be {
         exportFunction("staStarted",staStarted,0) ;
         exportFunction("staConnected",staConnected,0) ;
         exportFunction("apStarted",apStarted,0) ;
+        exportFunction("setMAC",setMAC,0) ;
+        exportFunction("getMAC",getMAC,0) ;
 
         enableNativeEvent(ctx, sizeof(wifi_nevent_t), 5) ;
     }
@@ -1290,4 +1293,77 @@ namespace be {
         return JS_NewBool(ctx, _ap_started) ;
     }
 
+    JSValue WiFi::setMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if(_started) {
+            JSTHROW("WiFi is already started, cannot set MAC address")
+        }
+        CHECK_ARGC(2)
+
+        std::string ARGV_TO_STRING(0, ifname)
+        std::string ARGV_TO_STRING(1, mac)
+
+        wifi_interface_t ifac ;
+        if(ifname=="sta") {
+            ifac = WIFI_IF_STA ;
+        }
+        else if(ifname=="ap") {
+            ifac = WIFI_IF_AP ;
+        }
+        else if(ifname=="nan") {
+            ifac = WIFI_IF_NAN ;
+        }
+        else {
+            JSTHROW("ifname must be 'ap', 'sta' or 'nan'") ;
+        }
+
+        if(mac.length()<17) {
+            JSTHROW("mac address must be a string like '12:34:56:78:9a:bc'") ;
+        }
+        
+        uint8_t custom_mac[7] = {0xcc,0x1b,0xe0,0xe3,0xc0,0xfc};
+        
+        if (sscanf(mac.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x", 
+            &custom_mac[0], &custom_mac[1], &custom_mac[2], 
+            &custom_mac[3], &custom_mac[4], &custom_mac[5]) != 6)
+        {
+            JSTHROW("mac address must be a string like '12:34:56:78:9a:bc'") ;
+        }
+
+        esp_err_t err = esp_wifi_set_mac(ifac, custom_mac) ;
+        if(err != ESP_OK) {
+            JSTHROW("esp_wifi_set_mac() failed: %d", err)
+        }
+
+        return JS_UNDEFINED ;
+    }
+    JSValue WiFi::getMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        std::string ARGV_TO_STRING(0, ifname)
+
+        wifi_interface_t ifac ;
+        if(ifname=="sta") {
+            ifac = WIFI_IF_STA ;
+        }
+        else if(ifname=="ap") {
+            ifac = WIFI_IF_AP ;
+        }
+        else if(ifname=="nan") {
+            ifac = WIFI_IF_NAN ;
+        }
+        else {
+            JSTHROW("ifname must be 'ap', 'sta' or 'nan'") ;
+        }
+
+        uint8_t mac[6] = {0,0,0,0,0,0} ;
+        esp_err_t err = esp_wifi_get_mac(ifac, mac) ;
+        if(err != ESP_OK) {
+            JSTHROW("esp_wifi_get_mac() failed: %d", err)
+        }
+
+        uint8_t mac_str[18] = {0} ;
+        snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]) ;
+
+        return JS_NewString(ctx, mac_str) ;
+
+    }
 }

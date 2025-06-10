@@ -20,6 +20,8 @@ New Feature:
 * wifi.setStaIP()
 * wifi.dhcpStaStart()
 * wifi.dhcpStaStop()
+* wifi.setMAC()
+* wifi.getMAC()
 * gpio pwm function
 
 Fix issure:
