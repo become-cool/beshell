@@ -15,6 +15,7 @@ New Feature:
 * process.getChipTemperature()
 * login / logout cmd
 * driver wb2812b
+* W5500.setup() arg "options" add property: "mac"
 * W5500.setIP()
 * wifi.setStaIP()
 * wifi.dhcpStaStart()

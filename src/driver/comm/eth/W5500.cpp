@@ -225,6 +225,34 @@ namespace be::driver::comm {
     
         // Init Ethernet driver to default and install it
         esp_eth_config_t eth_config_spi = ETH_DEFAULT_CONFIG(mac, phy);
+
+        uint8_t custom_mac[7] = {0xcc,0x1b,0xe0,0xe3,0xc0,0xfc};
+        JSValue jsmac = JS_GetPropertyStr(ctx, argv[0], "mac") ;
+        if( !JS_IsUndefined(jsmac) ) {
+            if( JS_IsString(jsmac) ) {
+                size_t c_str_mac_len = 0 ;
+                const char * c_str_mac = JS_ToCStringLen(ctx, &c_str_mac_len, jsmac) ;
+                if(c_str_mac && c_str_mac_len==17) {
+                    if (sscanf(c_str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
+                        &custom_mac[0], &custom_mac[1], &custom_mac[2], 
+                        &custom_mac[3], &custom_mac[4], &custom_mac[5]) == 6)
+                    {
+                        // printf("input: %02x:%02x:%02x:%02x:%02x:%02x\n",custom_mac[0],custom_mac[1],custom_mac[2],custom_mac[3],custom_mac[4],custom_mac[5]) ;
+                        mac->set_addr(mac, custom_mac);
+                        // mac->set_addr(mac, custom_mac2);
+
+                        // uint8_t custom_mac_read[6] = {0};
+                        // mac->get_addr(mac, custom_mac_read);
+                        // printf("%02x:%02x:%02x:%02x:%02x:%02x\n", custom_mac_read[0], custom_mac_read[1], custom_mac_read[2], custom_mac_read[3], custom_mac_read[4], custom_mac_read[5]) ;
+                    }
+                    JS_FreeCString(ctx, c_str_mac) ;
+                }
+
+                
+            }
+        }
+        JS_FreeValue(ctx, jsmac) ;
+
         if(esp_eth_driver_install(&eth_config_spi, &that->eth_handle) != ESP_OK){
             JSTHROW("SPI Ethernet driver install failed")
         }
