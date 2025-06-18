@@ -26,6 +26,7 @@ namespace be::driver::comm {
     std::vector<JSCFunctionListEntry> W5500::methods = {
         JS_CFUNC_DEF("setup", 0, W5500::setup),
         JS_CFUNC_DEF("setIP", 0, W5500::setIP),
+        JS_CFUNC_DEF("getMAC", 0, W5500::getMAC),
     } ;
 
     W5500::W5500(JSContext * ctx, JSValue _jsobj)
@@ -53,8 +54,6 @@ namespace be::driver::comm {
         obj->shared() ;
         return obj->jsobj ;
     }
-
-    
 
     /** Event handler for Ethernet events */
     void W5500::ethEventHandler(W5500 * that, esp_event_base_t event_base, int32_t event_id, void *event_data) {
@@ -226,45 +225,63 @@ namespace be::driver::comm {
         // Init Ethernet driver to default and install it
         esp_eth_config_t eth_config_spi = ETH_DEFAULT_CONFIG(mac, phy);
 
-        uint8_t custom_mac[7] = {0xcc,0x1b,0xe0,0xe3,0xc0,0xfc};
-        JSValue jsmac = JS_GetPropertyStr(ctx, argv[0], "mac") ;
-        if( !JS_IsUndefined(jsmac) ) {
-            if( JS_IsString(jsmac) ) {
-                size_t c_str_mac_len = 0 ;
-                const char * c_str_mac = JS_ToCStringLen(ctx, &c_str_mac_len, jsmac) ;
-                if(c_str_mac && c_str_mac_len==17) {
-                    if (sscanf(c_str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
-                        &custom_mac[0], &custom_mac[1], &custom_mac[2], 
-                        &custom_mac[3], &custom_mac[4], &custom_mac[5]) == 6)
-                    {
-                        // printf("input: %02x:%02x:%02x:%02x:%02x:%02x\n",custom_mac[0],custom_mac[1],custom_mac[2],custom_mac[3],custom_mac[4],custom_mac[5]) ;
-                        mac->set_addr(mac, custom_mac);
-                        // mac->set_addr(mac, custom_mac2);
-
-                        // uint8_t custom_mac_read[6] = {0};
-                        // mac->get_addr(mac, custom_mac_read);
-                        // printf("%02x:%02x:%02x:%02x:%02x:%02x\n", custom_mac_read[0], custom_mac_read[1], custom_mac_read[2], custom_mac_read[3], custom_mac_read[4], custom_mac_read[5]) ;
-                    }
-                    JS_FreeCString(ctx, c_str_mac) ;
-                }
-
-                
-            }
-        }
-        JS_FreeValue(ctx, jsmac) ;
+        // cc:1b:e0:e3:c4:58
+        // uint8_t custom_mac2[6] = {0xcc,0x1b,0xe0,0xe3,0xc4,0x58};
+        // uint8_t custom_mac2[6] = {0xcc,0x1b,0xe0,0xe3,0xc3,0xb8};
+        // mac->set_addr(mac, custom_mac2);
 
         if(esp_eth_driver_install(&eth_config_spi, &that->eth_handle) != ESP_OK){
             JSTHROW("SPI Ethernet driver install failed")
         }
 
-        // 设置 mac 地址
-        uint8_t base_mac_addr[ETH_ADDR_LEN];
-        esp_efuse_mac_get_default(base_mac_addr) ;
-        esp_derive_local_mac(that->mac_addr, base_mac_addr);
-        // printf("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x\n", that->mac_addr[0], that->mac_addr[1], that->mac_addr[2], that->mac_addr[3], that->mac_addr[4], that->mac_addr[5]);
-        if(esp_eth_ioctl(that->eth_handle, ETH_CMD_S_MAC_ADDR, that->mac_addr) != ESP_OK) {
-            printf("SPI Ethernet driver set MAC address failed\n") ;
-        }
+        // // 设置 mac 地址
+        // uint8_t custom_mac[7] = {0xcc,0x1b,0xe0,0xe3,0xc3,0xb8,0};
+        // JSValue jsmac = JS_GetPropertyStr(ctx, argv[0], "mac") ;
+        // if( !JS_IsUndefined(jsmac) ) {
+        //     if( JS_IsString(jsmac) ) {
+        //         size_t c_str_mac_len = 0 ;
+        //         const char * c_str_mac = JS_ToCStringLen(ctx, &c_str_mac_len, jsmac) ;
+        //         if(c_str_mac && c_str_mac_len==17) {
+        //             if (sscanf(c_str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
+        //                 &custom_mac[0], &custom_mac[1], &custom_mac[2], 
+        //                 &custom_mac[3], &custom_mac[4], &custom_mac[5]) == 6)
+        //             {
+        //                 // printf("input: %02x:%02x:%02x:%02x:%02x:%02x\n",custom_mac[0],custom_mac[1],custom_mac[2],custom_mac[3],custom_mac[4],custom_mac[5]) ;
+        //                 mac->set_addr(mac, custom_mac);
+        //                 // mac->set_addr(mac, custom_mac2);
+
+        //                 uint8_t custom_mac_read[6] = {0};
+        //                 mac->get_addr(mac, custom_mac_read);
+        //                 printf("%02x:%02x:%02x:%02x:%02x:%02x\n", custom_mac_read[0], custom_mac_read[1], custom_mac_read[2], custom_mac_read[3], custom_mac_read[4], custom_mac_read[5]) ;
+        //             }
+        //             JS_FreeCString(ctx, c_str_mac) ;
+        //         }
+        //     }
+        // }
+        // else {
+        //     uint8_t base_mac_addr[ETH_ADDR_LEN];
+        //     esp_efuse_mac_get_default(base_mac_addr) ;
+        //     esp_derive_local_mac(that->mac_addr, base_mac_addr);
+        //     // printf("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x\n", that->mac_addr[0], that->mac_addr[1], that->mac_addr[2], that->mac_addr[3], that->mac_addr[4], that->mac_addr[5]);
+        //     if(esp_eth_ioctl(that->eth_handle, ETH_CMD_S_MAC_ADDR, that->mac_addr) != ESP_OK) {
+        //         printf("SPI Ethernet driver set MAC address failed\n") ;
+        //     }
+        // }
+        // JS_FreeValue(ctx, jsmac) ;
+
+        
+            uint8_t base_mac_addr[ETH_ADDR_LEN];
+            esp_efuse_mac_get_default(base_mac_addr) ;
+            esp_derive_local_mac(that->mac_addr, base_mac_addr);
+            // printf("Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x\n", that->mac_addr[0], that->mac_addr[1], that->mac_addr[2], that->mac_addr[3], that->mac_addr[4], that->mac_addr[5]);
+            if(esp_eth_ioctl(that->eth_handle, ETH_CMD_S_MAC_ADDR, that->mac_addr) != ESP_OK) {
+                printf("SPI Ethernet driver set MAC address failed\n") ;
+            }
+
+
+        uint8_t custom_mac_read[6] = {0};
+        mac->get_addr(mac, custom_mac_read);
+        printf("w5500 mac: %02x:%02x:%02x:%02x:%02x:%02x\n", custom_mac_read[0], custom_mac_read[1], custom_mac_read[2], custom_mac_read[3], custom_mac_read[4], custom_mac_read[5]) ;
 
         // 注册网络接口
         // Use ESP_NETIF_DEFAULT_ETH when just one Ethernet interface is used and you don't need to modify
@@ -294,6 +311,10 @@ namespace be::driver::comm {
 #else
         JSTHROW("SPI Ethernet driver not enabled, please set \"CONFIG_ETH_USE_SPI_ETHERNET=y\" in sdkconfig")
 #endif
+    }
+    
+    JSValue W5500::getMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_UNDEFINED ;
     }
 
     JSValue W5500::setIP(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
