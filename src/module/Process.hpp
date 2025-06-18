@@ -19,5 +19,9 @@ namespace be {
         static JSValue ref(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getRunningTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getChipTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue resetReason(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue tasks(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue cpuCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
     } ;
 }

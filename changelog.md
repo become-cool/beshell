@@ -10,9 +10,14 @@ New Feature:
 * mg.https/mqtts support client cert/key
 * cdc module
 * cdc telnet
-* process.getTimerCallback(), process.getTimerCount()
+* process.getTimerCallback()
+* process.getTimerCount()
 * process.getRunningTime()
 * process.getChipTemperature()
+* process.resetReason()
+* process.top()
+* process.tasks()
+* process.cpuCount()
 * login / logout cmd
 * driver wb2812b
 * W5500.setup() arg "options" add property: "mac"

@@ -108,6 +108,7 @@ namespace be {
 
 #define JSEngineEvalEmbeded(ctx, filename)                                                      \
     if(be::FS::exist("/lib/local/"#filename".js")){                                             \
+        printf("import file: /lib/local/"#filename".js\n") ;                                    \
         be::JSEngine::fromJSContext(ctx)->evalScript("/lib/local/"#filename".js") ;             \
     } else {                                                                                    \
         JSEval(ctx, (const char *)embeded_js_src_##filename, -1, "embeded://"#filename ".js", JS_EVAL_TYPE_MODULE); \

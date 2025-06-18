@@ -2,6 +2,7 @@
 #include <JSEngine.hpp>
 #include "module/Process.hpp"
 #include "esp_err.h"
+#include "../js/process.c"
 
 #ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
@@ -40,11 +41,16 @@ namespace be {
         exportFunction("ref", ref);
         exportFunction("getTimerCount", JSTimer::getTimerCount);
         exportFunction("getTimerCallback", JSTimer::getTimerCallback);
+        exportFunction("resetReason", resetReason);
+        exportFunction("_top", top);
+        exportFunction("tasks", tasks);
+        exportFunction("cpuCount", cpuCount);
 
         // JS_ComputeMemoryUsage
         exportName("versions") ;
         exportName("platform") ;
         exportName("argv") ;
+        exportName("top") ;
     }
 
     void Process::exports(JSContext *ctx) {
@@ -76,6 +82,56 @@ namespace be {
 #ifdef LiNUX_PLATFORM
         exportValue("platform", JS_NewString(ctx, "linux")) ;
 #endif
+
+    JSValue DEF_JS_FUNC(jsTop, R"(
+function top(detail=false) {
+    let list = {}
+    if(detail) {
+        const cpuCount = process.cpuCount()
+        for(let i=0;i<cpuCount;i++) {
+            for(let taskName of process.tasks(i)) {
+                list[taskName] = {
+                    cpu: i
+                }
+            }
+        }
+    }
+    function parseTop(output) {
+        let lines = output.split('\n')
+        let result = []
+        for(let line of lines) {
+            line = line.trim()
+            if(!line.trim()) continue
+            result.push(line.split(/\t+/).map(item=>item.trim()))
+        }
+        return result
+    }
+    for(let [taskName, runCnt, usageRate] of parseTop(process._top())){
+        if(!list[taskName]){
+            list[taskName] = {}
+        }
+        list[taskName].runCnt = parseInt(runCnt)||0
+        list[taskName].usageRate = parseInt(usageRate)||0
+    }
+    if(detail) {
+        for(let [taskName, status, priority, stack, taskId] of parseTop(process._top(true))){
+            if(!list[taskName]){
+                list[taskName] = {}
+            }
+            list[taskName].status = status
+            list[taskName].priority = priority
+            list[taskName].stack = stack
+            list[taskName].taskId = taskId
+        }
+    }
+
+    return list
+}
+    )", "process.js", {
+            JSEngine::fromJSContext(ctx)->dumpError() ;
+            return ;
+        })
+        exportValue("top", jsTop) ;
     }
 
     /**
@@ -373,7 +429,7 @@ namespace be {
      * @function getChipTemperature
      * @return number
      */
-    static JSValue Process::getChipTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    JSValue Process::getChipTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         esp_err_t err ;
         static bool temp_sensor_initialized = false;
@@ -408,5 +464,174 @@ namespace be {
         temperature_sensor_disable(temp_handle);
 
         return JS_NewFloat64(ctx, temp_c); // 返回摄氏度温度值
+    }
+
+    
+    /**
+     * 芯片复位原因
+     * 
+     * @function resetReason
+     * @return string
+     */
+    JSValue Process::resetReason(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        
+        // 获取重启原因
+        esp_reset_reason_t reason = esp_reset_reason();
+
+        char * reason_str = nullptr;
+
+        // 打印重启原因
+        switch (reason) {
+            case ESP_RST_POWERON:
+                reason_str = "power-on";
+                break;
+            case ESP_RST_EXT:
+                reason_str = "external-pin";
+                break;
+            case ESP_RST_SW:
+                reason_str = "soft-reset";
+                break;
+            case ESP_RST_PANIC:
+                reason_str = "panic";
+                break;
+            case ESP_RST_INT_WDT:
+                reason_str = "watchdog-interrupt";
+                break;
+            case ESP_RST_TASK_WDT:
+                reason_str = "watchdog-task";
+                break;
+            case ESP_RST_WDT:
+                reason_str = "watchdog";
+                break;
+            case ESP_RST_DEEPSLEEP:
+                reason_str = "deep-sleep";
+                break;
+            case ESP_RST_BROWNOUT:
+                reason_str = "brownout";
+                break;
+            case ESP_RST_SDIO:
+                reason_str = "sdio";
+                break;
+            case ESP_RST_USB:
+                reason_str = "usb";
+                break;
+            case ESP_RST_JTAG:
+                reason_str = "jtag";
+                break;
+            case ESP_RST_EFUSE:
+                reason_str = "efuse";
+                break;
+            case ESP_RST_PWR_GLITCH:
+                reason_str = "power-glitch";
+                break;
+            case ESP_RST_CPU_LOCKUP:
+                reason_str = "cpu-lockup";
+                break;
+            case ESP_RST_UNKNOWN:
+            default:
+                reason_str = "unknown";
+                break;
+        }
+
+        return JS_NewString(ctx, reason_str);
+    }
+
+    
+    /**
+     * 返回各个任务执行的情况
+     * 
+     * > 需要配置 FreeRTOS 的以下选项：
+     * > * CONFIG_FREERTOS_USE_TRACE_FACILITY
+     * > * CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
+     * > * CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+     * 
+     * @function top
+     * @return string
+     */
+    JSValue Process::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        bool detail = false ;
+        if(argc>0) {
+            detail = JS_ToBool(ctx, argv[0]) ;
+        }
+        string buff ;
+#ifdef ESP_PLATFORM
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+        uint8_t CPU_RunInfo[1024];
+        memset(CPU_RunInfo, 0, sizeof(CPU_RunInfo)); /* 信息缓冲区清零 */
+
+        if(detail) {
+#ifdef CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS
+            vTaskList((char *)&CPU_RunInfo); //获取任务运行时间信息
+
+            // buff+= "task_name     task_status     priority stack task_id\r\n";
+            // buff = "----------------------------------------------------\r\n";
+            buff+= (char *)CPU_RunInfo;
+#endif
+        } else {
+
+#ifdef CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+
+            vTaskGetRunTimeStats((char *)&CPU_RunInfo);
+
+            // buff+= "----------------------------------------------------\r\n";
+            // buff+= "task_name      run_cnt                 usage_rate   \r\n";
+            buff+= (char *)CPU_RunInfo;
+#endif
+            }
+#endif
+#endif
+        return JS_NewString(ctx, buff.c_str()) ;
+    }
+    /**
+     * 返回cpu数量
+     * 
+     * @function cpuCount
+     * @return number
+     */
+    JSValue Process::cpuCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_NewInt32(ctx, configNUMBER_OF_CORES) ;
+    }
+    
+    /**
+     * 返回各个任务执行的情况
+     * 
+     * > 需要配置 FreeRTOS 的以下选项：
+     * > * CONFIG_FREERTOS_USE_TRACE_FACILITY
+     * 
+     * @function top
+     * @return string
+     */
+    JSValue Process::tasks(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ARGV_TO_UINT8_OPT(0, core, 0) ;
+        JSValue list = JS_NewArray(ctx) ;
+        if(core>configNUMBER_OF_CORES-1) {
+            JSTHROW("arg core id invalid", configNUMBER_OF_CORES) ;
+        }
+#ifdef ESP_PLATFORM
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+        TaskStatus_t *pxTaskStatusArray;
+        UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();
+        pxTaskStatusArray = malloc(uxArraySize * sizeof(TaskStatus_t));
+    
+        if (pxTaskStatusArray != NULL) {
+            uxArraySize = uxTaskGetSystemState(
+                pxTaskStatusArray,
+                uxArraySize,
+                NULL
+            );
+
+            int tindex = 0 ;
+            for (UBaseType_t i = 0; i < uxArraySize; i++) {
+                TaskHandle_t xTask = pxTaskStatusArray[i].xHandle;
+                BaseType_t xCoreID = xTaskGetCoreID(xTask);
+                if (xCoreID == core) {
+                    JS_SetPropertyUint32(ctx, list, tindex++, JS_NewString(ctx, pxTaskStatusArray[i].pcTaskName));
+                }
+            }
+            free(pxTaskStatusArray);
+        }
+#endif
+#endif
+        return list ;
     }
 }
