@@ -2,7 +2,6 @@
 #include <JSEngine.hpp>
 #include "module/Process.hpp"
 #include "esp_err.h"
-#include "../js/process.c"
 
 #ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
