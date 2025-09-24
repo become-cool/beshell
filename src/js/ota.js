@@ -25,19 +25,45 @@ function downloadFirmware(p, opt, type, onProgress, onComplete, step) {
             console.log("start download ...")
 
             let totalBytes = 0
+            let buffer = new Uint8Array(0);
             await mg.download(opt.url, null, (total,wrote,chunk)=>{
                 let prog = Math.round(wrote*100/total)
                 if(printProg==prog) {
-                    console.log(prog+"%,", ((Date.now()-t)/1000)+"sec")
+                    console.log(prog+"%", ((Date.now()-t)/1000)+"sec")
                     printProg+= step
                 }
-                p.write(writer, chunk)
-                writer+= chunk.byteLength
+                // 合并 buffer 和 chunk
+                let merged = new Uint8Array(buffer.length + chunk.byteLength);
+                merged.set(buffer, 0);
+                merged.set(new Uint8Array(chunk), buffer.length);
+                // 计算可写入的最大16字节倍数
+                let writeLen = Math.floor(merged.length / 16) * 16;
+                if (writeLen > 0) {
+                    p.write(writer, merged.slice(0, writeLen).buffer);
+                    writer += writeLen;
+                }
+                // 剩余部分缓存
+                buffer = merged.slice(writeLen);
 
                 onProgress && onProgress(type, total, wrote)
 
                 totalBytes = total
             })
+            // 写入最后剩余的 chunk（可能不足16字节）
+            if (buffer.length > 0) {
+                // 补齐到16字节
+                let padLen = (16 - (buffer.length % 16)) % 16;
+                if (padLen > 0) {
+                    let padded = new Uint8Array(buffer.length + padLen);
+                    padded.set(buffer, 0);
+                    // 末尾补0
+                    p.write(writer, padded.buffer);
+                    writer += padded.length;
+                } else {
+                    p.write(writer, buffer.buffer);
+                    writer += buffer.length;
+                }
+            }
             console.log("download and flash", (Date.now()-t)+"ms")
 
             if( Number.isInteger(opt.checksum) ){
