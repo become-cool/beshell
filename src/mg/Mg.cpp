@@ -421,6 +421,67 @@ namespace be::mg {
         return JS_UNDEFINED ;
     }
 
+    
+    /**
+     * 添加一条 DNS 缓存记录
+     * @function addDNSCache
+     * @param domain:string 域名
+     * @param ip:string IP地址（如 "1.2.3.4"）
+     * @param ttl:number=0 有效期（毫秒），0 表示永久有效
+     * @return undefined
+     */
+    JSValue Mg::addDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if (argc < 2) {
+            JSTHROW("addDNSCache(domain, ip[, ttl])");
+        }
+        ARGV_TO_CSTRING(0, domain);
+        ARGV_TO_CSTRING(1, ip);
+        uint32_t ttl = 0;
+        if (argc > 2) {
+            ARGV_TO_UINT32(2, ttl);
+        }
+
+        struct mg_addr addr;
+        memset(&addr, 0, sizeof(addr));
+        struct mg_str ipstr = mg_str(ip);
+        if (!mg_aton(ipstr, &addr)) {
+            JS_FreeCString(ctx, domain);
+            JS_FreeCString(ctx, ip);
+            JSTHROW("invalid ip address");
+        }
+
+        mg_dns_cache_set(domain, &addr, (uint64_t)ttl);
+        JS_FreeCString(ctx, domain);
+        JS_FreeCString(ctx, ip);
+        return JS_UNDEFINED;
+    }
+
+    /**
+     * 移除指定域名的 DNS 缓存
+     * @function removeDNSCache
+     * @param domain:string 域名
+     * @return undefined
+     */
+    JSValue Mg::removeDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        if (argc < 1) {
+            JSTHROW("removeDNSCache(domain)");
+        }
+        ARGV_TO_CSTRING(0, domain);
+        mg_dns_cache_remove(domain);
+        JS_FreeCString(ctx, domain);
+        return JS_UNDEFINED;
+    }
+
+    /**
+     * 清空所有 DNS 缓存
+     * @function clearDNSCache
+     * @return undefined
+     */
+    JSValue Mg::clearDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        mg_dns_cache_clear();
+        return JS_UNDEFINED;
+    }
+
     /**
      * 解析 URL 字符串，返回对象：
      * 

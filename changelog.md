@@ -1,7 +1,19 @@
 
 New Feature:
 
+* mg.addDNSCache()
+* mg.removeDNSCache()
+* mg.clearDNSCache()
+* ota module compatible with Flash encryption mode
+
+
+Fixed:
+
+* mg.download() catch the exceptions of the callback function
+
 # v0.3.8   2025-09-18
+
+New Feature:
 
 * bt.setPower() add arg `type`
 * bt.getMTU()

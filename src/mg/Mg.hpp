@@ -36,6 +36,9 @@ namespace be::mg {
         static JSValue setDNS(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setDNSTimeout(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue removeDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearDNSCache(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue parseUrl(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setLog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue connect(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

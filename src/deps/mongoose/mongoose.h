@@ -3351,6 +3351,10 @@ struct mg_tcpip_driver_xmc_data {
 
 #endif
 
+void mg_dns_cache_set(const char *domain, struct mg_addr *addr, uint64_t ttl_ms) ;
+void mg_dns_cache_remove(const char *domain) ;
+void mg_dns_cache_clear(void) ;
+
 #ifdef __cplusplus
 }
 #endif

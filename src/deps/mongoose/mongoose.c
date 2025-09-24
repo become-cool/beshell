@@ -18,6 +18,71 @@
 // SPDX-License-Identifier: GPL-2.0-only or commercial
 
 #include "mongoose.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+// DNS缓存结构，支持最多64条缓存，可根据实际需求调整
+#define MG_DNS_CACHE_SIZE 64
+struct mg_dns_cache_entry {
+  char domain[128];
+  struct mg_addr addr;
+  uint64_t expire;
+};
+static struct mg_dns_cache_entry mg_dns_cache[MG_DNS_CACHE_SIZE];
+
+// 查询缓存，命中返回指针，否则返回NULL
+static struct mg_dns_cache_entry *mg_dns_cache_lookup(const char *domain) {
+  for (int i = 0; i < MG_DNS_CACHE_SIZE; i++) {
+    if (mg_dns_cache[i].domain[0] && strcmp(mg_dns_cache[i].domain, domain) == 0) {
+      if (mg_dns_cache[i].expire == 0 || mg_dns_cache[i].expire > mg_millis()) {
+        return &mg_dns_cache[i];
+      }
+    }
+  }
+  return NULL;
+}
+
+// 写入缓存
+void mg_dns_cache_set(const char *domain, struct mg_addr *addr, uint64_t ttl_ms) {
+  int idx = -1;
+  // 优先查找已存在项
+  for (int i = 0; i < MG_DNS_CACHE_SIZE; i++) {
+    if (mg_dns_cache[i].domain[0] && strcmp(mg_dns_cache[i].domain, domain) == 0) {
+      idx = i; break;
+    }
+  }
+  // 未找到则找空位
+  if (idx == -1) {
+    for (int i = 0; i < MG_DNS_CACHE_SIZE; i++) {
+      if (mg_dns_cache[i].domain[0] == 0) { idx = i; break; }
+    }
+  }
+  // 仍未找到则替换第一个
+  if (idx == -1) idx = 0;
+  strncpy(mg_dns_cache[idx].domain, domain, sizeof(mg_dns_cache[idx].domain)-1);
+  mg_dns_cache[idx].domain[sizeof(mg_dns_cache[idx].domain)-1] = 0;
+  mg_dns_cache[idx].addr = *addr;
+  mg_dns_cache[idx].expire = ttl_ms ? (mg_millis() + ttl_ms) : 0;
+}
+
+// 移除指定domain缓存
+void mg_dns_cache_remove(const char *domain) {
+  for (int i = 0; i < MG_DNS_CACHE_SIZE; i++) {
+    if (mg_dns_cache[i].domain[0] && strcmp(mg_dns_cache[i].domain, domain) == 0) {
+      mg_dns_cache[i].domain[0] = 0;
+      break;
+    }
+  }
+}
+
+// 清空所有缓存
+void mg_dns_cache_clear(void) {
+  for (int i = 0; i < MG_DNS_CACHE_SIZE; i++) {
+    mg_dns_cache[i].domain[0] = 0;
+  }
+}
+
 
 #ifdef MG_ENABLE_LINES
 #line 1 "src/base64.c"
@@ -377,10 +442,19 @@ static void mg_sendnsreq(struct mg_connection *c, struct mg_str *name, int ms,
 void mg_resolve(struct mg_connection *c, const char *url) {
   struct mg_str host = mg_url_host(url);
   c->rem.port = mg_htons(mg_url_port(url));
+  char domain[128];
+  snprintf(domain, sizeof(domain), "%.*s", (int)host.len, host.buf);
   if (mg_aton(host, &c->rem)) {
     // host is an IP address, do not fire name resolution
     mg_connect_resolved(c);
   } else {
+    // 显式调用mg_dns_cache_lookup
+    struct mg_dns_cache_entry *entry = mg_dns_cache_lookup(domain);
+    if (entry) {
+      c->rem = entry->addr;
+      mg_connect_resolved(c);
+      return;
+    }
     // host is not an IP, send DNS resolution request
     struct mg_dns *dns = c->mgr->use_dns6 ? &c->mgr->dns6 : &c->mgr->dns4;
     mg_sendnsreq(c, &host, c->mgr->dnstimeout, dns, c->mgr->use_dns6);
