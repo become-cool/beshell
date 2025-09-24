@@ -109,7 +109,11 @@ async function download(url, localPath, progress_cb) {
         }
         wroten += data.byteLength
         
-        progress_cb && progress_cb(total, wroten, data)
+        try{
+          progress_cb && progress_cb(total, wroten, data)
+        }catch(e) {
+          console.error(e)
+        }
 
         if (wroten == total) {
           fhandle && fs.close(fhandle)
