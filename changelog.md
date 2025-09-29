@@ -1,10 +1,13 @@
 
+# v0.3.9   2025-09-30
+
 New Feature:
 
 * mg.addDNSCache()
 * mg.removeDNSCache()
 * mg.clearDNSCache()
 * ota module compatible with Flash encryption mode
+* gpio adc functions
 
 
 Fixed:

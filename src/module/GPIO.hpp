@@ -35,10 +35,9 @@ namespace be {
         static JSValue watch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unwatch(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
-        static JSValue adcUnitInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue adcChannelInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue adcConfigWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue adcConfigAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
-        static JSValue adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         
         static JSValue resetPin(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 

@@ -44,13 +44,14 @@ namespace be {
         exportFunction("pull",pull,2) ;
         exportFunction("write",write,2) ;
         exportFunction("read",read,1) ;
-        exportFunction("adcUnitInit",adcUnitInit,1) ;
-        exportFunction("adcChannelInit",adcChannelInit,1) ;
-        exportFunction("adcRead",adcRead,1) ;
-        exportFunction("readAnalog",adcRead,1) ;
-        exportFunction("adcInfo",adcInfo,0) ;
         exportFunction("resetPin",resetPin,0) ;
         exportName("blink") ;
+
+        // adc
+        exportFunction("adcConfigWidth",adcConfigWidth,1) ;
+        exportFunction("adcConfigAtten",adcConfigAtten,1) ;
+        exportFunction("adcRead",adcRead,1) ;
+        exportFunction("readAnalog",adcRead,1) ;
 
         // for watch
         exportFunction("apiSetHandler",apiSetHandler,0) ;
@@ -225,101 +226,129 @@ namespace be {
         return JS_NewUint32(ctx, gpio_get_level((gpio_num_t)pin)) ;
     }
 
+    // GPIO to ADC channel mapping for ESP32/ESP32S3/ESP32S2/ESP32C3
 
-    // JSValue GPIO::readAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    //     return JS_UNDEFINED ;
-    // }
-    // JSValue GPIO::writeAnalog(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    //     return JS_UNDEFINED ;
-    // }
-    
-    
-    // /**
-    //  * 设置 adc 的位宽
-    //  * 
-    //  * @function adcSetBits
-    //  * @param adc:number adc (目前版本只能为 1)
-    //  * @param bits:number 位宽 (9-12)
-    //  * @return bool
-    //  */
-    // JSValue GPIO::adcSetBits(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_UINT8(0, adc)
-    //     ARGV_TO_UINT8(1, bits)
-    //     if(adc!=1) {
-    //         JSTHROW("adcConfigBits() only set adc1")
-    //     }
-    //     if( bits<9 || bits>12 ) {
-    //         JSTHROW("adcConfigBits() arg bits must be 9-12")
-    //     }
-    //     return (adc1_config_width((adc_bits_width_t)(bits-9)) == ESP_OK)? JS_TRUE: JS_FALSE ;
-    // }
+    #define GPIO2ADCCHANNEL(vpin, vchannel, vadc) do { \
+        gpio_num_t _pin; \
+        vchannel = ADC_CHANNEL_0; \
+        vadc = 0; \
+        int _found = 0; \
+        for (int _c = 0; _c < ADC1_CHANNEL_MAX; ++_c) { \
+            if (adc1_pad_get_io_num((adc1_channel_t)_c, &_pin) == ESP_OK && _pin == vpin) { \
+                vchannel = (adc_channel_t)_c; \
+                vadc = 1; \
+                _found = 1; \
+                break; \
+            } \
+        } \
+        if (!_found) { \
+            GPIO2ADCCHANNEL_ADC2(vpin, vchannel, vadc, _found); \
+        } \
+        if (!_found) { \
+            JSTHROW("pin is not a valid adc pin for this chip"); \
+        } \
+    } while(0) ;
 
+    #if (SOC_ADC_PERIPH_NUM >= 2)
+    #define GPIO2ADCCHANNEL_ADC2(vpin, vchannel, vadc, _found) do { \
+        gpio_num_t _pin2; \
+        for (int _c2 = 0; _c2 < ADC2_CHANNEL_MAX; ++_c2) { \
+            if (adc2_pad_get_io_num((adc2_channel_t)_c2, &_pin2) == ESP_OK && _pin2 == vpin) { \
+                vchannel = (adc_channel_t)_c2; \
+                vadc = 2; \
+                _found = 1; \
+                break; \
+            } \
+        } \
+    } while(0) ;
+    #else
+    #define GPIO2ADCCHANNEL_ADC2(vpin, vchannel, vadc, _found) do {} while(0)
+    #endif
     
-    #define MAPCHANNEL(gpionum, channelnum, adcnum, vpin, vchannel, vadc)   \
-        if(vpin==gpionum) {                                                 \
-            vchannel = ADC_CHANNEL_##channelnum ;                           \
-            vadc = adcnum ;                                                 \
+    /**
+     * 配置 ADC 位宽（仅支持 ADC1）
+     * @function adcConfigWidth
+     * @param adc:number ADC编号（仅支持1）
+     * @param bits:number 位宽（9-12）
+     * @return undefined 设置失败抛出异常
+     */
+    JSValue GPIO::adcConfigWidth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_UINT8(0, adc)
+        ARGV_TO_UINT8(1, bits)
+        if(adc!=1) {
+            JSTHROW("adcConfigWidth() only supports adc1")
         }
-
-    #define GPIO2ADCCHANNEL(vpin, vchannel, vadc)               \
-        adc_channel_t vchannel = ADC_CHANNEL_0 ;                \
-        uint8_t vadc = 0 ;                                      \
-        MAPCHANNEL(36, 0, 1, vpin, vchannel, vadc)              \
-        else MAPCHANNEL(37, 1, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(38, 2, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(39, 3, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(32, 4, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(33, 5, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(34, 6, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(35, 7, 1, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(4, 0, 2, vpin, vchannel, vadc)          \
-        else MAPCHANNEL(0, 1, 2, vpin, vchannel, vadc)          \
-        else MAPCHANNEL(2, 2, 2, vpin, vchannel, vadc)          \
-        else MAPCHANNEL(15, 3, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(13, 4, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(12, 5, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(14, 6, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(27, 7, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(25, 8, 2, vpin, vchannel, vadc)         \
-        else MAPCHANNEL(26, 9, 2, vpin, vchannel, vadc)         \
-        else {                                                  \
-            JSTHROW("pin is not a valid adc pin, must be 0, 2, 4, 12-15, 25-27, 32-39.")   \
+        if(bits<9 || bits>12) {
+            JSTHROW("adcConfigWidth() arg bits must be 9-12")
         }
-    
-    // /**
-    //  * 设置 gpio 使用哪个 adc 通道
-    //  * 
-    //  * @function adcSetChannelAtten
-    //  * param pin:number mcu可用的gpio编号
-    //  * param atten:number adc通道 (1|2)
-    //  * @return bool
-    //  */
-    // JSValue GPIO::adcSetChannelAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        esp_err_t ret = adc1_config_width((adc_bits_width_t)(bits-9));
+        if(ret!=ESP_OK) {
+            JSTHROW("adc1_config_width() failed with err: %d", ret )
+        }
+        return JS_UNDEFINED ;
+    }
 
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_UINT8(0, pin)
-    //     ARGV_TO_UINT8(1, atten)
+    /**
+     * 配置 ADC 通道衰减
+     * @function adcConfigAtten
+     * @param pin:number ADC引脚编号
+     * @param atten:number 衰减等级（0~3）
+     * @return undefined 设置失败抛出异常
+     */
+    JSValue GPIO::adcConfigAtten(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(2)
+        ARGV_TO_UINT8(0, pin)
+        ARGV_TO_UINT8(1, atten)
+        if(atten<0 || atten>3) {
+            JSTHROW("adcConfigAtten() arg atten must be 0-3")
+        }
+        adc_channel_t channel;
+        uint8_t adc = 1;
+        GPIO2ADCCHANNEL(pin, channel, adc)
+        esp_err_t ret = ESP_FAIL;
+        if(adc==1) {
+            ret = adc1_config_channel_atten((adc1_channel_t)channel, (adc_atten_t)atten);
+        }
+#if (SOC_ADC_PERIPH_NUM >= 2)
+        else if(adc==2) {
+            ret = adc2_config_channel_atten((adc2_channel_t)channel, (adc_atten_t)atten);
+        }
+#endif
+        if(ret!=ESP_OK) {
+            JSTHROW("adc1_config_width() failed with err: %d", ret )
+        }
+        return JS_UNDEFINED ;
+    }
 
-    //     if( atten<0 || atten>3 ) {
-    //         JSTHROW("setChannelAtten() arg atten must be 0-3")
-    //     }
-
-    //     GPIO2ADCCHANNEL(pin, channel, adc)
-
-    //     esp_err_t ret = ESP_FAIL ;
-    //     if(adc==1) {
-    //         ret = adc1_config_channel_atten((adc1_channel_t)channel, (adc_atten_t)atten) ;
-    //     }
-        
-    //     #if (SOC_ADC_PERIPH_NUM >= 2)
-    //     else if(adc==2) {
-    //         ret = adc2_config_channel_atten((adc2_channel_t)channel, (adc_atten_t)atten) ;
-    //     }
-    //     #endif
-        
-    //     return (ret==ESP_OK)? JS_TRUE: JS_FALSE ;
-    // }
+    /**
+     * 读取 ADC 原始值
+     * @function adcRead
+     * @param pin:number ADC引脚编号
+     * @return number 读取到的 ADC 原始值
+     */
+    JSValue GPIO::adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+        ARGV_TO_UINT8(0, pin)
+        adc_channel_t channel;
+        uint8_t adc = 1;
+        GPIO2ADCCHANNEL(pin, channel, adc)
+        int value = 0;
+        esp_err_t ret = ESP_FAIL;
+        if(adc==1) {
+            value = adc1_get_raw((adc1_channel_t)channel);
+            ret = (value >= 0) ? ESP_OK : ESP_FAIL;
+        }
+#if (SOC_ADC_PERIPH_NUM >= 2)
+        else if(adc==2) {
+            ret = adc2_get_raw((adc2_channel_t)channel, ADC_WIDTH_BIT_12, &value);
+        }
+#endif
+        if(ret != ESP_OK) {
+            JSTHROW("adcRead() failed with err: %d", ret )
+        }
+        return JS_NewInt32(ctx, value);
+    }
 
     /**
      * 设置 GPIO PWM 输出
@@ -727,131 +756,6 @@ namespace be {
     
     JSValue GPIO::test(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return JS_UNDEFINED ;
-    }
-
-    static int _initADCUnit(adc_unit_t uint_num) {
-        if(adc_handles[uint_num]!=NULL) {
-            return -1 ;
-        }
-
-        // adc_oneshot_unit_init_cfg_t init_config = {
-        //     .unit_id = uint_num,
-        //     .clk_src = ADC_RTC_CLK_SRC_DEFAULT,
-        //     .ulp_mode = ADC_ULP_MODE_DISABLE,
-        // };
-        
-        // return adc_oneshot_new_unit(&init_config, &adc_handles[uint_num]) ;
-        return 0 ;
-    }
-    
-    static int _initADCChannel(adc_unit_t uint_num, adc_channel_t channel, gpio_num_t pin) {
-
-        esp_err_t err ;
-        if(!adc_handles[uint_num]) {
-            err = _initADCUnit(uint_num) ;
-            if(err!=ESP_OK) {
-                return err ;
-            }
-        }
-
-        // 通道配置
-        // adc_oneshot_chan_cfg_t config = {
-        //     .atten = ADC_ATTEN_DB_12,  // Use ADC_ATTEN_DB_0 as ADC_ATTEN_DB_11 is deprecated
-        //     .bitwidth = ADC_BITWIDTH_12,
-        // };
-        
-        // err = adc_oneshot_config_channel(adc_handles[uint_num], channel, &config) ;
-        // if(err!=ESP_OK) {
-        //     return err ;
-        // }
-
-        adc_channel_configured[pin] = true ;
-
-        return ESP_OK ;
-    }
-
-    JSValue GPIO::adcUnitInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
-        uint32_t uint_num = 1 ;
-        if( JS_ToUint32(ctx, &uint_num, argv[0])!=0 ) {
-            JSTHROW("Invalid param type")
-        }
-        if(uint_num<1 || uint_num>2) {
-            JSTHROW("Invalid param value")
-        }
-        int err = _initADCUnit((adc_unit_t)uint_num) ;
-        if(err==-1) {
-            JSTHROW("unit already inited")
-        }
-        if(err!=ESP_OK) {
-            JSTHROW("init adc unit failed, err:%d", err)
-        }
-        return JS_UNDEFINED ;
-    }
-
-    JSValue GPIO::adcChannelInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
-        ARGV_TO_GPIO(0, pin)
-
-        if(!adc_units.count(pin) || !adc_channels.count(pin)) {
-            JSTHROW("pin is not a valid adc pin.")
-        }
-        adc_unit_t uint_num = adc_units[pin] ;
-        adc_channel_t channel = adc_channels[pin] ;
-        
-        if(!adc_handles[uint_num]) {
-            esp_err_t err = _initADCUnit(uint_num) ;
-            if(err!=ESP_OK) {
-                JSTHROW("init adc unit failed, err:%d", err)
-            }
-        }
-        
-        esp_err_t err = _initADCChannel(uint_num, (adc_channel_t)channel, pin) ;
-        if(err!=ESP_OK) {
-            JSTHROW("init adc channel failed, err:%d", err)
-        }
-
-        return JS_UNDEFINED ;
-    }
-
-    JSValue GPIO::adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        CHECK_ARGC(1)
-        ARGV_TO_GPIO(0, pin)
-
-        if(!adc_units.count(pin) || !adc_channels.count(pin)) {
-            JSTHROW("pin is not a valid adc pin.")
-        }
-        adc_unit_t uint_num = adc_units[pin] ;
-        adc_channel_t channel = adc_channels[pin] ;
-
-        if(!adc_channel_configured.count(pin) || !adc_channel_configured[pin]) {
-            esp_err_t err = _initADCChannel(uint_num, (adc_channel_t)channel, pin) ;
-            if(err!=ESP_OK) {
-                JSTHROW("init adc channel failed, err:%d", err)
-            }
-        }
-
-        int value = 0 ;
-
-        // esp_err_t err = adc_oneshot_read(adc_handles[uint_num], (adc_channel_t)channel, &value) ;
-        // if(err!=ESP_OK) {
-        //     JSTHROW("read adc failed, err:%d", err)
-        // }
-
-        return JS_NewInt32(ctx, value) ;
-    }
-
-    JSValue GPIO::adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        JSValue obj = JS_NewObject(ctx) ;
-        int i = 0 ;
-        for(auto &kv: adc_channels) {
-
-            JSValue item = JS_NewObject(ctx) ;
-            JS_SetPropertyStr(ctx, item, "channel", JS_NewInt32(ctx, kv.second)) ;
-            JS_SetPropertyStr(ctx, item, "unit", JS_NewInt32(ctx, adc_units[kv.first])) ;
-            JS_SetPropertyUint32(ctx, obj, JS_NewInt32(ctx, kv.first), item) ;
-        }
-        return obj ;
     }
 
     /**
