@@ -1,4 +1,11 @@
 
+# v0.3.10   2025-12-29
+
+New Feature:
+
+* add serial.uart.unsetup()
+
+
 # v0.3.9   2025-09-30
 
 New Feature:

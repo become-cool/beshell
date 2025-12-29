@@ -31,6 +31,7 @@ namespace be{
     DEFINE_NCLASS_META(UART, NativeClass)
     std::vector<JSCFunctionListEntry> UART::methods = {
         JS_CFUNC_DEF("setup", 0, UART::setup),
+        JS_CFUNC_DEF("unsetup", 0, UART::unsetup),
         JS_CFUNC_DEF("read", 0, UART::read),
         JS_CFUNC_DEF("write", 0, UART::write),
         JS_CFUNC_DEF("listen", 0, UART::listen),
