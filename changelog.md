@@ -3,7 +3,7 @@ New Feature:
 
 * + sync, ping, pong 协议
 * + telnet MQTT 协议
-
+* + ota.start() 参数 opt.downloader
 
 # v0.3.10   2025-12-29
 

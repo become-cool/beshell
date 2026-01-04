@@ -6,7 +6,7 @@ import * as nvs from 'nvs'
 
 ;[start].map(func => exportValue(ota, func.name, func))
 
-function downloadFirmware(p, opt, type, onProgress, onComplete, step) {
+function downloadFirmware(p, opt, type, downloader, onProgress, onComplete, step) {
 
     if(!opt.url) {
         throw new Error("url not found")
@@ -26,7 +26,7 @@ function downloadFirmware(p, opt, type, onProgress, onComplete, step) {
 
             let totalBytes = 0
             let buffer = new Uint8Array(0);
-            await mg.download(opt.url, null, (total,wrote,chunk)=>{
+            await downloader(opt.url, null, (total,wrote,chunk)=>{
                 let prog = Math.round(wrote*100/total)
                 if(printProg==prog) {
                     console.log(prog+"%", ((Date.now()-t)/1000)+"sec")
@@ -112,6 +112,7 @@ function findOTAPartitions(){
     } ,
     onProgress(type, total, wrote) {},
     onComplete(type, error) {},
+    downloader(url, localpath, callback(total,wrote,chunk)) {}
 }
 */
 export async function start(opt) {
@@ -130,7 +131,7 @@ export async function start(opt) {
         }
         bootBinPart = parts[0]
         console.log("write bin firmware to partition:", bootBinPart.label)
-        await downloadFirmware(bootBinPart, opt.bin, "bin", opt.onProgress, opt.onComplete, opt.step||5)
+        await downloadFirmware(bootBinPart, opt.bin, "bin", (opt?.downloader)||mg.download, opt.onProgress, opt.onComplete, opt.step||5)
     }
 
     if(opt.fs) {
@@ -160,7 +161,7 @@ export async function start(opt) {
         }
         bootFSPart = parts[0]
         console.log("write bin firmware to partition:", bootFSPart.label)
-        await downloadFirmware(bootFSPart, opt.fs, "fs", opt.onProgress, opt.onComplete, opt.step||5)
+        await downloadFirmware(bootFSPart, opt.fs, "fs", (opt?.downloader)||mg.download, opt.onProgress, opt.onComplete, opt.step||5)
     }
 
     if(bootBinPart) {
