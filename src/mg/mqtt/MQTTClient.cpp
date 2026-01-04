@@ -18,6 +18,7 @@ namespace be::mg {
     DEFINE_NCLASS_META(MQTTClient, EventEmitter)
     std::vector<JSCFunctionListEntry> MQTTClient::methods = {
         JS_CFUNC_DEF("ping", 0, MQTTClient::ping),
+        JS_CFUNC_DEF("pub", 0, MQTTClient::push),
         JS_CFUNC_DEF("push", 0, MQTTClient::push),
         JS_CFUNC_DEF("sub", 0, MQTTClient::sub),
         JS_CFUNC_DEF("unsub", 0, MQTTClient::unsub),
@@ -25,6 +26,7 @@ namespace be::mg {
         JS_CFUNC_DEF("setClientKey", 0, MQTTClient::setClientKey),
         JS_CFUNC_DEF("enableClientAuth", 0, MQTTClient::enableClientAuth),
         JS_CFUNC_DEF("disableClientAuth", 0, MQTTClient::disableClientAuth),
+        JS_CFUNC_DEF("isConnected", 0, MQTTClient::isConnected),
     } ;
 
     MQTTClientHandler MQTTClient::handler = nullptr ;
@@ -155,6 +157,7 @@ namespace be::mg {
                 JSValue msg = JS_NewObject(ctx) ;
                 JS_SetPropertyStr(ctx, msg, "topic", JS_NewStringLen(ctx, event->data.msg.topic.buf, event->data.msg.topic.len));
                 JS_SetPropertyStr(ctx, msg, "data", JS_NewStringLen(ctx, event->data.msg.data.buf, event->data.msg.data.len));
+                JS_SetPropertyStr(ctx, msg, "buffer", JS_NewArrayBufferCopy(ctx, (uint8_t *)event->data.msg.data.buf, event->data.msg.data.len));
                 // JS_SetPropertyStr(ctx, msg, "dgram", JS_NewStringLen(ctx, event->data.msg.dgram.buf, event->data.msg.dgram.len));
                 JS_SetPropertyStr(ctx, msg, "id", JS_NewUint32(ctx, event->data.msg.id));
                 JS_SetPropertyStr(ctx, msg, "cmd", JS_NewUint32(ctx, event->data.msg.cmd));
@@ -363,4 +366,17 @@ namespace be::mg {
         that->useClientCert = false ;
         return JS_UNDEFINED ;
     }
+
+    JSValue MQTTClient::isConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(MQTTClient, that)
+        if(!that->conn){
+            return JS_FALSE ;
+        }
+        // Consider the connection not connected if it's being closed
+        if (that->conn->is_closing) {
+            return JS_FALSE ;
+        }
+        return JS_TRUE ;
+    }
+
 }

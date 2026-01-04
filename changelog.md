@@ -1,4 +1,10 @@
 
+New Feature:
+
+* + sync, ping, pong 协议
+* + telnet MQTT 协议
+
+
 # v0.3.10   2025-12-29
 
 New Feature:

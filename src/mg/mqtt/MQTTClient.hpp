@@ -22,6 +22,7 @@ namespace be::mg {
         static JSValue setClientKey(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue enableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue disableClientAuth(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isConnected(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static void setHandler(MQTTClientHandler handler) ;
 

@@ -113,94 +113,51 @@ exportValue(telnet, "cdc", {
     }
 })
 
-// log
-;(function () {
-
-    let logger = null
-    let openedFile = -1
-    let storeDir = "/store/log"
-    let writingFilePath = null
-    let wroteBytes = 0
-    let fileSize = 1024
-    let maxFiles = 50
-
-    function startLog(options) {
-        const fs = importSync("fs")
-        if (logger) {
-            throw new Error("telnet.startLog already started")
+// mqtt
+let mqttChannel = null
+let mqttClient = null
+let mqttTopicIn = null
+exportValue(telnet, "mqtt", {
+    start(mqtt, topicIn = null, topicOut = null) {
+        if(mqttChannel) {
+            throw new Error("telnet.mqtt already started")
         }
-        if(!options){
-            throw new Error("telnet.startLog requires options")
+        if(!topicIn) {
+            topicIn = "beshell/repl/in/" + process.readMac("base", true)
         }
-        if(!options.dir){
-            throw new Error("telnet.startLog requires options.dir")
-        }
-        storeDir = options.dir
-        if( !fs.mkdirSync(storeDir, true) ){
-            throw new Error("telnet.startLog failed to create directory: " + storeDir)
-        }
-        fileSize = parseInt(options.fileSize)
-        if(isNaN(fileSize)){
-            fileSize = 1024*100
-        }
-        maxFiles = parseInt(options.maxFiles)
-        if(isNaN(maxFiles)){
-            maxFiles = 20
+        if(!topicOut) {
+            topicOut = "beshell/repl/out/" + process.readMac("base", true)
         }
 
-        logger = new telnet.TelnetChannel()
-        logger.on("output", writeLog)
-        logger.enableEventOutput()
-    }
-    exportValue(telnet, "startLog", startLog)
-    exportValue(telnet, "stopLog", function stopLog() {
-        logger = null
-    })
-    function writeLog (data) {
-        try{
-            if( !writingFilePath || wroteBytes>fileSize ) {
-                createNewLogFile()
-            }
+        mqtt.sub(topicIn)
 
-            let content = `[${new Date().toISOString().replace("T", ' ').slice(0,19)}] ${data.asString()}`
-            if(content[content.length-1] != '\n') {
-                content += '\n'
-            }
-            fs.writeFileSync(writingFilePath, content, true)
-            wroteBytes+= content.length
-        }catch (e) {}
-    }
-    function createNewLogFile() {
-        let logFiles = findLastFile(storeDir)
-        if (logFiles.length > maxFiles) {
-            logFiles.slice(0, logFiles.length - maxFiles).forEach(item => {
-                fs.rmSync(storeDir+"/"+item.name)
-            })
-        }
+        mqttChannel = new telnet.TelnetChannel()
 
-        if(logFiles.length > 0) {
-            var fileId = logFiles.pop().fileId + 1
-        } else {
-            var fileId = 0
-        }
-
-        writingFilePath = `${storeDir}/${fileId}-${new Date().toISOString().replace(/[-:]/g, '').replace("T",'_').slice(0, 15)}.txt`
-        return writingFilePath
-    }
-    function findLastFile(dir) {
-        return fs.listDirSync(dir,true).filter(item => {
-            if(item.type=="file") {
-                let res = item.name.match(/^(\d+)\-\d{8}_\d{4}\.txt$/i)
-                if(!res) {
-                    return false
-                }
-                item.fileId = parseInt(res[1])
-                return true
-            }
-            return false
-        }).sort((a, b) => {
-            return a.fileId - b.fileId
+        mqttChannel.on("output-stream", (data) => {
+            mqtt.push(topicOut, data)
         })
-    }
+        mqtt.on("msg", (msg) => {
+            if (msg.topic === topicIn) {
+                mqttChannel.process(msg.buffer)
+            }
+        })
+        mqtt.on("error", () => {
+            mqttChannel = null
+        })
+        mqtt.on("close", () => {
+            mqttChannel = null
+        })
 
-})()
+        mqttClient = mqtt
+        mqttTopicIn = topicIn
+    } ,
+
+    stop() {
+        mqttChannel = null
+        if(mqttClient) {
+            mqttClient.unsub(mqttTopicIn)
+            mqttClient = null
+        }
+    }
+})
+
