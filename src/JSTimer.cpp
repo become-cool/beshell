@@ -231,6 +231,25 @@ namespace be {
         }
     }
     
+    void JSTimer::setTime(int64_t ms) {
+
+        updateTime(ms) ;
+
+        struct timeval tv;
+        tv.tv_sec = ms/1000;  // epoch time (seconds)
+        tv.tv_usec = (ms%1000)*1000;    // microseconds
+
+        //printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
+
+#ifdef ESP_PLATFORM
+        settimeofday(&tv, NULL);
+#endif
+
+    }
+    int64_t JSTimer::getTime() {
+        return gettime() ;
+    }
+    
     bool JSTimer::take(bool fromISR, bool createWhenFirst) {
 #ifdef ESP_PLATFORM
         bool toke = false ; 

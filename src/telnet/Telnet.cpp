@@ -1,6 +1,7 @@
 #include "Telnet.hpp"
 #include "debug.h"
 #include "BeShell.hpp"
+#include "../module/Process.hpp"
 #include <cassert>
 #include <string.h>
 #include <sys/stat.h>
@@ -121,6 +122,32 @@ namespace be {
         case FILE_PULL:
             pullFile(ch,pkg) ;
             break;
+
+        case SYNC:
+            if(pkg->body_len==8) {
+                uint8_t * p = pkg->body() ;
+                uint64_t ms = ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48) | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32)
+                            | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16) | ((uint64_t)p[6] << 8)  | (uint64_t)p[7] ;
+                beshell->engine->timer.setTime(ms) ;
+            }
+            ch->send(nullptr,0,pkg->head.fields.pkgid,RSPN) ;
+            break;
+        case PING:
+            {
+                int64_t ms = gettime() ;
+                uint8_t data[8] ;
+                data[0] = (ms >> 56) & 0xFF ;
+                data[1] = (ms >> 48) & 0xFF ;
+                data[2] = (ms >> 40) & 0xFF ;
+                data[3] = (ms >> 32) & 0xFF ;
+                data[4] = (ms >> 24) & 0xFF ;
+                data[5] = (ms >> 16) & 0xFF ;
+                data[6] = (ms >> 8) & 0xFF ;
+                data[7] = ms & 0xFF ;
+                ch->send((const char *)data, 8, pkg->head.fields.pkgid, PONG) ;
+            }
+            break;
+
         default: 
             ch->sendError(pkg->head.fields.pkgid, "cmd %d not implements", pkg->head.fields.cmd) ;
             break;

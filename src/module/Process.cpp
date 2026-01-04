@@ -468,22 +468,9 @@ function top(detail=false) {
     JSValue Process::setTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
         ASSERT_ARGC(1)
         ARGV_TO_INT64(0, ms)
-        
-        JSEngine::fromJSContext(ctx)->timer.updateTime(ms) ;
-
-        struct timeval tv;
-        tv.tv_sec = ms/1000;  // epoch time (seconds)
-        tv.tv_usec = (ms%1000)*1000;    // microseconds
-
-        //printf("%lu.%lu\n",tv.tv_sec,tv.tv_usec);
-
-#ifdef ESP_PLATFORM
-        settimeofday(&tv, NULL);
-#endif
-
+        JSEngine::fromJSContext(ctx)->timer.setTime(ms) ;
         return JS_UNDEFINED ;
     }
-
 
     /**
      * 设置系统时区时间偏置量(分钟)

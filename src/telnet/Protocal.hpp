@@ -40,6 +40,9 @@ namespace be {
 		, FILE_MAX = 39
 
 		, READY = 60				// 系统准备就绪事件
+		, PING = 61					// 
+		, PONG = 62					// 反回设备64位时间戳作为回应
+		, SYNC = 63					// 时间同步包
 	} ;
 
 	class State ;

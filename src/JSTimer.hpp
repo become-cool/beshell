@@ -44,7 +44,10 @@ namespace be {
         // JSTimerEvent * setTimer(JSContext *ctx, JSValue func, int interval, bool repeat=false, JSValue thisobj=JS_UNDEFINED, std::initializer_list<JSValue> argv={}) ;
 
         JSTimerEvent * setImmediate(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
-        
+
+        void setTime(int64_t ms) ;
+        int64_t getTime() ;
+
 #if defined(ESP_PLATFORM)
         JSTimerEvent * setImmediateAsync(JSContext *ctx, JSValue func, JSValue thisobj, int argc, JSValueConst *argv) ;
 #endif
