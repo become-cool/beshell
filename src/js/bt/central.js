@@ -32,6 +32,7 @@ class Central extends EventEmitter {
     })
     bt.on("central.close", (connid, addr, reason) => {
       this.emit("close", connid, addr, reason)
+      delete this._mapAddr[addr]
     })
     bt.on("dis-srvc-cmpl", (status, connid) => {
       let peer = this._mapConnId[connid]
@@ -81,10 +82,10 @@ class Central extends EventEmitter {
       addr = addr.toUpperCase()
       bt.connect(addr)
 
-      this._mapConnectResolves[addr] = (status, peer) => {
+      this._mapConnectResolves[addr] = (status, addr) => {
         // 在连接成功之前触发了超时，主动断开，放弃连接
         if(timeout) {
-          peer.disconnect()
+          this._mapConnId[addr]?.disconnect()
           return
         }
         // 清除定时器
@@ -92,7 +93,7 @@ class Central extends EventEmitter {
           clearTimeout(timer)
         }
         if (status == 0)
-          resolve(peer)
+          resolve(addr)
         else
           reject(new Error("connect failed with error: " + status))
       }
