@@ -97,7 +97,7 @@ namespace be {
             while(datalen) {
                 chunk_size = datalen > buffsize ? buffsize : datalen;
 
-                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 100/portTICK_PERIOD_MS);
+                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 0/portTICK_PERIOD_MS);
             
                 datalen -= chunk_size;
                 chunk += chunk_size;
