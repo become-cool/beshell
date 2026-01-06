@@ -5,6 +5,12 @@ New Feature:
 * + telnet MQTT 协议
 * + ota.start() 参数 opt.downloader
 
+Fixed: 
+
+* telnet cdc delay
+* "bt queue full" 刷屏
+
+
 # v0.3.10   2025-12-29
 
 New Feature:

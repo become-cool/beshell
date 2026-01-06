@@ -81,7 +81,13 @@ namespace be {
 
         if(BT::singleton){
             if( !BT::singleton->emitNativeEvent(&event_msg) ){
-                printf("bt queue full\n") ;
+
+                static int drop_count = 0 ;
+                drop_count ++;
+                if(drop_count>=10){ {
+                    printf("bt queue full, drop %d\n", drop_count) ;
+                }
+
                 if(event_msg.data.ptr) {
                     free(event_msg.data.ptr) ;
                     event_msg.data.ptr = NULL ;
