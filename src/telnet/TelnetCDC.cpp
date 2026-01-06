@@ -19,6 +19,10 @@
 
 using namespace std ;
 
+extern "C" {
+    bool usb_serial_jtag_write_ready(void) ;
+}
+
 namespace be {
 
     
@@ -86,18 +90,24 @@ namespace be {
     }
 
     void TelnetCDC::sendData (const char * data, size_t datalen) {
-        if(!setuped) {
+        if(!setuped || !usb_serial_jtag_write_ready()) {
             return ;
         }
-        int buffsize = tx_buffer_size/2;
+        int buffsize = tx_buffer_size/3;
         if(data && datalen) {
 
             int chunk_size = 0;
             char * chunk = (char *)data;
-            while(datalen) {
+            for(int i=0; datalen>0; i++) {
+
                 chunk_size = datalen > buffsize ? buffsize : datalen;
 
-                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 0/portTICK_PERIOD_MS);
+                // 当没有上位机连接时，数据会在缓冲区等待，此时等待数据发送完成是无效的
+                // 第1个chunk遇到缓冲满，取消发送；后续chunk等待5ms
+                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 2/portTICK_PERIOD_MS);
+                if(sentlen!=chunk_size) {
+                    return ;
+                }
             
                 datalen -= chunk_size;
                 chunk += chunk_size;

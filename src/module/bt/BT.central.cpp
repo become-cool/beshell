@@ -84,7 +84,7 @@ namespace be {
 
                 static int drop_count = 0 ;
                 drop_count ++;
-                if(drop_count>=10){ {
+                if(drop_count>=10){
                     printf("bt queue full, drop %d\n", drop_count) ;
                 }
 
