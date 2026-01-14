@@ -110,6 +110,7 @@ namespace be{
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
         uart_stop_bits_t GET_INT_PROP_OPT(argv[0], "stopbits", stopbits, uart_stop_bits_t, UART_STOP_BITS_1)
         uart_parity_t GET_INT_PROP_OPT(argv[0], "parity", parity, uart_parity_t, UART_PARITY_DISABLE)
+        BaseType_t GET_UINT32_PROP_OPT(argv[0], "core", core, 0 )
 
         // dn3(baudrate,stopbits,parity)
 
@@ -117,6 +118,17 @@ namespace be{
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)
         }
+
+        // uart_port_t bus = uart->m_uartNum ;
+        // esp_err_t ret ;
+        // run_wait_on_core([&ret, bus](){
+
+        //     ret = uart_driver_install(bus, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
+
+        // }, core) ;
+        // if(ret!=0) {
+        //     JSTHROW("uart setup failded(%s:%d)","install", ret)
+        // }
 
 
         // Configure UART parameters
@@ -276,6 +288,30 @@ namespace be{
 
     JSValue UART::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
+
+        JSEngine::fromJSContext(ctx)->removeLooping(UART::loop, (void *)uart) ;
+
+        if(uart->taskListenerHandle){
+            vTaskDelete(uart->taskListenerHandle) ;
+            uart->taskListenerHandle = nullptr ;
+        }
+
+        if(uart->data_queue){
+            uart_chunk_t chunk ;
+            while(xQueueReceive(uart->data_queue, &chunk, 0)==pdTRUE){
+                if(chunk.data){
+                    free(chunk.data) ;
+                }
+            }
+            vQueueDelete(uart->data_queue) ;
+            uart->data_queue = nullptr ;
+        }
+
+        if(!JS_IsNull(uart->listener)){
+            JS_FreeValue(ctx, uart->listener) ;
+            uart->listener = JS_NULL ;
+        }
+
         uart_driver_delete(uart->m_uartNum) ;
         return JS_UNDEFINED ;
     }
