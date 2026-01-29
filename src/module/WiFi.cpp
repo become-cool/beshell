@@ -40,11 +40,12 @@ typedef struct {
     int reason ;
 } wifi_nevent_t ;
 
-
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
 static esp_netif_t * netif_ap = NULL ;
 esp_netif_t * get_netif_ap() {
     return netif_ap ;
 }
+#endif
 
 static esp_netif_t * netif_sta = NULL ;
 esp_netif_t * get_netif_sta() {
@@ -390,7 +391,9 @@ namespace be {
         esp_err_t res ;
 
         netif_sta = esp_netif_create_default_wifi_sta();
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
         netif_ap = esp_netif_create_default_wifi_ap();
+#endif
 
         wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
         ESP_API(esp_wifi_init(&cfg))
@@ -1008,9 +1011,11 @@ namespace be {
         if( type==WIFI_MODE_STA ) {
             esp_netif_get_ip_info(netif_sta, &ipinfo);
         }
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
         else if(type==WIFI_MODE_AP) {
             esp_netif_get_ip_info(netif_ap, &ipinfo);
         }
+#endif
         else{
             JSTHROW("unknow netif type: %d", type)
         }
@@ -1043,8 +1048,9 @@ namespace be {
 
         const char * hostname = JS_ToCString(ctx, argv[0]) ;
         esp_netif_set_hostname(netif_sta, hostname);
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
         esp_netif_set_hostname(netif_ap, hostname);
-
+#endif
         JS_FreeCString(ctx, hostname) ;
 
         return JS_UNDEFINED ;
