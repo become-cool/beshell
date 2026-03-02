@@ -120,7 +120,8 @@ let mqttTopicIn = null
 exportValue(telnet, "mqtt", {
     start(mqtt, topicIn = null, topicOut = null) {
         if(mqttChannel) {
-            throw new Error("telnet.mqtt already started")
+            // throw new Error("telnet.mqtt already started")
+            this.stop()
         }
         if(!topicIn) {
             topicIn = "beshell/repl/in/" + process.readMac("base", true)
@@ -142,10 +143,10 @@ exportValue(telnet, "mqtt", {
             }
         })
         mqtt.on("error", () => {
-            mqttChannel = null
+            this.stop()
         })
         mqtt.on("close", () => {
-            mqttChannel = null
+            this.stop()
         })
 
         mqttClient = mqtt
