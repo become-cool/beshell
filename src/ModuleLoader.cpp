@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cassert>
 #include <stdlib.h>
+#include <tuple>
 #include "path.hpp"
 #include "mallocf.h"
 #include "qjs_utils.h"
@@ -318,6 +319,14 @@ namespace be {
             }
         }
 
+        // 预设置源码的模块
+        // -------------
+        for (const auto & pair : mloader->moduleSources) {
+            if( pair.first==module_name ) {
+                return js_strdup(ctx, module_name) ;
+            }
+        }
+
         // resolve file
         // -------------
         std::string fullpath ;
@@ -355,22 +364,53 @@ namespace be {
         return jfullpath ;
     }
 
+    void ModuleLoader::addModuleSource(const char * name, const char * source, int source_len, bool isBin) {
+        if(source_len<0) {
+            source_len = strlen(source) ;
+        }
+        moduleSources[name] = std::make_tuple(source, source_len, isBin);
+    }
+
+    void ModuleLoader::addModuleBinary(const char * name, const char * source, int source_len) {
+        addModuleSource(name, source, source_len, true);
+    }
+
+
     JSModuleDef * ModuleLoader::load(JSContext *ctx, const char *path, void *opaque) {
 
+        if(!opaque) {
+            printf("invalid opaque in ModuleLoader::load()\n") ;
+            return nullptr ;
+        }
+        
+        ModuleLoader * mloader = (ModuleLoader *)opaque ;
+
         JSModuleDef *m;
-
-        size_t buf_len;
-        uint8_t *buf;
         JSValue func_val;
+        const uint8_t *buf = nullptr;
+        size_t buf_len = 0;
+        bool asBin = false;
+        bool fromSource = false;
 
-        buf = js_load_file(ctx, &buf_len, path);
-        if (!buf) {
-            JS_ThrowReferenceError(ctx, "could not load module filename '%s'", path);
-            return NULL;
+        // 检查是否是预设置的模块源码
+        auto it = mloader->moduleSources.find(path);
+        if (it != mloader->moduleSources.end()) {
+            // 使用预设置的源码
+            buf = (const uint8_t *)std::get<0>(it->second);
+            buf_len = std::get<1>(it->second);
+            asBin = std::get<2>(it->second);
+            fromSource = true;
+        } else {
+            // 从文件系统读取
+            buf = js_load_file(ctx, &buf_len, path);
+            if (!buf) {
+                JS_ThrowReferenceError(ctx, "Loader::load() could not load module filename '%s'", path);
+                return NULL;
+            }
+            size_t pathlen = strlen(path);
+            asBin = strcmp(path + pathlen - 7, ".js.bin") == 0;
         }
 
-        size_t pathlen = strlen(path) ;
-        bool asBin = strcmp(path+pathlen-7,".js.bin") == 0 ;
         if(asBin) {
             // 做为字节码加载
             func_val = JS_ReadObject(ctx, buf, buf_len, JS_READ_OBJ_BYTECODE);
@@ -379,7 +419,10 @@ namespace be {
             func_val = JS_Eval(ctx, (char *)buf, buf_len, path, JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);
         }
 
-        js_free(ctx, buf);
+        if (!fromSource) {
+            js_free(ctx, (void *)buf);
+        }
+        
         if (JS_IsException(func_val)){
             return NULL;
         }

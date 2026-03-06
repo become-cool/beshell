@@ -18,6 +18,7 @@ namespace be {
     private:
         std::map<const char *, NativeModuleFactoryFunc> factories ;
         std::map<JSContext*, std::map<std::string, NativeModule*>> modules ;
+        std::map<std::string, std::tuple<const char*, size_t, bool>> moduleSources ;
 
     public:
         ModuleLoader(BeShell * beshell) ;
@@ -65,6 +66,10 @@ namespace be {
             }
             return nm->nsObject() ;
         }
+        
+        void addModuleSource(const char * name, const char * source, int source_len=-1, bool isBin=false) ;
+        void addModuleBinary(const char * name, const char * source, int source_len=-1) ;
+
     friend class JSLoader ;
     } ;
 }
