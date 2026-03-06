@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 function js2c (src, cArrayName) {
-    let cArray = `static unsigned char ${cArrayName}[] = {\n`;
+    let cArray = `const unsigned char ${cArrayName}[] = {\n`;
 
     for (let i = 0; i < src.length; i++) {
         if (i % 16 === 0 && i !== 0) {
