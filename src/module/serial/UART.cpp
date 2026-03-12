@@ -8,6 +8,7 @@
 using namespace std ;
 
 #define RX_BUF_SIZE 1024
+#define DEFAULT_RX_BUFFER_SIZE (RX_BUF_SIZE * 2)
 
 namespace be{
     
@@ -110,25 +111,16 @@ namespace be{
         int GET_UINT32_PROP_OPT(argv[0], "baudrate", baudrate, 115200)
         uart_stop_bits_t GET_INT_PROP_OPT(argv[0], "stopbits", stopbits, uart_stop_bits_t, UART_STOP_BITS_1)
         uart_parity_t GET_INT_PROP_OPT(argv[0], "parity", parity, uart_parity_t, UART_PARITY_DISABLE)
-        BaseType_t GET_UINT32_PROP_OPT(argv[0], "core", core, 0 )
+
+        uint32_t GET_UINT32_PROP_OPT(argv[0], "rx_buffer_size", rx_buffer_size, DEFAULT_RX_BUFFER_SIZE)
+        uint32_t GET_UINT32_PROP_OPT(argv[0], "tx_buffer_size", tx_buffer_size, 0)
 
         // dn3(baudrate,stopbits,parity)
 
-        esp_err_t ret = uart_driver_install(uart->m_uartNum, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
+        esp_err_t ret = uart_driver_install(uart->m_uartNum, rx_buffer_size, tx_buffer_size, 0, NULL, 0);
         if(ret!=0) {
             JSTHROW("uart setup failded(%s:%d)","install", ret)
         }
-
-        // uart_port_t bus = uart->m_uartNum ;
-        // esp_err_t ret ;
-        // run_wait_on_core([&ret, bus](){
-
-        //     ret = uart_driver_install(bus, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
-
-        // }, core) ;
-        // if(ret!=0) {
-        //     JSTHROW("uart setup failded(%s:%d)","install", ret)
-        // }
 
 
         // Configure UART parameters
@@ -222,11 +214,10 @@ namespace be{
     } uart_chunk_t ;
 
     void UART::task_listen(void * arg) {
-        uart_event_t event;
         UART * uart = (UART *) arg ;
-        uint8_t buff [32];
         uart_chunk_t chunk ;
         while(1) {
+            uint8_t buff[32];
             chunk.len = uart_read_bytes(uart->uartNum(), buff, sizeof(buff), 1);
             if(chunk.len) {
                 chunk.data = (uint8_t *)malloc(chunk.len) ;
@@ -236,26 +227,37 @@ namespace be{
                 }
             }
 
-            vTaskDelay(1);
+            // 关键：仅在无数据时让出 CPU，避免吞吐上限过低
+            if(!chunk.len) {
+                vTaskDelay(1);
+            }
         }
     }
 
     void UART::loop(JSContext * ctx, void * opaque) {
         UART * uart = (UART *) opaque ;
         uart_chunk_t chunk ;
-        if(xQueueReceive(uart->data_queue, &chunk, 0)) {
+        // 关键：旧实现每次 loop 只消费 1 个 chunk。
+        // 在高波特率下 JS loop 的调用频率远小于 UART 生产速率，会导致队列迅速满并丢数据。
+        // 这里改为每次 loop 尽量 drain 多个 chunk（带上限，避免一次占用太久）。
+        int drained = 0;
+        const int maxDrain = 64;
+        while (drained < maxDrain && xQueueReceive(uart->data_queue, &chunk, 0)) {
+            drained++;
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
                 JSValue ret = JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
                 if( JS_IsException(ret) ) {
                     JSEngine::fromJSContext(ctx)->dumpError() ;
                 }
+                JS_FreeValue(ctx, ret);
                 JS_FreeValue(ctx, ab) ;
             }
         }
     }
 
-    #define DATA_QUEUE_LEN 10
+    // listen 队列：旧值 10 在大吞吐下太容易满导致丢数据
+    #define DATA_QUEUE_LEN 128
     JSValue UART::listen(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
         
@@ -268,17 +270,18 @@ namespace be{
             JSTHROW("arg callback must be a function")
         }
 
-        if(JS_IsNull(uart->listener)) {
+        if(!JS_IsNull(uart->listener)) {
             JS_FreeValue(ctx, uart->listener) ;
         }
         uart->listener = JS_DupValue(ctx, argv[0]) ;
 
-        if(uart->taskListenerHandle == nullptr) {
-            xTaskCreatePinnedToCore(task_listen, "task-listen", 1024, uart, 5, &uart->taskListenerHandle, 1);
-        }
-        
+        // 先创建队列再启动 task，避免 task 先运行导致访问空队列的竞态
         if(uart->data_queue==nullptr){
             uart->data_queue = xQueueCreate(DATA_QUEUE_LEN, sizeof(uart_chunk_t));
+        }
+
+        if(uart->taskListenerHandle == nullptr) {
+            xTaskCreatePinnedToCore(task_listen, "task-listen", 1024, uart, 5, &uart->taskListenerHandle, 1);
         }
 
         JSEngine::fromJSContext(ctx)->addLoopFunction(UART::loop, (void *)uart, true, 0) ;
@@ -288,30 +291,6 @@ namespace be{
 
     JSValue UART::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(UART, uart)
-
-        JSEngine::fromJSContext(ctx)->removeLooping(UART::loop, (void *)uart) ;
-
-        if(uart->taskListenerHandle){
-            vTaskDelete(uart->taskListenerHandle) ;
-            uart->taskListenerHandle = nullptr ;
-        }
-
-        if(uart->data_queue){
-            uart_chunk_t chunk ;
-            while(xQueueReceive(uart->data_queue, &chunk, 0)==pdTRUE){
-                if(chunk.data){
-                    free(chunk.data) ;
-                }
-            }
-            vQueueDelete(uart->data_queue) ;
-            uart->data_queue = nullptr ;
-        }
-
-        if(!JS_IsNull(uart->listener)){
-            JS_FreeValue(ctx, uart->listener) ;
-            uart->listener = JS_NULL ;
-        }
-
         uart_driver_delete(uart->m_uartNum) ;
         return JS_UNDEFINED ;
     }
