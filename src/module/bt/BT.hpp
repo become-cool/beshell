@@ -87,8 +87,18 @@ namespace be{
         static void setGattsHandler(gatts_handler_t handler) ;
 
 
+
+        static JSValue eventAdded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue eventRemoved(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+
     protected:
         virtual void exports(JSContext *ctx) ;
+        static void eventAdded(const char * eventName) ;
+        static void eventRemoved(const char * eventName) ;
+
+        static bool hookedScanRes ;
+        static bool hookedScanCmpl ;
+
     private :
         static JSValue getCharacteristics(JSContext *ctx, esp_gatt_if_t gattc_if, uint16_t conn_id, uint16_t start_handle, uint16_t end_handle) ;
         

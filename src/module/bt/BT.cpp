@@ -29,7 +29,8 @@ namespace be{
     bool BT::bScanning = false ;
     int BT::connect_type = 0 ;
     int BT::disconnect_type = 0 ;
-    
+    bool BT::hookedScanRes = false ;
+    bool BT::hookedScanCmpl = false ;
     
     gap_handler_t   BT::gapHandler = nullptr ;
     gattc_handler_t BT::gattcHandler = nullptr ;
@@ -82,6 +83,8 @@ namespace be{
         exportName("periph") ;
         exportName("pher") ;
         
+        EXPORT_FUNCTION(eventAdded)
+        EXPORT_FUNCTION(eventRemoved)
         enableNativeEvent(ctx, sizeof(struct bt_event), 128) ;
     }
 
@@ -218,6 +221,37 @@ namespace be{
         }
     }
 
+    void BT::eventAdded(const char * eventName) {
+        if(strcmp(eventName, "scan-cmpl") == 0) {
+            hookedScanCmpl = true ;
+        }
+        else if(strcmp(eventName, "scan-res") == 0) {
+            hookedScanRes = true ;
+        }
+
+    }
+    void BT::eventRemoved(const char * eventName) {
+        if(strcmp(eventName, "scan-cmpl") == 0) {
+            hookedScanCmpl = false ;
+        }
+        else if(strcmp(eventName, "scan-res") == 0) {
+            hookedScanRes = false ;
+        }
+    }
+    JSValue BT::eventAdded(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        const char * event_name = JS_ToCString(ctx, argv[0]) ;
+        eventAdded(event_name) ;
+        JS_FreeCString(ctx, event_name) ;
+        return JS_NULL ;
+    }
+
+    JSValue BT::eventRemoved(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        const char * event_name = JS_ToCString(ctx, argv[0]) ;
+        eventRemoved(event_name) ;
+        JS_FreeCString(ctx, event_name) ;
+        return JS_NULL ;
+    }
+
     void BT::onNativeEvent(JSContext *ctx, void * param) {
         bt_event * msg = (bt_event*) param ;
         if(msg->event<100) {
@@ -230,6 +264,9 @@ namespace be{
                 case ESP_GAP_BLE_SCAN_RESULT_EVT:{
                     switch(msg->gap.scan_rst.search_evt) {
                         case ESP_GAP_SEARCH_INQ_RES_EVT: {
+                            if(!hookedScanRes) {
+                                break ;
+                            }
                             uint8_t addr[18] ;
                             sprintf((char *)addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
                                 msg->gap.scan_rst.bda[0] ,
@@ -257,6 +294,9 @@ namespace be{
                         case ESP_GAP_SEARCH_INQ_CMPL_EVT: {
                             // bScanning = false ;
                             // printf("scan complete\n") ;
+                            if(!hookedScanCmpl) {
+                                break;
+                            }
                             emitSyncFree("scan-cmpl", {}) ;
                             break ;
                         }
