@@ -45,7 +45,7 @@ set(JS_TO_C_PATH "${BESHELL_TOOLS_DIR}/js-to-c.js")
 
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(demo)
+project(beshell-app)
 
 
 # 自动打包 js.bin

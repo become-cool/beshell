@@ -142,7 +142,11 @@ namespace be {
 
         adc_oneshot_unit_init_cfg_t init_config = {
             .unit_id = unit_id,
+#if CONFIG_IDF_TARGET_ESP32C6 || CONFIG_IDF_TARGET_ESP32H2
+            .clk_src = ADC_DIGI_CLK_SRC_DEFAULT,
+#else
             .clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+#endif
             .ulp_mode = ADC_ULP_MODE_DISABLE,
         } ;
 
@@ -199,6 +203,16 @@ namespace be {
         return true ;
     }
 
+    /**
+     * 初始化指定的 ADC 单元。
+     *
+     * @module gpio
+     * @function adcUnitInit
+     * 
+     * @param unit:number ADC 单元号，支持 1 或 2（取决于芯片能力）
+     *
+     * @return undefined
+     */
     JSValue GPIO::adcUnitInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         uint32_t unit_num = 1 ;
@@ -265,6 +279,18 @@ namespace be {
     }
 
 
+    /**
+     * 通过MCU引脚号初始化 ADC 通道。
+     * 
+     * @module gpio
+     * @function adcPinInit
+     * 
+     * @param pin:number 引脚序号
+     * @param atten:number=3 ADC 衰减值, 默认值 ADC_ATTEN_DB_12
+     * @param bitwidth:number=0 ADC 位宽, 默认值 ADC_BITWIDTH_DEFAULT
+     * 
+     * @return undefined
+     */
     JSValue GPIO::adcPinInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_GPIO(0, pin)
@@ -278,6 +304,19 @@ namespace be {
         return adc_channel_init_helper(ctx, unit, channel, argc, argv) ;
     }
 
+    /**
+     * 初始化指定 ADC 通道。
+     * 
+     * @module gpio
+     * @function adcChannelInit
+     * 
+     * @param channel:number adc 通道号
+     * @param atten:number=3 ADC 衰减值, 默认值 ADC_ATTEN_DB_12
+     * @param bitwidth:number=0 ADC 位宽, 默认值 ADC_BITWIDTH_DEFAULT
+     * @param unit:number=1 ADC 单元号, 默认单元1 ，部分 esp32 型号支持单元2
+     * 
+     * @return undefined
+     */
     JSValue GPIO::adcChannelInit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_INT(0, channel, adc_channel_t, uint32_t, JS_ToUint32)
@@ -331,7 +370,16 @@ namespace be {
         return JS_NewInt32(ctx, value) ;
     }
     
-    
+    /**
+     * 读取指定 ADC 通道的值。
+     * 
+     * @module gpio
+     * @function adcChannelRead
+     * @param channel:number 通道号
+     * @param unit:number=1 ADC 单元号, 默认单元1 ，部分 esp32 型号支持单元2
+     * 
+     * @return number ADC 通道的读取值
+     */
     JSValue GPIO::adcChannelRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_INT(0, channel, adc_channel_t, uint32_t, JS_ToUint32)
@@ -357,6 +405,15 @@ namespace be {
         return adc_channel_read_helper(ctx, channel, unit) ;
     }
 
+    /**
+     * 通过MCU引脚号读取 ADC 通道的值。
+     * 
+     * @module gpio
+     * @function adcRead
+     * @param pin:number 引脚号
+     * 
+     * @return number ADC 通道的读取值
+     */
     JSValue GPIO::adcRead(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_GPIO(0, pin)
@@ -369,6 +426,14 @@ namespace be {
         return adc_channel_read_helper(ctx, channel, unit) ;
     }
 
+    /**
+     * 获取当前 MCU 引脚与 ADC 通道的映射信息。
+     *
+     * @module gpio
+     * @function adcInfo
+     *
+     * @return object 以引脚号为键的对象，每项包含 channel 与 unit 字段
+     */
     JSValue GPIO::adcInfo(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         JSValue obj = JS_NewObject(ctx) ;
         for(const auto &entry : map_gpio_adc_info) {
@@ -867,278 +932,3 @@ namespace be {
     }
 
 }
-
-
-// ============================================================================
-// adc 对象在 js/gpio.js 中定义，通过 exportValue 导出到 GPIO 模块
-// ============================================================================
-
-/**
- * ADC 对象
- * 
- * 提供模数转换（ADC）功能，用于读取模拟信号（如传感器、电位器等）。
- * 
- * @module gpio
- * @object adc
- */
-
-/**
- * 初始化 ADC 单元
- * 
- * 配置 ADC 单元的基本参数。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 初始化 ADC1 单元
- * gpio.adc.initUnit({
- *     unit: 1,           // ADC 单元：1 或 2
- *     clk: "default"     // 时钟源
- * })
- * ```
- *
- * @module gpio
- * @object adc
- * @function initUnit
- * @param options:object 配置选项
- *     {
- *         unit: number,          // ADC 单元号（1 或 2）
- *         clk: string            // 时钟源
- *     }
- */
-
-/**
- * 初始化 ADC 通道
- * 
- * 配置 ADC 通道的衰减和位宽。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 初始化通道
- * gpio.adc.initChannel({
- *     unit: 1,
- *     channel: 0,
- *     atten: 11,      // 衰减：0=0dB(0-1.1V), 3=11dB(0-3.3V)
- *     bitwidth: 12    // 位宽：12位(0-4095)
- * })
- * ```
- *
- * @module gpio
- * @object adc
- * @function initChannel
- * @param options:object 配置选项
- *     {
- *         unit: number,          // ADC 单元号
- *         channel: number,       // 通道号
- *         atten: number,         // 衰减设置
- *         bitwidth: number       // 位宽
- *     }
- */
-
-/**
- * 初始化 ADC 引脚
- * 
- * 将 GPIO 引脚配置为 ADC 输入。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 将 GPIO 34 配置为 ADC 输入
- * gpio.adc.initPin(34)
- * ```
- *
- * @module gpio
- * @object adc
- * @function initPin
- * @param pin:number GPIO 引脚号
- */
-
-/**
- * 读取 ADC 值（通过引脚）
- * 
- * 从指定的 GPIO 引脚读取模拟值。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 初始化
- * gpio.adc.initPin(34)
- * 
- * // 读取电位器值
- * setInterval(() => {
- *     const value = gpio.adc.read(34)
- *     const voltage = value / 4095 * 3.3  // 转换为电压
- *     console.log(`ADC: ${value}, Voltage: ${voltage.toFixed(2)}V`)
- * }, 100)
- * 
- * // 光敏电阻示例
- * const lightValue = gpio.adc.read(34)
- * if (lightValue < 1000) {
- *     console.log("Bright")
- * } else if (lightValue < 3000) {
- *     console.log("Normal")
- * } else {
- *     console.log("Dark")
- * }
- * ```
- *
- * @module gpio
- * @object adc
- * @function read
- * @param pin:number GPIO 引脚号
- * @return number ADC 读数（0 到 2^bitwidth - 1）
- */
-
-/**
- * 读取 ADC 值（通过通道）
- * 
- * 从指定的 ADC 通道读取模拟值。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 通过通道读取
- * const value = gpio.adc.readChannel(1, 0)  // 单元1，通道0
- * console.log("Channel value:", value)
- * ```
- *
- * @module gpio
- * @object adc
- * @function readChannel
- * @param unit:number ADC 单元号
- * @param channel:number 通道号
- * @return number ADC 读数
- */
-
-/**
- * 获取 ADC 信息
- * 
- * 返回 ADC 的配置信息。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * const info = gpio.adc.info()
- * console.log(info)
- * ```
- *
- * @module gpio
- * @object adc
- * @function info
- * @return object ADC 配置信息
- */
-
-/**
- * 启动连续转换模式
- * 
- * 启动 ADC 连续采样模式，用于高速采集。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * // 配置连续转换
- * const handle = gpio.adc.startCont({
- *     unit: 1,
- *     channels: [0, 1],      // 转换通道
- *     freq: 1000,            // 采样频率
- *     buffer: 1024           // 缓冲区大小
- * })
- * 
- * // 设置回调处理数据
- * gpio.adc.setContCallback(handle, (data) => {
- *     console.log("Samples:", data.length)
- * })
- * 
- * // 读取数据
- * const samples = gpio.adc.readCont(handle)
- * 
- * // 停止连续转换
- * gpio.adc.stopCont(handle)
- * ```
- *
- * @module gpio
- * @object adc
- * @function startCont
- * @param options:object 配置选项
- * @return number 连续转换句柄
- */
-
-/**
- * 读取连续转换数据
- * 
- * 从连续转换模式读取采样数据。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * const handle = gpio.adc.startCont({...})
- * 
- * // 读取数据
- * const data = gpio.adc.readCont(handle)
- * console.log("Samples:", data)
- * ```
- *
- * @module gpio
- * @object adc
- * @function readCont
- * @param handle:number 连续转换句柄
- * @return number[] 采样数据数组
- */
-
-/**
- * 停止连续转换模式
- * 
- * 停止 ADC 连续采样并释放资源。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * const handle = gpio.adc.startCont({...})
- * 
- * // ... 使用连续转换 ...
- * 
- * // 停止并释放资源
- * gpio.adc.stopCont(handle)
- * ```
- *
- * @module gpio
- * @object adc
- * @function stopCont
- * @param handle:number 连续转换句柄
- */
-
-/**
- * 设置连续转换回调
- * 
- * 设置连续转换模式的数据回调函数。
- * 
- * 示例：
- * ```javascript
- * import * as gpio from "gpio"
- * 
- * const handle = gpio.adc.startCont({...})
- * 
- * // 设置数据处理回调
- * gpio.adc.setContCallback(handle, (samples) => {
- *     // 计算平均值
- *     const avg = samples.reduce((a, b) => a + b, 0) / samples.length
- *     console.log("Average:", avg)
- * })
- * ```
- *
- * @module gpio
- * @object adc
- * @function setContCallback
- * @param handle:number 连续转换句柄
- * @param callback:function 数据回调函数
- */

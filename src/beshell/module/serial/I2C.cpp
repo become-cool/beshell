@@ -76,7 +76,7 @@ namespace be {
     DEFINE_NCLASS_META(I2C, NativeClass)
 
     I2C * I2C::i2c0 = nullptr ;
-    #if SOC_I2C_NUM > 1
+    #if SOC_HP_I2C_NUM > 1
     I2C * I2C::i2c1 = nullptr ;
     #endif
     #if SOC_LP_I2C_NUM > 0
@@ -141,7 +141,7 @@ namespace be {
             }
             return i2c0 ;
         }
-        #if SOC_I2C_NUM > 1
+        #if SOC_HP_I2C_NUM > 1
         else if(bus==I2C_NUM_1) {
             if(!i2c1) {
                 i2c1 = new I2C(ctx, I2C_NUM_1) ;

@@ -207,7 +207,7 @@ namespace be {
 #if CONFIG_BESHELL_SERIAL_USE_I2C
         exportName("i2c0") ;
 
-        #if SOC_I2C_NUM > 1
+        #if SOC_HP_I2C_NUM > 1
         exportName("i2c1") ;
         #endif
 
@@ -291,7 +291,7 @@ namespace be {
         I2C * i2c0 = I2C::flyweight(ctx, I2C_NUM_0) ;
         exportValue("i2c0", JS_DupValue(ctx,i2c0->jsobj)) ;
 
-        #if SOC_I2C_NUM > 1
+        #if SOC_HP_I2C_NUM > 1
         I2C * i2c1 = I2C::flyweight(ctx, I2C_NUM_1) ;
         if(i2c1) {
             exportValue("i2c1", JS_DupValue(ctx,i2c1->jsobj)) ;
