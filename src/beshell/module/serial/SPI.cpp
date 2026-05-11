@@ -232,7 +232,7 @@ namespace be {
             .max_transfer_sz=max_transfer_sz
         } ;
 
-        esp_err_t ret = spi_bus_initialize(that->busnum, &buscfg, SPI_DMA_CH_AUTO);
+        esp_err_t ret = spi_bus_initialize((spi_host_device_t)that->busnum, &buscfg, SPI_DMA_CH_AUTO);
         if(ret!=ESP_OK) {
             printf("spi_bus_initialize() failed with err: %d\n", ret) ;
         }
