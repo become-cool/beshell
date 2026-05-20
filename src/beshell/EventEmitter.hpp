@@ -37,7 +37,7 @@ namespace be {
         void emitSync(const char * eventName) ;
 
 #ifdef ESP_PLATFORM
-        bool emitNativeEvent(void * param, bool fromISR=false) ;
+        bool IRAM_ATTR emitNativeEvent(void * param, bool fromISR=false) ;
 #endif
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

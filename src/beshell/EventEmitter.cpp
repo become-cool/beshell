@@ -242,7 +242,7 @@ namespace be {
     // 注意，该函数可能返回 false ，
     // 消息没有实际进入到队列中，因为队列满了或队列尚未创建
     // 如果消息中有由接收方负责释放的指针，此时需要由发送方负责释放回收
-    bool EventEmitter::emitNativeEvent(void * param, bool fromISR) {
+    bool IRAM_ATTR EventEmitter::emitNativeEvent(void * param, bool fromISR) {
         if(!nevent_queue) {
             return false ;
         }

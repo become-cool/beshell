@@ -55,6 +55,7 @@ namespace be {
             , NClassFinalizerFunc finalizer
             , JSClassID parentClassID
     ) {
+        assert(ctx) ;
         JS_NewClassID(&classID);
 
         if(mapCtxClassID2Constructor[ctx].count(classID)>0) {
