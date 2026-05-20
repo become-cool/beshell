@@ -25,10 +25,6 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
-#define JSTHROW(...)                                \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
-    return JS_EXCEPTION ;
-    
 typedef struct  {
     adc_unit_t unit ;
     adc_channel_t channel ;

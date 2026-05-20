@@ -69,12 +69,12 @@ namespace be {
      */
     JSValue Logger::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if (argc < 1) {
-            return JSTHROW("setup requires an options object");
+            JSTHROW("setup requires an options object");
         }
 
         // 检查参数是否为对象
         if (!JS_IsObject(argv[0])) {
-            return JSTHROW("options must be an object");
+            JSTHROW("options must be an object");
         }
 
         // 获取partition属性
@@ -85,7 +85,7 @@ namespace be {
 
         if (JS_IsUndefined(partition_val) || JS_IsNull(partition_val)) {
             JS_FreeValue(ctx, partition_val);
-            return JSTHROW("partition property is required");
+            JSTHROW("partition property is required");
         }
 
         // 转换partition为字符串
@@ -93,7 +93,7 @@ namespace be {
         JS_FreeValue(ctx, partition_val);
         
         if (!partition_name) {
-            return JSTHROW("partition must be a string");
+            JSTHROW("partition must be a string");
         }
         
         // 获取bufferSize属性（可选）
@@ -116,17 +116,17 @@ namespace be {
             case Logger::SUCCESS:
                 return JS_UNDEFINED;
             case Logger::ERROR_INVALID_PARTITION_NAME:
-                return JSTHROW("Invalid partition name");
+                JSTHROW("Invalid partition name");
             case Logger::ERROR_PARTITION_NOT_FOUND:
-                return JSTHROW("Partition not found");
+                JSTHROW("Partition not found");
             case Logger::ERROR_PARTITION_READ_FAILED:
-                return JSTHROW("Failed to read partition metadata");
+                JSTHROW("Failed to read partition metadata");
             case Logger::ERROR_PARTITION_WRITE_FAILED:
-                return JSTHROW("Failed to write partition metadata");
+                JSTHROW("Failed to write partition metadata");
             case Logger::ERROR_MEMORY_ALLOCATION_FAILED:
-                return JSTHROW("Failed to allocate memory for buffer");
+                JSTHROW("Failed to allocate memory for buffer");
             default:
-                return JSTHROW("Unknown error occurred");
+                JSTHROW("Unknown error occurred");
         }
     }
 
@@ -171,11 +171,11 @@ namespace be {
             case Logger::SUCCESS:
                 return JS_UNDEFINED;
             case Logger::ERROR_PARTITION_NOT_FOUND:
-                return JSTHROW("Logger not initialized - call setup() first");
+                JSTHROW("Logger not initialized - call setup() first");
             case Logger::ERROR_PARTITION_WRITE_FAILED:
-                return JSTHROW("Failed to update metadata");
+                JSTHROW("Failed to update metadata");
             default:
-                return JSTHROW("Unknown error occurred");
+                JSTHROW("Unknown error occurred");
         }
     }
 
@@ -222,10 +222,10 @@ namespace be {
         if (argc >= 1 && !JS_IsUndefined(argv[0])) {
             int64_t pos;
             if (JS_ToInt64(ctx, &pos, argv[0]) < 0) {
-                return JSTHROW("start position must be a number");
+                JSTHROW("start position must be a number");
             }
             if (pos < 0) {
-                return JSTHROW("start position must be non-negative");
+                JSTHROW("start position must be non-negative");
             }
             start_pos = (size_t)pos;
         }
@@ -234,17 +234,17 @@ namespace be {
         if (argc >= 2 && !JS_IsUndefined(argv[1])) {
             int64_t length;
             if (JS_ToInt64(ctx, &length, argv[1]) < 0) {
-                return JSTHROW("read length must be a number");
+                JSTHROW("read length must be a number");
             }
             if (length <= 0) {
-                return JSTHROW("read length must be positive");
+                JSTHROW("read length must be positive");
             }
             read_length = (size_t)length;
         }
 
         uint8_t* buffer = (uint8_t*)malloc(read_length);
         if(!buffer) {
-            return JSTHROW("Failed to allocate read buffer");
+            JSTHROW("Failed to allocate read buffer");
         }
         size_t actual_length = read(start_pos, read_length, buffer);
         if(!actual_length) {
@@ -288,7 +288,7 @@ namespace be {
      */
     JSValue Logger::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if (argc < 1) {
-            return JSTHROW("write requires data argument");
+            JSTHROW("write requires data argument");
         }
 
         JSValue data = argv[0];
@@ -305,7 +305,7 @@ namespace be {
             size_t str_len;
             const char* str = JS_ToCStringLen(ctx, &str_len, data);
             if (!str) {
-                return JSTHROW("Failed to convert string data");
+                JSTHROW("Failed to convert string data");
             }
             
             if (str_len > 0) {
@@ -320,7 +320,7 @@ namespace be {
             uint8_t* buffer_data = JS_GetArrayBuffer(ctx, &buffer_size, data);
             
             if (!buffer_data) {
-                return JSTHROW("Failed to get ArrayBuffer data");
+                JSTHROW("Failed to get ArrayBuffer data");
             }
             
             if (buffer_size > 0) {
@@ -366,7 +366,7 @@ namespace be {
                     }
                     JS_FreeCString(ctx, str);
                 } else {
-                    return JSTHROW("Unsupported data type - must be string or ArrayBuffer");
+                    JSTHROW("Unsupported data type - must be string or ArrayBuffer");
                 }
             }
         }
@@ -443,20 +443,20 @@ namespace be {
         // 解析第一个参数：页码
         if (argc >= 1 && !JS_IsUndefined(argv[0])) {
             if (JS_ToInt64(ctx, &page, argv[0]) < 0) {
-                return JSTHROW("page must be a number");
+                JSTHROW("page must be a number");
             }
             if (page < 0) {
-                return JSTHROW("page must be non-negative");
+                JSTHROW("page must be non-negative");
             }
         }
 
         // 解析第二个参数：每页行数
         if (argc >= 2 && !JS_IsUndefined(argv[1])) {
             if (JS_ToInt64(ctx, &lines_per_page, argv[1]) < 0) {
-                return JSTHROW("linesPerPage must be a number");
+                JSTHROW("linesPerPage must be a number");
             }
             if (lines_per_page <= 0) {
-                return JSTHROW("linesPerPage must be positive");
+                JSTHROW("linesPerPage must be positive");
             }
         }
         
@@ -583,20 +583,20 @@ namespace be {
         // 解析第一个参数：页码
         if (argc >= 1 && !JS_IsUndefined(argv[0])) {
             if (JS_ToInt64(ctx, &page, argv[0]) < 0) {
-                return JSTHROW("page must be a number");
+                JSTHROW("page must be a number");
             }
             if (page < 0) {
-                return JSTHROW("page must be non-negative");
+                JSTHROW("page must be non-negative");
             }
         }
 
         // 解析第二个参数：每页行数
         if (argc >= 2 && !JS_IsUndefined(argv[1])) {
             if (JS_ToInt64(ctx, &lines_per_page, argv[1]) < 0) {
-                return JSTHROW("linesPerPage must be a number");
+                JSTHROW("linesPerPage must be a number");
             }
             if (lines_per_page <= 0) {
-                return JSTHROW("linesPerPage must be positive");
+                JSTHROW("linesPerPage must be positive");
             }
         }
 
@@ -752,17 +752,17 @@ namespace be {
      */
         JSValue Logger::setWriteOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             if (argc < 1) {
-                return JSTHROW("setWriteOffset requires an offset argument");
+                JSTHROW("setWriteOffset requires an offset argument");
             }
 
             // 解析offset参数
             int64_t offset;
             if (JS_ToInt64(ctx, &offset, argv[0]) < 0) {
-                return JSTHROW("offset must be a number");
+                JSTHROW("offset must be a number");
             }
 
             if (offset < 0) {
-                return JSTHROW("offset must be non-negative");
+                JSTHROW("offset must be non-negative");
             }
 
             // 调用底层函数设置写入偏移
@@ -821,7 +821,7 @@ namespace be {
      */
         JSValue Logger::fill(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
             if (argc < 1) {
-                return JSTHROW("fill requires a data argument");
+                JSTHROW("fill requires a data argument");
             }
 
             uint8_t fill_data = 0x00; // 默认填充0
@@ -831,7 +831,7 @@ namespace be {
                 size_t str_len;
                 const char* str = JS_ToCStringLen(ctx, &str_len, argv[0]);
                 if (!str) {
-                    return JSTHROW("Failed to convert string data");
+                    JSTHROW("Failed to convert string data");
                 }
                 
                 if (str_len > 0) {
@@ -847,7 +847,7 @@ namespace be {
                 }
             }
             else {
-                return JSTHROW("fill data must be a string or number");
+                JSTHROW("fill data must be a string or number");
             }
 
             // 调用底层函数进行填充

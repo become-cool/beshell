@@ -17,23 +17,24 @@ extern "C" {
 #define VAR_REFCNT(var) ((JSRefCountHeader *)JS_VALUE_GET_PTR(var))->ref_count
 #define P_VAR_REFCNT(var) printf(#var" ref count:%d @%d\n", VAR_REFCNT(var), __LINE__) ;
 
-#define JSTHROW(...)                                \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
-    return JS_EXCEPTION ;
+#define JSTHROW(...)                                        \
+        return JS_ThrowReferenceError(ctx, __VA_ARGS__);    \
 
 
-#define JSTHROW_GOTO(label, ...)                    \
-    JS_ThrowReferenceError(ctx, __VA_ARGS__);       \
-    goto label ;
+#define JSTHROW_GOTO(label, ...)                            \
+    {                                                       \
+        JS_ThrowReferenceError(ctx, __VA_ARGS__);           \
+        goto label ;                                        \
+    }
 
-#define ASSERT_ARGC(num)                             \
+#define ASSERT_ARGC(num)                            \
     if(argc<num) {                                  \
         JSTHROW("Missing param")                    \
     }
 #define CHECK_ARGC(num) ASSERT_ARGC(num)
 
-#define ARGV_TO_INT_VAR(i, var, api, ctype)                \
-	if( api(ctx, (ctype*)&var, argv[i])!=0 ) {              \
+#define ARGV_TO_INT_VAR(i, var, api, ctype)         \
+	if( api(ctx, (ctype*)&var, argv[i])!=0 ) {      \
         JSTHROW("Invalid param type")               \
 	}
 #define  ARGV_TO_UINT8_VAR(i,var)   ARGV_TO_INT_VAR(i, var, JS_ToUint32, uint32_t)
