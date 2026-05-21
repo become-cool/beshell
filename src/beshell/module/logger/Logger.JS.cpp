@@ -63,8 +63,9 @@ namespace be {
      * }
      * ```
      * 
+     * @module logger
      * @function setup
-     * @param options object 配置选项
+     * @param options:object 配置选项
      * @return undefined
      */
     JSValue Logger::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -135,6 +136,7 @@ namespace be {
      * 
      * 调用此函数后，printf 和 write 的输出将停止被捕获到日志分区中。
      * 
+     * @module logger
      * @function pause
      * @return undefined
      */
@@ -148,6 +150,7 @@ namespace be {
      * 
      * 调用此函数后，printf 和 write 的输出将重新开始被捕获到日志分区中。
      * 
+     * @module logger
      * @function resume
      * @return undefined
      */
@@ -161,6 +164,7 @@ namespace be {
      * 
      * 清除分区中的所有日志数据，重置写入位置到起始状态。此操作不可逆。
      * 
+     * @module logger
      * @function clear
      * @return undefined
      */
@@ -186,6 +190,7 @@ namespace be {
      * 如果日志发生了循环写入，返回值为可用空间大小（分区大小减去元数据大小）。
      * 如果未发生循环，返回值为当前写入位置。
      * 
+     * @module logger
      * @function length
      * @return number 日志数据字节数
      */
@@ -209,8 +214,9 @@ namespace be {
      * const data2 = logger.read(512, 512);
      * ```
      * 
+     * @module logger
      * @function read
-     * @param start_pos number=0 读取起始位置（相对于日志数据区）
+     * @param start_pos:number=0 读取起始位置（相对于日志数据区）
      * @param length number=1024 读取长度（字节数）
      * @return ArrayBuffer 读取到的原始数据
      */
@@ -281,8 +287,9 @@ namespace be {
      * logger.write(`Value is: ${value}`);
      * ```
      * 
+     * @module logger
      * @function write
-     * @param data string|ArrayBuffer 要写入的数据
+     * @param data:string|ArrayBuffer 要写入的数据
      * @param timestampPrefix boolean=true 是否添加时间戳前缀
      * @return number 实际写入的字节数
      */
@@ -380,6 +387,7 @@ namespace be {
      * 调用此函数将强制把当前缓冲区中的所有数据写入到flash分区中，无论缓冲区是否已满。
      * 这在需要确保日志立即持久化的情况下非常有用，如在关键操作前后或系统即将重启时。
      * 
+     * @module logger
      * @function flush
      * @return number 实际写入的字节数
      */
@@ -393,6 +401,7 @@ namespace be {
      * 调用此函数将清除日志分区中的所有数据，并重置写入位置到起始状态。
      * 注意，此操作不可逆，所有日志数据将被永久删除。
      * 
+     * @module logger
      * @function erase
      * @return undefined
      */
@@ -431,8 +440,9 @@ namespace be {
      * logger.top(1, 10);
      * ```
      * 
+     * @module logger
      * @function top
-     * @param page number=0 页码（从0开始）
+     * @param page:number=0 页码（从0开始）
      * @param linesPerPage number=20 每页显示的行数
      * @return undefined
      */
@@ -568,8 +578,9 @@ namespace be {
      * logger.tail(1, 10);
      * ```
      * 
+     * @module logger
      * @function tail
-     * @param page number=0 页码（从0开始，0表示最后一页）
+     * @param page:number=0 页码（从0开始，0表示最后一页）
      * @param linesPerPage number=20 每页显示的行数
      * @return undefined
      */
@@ -746,8 +757,9 @@ namespace be {
      * logger.setWriteOffset(0);
      * ```
      * 
+     * @module logger
      * @function setWriteOffset
-     * @param offset number 写入偏移位置（字节数）
+     * @param offset:number 写入偏移位置（字节数）
      * @return undefined
      */
         JSValue Logger::setWriteOffset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -784,6 +796,7 @@ namespace be {
      * console.log(`Current write offset: ${offset}`);
      * ```
      * 
+     * @module logger
      * @function getWriteOffset
      * @return number 当前写入偏移位置（字节数）
      */
@@ -815,8 +828,9 @@ namespace be {
      * logger.fill(255);
      * ```
      * 
+     * @module logger
      * @function fill
-     * @param data string|number 填充数据，字符串取首字符，数字取低8位
+     * @param data:string|number 填充数据，字符串取首字符，数字取低8位
      * @return undefined
      */
         JSValue Logger::fill(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

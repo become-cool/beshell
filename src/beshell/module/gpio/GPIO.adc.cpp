@@ -203,8 +203,9 @@ namespace be {
      * 初始化指定的 ADC 单元。
      *
      * @module gpio
+     * @object adc
      * @function adcUnitInit
-     * 
+     *
      * @param unit:number ADC 单元号，支持 1 或 2（取决于芯片能力）
      *
      * @return undefined
@@ -279,8 +280,9 @@ namespace be {
      * 通过MCU引脚号初始化 ADC 通道。
      * 
      * @module gpio
+     * @object adc
      * @function adcPinInit
-     * 
+     *
      * @param pin:number 引脚序号
      * @param atten:number=3 ADC 衰减值, 默认值 ADC_ATTEN_DB_12
      * @param bitwidth:number=0 ADC 位宽, 默认值 ADC_BITWIDTH_DEFAULT
@@ -304,8 +306,9 @@ namespace be {
      * 初始化指定 ADC 通道。
      * 
      * @module gpio
+     * @object adc
      * @function adcChannelInit
-     * 
+     *
      * @param channel:number adc 通道号
      * @param atten:number=3 ADC 衰减值, 默认值 ADC_ATTEN_DB_12
      * @param bitwidth:number=0 ADC 位宽, 默认值 ADC_BITWIDTH_DEFAULT
@@ -370,6 +373,7 @@ namespace be {
      * 读取指定 ADC 通道的值。
      * 
      * @module gpio
+     * @object adc
      * @function adcChannelRead
      * @param channel:number 通道号
      * @param unit:number=1 ADC 单元号, 默认单元1 ，部分 esp32 型号支持单元2
@@ -405,6 +409,7 @@ namespace be {
      * 通过MCU引脚号读取 ADC 通道的值。
      * 
      * @module gpio
+     * @object adc
      * @function adcRead
      * @param pin:number 引脚号
      * 
@@ -426,6 +431,7 @@ namespace be {
      * 获取当前 MCU 引脚与 ADC 通道的映射信息。
      *
      * @module gpio
+     * @object adc
      * @function adcInfo
      *
      * @return object 以引脚号为键的对象，每项包含 channel 与 unit 字段
