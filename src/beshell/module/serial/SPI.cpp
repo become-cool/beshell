@@ -204,8 +204,10 @@ namespace be {
      *         sck: number,           // SCK 引脚 GPIO 编号（必需）
      *         quadwp_io_num?: number, // Quad WP IO 编号，默认 -1
      *         quadhd_io_num?: number, // Quad HD IO 编号，默认 -1
-     *         max_transfer_sz?: number // 最大传输大小，默认 20480
+     *         max_transfer_sz?: number, // 最大传输大小，默认 20480
+     *         flags?: number          // SPI 总线标志位（如 SPICOMMON_BUSFLAG_QUAD），默认 0
      *     }
+     *     注意：当 quadwp_io_num 和 quadhd_io_num 均被设置时，会自动添加 SPICOMMON_BUSFLAG_QUAD 标志
      * @return number 错误代码，0 表示成功
      * @throws SPI 总线初始化失败
      */
@@ -219,9 +221,11 @@ namespace be {
         int GET_INT32_PROP_OPT(argv[0], "quadwp_io_num", quadwp_io_num, -1)
         int GET_INT32_PROP_OPT(argv[0], "quadhd_io_num", quadhd_io_num, -1)
         int GET_INT32_PROP_OPT(argv[0], "max_transfer_sz", max_transfer_sz, 20480)
-        
-        // printf("spi[%d] miso=%d, mosi=%d, sck=%d\n", that->busnum, misopin, mosipin, sckpin);
-        // dn(busnum)
+        int GET_INT32_PROP_OPT(argv[0], "flags", flags, 0)
+
+        if(quadwp_io_num!=-1 && quadhd_io_num!=-1) {
+            flags |= SPICOMMON_BUSFLAG_QUAD ;
+        }
 
         spi_bus_config_t buscfg = {
             .mosi_io_num=mosipin,
@@ -231,6 +235,7 @@ namespace be {
             .quadhd_io_num=quadhd_io_num,
             .max_transfer_sz=max_transfer_sz
         } ;
+        buscfg.flags = (uint32_t)flags ;
 
         esp_err_t ret = spi_bus_initialize((spi_host_device_t)that->busnum, &buscfg, SPI_DMA_CH_AUTO);
         if(ret!=ESP_OK) {
