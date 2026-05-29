@@ -1,11 +1,12 @@
 #pragma once
 
+#include <vector>
 #include "../../NativeClass.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/i2c_master.h"
-#include "debug.h"
+#include "../../debug.h"
 #if SOC_I2C_SUPPORT_SLAVE
 #include "driver/i2c_slave.h"
 #endif
@@ -245,5 +246,11 @@ namespace be {
         i2c_master_dev_handle_t devHandle(uint16_t addr, bool bit10=false) ;
         uint8_t devRegBit(uint16_t addr, bool bit10=false) ;
         inner::i2c_device_memo_t * devMemo(uint16_t addr, bool bit10=false) ;
+
+        // Arduino-like API internal state
+        uint8_t _arduino_addr = 0 ;
+        std::vector<uint8_t> _tx_buffer ;
+        std::vector<uint8_t> _rx_buffer ;
+        int _rx_read_index = 0 ;
     } ;
 }

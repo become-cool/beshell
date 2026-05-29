@@ -976,6 +976,97 @@ namespace be {
     JSValue I2C::readU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return readRegInt<uint32_t>(ctx, this_val, argc, argv, true) ;
     }
+
+    // -------------------
+    // arduino like api
+
+    gpio_num_t I2C::sda() const {
+        return _sda ;
+    }
+    gpio_num_t I2C::scl() const {
+        return _scl ;
+    }
+    i2c_port_t I2C::number() const {
+        return busnum ;
+    }
+
+    void I2C::begin(uint32_t freq) {
+        if (isInstalled()) {
+            return ;
+        }
+        if (_sda == GPIO_NUM_NC || _scl == GPIO_NUM_NC) {
+            return ;
+        }
+        i2c_master_bus_config_t bus_config = {} ;
+        bus_config.i2c_port = busnum ;
+        bus_config.sda_io_num = _sda ;
+        bus_config.scl_io_num = _scl ;
+        bus_config.clk_source = I2C_CLK_SRC_DEFAULT ;
+        bus_config.glitch_ignore_cnt = 7 ;
+        bus_config.flags.enable_internal_pullup = true ;
+        i2c_new_master_bus(&bus_config, &bus_handle) ;
+    }
+
+    void I2C::end() {
+        _tx_buffer.clear() ;
+        _rx_buffer.clear() ;
+        _rx_read_index = 0 ;
+    }
+
+    void I2C::beginTransmission(uint8_t addr) {
+        _arduino_addr = addr ;
+        _tx_buffer.clear() ;
+        if (mode == I2C_MODE_MASTER) {
+            devHandle(addr) ;
+        }
+    }
+
+    size_t I2C::write(uint8_t data) {
+        _tx_buffer.push_back(data) ;
+        return _tx_buffer.size() ;
+    }
+
+    int I2C::endTransmission(bool stop) {
+        if (_tx_buffer.empty() || mode != I2C_MODE_MASTER) {
+            return -1 ;
+        }
+        i2c_master_dev_handle_t handle = devHandle(_arduino_addr) ;
+        if (!handle) {
+            return -1 ;
+        }
+        esp_err_t res = i2c_master_transmit(handle, _tx_buffer.data(), _tx_buffer.size(), 10) ;
+        _tx_buffer.clear() ;
+        return (int)res ;
+    }
+
+    uint8_t I2C::requestFrom(uint8_t addr, size_t len, uint8_t stop) {
+        if (mode != I2C_MODE_MASTER || len == 0) {
+            return 0 ;
+        }
+        i2c_master_dev_handle_t handle = devHandle(addr) ;
+        if (!handle) {
+            return 0 ;
+        }
+        _rx_buffer.resize(len) ;
+        _rx_read_index = 0 ;
+        esp_err_t res = i2c_master_receive(handle, _rx_buffer.data(), len, 10) ;
+        if (res != ESP_OK) {
+            _rx_buffer.clear() ;
+            return 0 ;
+        }
+        return len ;
+    }
+
+    int I2C::read() {
+        if (_rx_read_index >= (int)_rx_buffer.size()) {
+            return -1 ;
+        }
+        return _rx_buffer[_rx_read_index++] ;
+    }
+
+    int I2C::available() {
+        return (int)_rx_buffer.size() - _rx_read_index ;
+    }
 }
 
 #endif

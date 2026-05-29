@@ -4,6 +4,7 @@ New Feature:
 
 * + InDevPointer
 * spi.setup() 支持4线SPI
+* I2C arduino like api ，方便移植
 
 
 # v1.0.11 2026/5/11
