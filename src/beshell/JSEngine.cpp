@@ -285,7 +285,7 @@ namespace be {
 
     JSValue JSEngine::evalScript(const char * filepath, int flags, bool dumpException) {
         assert(beshell) ;
-        
+
         int readed ;
         unique_ptr<char> content = FS::readFileSync(filepath,&readed) ;
         if(readed<0) {
@@ -294,7 +294,47 @@ namespace be {
 
         string code(content.get(), readed) ;
 
-        JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
+        bool exportToGlobal = (flags & FLAG_EXPORT_TO_GLOBAL) &&
+                              ((flags & JS_EVAL_TYPE_MASK) == JS_EVAL_TYPE_MODULE) ;
+        if (exportToGlobal) {
+            flags &= ~FLAG_EXPORT_TO_GLOBAL ;
+        }
+
+        JSValue evalRet ;
+        if (exportToGlobal) {
+            // Step 1: compile only, returns JS_TAG_MODULE JSValue
+            evalRet = JS_Eval(ctx, code.c_str(), code.length(), filepath,
+                              flags | JS_EVAL_FLAG_COMPILE_ONLY) ;
+            if (!JS_IsException(evalRet)) {
+                JSModuleDef *m = JS_VALUE_GET_PTR(evalRet) ;
+                // Step 2: execute module (consumes evalRet)
+                JSValue execRet = JS_EvalFunction(ctx, evalRet) ;
+                if (!JS_IsException(execRet)) {
+                    // Step 3: 将 module export 的内容导出到全局对象上
+                    JSValue ns = js_get_module_ns(ctx, m) ;
+                    JSValue global = JS_GetGlobalObject(ctx) ;
+
+                    JSPropertyEnum *tab ;
+                    uint32_t tab_len ;
+                    if (JS_GetOwnPropertyNames(ctx, &tab, &tab_len, ns,
+                            JS_GPN_STRING_MASK | JS_GPN_ENUM_ONLY) == 0) {
+                        for (uint32_t i = 0; i < tab_len; i++) {
+                            JSValue val = JS_GetProperty(ctx, ns, tab[i].atom) ;
+                            JS_SetProperty(ctx, global, tab[i].atom, val) ;
+                            JS_FreeValue(ctx, val) ;
+                        }
+                        js_free_prop_enum(ctx, tab, tab_len) ;
+                    }
+
+                    JS_FreeValue(ctx, global) ;
+                    JS_FreeValue(ctx, ns) ;
+                }
+                JS_FreeValue(ctx, execRet) ;
+            }
+        } else {
+            evalRet = JS_Eval(ctx, code.c_str(), code.length(), filepath, flags) ;
+        }
+
         JSValue ret = JS_GetException(ctx) ;
         if(dumpException && !JS_IsNull(ret) && !JS_IsUndefined(ret)) {
             string str = getExceptionStr(ctx, ret) ;

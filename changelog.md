@@ -2,6 +2,7 @@
 
 New Feature:
 
+* + JSEngine::FLAG_EXPORT_TO_GLOBAL — evalScript() 支持将 module export 自动导出到 global scope
 * + InDevPointer
 * spi.setup() 支持4线SPI
 * I2C arduino like api ，方便移植

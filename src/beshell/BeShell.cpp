@@ -82,7 +82,7 @@ namespace be {
         char mainRunPath[256] = {0} ;
         if( NVS::readString("main-run", mainRunPath, sizeof(mainRunPath)-1)==0 ){
             NVS::erase("main-run") ;
-            engine->evalScript(mainRunPath) ;
+            engine->evalScript(mainRunPath, JSEngine::FLAG_EXPORT_TO_GLOBAL|JS_EVAL_TYPE_MODULE) ;
         }
 
         else if(mainScriptPath) {
@@ -132,7 +132,7 @@ namespace be {
             }
 #endif
 
-            engine->evalScript(mainScriptPath) ;
+            engine->evalScript(mainScriptPath, JSEngine::FLAG_EXPORT_TO_GLOBAL|JS_EVAL_TYPE_MODULE) ;
         }
     }
 
