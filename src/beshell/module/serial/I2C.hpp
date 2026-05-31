@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/i2c_master.h"
+#include "freertos/semphr.h"
 #include "../../debug.h"
 #if SOC_I2C_SUPPORT_SLAVE
 #include "driver/i2c_slave.h"
@@ -41,6 +42,23 @@ namespace be {
         I2C(JSContext * ctx, i2c_port_t busnum) ;
         ~I2C() ;
 
+        inline void take() {
+            if(!sema) {
+                sema = xSemaphoreCreateMutex();
+            }
+            if(sema) {
+                xSemaphoreTake(sema, portMAX_DELAY);
+            }
+        }
+        inline void give() {
+            if(sema) {
+                xSemaphoreGive(sema);
+            }
+        }
+
+        static void s_take();
+        static void s_give();
+
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static I2C * flyweight(JSContext *, i2c_port_t) ;
@@ -74,7 +92,7 @@ namespace be {
                 _value[i] = ( value >> ((sizeof(TV)-i-1)*8) ) & 0xFF ;
             }
 
-            constexpr int default_timeout_ms = 10;
+            constexpr int default_timeout_ms = 50;
 
             i2c_master_transmit_multi_buffer_info_t buffer_info[2] = {};
             buffer_info[0].write_buffer = _reg;
@@ -105,7 +123,7 @@ namespace be {
                 reg_buf[i] = (reg >> ((memo->reg_addr_bits - (i + 1) * 8))) & 0xFF;
             }
 
-            constexpr int default_timeout_ms = 10;
+            constexpr int default_timeout_ms = 50;
             return i2c_master_transmit_receive(memo->dev_handle, reg_buf, bytes, buff, buff_size, default_timeout_ms) == ESP_OK;
         }
         
@@ -122,42 +140,50 @@ namespace be {
 
         template <typename TV>
         static JSValue readRegInt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, bool isSigned=true) {
-            THIS_NCLASS(I2C, that)
-            if(that->mode!=I2C_MODE_MASTER) {
-                JSTHROW("I2C is not in %s mode", "master") ;
-            }
             ASSERT_ARGC(2)
             ARGV_TO_UINT16(0, addr)
+            ARGV_TO_UINT32_OPT(2, len, 1)
+
+            THIS_NCLASS(I2C, that)
+            that->take();
+
+            if(that->mode != I2C_MODE_MASTER) {
+                that->give();
+                JSTHROW("I2C is not in %s mode", "master") ;
+            }
+
             bool bit10 = addr > 0x7F;
-            
             inner::i2c_device_memo_t * memo = that->devMemo(addr, bit10);
             if(!memo) {
+                that->give();
                 JSTHROW("i2c device 0x%02X not found", addr) ;
             }
 
             uint32_t reg32 = 0 ;
-            if( JS_ToUint32(ctx, &reg32, argv[1])!=0 ) {
+            if(JS_ToUint32(ctx, &reg32, argv[1]) != 0) {
+                that->give();
                 JSTHROW("Invalid register address")
             }
 
-            ARGV_TO_UINT32_OPT(2, len, 1)
-            TV * buffer = (TV*) malloc( len * sizeof(TV) ) ;
+            TV * buffer = (TV*) malloc(len * sizeof(TV)) ;
             if(!buffer) {
+                that->give();
                 JSTHROW("out of memory?") ;
             }
-            memset(buffer,128,len*sizeof(TV)) ;
+            memset(buffer, 128, len * sizeof(TV)) ;
 
+            bool read_ok ;
             if(bit10) {
-                if(!that->read<uint16_t>(addr,reg32,(uint8_t*)buffer,len)){
-                    free(buffer) ;
-                    JSTHROW("i2c read failed") ;
-                }
+                read_ok = that->read<uint16_t>(addr, reg32, (uint8_t*)buffer, len);
+            } else {
+                read_ok = that->read<uint8_t>(addr, reg32, (uint8_t*)buffer, len);
             }
-            else {
-                if(!that->read<uint8_t>(addr,reg32,(uint8_t*)buffer,len)){
-                    free(buffer) ;
-                    JSTHROW("i2c read failed") ;
-                }
+
+            that->give();
+
+            if(!read_ok) {
+                free(buffer) ;
+                JSTHROW("i2c read failed") ;
             }
 
             JSValue arr ;
@@ -224,6 +250,8 @@ namespace be {
         gpio_num_t _scl = GPIO_NUM_NC ;
         i2c_mode_t mode = I2C_MODE_MASTER ;
 
+        SemaphoreHandle_t sema = nullptr ;
+
         static I2C * i2c0 ;
         #if SOC_I2C_NUM > 1
         static I2C * i2c1 ;
@@ -231,6 +259,8 @@ namespace be {
         #if SOC_LP_I2C_NUM > 0
         static I2C * i2clp0 ;
         #endif
+
+        static SemaphoreHandle_t s_flyweightMutex ;
 
         #if SOC_I2C_SUPPORT_SLAVE
         // ...

@@ -83,6 +83,28 @@ namespace be {
     I2C * I2C::i2clp0 = nullptr ;
     #endif
 
+    SemaphoreHandle_t I2C::s_flyweightMutex = nullptr ;
+
+    void I2C::s_take() {
+        if(!s_flyweightMutex) {
+            static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+            portENTER_CRITICAL(&mux);
+            if(!s_flyweightMutex) {
+                s_flyweightMutex = xSemaphoreCreateMutex();
+            }
+            portEXIT_CRITICAL(&mux);
+        }
+        if(s_flyweightMutex) {
+            xSemaphoreTake(s_flyweightMutex, portMAX_DELAY);
+        }
+    }
+
+    void I2C::s_give() {
+        if(s_flyweightMutex) {
+            xSemaphoreGive(s_flyweightMutex);
+        }
+    }
+
     std::vector<JSCFunctionListEntry> I2C::methods = {
         JS_CFUNC_DEF("setup", 1, I2C::setup),
         JS_CFUNC_DEF("unsetup", 1, I2C::unsetup),
@@ -121,7 +143,10 @@ namespace be {
     }
     
     I2C::~I2C() {
-        // vSemaphoreDelete(sema) ;
+        if(sema) {
+            vSemaphoreDelete(sema);
+            sema = nullptr;
+        }
     }
     
     JSValue I2C::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -135,18 +160,20 @@ namespace be {
     }
     
     I2C * I2C::flyweight(JSContext * ctx, i2c_port_t bus) {
+        I2C * result = nullptr;
+        s_take();
         if(bus==I2C_NUM_0) {
             if(!i2c0) {
                 i2c0 = new I2C(ctx, I2C_NUM_0) ;
             }
-            return i2c0 ;
+            result = i2c0 ;
         }
         #if SOC_HP_I2C_NUM > 1
         else if(bus==I2C_NUM_1) {
             if(!i2c1) {
                 i2c1 = new I2C(ctx, I2C_NUM_1) ;
             }
-            return i2c1 ;
+            result = i2c1 ;
         }
         #endif
         #if SOC_LP_I2C_NUM > 0
@@ -154,10 +181,11 @@ namespace be {
             if(!i2clp0) {
                 i2clp0 = new I2C(ctx, LP_I2C_NUM_0) ;
             }
-            return i2clp0 ;
+            result = i2clp0 ;
         }
         #endif
-        return nullptr ;
+        s_give();
+        return result ;
     }
 
     
@@ -277,105 +305,201 @@ namespace be {
      * @throws 从模式不受支持
      */
     JSValue I2C::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, that)
-        ASSERT_ARGC(1)
+        if(argc < 1) {
+            JSTHROW("Missing param");
+        }
 
-        GET_GPIO_PROP(argv[0], "sda", that->_sda, )
-        GET_GPIO_PROP(argv[0], "scl", that->_scl, )
-        i2c_mode_t GET_UINT_PROP_OPT(argv[0], "mode", mode, i2c_mode_t, I2C_MODE_MASTER)
+        THIS_NCLASS(I2C, that)
+        JSValue ret = JS_UNDEFINED;
+        bool locked = false;
+        esp_err_t res = ESP_OK;
+        i2c_mode_t local_mode = I2C_MODE_MASTER;
+        uint32_t clk_source = I2C_CLK_SRC_DEFAULT;
+        uint32_t glitch_ignore_cnt = 7;
+        bool enable_internal_pullup = true;
+        bool allow_power_down = false;
+        int intr_priority = 0;
+        uint32_t trans_queue_depth = 0;
+        uint8_t core = 0;
+        i2c_master_bus_config_t bus_config = {};
+
+        that->take();
+        locked = true;
 
         auto cleanup_master_bus = [&]() {
             if(!that->devices.empty()) {
                 for(auto &entry : that->devices) {
                     if(entry.second.dev_handle) {
-                        i2c_master_bus_rm_device(entry.second.dev_handle) ;
-                        entry.second.dev_handle = nullptr ;
+                        i2c_master_bus_rm_device(entry.second.dev_handle);
+                        entry.second.dev_handle = nullptr;
                     }
                 }
-                that->devices.clear() ;
+                that->devices.clear();
             }
             if(that->bus_handle) {
-                i2c_del_master_bus(that->bus_handle) ;
-                that->bus_handle = nullptr ;
+                i2c_del_master_bus(that->bus_handle);
+                that->bus_handle = nullptr;
             }
         };
 
-        esp_err_t res = ESP_OK ;
-        i2c_port_t bus = that->busnum ;
+        GET_GPIO_PROP(argv[0], "sda", that->_sda, {ret = JS_EXCEPTION; goto cleanup;})
+        GET_GPIO_PROP(argv[0], "scl", that->_scl, {ret = JS_EXCEPTION; goto cleanup;})
 
-        if(mode==I2C_MODE_MASTER) {
-            that->mode = mode ;
-            
-            uint32_t clk_source = I2C_CLK_SRC_DEFAULT ;
-            GET_UINT32_PROP_OPT(argv[0], "clk_source", clk_source, I2C_CLK_SRC_DEFAULT)
-            uint32_t glitch_ignore_cnt = 7 ;
-            GET_UINT32_PROP_OPT(argv[0], "glitch_ignore_cnt", glitch_ignore_cnt, 7)
-            bool enable_internal_pullup = true ;
-            GET_BOOL_PROP_OPT(argv[0], "internal_pullup", enable_internal_pullup, true)
-            bool allow_power_down = false ;
-            GET_BOOL_PROP_OPT(argv[0], "allow_pd", allow_power_down, false)
-            int intr_priority = 0 ;
-            GET_INT32_PROP_OPT(argv[0], "intr_priority", intr_priority, 0)
-            uint32_t trans_queue_depth = 0 ;
-            GET_UINT32_PROP_OPT(argv[0], "trans_queue_depth", trans_queue_depth, 0)
-            uint8_t GET_UINT8_PROP_OPT(argv[0], "core", core, 0)
+        // Parse mode manually to avoid JSTHROW inside lock
+        {
+            JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "mode");
+            if(!JS_IsUndefined(jsvar)) {
+                if(!JS_IsNumber(jsvar)) {
+                    JS_FreeValue(ctx, jsvar);
+                    JS_ThrowReferenceError(ctx, "property mode is not a number");
+                    ret = JS_EXCEPTION;
+                    goto cleanup;
+                }
+                uint32_t tmp;
+                JS_ToUint32(ctx, &tmp, jsvar);
+                local_mode = (i2c_mode_t)tmp;
+            }
+            JS_FreeValue(ctx, jsvar);
+        }
 
-            i2c_master_bus_config_t bus_config = {} ;
-            bus_config.i2c_port = bus ;
-            bus_config.sda_io_num = that->_sda ;
-            bus_config.scl_io_num = that->_scl ;
-            bus_config.clk_source = static_cast<i2c_clock_source_t>(clk_source) ;
-            bus_config.glitch_ignore_cnt = static_cast<uint8_t>(glitch_ignore_cnt) ;
-            bus_config.intr_priority = intr_priority ;
-            bus_config.trans_queue_depth = trans_queue_depth ;
-            bus_config.flags.enable_internal_pullup = enable_internal_pullup ;
-            bus_config.flags.allow_pd = allow_power_down ;
+        if(local_mode == I2C_MODE_MASTER) {
+            that->mode = local_mode;
+
+            // clk_source
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "clk_source");
+                if(!JS_IsUndefined(jsvar)) {
+                    if(!JS_IsNumber(jsvar)) { JS_FreeValue(ctx, jsvar); JS_ThrowReferenceError(ctx, "property clk_source is not a number"); ret = JS_EXCEPTION; goto cleanup; }
+                    JS_ToUint32(ctx, &clk_source, jsvar);
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // glitch_ignore_cnt
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "glitch_ignore_cnt");
+                if(!JS_IsUndefined(jsvar)) {
+                    if(!JS_IsNumber(jsvar)) { JS_FreeValue(ctx, jsvar); JS_ThrowReferenceError(ctx, "property glitch_ignore_cnt is not a number"); ret = JS_EXCEPTION; goto cleanup; }
+                    JS_ToUint32(ctx, &glitch_ignore_cnt, jsvar);
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // internal_pullup
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "internal_pullup");
+                if(!JS_IsUndefined(jsvar)) {
+                    enable_internal_pullup = JS_ToBool(ctx, jsvar);
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // allow_pd
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "allow_pd");
+                if(!JS_IsUndefined(jsvar)) {
+                    allow_power_down = JS_ToBool(ctx, jsvar);
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // intr_priority
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "intr_priority");
+                if(!JS_IsUndefined(jsvar)) {
+                    if(!JS_IsNumber(jsvar)) { JS_FreeValue(ctx, jsvar); JS_ThrowReferenceError(ctx, "property intr_priority is not a number"); ret = JS_EXCEPTION; goto cleanup; }
+                    int32_t tmp;
+                    JS_ToInt32(ctx, &tmp, jsvar);
+                    intr_priority = (int)tmp;
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // trans_queue_depth
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "trans_queue_depth");
+                if(!JS_IsUndefined(jsvar)) {
+                    if(!JS_IsNumber(jsvar)) { JS_FreeValue(ctx, jsvar); JS_ThrowReferenceError(ctx, "property trans_queue_depth is not a number"); ret = JS_EXCEPTION; goto cleanup; }
+                    JS_ToUint32(ctx, &trans_queue_depth, jsvar);
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+            // core
+            {
+                JSValue jsvar = JS_GetPropertyStr(ctx, argv[0], "core");
+                if(!JS_IsUndefined(jsvar)) {
+                    if(!JS_IsNumber(jsvar)) { JS_FreeValue(ctx, jsvar); JS_ThrowReferenceError(ctx, "property core is not a number"); ret = JS_EXCEPTION; goto cleanup; }
+                    uint32_t tmp;
+                    JS_ToUint32(ctx, &tmp, jsvar);
+                    core = (uint8_t)tmp;
+                }
+                JS_FreeValue(ctx, jsvar);
+            }
+
+            bus_config.i2c_port = that->busnum;
+            bus_config.sda_io_num = that->_sda;
+            bus_config.scl_io_num = that->_scl;
+            bus_config.clk_source = static_cast<i2c_clock_source_t>(clk_source);
+            bus_config.glitch_ignore_cnt = static_cast<uint8_t>(glitch_ignore_cnt);
+            bus_config.intr_priority = intr_priority;
+            bus_config.trans_queue_depth = trans_queue_depth;
+            bus_config.flags.enable_internal_pullup = enable_internal_pullup;
+            bus_config.flags.allow_pd = allow_power_down;
 
             run_wait_on_core([&]() {
-                cleanup_master_bus() ;
-                res = i2c_new_master_bus(&bus_config, &that->bus_handle) ;
-            }, core) ;
+                cleanup_master_bus();
+                res = i2c_new_master_bus(&bus_config, &that->bus_handle);
+            }, core);
 
-            if(res!=ESP_OK) {
-                JSTHROW("failed to setup i2c master bus: %d", res)
+            if(res != ESP_OK) {
+                JS_ThrowReferenceError(ctx, "failed to setup i2c master bus: %d", res);
+                ret = JS_EXCEPTION;
+                goto cleanup;
             }
 
-            JSValue dev = JS_GetPropertyStr(ctx, that->jsobj, "dev") ;
-            if( JS_IsObject(dev) ) {
-                uint32_t len = 0 ;
-                JSValue len_val = JS_GetPropertyStr(ctx, dev, "length") ;
-                JS_ToUint32(ctx, &len, len_val) ;
-                JS_FreeValue(ctx, len_val) ;
+            JSValue dev = JS_GetPropertyStr(ctx, that->jsobj, "dev");
+            if(JS_IsObject(dev)) {
+                uint32_t len = 0;
+                JSValue len_val = JS_GetPropertyStr(ctx, dev, "length");
+                JS_ToUint32(ctx, &len, len_val);
+                JS_FreeValue(ctx, len_val);
 
-                for(uint32_t i=0;i<len;i++) {
-                    JSValue dev_obj = JS_GetPropertyUint32(ctx, dev, i) ;
-                    if( !JS_IsObject(dev_obj) ) {
-                        JS_FreeValue(ctx, dev_obj) ;
-                        continue ;
+                for(uint32_t i = 0; i < len; i++) {
+                    JSValue dev_obj = JS_GetPropertyUint32(ctx, dev, i);
+                    if(!JS_IsObject(dev_obj)) {
+                        JS_FreeValue(ctx, dev_obj);
+                        continue;
                     }
 
-                    if( !that->addDevice(ctx, dev_obj) ) {
-                        JS_FreeValue(ctx, dev) ;
-                        JS_FreeValue(ctx, dev_obj) ;
-                        return JS_EXCEPTION ;
+                    if(!that->addDevice(ctx, dev_obj)) {
+                        JS_FreeValue(ctx, dev);
+                        JS_FreeValue(ctx, dev_obj);
+                        ret = JS_EXCEPTION;
+                        goto cleanup;
                     }
 
-                    JS_FreeValue(ctx, dev_obj) ;
+                    JS_FreeValue(ctx, dev_obj);
                 }
             }
-            JS_FreeValue(ctx, dev) ;
+            JS_FreeValue(ctx, dev);
 
-            return JS_UNDEFINED ;
+            ret = JS_UNDEFINED;
+            goto cleanup;
         }
 
         #if SOC_I2C_SUPPORT_SLAVE
-        if(mode==I2C_MODE_SLAVE) {
-            cleanup_master_bus() ;
-            JSTHROW("I2C slave mode is not supported by NG driver yet")
+        if(local_mode == I2C_MODE_SLAVE) {
+            cleanup_master_bus();
+            JS_ThrowReferenceError(ctx, "I2C slave mode is not supported by NG driver yet");
+            ret = JS_EXCEPTION;
+            goto cleanup;
         }
         #endif
 
-        JSTHROW("invalid mode")
+        JS_ThrowReferenceError(ctx, "invalid mode");
+        ret = JS_EXCEPTION;
+        goto cleanup;
+
+    cleanup:
+        if(locked) {
+            that->give();
+        }
+        return ret;
     }
 
     /**
@@ -408,12 +532,18 @@ namespace be {
      * @throws 添加设备失败
      */
     JSValue I2C::addDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
         ASSERT_ARGC(1)
-        if( !that->addDevice(ctx, argv[0]) ) {
-            return JS_EXCEPTION ;
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            JSTHROW("I2C is not in %s mode", "master");
         }
+        if(!that->addDevice(ctx, argv[0])) {
+            that->give();
+            return JS_EXCEPTION;
+        }
+        that->give();
         return JS_UNDEFINED ;
     }
 
@@ -433,29 +563,37 @@ namespace be {
      * @throws 移除设备失败
      */
     JSValue I2C::removeDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
         ASSERT_ARGC(1)
         ARGV_TO_INT16(0, addr)
         bool bit10 = addr > 0x7F;
-        if(argc>1) {
-            bit10 = JS_ToBool(ctx, argv[1]) ;   
+        if(argc > 1) {
+            bit10 = JS_ToBool(ctx, argv[1]);
+        }
+
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            JSTHROW("I2C is not in %s mode", "master");
         }
 
         uint16_t addr_key = bit10 ? (addr | (30<<10)) : addr ;
-        if(that->devices.count(addr_key)==0) {
+        if(that->devices.count(addr_key) == 0) {
+            that->give();
             JSTHROW("i2c device 0x%02X not found", addr) ;
         }
         inner::i2c_device_memo_t & dev = that->devices[addr_key] ;
         if(dev.dev_handle) {
             esp_err_t res = i2c_master_bus_rm_device(dev.dev_handle) ;
-            if(res!=ESP_OK) {
+            if(res != ESP_OK) {
+                that->give();
                 JSTHROW("failed to remove i2c device 0x%02X: %d", addr, res) ;
             }
             dev.dev_handle = nullptr ;
         }
         that->devices.erase(addr_key) ;
 
+        that->give();
         return JS_UNDEFINED ;
     }
 
@@ -472,6 +610,7 @@ namespace be {
      */
     JSValue I2C::unsetup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
+        that->take();
         #if SOC_I2C_SUPPORT_SLAVE
         // if(that->slaverRegisters) {
         //     free(that->slaverRegisters) ;
@@ -508,6 +647,7 @@ namespace be {
         }
 
         that->mode = I2C_MODE_MASTER ;
+        that->give();
         return res==ESP_OK? JS_TRUE: JS_FALSE ;
     }
     /**
@@ -520,7 +660,10 @@ namespace be {
      */
     JSValue I2C::isInstalled(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(I2C, that)
-        return that->isInstalled()? JS_TRUE: JS_FALSE ;
+        that->take();
+        bool installed = that->isInstalled();
+        that->give();
+        return installed ? JS_TRUE : JS_FALSE ;
     }
 
     bool I2C::isInstalled() const {
@@ -631,7 +774,7 @@ namespace be {
             return false;
         }
 
-        constexpr int default_timeout_ms = 10;
+        constexpr int default_timeout_ms = 50;
 
         if(data_len == 0) {
             i2c_master_transmit_multi_buffer_info_t buffer_info = {};
@@ -666,7 +809,7 @@ namespace be {
             return false;
         }
 
-        constexpr int default_timeout_ms = 10;
+        constexpr int default_timeout_ms = 50;
         return i2c_master_receive(handle, buff, buffsize, default_timeout_ms) == ESP_OK;
     }
 
@@ -686,10 +829,16 @@ namespace be {
      */
     JSValue I2C::ping(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(1)
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
         ARGV_TO_UINT16(0, addr)
-        return that->ping(addr)? JS_TRUE: JS_FALSE ;
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            JSTHROW("I2C is not in %s mode", "master");
+        }
+        bool result = that->ping(addr);
+        that->give();
+        return result ? JS_TRUE : JS_FALSE ;
     }
     /**
      * 扫描 I2C 总线上的所有设备。
@@ -706,12 +855,17 @@ namespace be {
      * @throws I2C 未在主机模式下初始化
      */
     JSValue I2C::scan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
         ARGV_TO_UINT8_OPT(0, from, 1)
         ARGV_TO_UINT8_OPT(1, to, 127)
         ARGV_TO_UINT32_OPT(2, timeout_ms, 20)
-        that->scan(from,to, timeout_ms) ;
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            JSTHROW("I2C is not in %s mode", "master");
+        }
+        that->scan(from, to, timeout_ms);
+        that->give();
         return JS_UNDEFINED ;
     }
     /**
@@ -731,34 +885,47 @@ namespace be {
      */
     JSValue I2C::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ASSERT_ARGC(2)
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
         ARGV_TO_UINT16(0, addr)
         if(!JS_IsArray(ctx, argv[1])) {
             JSTHROW("arg must be a array")
         }
         int len ;
         uint8_t * data = JS_ArrayToBufferUint8(ctx, argv[1], &len) ;
-        if(data) {
-            bool res = that->send(addr,data,len) ;
-            free(data) ;
-            return res? JS_TRUE: JS_FALSE ;
-        } else {
+        if(!data) {
             return JS_FALSE ;
         }
+
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            free(data);
+            JSTHROW("I2C is not in %s mode", "master");
+        }
+        bool res = that->send(addr, data, len);
+        that->give();
+        free(data);
+        return res ? JS_TRUE : JS_FALSE ;
     }
 
     #define I2C_WRITE(type, ARGV_CONVERT)       \
         ASSERT_ARGC(3)                          \
-        THIS_NCLASS(I2C, that)                  \
-        JSCHECK_MASTER                          \
         ARGV_TO_UINT16(0, addr)                 \
         ARGV_TO_UINT8(1, reg)                   \
         ARGV_CONVERT(2, byte)                   \
-        if(that->devices.count(addr)==0 && !that->devHandle(addr)) {    \
-            JSTHROW("device 0x%02x is not installed", addr) ;           \
+        THIS_NCLASS(I2C, that)                  \
+        that->take();                           \
+        if(that->mode != I2C_MODE_MASTER) {     \
+            that->give();                       \
+            JSTHROW("I2C is not in %s mode", "master"); \
         }                                       \
-        return  that->write<type>(addr, reg, byte)? JS_TRUE: JS_FALSE ;
+        if(that->devices.count(addr)==0 && !that->devHandle(addr)) {   \
+            that->give();                       \
+            JSTHROW("device 0x%02x is not installed", addr);          \
+        }                                       \
+        bool __wr_ok = that->write<type>(addr, reg, byte); \
+        that->give();                           \
+        return __wr_ok ? JS_TRUE : JS_FALSE;
 
     /**
      * 向 I2C 设备寄存器写入 8 位数据。
@@ -832,17 +999,26 @@ namespace be {
         ASSERT_ARGC(2)
         ARGV_TO_UINT16(0, addr)
         ARGV_TO_UINT8(1, len)
-        THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
-        if(len<1) {
+        if(len < 1) {
             JSTHROW("invalid recv length")
         }
         uint8_t * buffer = (uint8_t*)malloc(len) ;
         if(!buffer) {
             JSTHROW("out of memory?") ;
         }
-        if(!that->recv(addr,buffer,len)){
-            free(buffer) ;
+
+        THIS_NCLASS(I2C, that)
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            free(buffer);
+            JSTHROW("I2C is not in %s mode", "master");
+        }
+        bool ok = that->recv(addr, buffer, len);
+        that->give();
+
+        if(!ok) {
+            free(buffer);
             return JS_NULL;
         }
         return JS_NewArrayBuffer(ctx, buffer, len, freeArrayBuffer, NULL, false) ;
@@ -866,12 +1042,18 @@ namespace be {
         ASSERT_ARGC(1)
         ARGV_TO_UINT16(0, addr)
         THIS_NCLASS(I2C, that)
-        JSCHECK_MASTER
-        uint8_t byte ;
-        if(!that->recv(addr,&byte,1)){
-            JSTHROW("i2c recv failed")
+        that->take();
+        if(that->mode != I2C_MODE_MASTER) {
+            that->give();
+            JSTHROW("I2C is not in %s mode", "master");
         }
-        return JS_NewUint32(ctx,byte) ;
+        uint8_t byte ;
+        if(!that->recv(addr, &byte, 1)) {
+            that->give();
+            JSTHROW("i2c recv failed");
+        }
+        that->give();
+        return JS_NewUint32(ctx, byte) ;
     }
 
     /**
@@ -991,10 +1173,13 @@ namespace be {
     }
 
     void I2C::begin(uint32_t freq) {
+        take();
         if (isInstalled()) {
+            give();
             return ;
         }
         if (_sda == GPIO_NUM_NC || _scl == GPIO_NUM_NC) {
+            give();
             return ;
         }
         i2c_master_bus_config_t bus_config = {} ;
@@ -1005,46 +1190,61 @@ namespace be {
         bus_config.glitch_ignore_cnt = 7 ;
         bus_config.flags.enable_internal_pullup = true ;
         i2c_new_master_bus(&bus_config, &bus_handle) ;
+        give();
     }
 
     void I2C::end() {
+        take();
         _tx_buffer.clear() ;
         _rx_buffer.clear() ;
         _rx_read_index = 0 ;
+        give();
     }
 
     void I2C::beginTransmission(uint8_t addr) {
+        take();
         _arduino_addr = addr ;
         _tx_buffer.clear() ;
         if (mode == I2C_MODE_MASTER) {
             devHandle(addr) ;
         }
+        give();
     }
 
     size_t I2C::write(uint8_t data) {
+        take();
         _tx_buffer.push_back(data) ;
-        return _tx_buffer.size() ;
+        size_t sz = _tx_buffer.size() ;
+        give();
+        return sz ;
     }
 
     int I2C::endTransmission(bool stop) {
+        take();
         if (_tx_buffer.empty() || mode != I2C_MODE_MASTER) {
+            give();
             return -1 ;
         }
         i2c_master_dev_handle_t handle = devHandle(_arduino_addr) ;
         if (!handle) {
+            give();
             return -1 ;
         }
         esp_err_t res = i2c_master_transmit(handle, _tx_buffer.data(), _tx_buffer.size(), 10) ;
         _tx_buffer.clear() ;
+        give();
         return (int)res ;
     }
 
     uint8_t I2C::requestFrom(uint8_t addr, size_t len, uint8_t stop) {
+        take();
         if (mode != I2C_MODE_MASTER || len == 0) {
+            give();
             return 0 ;
         }
         i2c_master_dev_handle_t handle = devHandle(addr) ;
         if (!handle) {
+            give();
             return 0 ;
         }
         _rx_buffer.resize(len) ;
@@ -1052,20 +1252,29 @@ namespace be {
         esp_err_t res = i2c_master_receive(handle, _rx_buffer.data(), len, 10) ;
         if (res != ESP_OK) {
             _rx_buffer.clear() ;
+            give();
             return 0 ;
         }
+        give();
         return len ;
     }
 
     int I2C::read() {
+        take();
         if (_rx_read_index >= (int)_rx_buffer.size()) {
+            give();
             return -1 ;
         }
-        return _rx_buffer[_rx_read_index++] ;
+        int val = _rx_buffer[_rx_read_index++] ;
+        give();
+        return val ;
     }
 
     int I2C::available() {
-        return (int)_rx_buffer.size() - _rx_read_index ;
+        take();
+        int avail = (int)_rx_buffer.size() - _rx_read_index ;
+        give();
+        return avail ;
     }
 }
 

@@ -1,3 +1,11 @@
+# v1.0.14
+
+Fix:
+
+* I2C 层增加 FreeRTOS 互斥锁，保护 devices map / bus_handle / Arduino API 缓冲区，防止多任务并发访问竞态
+* 修复 InDevPointer::read() ring buffer use-after-free：先拷贝数据再 vRingbufferReturnItem()，防止 daemon task 覆写
+
+
 # v1.0.13 2026/5/31
 
 New Feature:
