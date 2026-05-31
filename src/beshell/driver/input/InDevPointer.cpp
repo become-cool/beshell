@@ -104,15 +104,14 @@ using namespace std ;
                 return ;
             }
 
-            // 释放接收到的缓冲区
-            vRingbufferReturnItem(ringbuf, (void *)_data);
-
-            // printf("< %d, %d, %d\n",data.pcount,data.x[0],data.y[0]) ;
+            // 先拷贝数据，再归还缓冲区（避免 daemon task 覆写）
             data = *_data ;
+            vRingbufferReturnItem(ringbuf, (void *)_data);
         } else {
             _read(data) ;
         }
 
+        // 直接触发 JS 事件
         if(enabledEvents>0 && 0!=memcmp(&data,&lastData,sizeof(PointsData))) {
             if( enabledEvents&PRESSED && data.pcount>lastData.pcount ) {
                 JSValue jsname = JS_NewString(ctx,"pressed") ;
@@ -150,8 +149,6 @@ using namespace std ;
         }
     }
 
-    // @todo
-    // 后台进程，定时读取点坐标，并发送事件 (未完成)
     JSValue InDevPointer::startDaemon(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(InDevPointer, that)
         that->startDaemon() ;
