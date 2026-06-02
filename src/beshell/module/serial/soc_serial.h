@@ -1,5 +1,9 @@
 
 
+#if __has_include("soc/soc_caps.h")
+#include "soc/soc_caps.h"
+#endif
+
 #ifndef SOC_UART_HP_NUM
     #ifdef CONFIG_IDF_TARGET_ESP32S2
         #define SOC_UART_HP_NUM             (2)

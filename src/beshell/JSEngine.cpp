@@ -306,7 +306,7 @@ namespace be {
             evalRet = JS_Eval(ctx, code.c_str(), code.length(), filepath,
                               flags | JS_EVAL_FLAG_COMPILE_ONLY) ;
             if (!JS_IsException(evalRet)) {
-                JSModuleDef *m = JS_VALUE_GET_PTR(evalRet) ;
+                JSModuleDef *m = (JSModuleDef *)JS_VALUE_GET_PTR(evalRet) ;
                 // Step 2: execute module (consumes evalRet)
                 JSValue execRet = JS_EvalFunction(ctx, evalRet) ;
                 if (!JS_IsException(execRet)) {
