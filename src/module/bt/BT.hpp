@@ -55,6 +55,9 @@ namespace be{
         static JSValue setScanParam(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue waitScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addFilterByName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue removeFilterByName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue clearNameFilters(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setAdvName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setAdvData(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue startAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
@@ -112,6 +115,12 @@ namespace be{
 
         void onNativeCentralEvent(JSContext *ctx, bt_event * event) ;
         void onNativePeripheralEvent(JSContext *ctx, bt_event * event) ;
+
+        struct NameFilter {
+            std::string name ;
+            bool exact ;
+        } ;
+        static std::vector<NameFilter> filterNames ;
 
         static gap_handler_t gapHandler ;
         static gattc_handler_t gattcHandler ;

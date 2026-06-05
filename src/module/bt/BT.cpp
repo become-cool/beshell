@@ -15,6 +15,7 @@
 #include "esp_bt_device.h"
 #include "qjs_utils.h"
 #include "quickjs/quickjs.h"
+#include <algorithm>
 #include "../../js/bt/central.c"
 #include "../../js/bt/peripheral.c"
 
@@ -31,6 +32,7 @@ namespace be{
     int BT::disconnect_type = 0 ;
     bool BT::hookedScanRes = false ;
     bool BT::hookedScanCmpl = false ;
+    std::vector<BT::NameFilter> BT::filterNames ;
     
     gap_handler_t   BT::gapHandler = nullptr ;
     gattc_handler_t BT::gattcHandler = nullptr ;
@@ -85,6 +87,9 @@ namespace be{
         
         EXPORT_FUNCTION(eventAdded)
         EXPORT_FUNCTION(eventRemoved)
+        EXPORT_FUNCTION(addFilterByName)
+        EXPORT_FUNCTION(removeFilterByName)
+        EXPORT_FUNCTION(clearNameFilters)
         enableNativeEvent(ctx, sizeof(struct bt_event), 128) ;
     }
 
@@ -209,6 +214,59 @@ namespace be{
                 // }
                 break;
         }
+
+        // 名称过滤: 仅当有 filter 时才进行
+        if(!BT::filterNames.empty()
+           && event == ESP_GAP_BLE_SCAN_RESULT_EVT
+           && param->scan_rst.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {
+
+            const uint8_t *adv_data = param->scan_rst.ble_adv ;
+            uint8_t adv_data_len = param->scan_rst.adv_data_len ;
+            std::string devName ;
+            uint8_t pos = 0 ;
+
+            // 遍历 AD 结构，提取设备名称
+            while(pos < adv_data_len) {
+                uint8_t length = adv_data[pos] ;
+                if(length == 0 || pos + length + 1 > adv_data_len) {
+                    break ;
+                }
+                uint8_t type = adv_data[pos + 1] ;
+                uint8_t data_len = length - 1 ;
+                const uint8_t *data = &adv_data[pos + 2] ;
+
+                if(type == 0x09 || type == 0x08) {
+                    // 完整名称 (0x09) 或短名称 (0x08)
+                    devName.assign((const char *)data, data_len) ;
+                    break ;  // 优先使用先出现的名称
+                }
+                pos += length + 1 ;
+            }
+
+            if(devName.empty()) {
+                return ;  // 无名称，跳过此设备
+            }
+
+            // 检查是否匹配任一 filter
+            bool matched = false ;
+            for(const auto& f : BT::filterNames) {
+                if(f.exact) {
+                    if(devName == f.name) {
+                        matched = true ;
+                        break ;
+                    }
+                } else {
+                    if(devName.find(f.name) != std::string::npos) {
+                        matched = true ;
+                        break ;
+                    }
+                }
+            }
+            if(!matched) {
+                return ;  // 不匹配任何 filter，丢弃
+            }
+        }
+
         if(BT::singleton){
             bt_event event_msg = {
                 .event = event ,
@@ -430,6 +488,85 @@ namespace be{
         if( ret != ESP_OK ) {
             JSTHROW("Failed to set MAC address: %s", esp_err_to_name(ret))
         }
+        return JS_UNDEFINED ;
+    }
+
+    JSValue BT::addFilterByName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+
+        bool exactMode = true ;
+        if(argc > 1) {
+            exactMode = JS_ToBool(ctx, argv[1]) ;
+        }
+
+        // 支持 string 或 string[]
+        if(JS_IsArray(ctx, argv[0])) {
+            JSValue lenVal = JS_GetPropertyStr(ctx, argv[0], "length") ;
+            uint32_t len ;
+            JS_ToUint32(ctx, &len, lenVal) ;
+            JS_FreeValue(ctx, lenVal) ;
+
+            for(uint32_t i = 0 ; i < len ; i++) {
+                JSValue item = JS_GetPropertyUint32(ctx, argv[0], i) ;
+                const char *cstr = JS_ToCString(ctx, item) ;
+                if(cstr) {
+                    std::string name(cstr) ;
+                    JS_FreeCString(ctx, cstr) ;
+                    // 先删同名+同模式的旧项，再添加
+                    filterNames.erase(std::remove_if(filterNames.begin(), filterNames.end(),
+                        [&](const NameFilter& f){ return f.name == name && f.exact == exactMode ; }),
+                        filterNames.end()) ;
+                    filterNames.push_back({name, exactMode}) ;
+                }
+                JS_FreeValue(ctx, item) ;
+            }
+        } else {
+            std::string ARGV_TO_STRING(0, name)
+            filterNames.erase(std::remove_if(filterNames.begin(), filterNames.end(),
+                [&](const NameFilter& f){ return f.name == name && f.exact == exactMode ; }),
+                filterNames.end()) ;
+            filterNames.push_back({name, exactMode}) ;
+        }
+        return JS_UNDEFINED ;
+    }
+
+    JSValue BT::removeFilterByName(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        CHECK_ARGC(1)
+
+        bool exactMode = true ;
+        if(argc > 1) {
+            exactMode = JS_ToBool(ctx, argv[1]) ;
+        }
+
+        if(JS_IsArray(ctx, argv[0])) {
+            JSValue lenVal = JS_GetPropertyStr(ctx, argv[0], "length") ;
+            uint32_t len ;
+            JS_ToUint32(ctx, &len, lenVal) ;
+            JS_FreeValue(ctx, lenVal) ;
+
+            for(uint32_t i = 0 ; i < len ; i++) {
+                JSValue item = JS_GetPropertyUint32(ctx, argv[0], i) ;
+                const char *cstr = JS_ToCString(ctx, item) ;
+                if(cstr) {
+                    std::string name(cstr) ;
+                    JS_FreeCString(ctx, cstr) ;
+                    filterNames.erase(std::remove_if(filterNames.begin(), filterNames.end(),
+                        [&](const NameFilter& f){ return f.name == name && f.exact == exactMode ; }),
+                        filterNames.end()) ;
+                }
+                JS_FreeValue(ctx, item) ;
+            }
+        } else {
+            std::string ARGV_TO_STRING(0, name)
+            filterNames.erase(std::remove_if(filterNames.begin(), filterNames.end(),
+                [&](const NameFilter& f){ return f.name == name && f.exact == exactMode ; }),
+                filterNames.end()) ;
+        }
+        return JS_UNDEFINED ;
+    }
+
+    JSValue BT::clearNameFilters(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        filterNames.clear() ;
         return JS_UNDEFINED ;
     }
 }

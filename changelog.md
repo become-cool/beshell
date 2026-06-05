@@ -1,9 +1,14 @@
 
+# v0.3.11   2026-06-06
+
 New Feature:
 
-* + sync, ping, pong 协议
-* + telnet MQTT 协议
-* + ota.start() 参数 opt.downloader
+* sync, ping, pong 协议
+* telnet MQTT 协议
+* ota.start() 参数 opt.downloader
+* bt.addFilterByName()
+* bt.removeFilterByName()
+* bt.clearNameFilters()
 
 Fixed: 
 
