@@ -51,7 +51,7 @@ namespace be {
     }
 
     void REPLCDC::setup () {
-        setup(512, 256) ;
+        setup(512, 512) ;
     }
     void REPLCDC::setup (uint32_t rx_size, uint32_t tx_size) {
         if(setuped) {

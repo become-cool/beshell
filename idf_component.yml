@@ -1,5 +1,5 @@
 name: "BeShell"
-version: "1.0.14"
+version: "1.0.15"
 description: "A JavaScript framework for ESP32 Platform, providing a powerful scripting environment"
 keywords:
   - "JavaScript"
