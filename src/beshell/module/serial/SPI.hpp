@@ -2,16 +2,19 @@
 
 #include "../../NativeClass.hpp"
 #include "./soc_serial.h"
+#include <map>
+#include <driver/spi_master.h>
 
 namespace be {
 
     class SPI: public NativeClass {
         DECLARE_NCLASS_META
         static std::vector<JSCFunctionListEntry> methods ;
-        // static std::vector<JSCFunctionListEntry> staticMethods ;
 
     private:
         int busnum ;
+        int nextDeviceId = 1 ;
+        std::map<int, spi_device_handle_t> devices ;
 
         static SPI * spi0 ;
         #if SOC_SPI_PERIPH_NUM > 1
@@ -24,8 +27,6 @@ namespace be {
         static SPI * spi3 ;
         #endif
 
-        // std::map<int, spi_device_handle_t> devices ;
-
     public:
         SPI(JSContext * ctx, int busnum) ;
 
@@ -35,6 +36,10 @@ namespace be {
 
         static JSValue setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue spiNum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue addDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue removeDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue trans(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue sendU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;

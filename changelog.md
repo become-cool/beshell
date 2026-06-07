@@ -7,7 +7,7 @@ Fix:
 * 修复 EventEmitter.hpp: emitNativeEvent() 声明移除 IRAM_ATTR，消除与 .cpp 定义中 IRAM_ATTR section 属性冲突警告
 * 修复 JSEngine.cpp: JS_VALUE_GET_PTR 增加显式 (JSModuleDef *) 转换，消除 -fpermissive void* 转换警告
 * 修复 soc_serial.h: 在兼容宏定义前 include soc/soc_caps.h，消除 SOC_SPI_PERIPH_NUM 重复定义警告
-
+* 调整 REPLCDC 缓冲区大小,解决上位机传较大文件出错的问题
 
 # v1.0.13 2026/5/31
 

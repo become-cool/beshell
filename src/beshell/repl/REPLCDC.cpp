@@ -44,13 +44,14 @@ namespace be {
         while (1) {
             int len = usb_serial_jtag_read_bytes(buf, sizeof(buf), pdMS_TO_TICKS(1000));
             if (len > 0) {
+                // printf("Read %d bytes from USB CDC\n", len);
                 parser.parse(buf, len) ;
             }
         }
     }
 
     void REPLCDC::setup () {
-        setup(256, 256) ;
+        setup(512, 256) ;
     }
     void REPLCDC::setup (uint32_t rx_size, uint32_t tx_size) {
         if(setuped) {
@@ -113,7 +114,7 @@ namespace be {
 
                 // 当没有上位机连接时，数据会在缓冲区等待，此时等待数据发送完成是无效的
                 // 第1个chunk遇到缓冲满，取消发送；后续chunk等待5ms
-                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 100/portTICK_PERIOD_MS);
+                int sentlen = usb_serial_jtag_write_bytes(chunk, chunk_size, 5/portTICK_PERIOD_MS);
                 if(sentlen!=chunk_size) {
                     return ;
                 }

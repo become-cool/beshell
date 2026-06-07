@@ -62,18 +62,19 @@ namespace be {
     std::vector<JSCFunctionListEntry> SPI::methods = {
         JS_CFUNC_DEF("setup", 0, SPI::setup),
         JS_CFUNC_DEF("spiNum", 0, SPI::spiNum),
-        // JS_CFUNC_DEF("addDevice", 0, SPI::addDevice),
-        // JS_CFUNC_DEF("removeDevice", 0, SPI::removeDevice),
-        // JS_CFUNC_DEF("send", 0, SPI::send),
-        // JS_CFUNC_DEF("sendU8", 0, SPI::sendU8),
-        // JS_CFUNC_DEF("sendU16", 0, SPI::sendU16),
-        // JS_CFUNC_DEF("sendU32", 0, SPI::sendU32),
-        // JS_CFUNC_DEF("recvU8", 0, SPI::recvU8),
-        // JS_CFUNC_DEF("recvU16", 0, SPI::recvU16),
-        // JS_CFUNC_DEF("recvU32", 0, SPI::recvU32),
-        // JS_CFUNC_DEF("transU8", 0, SPI::transU8),
-        // JS_CFUNC_DEF("transU16", 0, SPI::transU16),
-        // JS_CFUNC_DEF("transU32", 0, SPI::transU32),
+        JS_CFUNC_DEF("addDevice", 0, SPI::addDevice),
+        JS_CFUNC_DEF("removeDevice", 0, SPI::removeDevice),
+        JS_CFUNC_DEF("send", 0, SPI::send),
+        JS_CFUNC_DEF("trans", 0, SPI::trans),
+        JS_CFUNC_DEF("sendU8", 0, SPI::sendU8),
+        JS_CFUNC_DEF("sendU16", 0, SPI::sendU16),
+        JS_CFUNC_DEF("sendU32", 0, SPI::sendU32),
+        JS_CFUNC_DEF("recvU8", 0, SPI::recvU8),
+        JS_CFUNC_DEF("recvU16", 0, SPI::recvU16),
+        JS_CFUNC_DEF("recvU32", 0, SPI::recvU32),
+        JS_CFUNC_DEF("transU8", 0, SPI::transU8),
+        JS_CFUNC_DEF("transU16", 0, SPI::transU16),
+        JS_CFUNC_DEF("transU32", 0, SPI::transU32),
     } ;
     
 
@@ -245,233 +246,527 @@ namespace be {
         return JS_NewInt32(ctx, ret) ;
     }
 
-    // /**
-    //  * cspin pin (-1 表示不使用)
-    //  * freq
-    //  * mode
-    //  */
-    // JSValue SPI::addDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
+    // ================================================================
+    // 内部辅助函数
+    // ================================================================
 
-    //     spi_device_handle_t handle = NULL ;
-    //     ASSERT_ARGC(3)
-    //     ARGV_TO_UINT8(0, cspin)
-    //     ARGV_TO_INT32(1, freq)
-    //     ARGV_TO_UINT8(2, mode)
-        
-    //     spi_device_interface_config_t devcfg = {
-    //         .clock_speed_hz=freq,
-    //         .mode=mode,
-    //         .spics_io_num=cspin,
-    //         .queue_size=7,                          //We want to be able to queue 7 transactions at a time
-    //         .pre_cb=NULL,
-    //     };
-    //     esp_err_t ret = spi_bus_add_device(busnum, &devcfg, &handle);
-    //     if(ret!=ESP_OK) {
-    //         JSTHROW("spi_bus_add_device() failed with err: %d", ret)
-    //     }
+    /**
+     * 执行一次 SPI 传输 (底层)
+     * @param handle SPI 设备句柄
+     * @param tx 发送缓冲区 (可为 NULL，此时发送 0)
+     * @param rx 接收缓冲区 (可为 NULL，丢弃接收数据)
+     * @param bit_length 传输位数
+     */
+    static inline esp_err_t spi_transfer(spi_device_handle_t handle,
+                                          const void* tx, void* rx,
+                                          size_t bit_length) {
+        spi_transaction_t t = {};
+        t.tx_buffer = tx;
+        t.rx_buffer = rx;
+        t.length = bit_length;
+        return spi_device_transmit(handle, &t);
+    }
 
-    //     return JS_NewInt32(ctx, ret!=0? -1: spiidx) ;
-    // }
-/*
-    #define ARGV_TO_SPI_HANDLE(i, handle)                           \
-        ARGV_TO_UINT8(i, spiidx)                                    \
-        spi_device_handle_t handle = spi_handle_with_id(spiidx) ;   \
-        if(handle==NULL) {                                          \
-            JSTHROW("unknow spi device id:%d",spiidx)               \
+    // ================================================================
+    // addDevice — 添加 SPI 设备
+    // ================================================================
+    /**
+     * 向 SPI 总线添加一个设备。
+     *
+     * ```javascript
+     * // 基本用法（无 CS 引脚，如 74HC165）
+     * let devId = spi.addDevice({ cs: -1, freq: 1000000 })
+     *
+     * // 标准用法（带 CS 引脚）
+     * let devId = spi.addDevice({ cs: 5, freq: 8000000, mode: 0 })
+     *
+     * // 高级用法
+     * let devId = spi.addDevice({
+     *     cs: 10,
+     *     freq: 20000000,
+     *     mode: 3,
+     *     queue_size: 4,
+     *     flags: 0
+     * })
+     * ```
+     *
+     * @param options 配置对象
+     *   - cs: CS 引脚号, -1 表示不使用 (默认 -1)
+     *   - freq: 时钟频率 Hz (默认 1000000)
+     *   - mode: SPI 模式 0-3 (默认 0)
+     *   - queue_size: 事务队列大小 (默认 1)
+     *   - flags: 设备标志位 (默认 0)
+     * @return number 设备 ID，用于后续的 send/recv/trans 操作
+     */
+    JSValue SPI::addDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+
+        int GET_INT32_PROP_OPT(argv[0], "cs", cs, -1)
+        int GET_INT32_PROP_OPT(argv[0], "freq", freq, 1000000)
+        int GET_INT32_PROP_OPT(argv[0], "mode", mode, 0)
+        int GET_INT32_PROP_OPT(argv[0], "queue_size", queue_size, 1)
+        int GET_INT32_PROP_OPT(argv[0], "flags", flags, 0)
+
+        spi_device_interface_config_t devcfg = {};
+        devcfg.clock_speed_hz = freq;
+        devcfg.mode = (uint8_t)mode;
+        devcfg.spics_io_num = cs;
+        devcfg.queue_size = queue_size;
+        devcfg.flags = flags;
+
+        spi_device_handle_t handle = nullptr;
+        esp_err_t ret = spi_bus_add_device((spi_host_device_t)that->busnum, &devcfg, &handle);
+        if (ret != ESP_OK) {
+            JSTHROW("spi_bus_add_device() failed, err: %d", ret)
         }
-*/
-    // /**
-    //  * 
-    //  * bus (1-3)
-    //  * data {string|ArrayBuffer}
-    //  * offset?
-    //  * length?
-    //  */
-    // JSValue SPI::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_SPI_HANDLE(0, handle)
 
-    //     int offset = 0 ;
-    //     if(argc>=3) {
-    //         if( JS_ToInt32(ctx, &offset, argv[2])!=0 ) {
-    //             JSTHROW("Invalid param type for offset");
-    //         }
-    //     }
-    //     int length = -1 ;
-    //     if(argc>=4) {
-    //         if( JS_ToInt32(ctx, &length, argv[3])!=0 ) {
-    //             JSTHROW("Invalid param type for length");
-    //         }
-    //     }
+        int devId = that->nextDeviceId++;
+        that->devices[devId] = handle;
+        return JS_NewInt32(ctx, devId);
+    }
 
-    //     spi_transaction_t t;
-    //     memset(&t, 0, sizeof(t));
+    // ================================================================
+    // removeDevice — 移除 SPI 设备
+    // ================================================================
+    /**
+     * 从 SPI 总线移除一个设备。
+     *
+     * ```javascript
+     * spi.removeDevice(devId)
+     * ```
+     *
+     * @param devId 设备 ID (addDevice 返回的)
+     */
+    JSValue SPI::removeDevice(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
 
-    //     esp_err_t ret = -1 ;
-    //     if(JS_IsString(argv[1])) {
-    //         t.tx_buffer = JS_ToCStringLen(ctx, &t.length, argv[1]) ;
-    //         if(length>-1 && length<t.length) {
-    //             t.length = length ;
-    //         }
-    //         t.length*= 8 ;
-    //         ret = spi_device_transmit(handle, &t) ;
-
-    //         JS_FreeCString(ctx, t.tx_buffer) ;
-    //         goto end ;
-    //     }
-
-    //     t.tx_buffer = JS_GetArrayBuffer(ctx, &t.length, argv[1]) ;
-    //     if(t.tx_buffer) {
-    //         if(length>-1 && length<t.length) {
-    //             t.length = length ;
-    //         }
-    //         t.length*= 8 ;
-    //         ret = spi_device_transmit(handle, &t) ;
-    //         // JS_FreeValue(ctx, argv[1]) ;
-    //     }
-    //     else {
-    //         JSTHROW("Invalid data")
-    //     }
-
-    // end:
-    //     return JS_NewInt32(ctx, ret) ;
-    // }
-
-/*
-    #define ARGV_TO_SPI_OUT_NUMBER(i, type, var)            \
-        type var = 0 ;                                      \
-        if( !JS_IsUndefined(var) && !JS_IsUndefined(var) ) {\
-            if(JS_ToUint32(ctx, &out, argv[i])!=0) {        \
-                JSTHROW("arg must be a number")     \
-            }                                               \
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
         }
-        */
 
-    // inline esp_err_t spi_trans_int(spi_device_handle_t handle, uint8_t * rx_buff, uint8_t * tx_buff, size_t bit_length) {
-    //     spi_transaction_t t;
-    //     memset(&t, 0, sizeof(t));
+        spi_bus_remove_device(it->second);
+        that->devices.erase(it);
+        return JS_UNDEFINED;
+    }
 
-    //     // t.flags = SPI_TRANS_USE_RXDATA | SPI_TRANS_USE_TXDATA ;
-    //     t.tx_buffer = tx_buff ;
-    //     t.rx_buffer = rx_buff ;
-    //     t.length = bit_length ;
-    //     t.rxlength = 0 ; // same to length
-        
-    //     return spi_device_transmit(handle, &t) ;
-    // }
+    // ================================================================
+    // sendU8 / sendU16 / sendU32 — 单值发送 (TX only)
+    // ================================================================
+    /**
+     * 发送一个 8 位值，丢弃接收数据。
+     * @param devId 设备 ID
+     * @param value 要发送的 8 位值
+     * @return number 错误码，0 表示成功
+     */
+    JSValue SPI::sendU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(2)
+        ARGV_TO_INT32(0, devId)
+        ARGV_TO_UINT8(1, val)
 
-    
-
-    // /**
-    //  * 
-    //  * dev id
-    //  * u8
-    //  */
-    // JSValue SPI::sendU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_SPI_HANDLE(0, handle)
-
-    //     uint8_t in = 0 ;
-    //     ARGV_TO_SPI_OUT_NUMBER(1, uint8_t, out)
-
-    //     esp_err_t ret = spi_trans_int(handle, (uint8_t*)&in, (uint8_t*)&out, 8) ;
-    //     if(ret!=ESP_OK) {
-    //         JSTHROW("spi bus transmit failed:%d", ret)
-    //     }
-
-    //     return JS_NewInt32(ctx, in) ;
-    // }
-
-    // /**
-    //  * 
-    //  * dev id
-    //  * u16
-    //  */
-    // JSValue SPI::sendU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_SPI_HANDLE(0, handle)
-
-    //     uint16_t in = 0 ;
-    //     ARGV_TO_SPI_OUT_NUMBER(1, uint16_t, out)
-
-    //     esp_err_t ret = spi_trans_int(handle, (uint8_t*)&in, (uint8_t*)&out, 16) ;
-    //     if(ret!=ESP_OK) {
-    //         JSTHROW("spi bus transmit failed:%d", ret)
-    //     } 
-
-    //     return JS_NewInt32(ctx, in) ;
-    // }
-
-    // /**
-    //  * 
-    //  * dev id
-    //  * u32
-    //  */
-    // JSValue SPI::sendU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     ASSERT_ARGC(2)
-    //     ARGV_TO_SPI_HANDLE(0, handle)
-    //     ARGV_TO_UINT32(1, val)
-
-    //     spi_transaction_t t;
-    //     memset(&t, 0, sizeof(t));
-
-    //     t.tx_buffer = (uint8_t *) & val ;
-    //     t.length = 32 ;
-
-    //     esp_err_t ret = spi_device_transmit(handle, &t) ;
-    //     return JS_NewInt32(ctx, ret) ;
-    // }
-/*
-    // 双工收发, 或 接受
-    #define SPI_TRANS(h, in, out, bit_length)                       \
-            esp_err_t ret = spi_trans_int(h, in, out, bit_length) ; \
-            if(ret!=ESP_OK) {                                       \
-                JSTHROW("spi bus transmit failed:%d", ret)  \
-            }                                                       \
-            return JS_NewInt32(ctx, in) ;
-
-    #define SPI_TRANS_FUNC(type, bit_length) \
-        ASSERT_ARGC(1) \
-        ARGV_TO_SPI_HANDLE(0, handle) \
-        type in_var = 0 ; \
-        if( argc>1 && !JS_IsUndefined(argv[1]) && !JS_IsUndefined(argv[1]) ) { \
-            type out_var ; \
-            if(JS_ToUint32(ctx, &out_var, argv[1])!=0) { \
-                JSTHROW("arg must be a number") \
-            } \
-            SPI_TRANS(handle, in_var, (uint8_t*)&out_var, bit_length) \
-        } \ 
-        else { \
-            SPI_TRANS(handle, in_var, NULL, bit_length) \
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
         }
-*/
 
-    // JSValue SPI::transU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_TRANS_FUNC(uint8_t, 8)
-    // }
-    // JSValue SPI::transU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_TRANS_FUNC(uint16_t, 16)
-    // }
-    // JSValue SPI::transU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_TRANS_FUNC(uint32_t, 32)
-    // }
+        uint8_t tx = val;
+        esp_err_t ret = spi_transfer(it->second, &tx, nullptr, 8);
+        return JS_NewInt32(ctx, ret);
+    }
 
-/*
-    #define SPI_RECV_FUNC(type, bit_length)         \
-        ASSERT_ARGC(1)                               \
-        ARGV_TO_SPI_HANDLE(0, handle)               \
-        type in_var = 0 ;                           \
-        SPI_TRANS(handle, in_var, NULL, bit_length)
-        */
+    /**
+     * 发送一个 16 位值，丢弃接收数据。
+     * @param devId 设备 ID
+     * @param value 要发送的 16 位值
+     * @return number 错误码，0 表示成功
+     */
+    JSValue SPI::sendU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(2)
+        ARGV_TO_INT32(0, devId)
+        ARGV_TO_UINT16(1, val)
 
-    // JSValue SPI::recvU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_RECV_FUNC(uint8_t, 8)
-    // }
-    // JSValue SPI::recvU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_RECV_FUNC(uint16_t, 16)
-    // }
-    // JSValue SPI::recvU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv){
-    //     SPI_RECV_FUNC(uint32_t, 32)
-    // }
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint16_t tx = val;
+        esp_err_t ret = spi_transfer(it->second, &tx, nullptr, 16);
+        return JS_NewInt32(ctx, ret);
+    }
+
+    /**
+     * 发送一个 32 位值，丢弃接收数据。
+     * @param devId 设备 ID
+     * @param value 要发送的 32 位值
+     * @return number 错误码，0 表示成功
+     */
+    JSValue SPI::sendU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(2)
+        ARGV_TO_INT32(0, devId)
+        ARGV_TO_UINT32(1, val)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint32_t tx = val;
+        esp_err_t ret = spi_transfer(it->second, &tx, nullptr, 32);
+        return JS_NewInt32(ctx, ret);
+    }
+
+    // ================================================================
+    // recvU8 / recvU16 / recvU32 — 单值接收 (RX only)
+    // ================================================================
+    /**
+     * 接收一个 8 位值（发送 0x00）。
+     * @param devId 设备 ID
+     * @return number 接收到的 8 位值 (0-255)
+     */
+    JSValue SPI::recvU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint8_t rx = 0;
+        esp_err_t ret = spi_transfer(it->second, nullptr, &rx, 8);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI receive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, rx);
+    }
+
+    /**
+     * 接收一个 16 位值（发送 0x0000）。
+     * @param devId 设备 ID
+     * @return number 接收到的 16 位值 (0-65535)
+     */
+    JSValue SPI::recvU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint16_t rx = 0;
+        esp_err_t ret = spi_transfer(it->second, nullptr, &rx, 16);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI receive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, rx);
+    }
+
+    /**
+     * 接收一个 32 位值（发送 0x00000000）。
+     * @param devId 设备 ID
+     * @return number 接收到的 32 位值
+     */
+    JSValue SPI::recvU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint32_t rx = 0;
+        esp_err_t ret = spi_transfer(it->second, nullptr, &rx, 32);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI receive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, (int32_t)rx);  // JS 只有 int32，需要处理符号
+    }
+
+    // ================================================================
+    // transU8 / transU16 / transU32 — 单值全双工传输
+    // ================================================================
+    /**
+     * 全双工传输 1 字节。
+     * @param devId 设备 ID
+     * @param outVal 发送的值 (可选，默认 0)
+     * @return number 接收到的 8 位值
+     */
+    JSValue SPI::transU8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint8_t tx = 0, rx = 0;
+        if (argc > 1 && !JS_IsUndefined(argv[1])) {
+            ARGV_TO_UINT8(1, tx)
+        }
+
+        esp_err_t ret = spi_transfer(it->second, &tx, &rx, 8);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI transceive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, rx);
+    }
+
+    /**
+     * 全双工传输 2 字节。
+     * @param devId 设备 ID
+     * @param outVal 发送的值 (可选，默认 0)
+     * @return number 接收到的 16 位值
+     */
+    JSValue SPI::transU16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint16_t tx = 0, rx = 0;
+        if (argc > 1 && !JS_IsUndefined(argv[1])) {
+            ARGV_TO_UINT16(1, tx)
+        }
+
+        esp_err_t ret = spi_transfer(it->second, &tx, &rx, 16);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI transceive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, rx);
+    }
+
+    /**
+     * 全双工传输 4 字节。
+     * @param devId 设备 ID
+     * @param outVal 发送的值 (可选，默认 0)
+     * @return number 接收到的 32 位值
+     */
+    JSValue SPI::transU32(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(1)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+
+        uint32_t tx = 0, rx = 0;
+        if (argc > 1 && !JS_IsUndefined(argv[1])) {
+            ARGV_TO_UINT32(1, tx)
+        }
+
+        esp_err_t ret = spi_transfer(it->second, &tx, &rx, 32);
+        if (ret != ESP_OK) {
+            JSTHROW("SPI transceive failed, err: %d", ret)
+        }
+        return JS_NewInt32(ctx, (int32_t)rx);
+    }
+
+    // ================================================================
+    // send — 缓冲区发送 (TX only)
+    // ================================================================
+    /**
+     * 发送缓冲区数据 (TX only，丢弃接收数据)。
+     *
+     * ```javascript
+     * // 发送字符串
+     * spi.send(devId, "hello")
+     *
+     * // 发送 ArrayBuffer
+     * let buf = new ArrayBuffer(4)
+     * spi.send(devId, buf)
+     *
+     * // 从指定偏移量开始发送
+     * spi.send(devId, buf, 2)
+     *
+     * // 发送指定长度
+     * spi.send(devId, buf, 0, 4)
+     * ```
+     *
+     * @param devId 设备 ID
+     * @param data 要发送的数据 (string 或 ArrayBuffer)
+     * @param offset 起始偏移量 (可选，默认 0)
+     * @param length 发送长度 (可选，默认全部)
+     * @return number 错误码，0 表示成功
+     */
+    JSValue SPI::send(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(2)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+        spi_device_handle_t handle = it->second;
+
+        int offset = 0;
+        if (argc >= 3) {
+            ARGV_TO_INT32(2, offset)
+        }
+        int userLength = -1;
+        if (argc >= 4) {
+            ARGV_TO_INT32(3, userLength)
+        }
+
+        spi_transaction_t t = {};
+        esp_err_t ret = ESP_FAIL;
+
+        if (JS_IsString(argv[1])) {
+            size_t strLen;
+            const char* strData = JS_ToCStringLen(ctx, &strLen, argv[1]);
+            size_t dataLen = strLen;
+            if (offset < 0) offset = 0;
+            if ((size_t)offset > dataLen) offset = (int)dataLen;
+            size_t remaining = dataLen - offset;
+            size_t xferLen = (userLength >= 0 && (size_t)userLength < remaining)
+                                ? (size_t)userLength : remaining;
+            t.tx_buffer = strData + offset;
+            t.length = xferLen * 8;
+            ret = spi_device_transmit(handle, &t);
+            JS_FreeCString(ctx, strData);
+        } else {
+            size_t dataLen;
+            uint8_t* buf = JS_GetArrayBuffer(ctx, &dataLen, argv[1]);
+            if (!buf) {
+                JSTHROW("data must be a string or ArrayBuffer")
+            }
+            if (offset < 0) offset = 0;
+            if ((size_t)offset > dataLen) offset = (int)dataLen;
+            size_t remaining = dataLen - offset;
+            size_t xferLen = (userLength >= 0 && (size_t)userLength < remaining)
+                                ? (size_t)userLength : remaining;
+            t.tx_buffer = buf + offset;
+            t.length = xferLen * 8;
+            ret = spi_device_transmit(handle, &t);
+        }
+
+        return JS_NewInt32(ctx, ret);
+    }
+
+    // ================================================================
+    // trans — 缓冲区全双工传输
+    // ================================================================
+    /**
+     * 全双工缓冲区传输，同时发送和接收数据。
+     *
+     * ```javascript
+     * // 发送 ArrayBuffer，返回接收到的 ArrayBuffer
+     * let txBuf = new ArrayBuffer(4)
+     * let rxBuf = spi.trans(devId, txBuf)
+     *
+     * // 从指定偏移量开始
+     * let rxBuf = spi.trans(devId, txBuf, 2)
+     *
+     * // 指定长度
+     * let rxBuf = spi.trans(devId, txBuf, 0, 4)
+     *
+     * // 发送字符串
+     * let rxBuf = spi.trans(devId, "hello")
+     * ```
+     *
+     * @param devId 设备 ID
+     * @param data 要发送的数据 (string 或 ArrayBuffer)
+     * @param offset 起始偏移量 (可选，默认 0)
+     * @param length 传输长度 (可选，默认全部)
+     * @return ArrayBuffer 接收到的数据，长度与发送数据相同
+     */
+    JSValue SPI::trans(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(SPI, that)
+        ASSERT_ARGC(2)
+        ARGV_TO_INT32(0, devId)
+
+        auto it = that->devices.find(devId);
+        if (it == that->devices.end()) {
+            JSTHROW("Unknown SPI device id: %d", devId)
+        }
+        spi_device_handle_t handle = it->second;
+
+        int offset = 0;
+        if (argc >= 3) {
+            ARGV_TO_INT32(2, offset)
+        }
+        int userLength = -1;
+        if (argc >= 4) {
+            ARGV_TO_INT32(3, userLength)
+        }
+
+        const void* txPtr = nullptr;
+        size_t xferLen = 0;
+        const char* strData = nullptr;
+
+        // 计算传输长度和 TX 指针
+        if (JS_IsString(argv[1])) {
+            size_t dataLen;
+            strData = JS_ToCStringLen(ctx, &dataLen, argv[1]);
+            if (offset < 0) offset = 0;
+            if ((size_t)offset > dataLen) offset = (int)dataLen;
+            size_t remaining = dataLen - offset;
+            xferLen = (userLength >= 0 && (size_t)userLength < remaining)
+                        ? (size_t)userLength : remaining;
+            txPtr = strData + offset;
+        } else {
+            size_t dataLen;
+            uint8_t* buf = JS_GetArrayBuffer(ctx, &dataLen, argv[1]);
+            if (!buf) {
+                JSTHROW("data must be a string or ArrayBuffer")
+            }
+            if (offset < 0) offset = 0;
+            if ((size_t)offset > dataLen) offset = (int)dataLen;
+            size_t remaining = dataLen - offset;
+            xferLen = (userLength >= 0 && (size_t)userLength < remaining)
+                        ? (size_t)userLength : remaining;
+            txPtr = buf + offset;
+        }
+
+        if (xferLen == 0) {
+            if (strData) JS_FreeCString(ctx, strData);
+            return JS_NewArrayBufferCopy(ctx, nullptr, 0);
+        }
+
+        // 分配接收缓冲区
+        uint8_t* rxBuf = (uint8_t*)malloc(xferLen);
+        if (!rxBuf) {
+            if (strData) JS_FreeCString(ctx, strData);
+            JSTHROW("Failed to allocate RX buffer")
+        }
+
+        spi_transaction_t t = {};
+        t.tx_buffer = txPtr;
+        t.rx_buffer = rxBuf;
+        t.length = xferLen * 8;
+
+        esp_err_t ret = spi_device_transmit(handle, &t);
+
+        if (strData) JS_FreeCString(ctx, strData);
+
+        if (ret != ESP_OK) {
+            free(rxBuf);
+            JSTHROW("SPI transceive failed, err: %d", ret)
+        }
+
+        JSValue result = JS_NewArrayBufferCopy(ctx, rxBuf, xferLen);
+        free(rxBuf);
+        return result;
+    }
 
 }
