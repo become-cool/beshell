@@ -9,7 +9,7 @@ authors:
 homepage: "https://beshell.become.cool"
 url: "https://beshell.become.cool"
 repository: "https://github.com/become-cool/beshell.git"
-license: "LGPL"
+license: "LGPL-2.1-only"
 dependencies:
   idf:
     version: ">=5.0.0"
