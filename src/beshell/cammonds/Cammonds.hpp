@@ -11,7 +11,7 @@ namespace be {
     class REPLChannel ;
 
 
-	typedef std::function<void(BeShell * , REPLChannel *, Options & args)> CammondsCommandHandler;
+	typedef std::function<void(BeShell * , REPLChannel *, int rspnId, Options & args)> CammondsCommandHandler;
     typedef struct {
         CammondsCommandHandler handler = nullptr ;
         std::unique_ptr<Options> args ;
@@ -30,7 +30,7 @@ namespace be {
         Cammonds(BeShell * beshell) ;
         void input(Package & pkg, REPLChannel * ch) ;
 
-        bool execCommand(REPLChannel *, const char * input, int iptLen=-1) ;
+        bool execCommand(REPLChannel *, int rspnId, const char * input, int iptLen=-1) ;
         std::shared_ptr<CammondsCommand> registerCommand(const char * name, const char * usage, CammondsCommandHandler handler) ;
         void alias(const char * alias, const char * origin) ;
         void setPassword(const std::string & pwd) ;

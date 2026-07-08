@@ -160,6 +160,8 @@ namespace be {
         EXPORT_FUNCTION(rmSync) ;
         EXPORT_FUNCTION(renameSync) ;
         EXPORT_FUNCTION(usage) ;
+        EXPORT_FUNCTION(cwd) ;
+        EXPORT_FUNCTION(setCwd) ;
         EXPORT_FUNCTION(statSync) ;
         EXPORT_FUNCTION(existsSync) ;
         EXPORT_FUNCTION(isFileSync) ;
@@ -896,6 +898,56 @@ namespace be {
      * @throws 路径不是有效的分区挂载点
      * @throws 获取分区使用情况失败
      */
+    /**
+     * 获取当前工作目录。
+     *
+     * 返回 BeShell 维护的当前工作路径（通过 `cd` 命令或 `FS.setCwd()` 设置）。
+     * 注意：这个路径可能与底层操作系统的当前目录不同。
+     *
+     * 示例：
+     * ```javascript
+     * import * as fs from "fs"
+     *
+     * console.log(fs.cwd())  // 例如: "/"
+     * ```
+     *
+     * @module fs
+     * @function cwd
+     * @return string 当前工作目录路径
+     */
+    JSValue FS:: cwd(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        return JS_NewString(ctx, FS::cwd().c_str()) ;
+    }
+
+    /**
+     * 设置当前工作目录。
+     *
+     * 设置 BeShell 的当前工作路径（与 CLI `cd` 命令等效）。
+     * 路径必须是已存在的目录，否则操作失败并返回 false。
+     *
+     * 示例：
+     * ```javascript
+     * import * as fs from "fs"
+     *
+     * fs.setCwd("/app")
+     * console.log(fs.cwd())  // "/app"
+     * ```
+     *
+     * @module fs
+     * @function setCwd
+     * @param path:string 新的工作目录路径
+     * @return bool 设置成功返回 true，失败返回 false
+     */
+    JSValue FS:: setCwd(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        ASSERT_ARGC(1)
+        ARGV_PATH(path, 0)
+        struct stat st ;
+        if(stat(path.c_str(), &st) < 0 || !S_ISDIR(st.st_mode)) {
+            return JS_FALSE ;
+        }
+        return FS::setCwd(path) ? JS_TRUE : JS_FALSE ;
+    }
+
     JSValue FS:: usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 
         ASSERT_ARGC(1)

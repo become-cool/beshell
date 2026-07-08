@@ -1,12 +1,28 @@
+# v1.0.16 2026/6/8
+
+## Fix:
+
+* REPLCDC TX 缓冲区从 256 增大到 512
+* USB CDC 无法下载文件的问题
+* 启动时 adc io 错误
+
+## New Feature:
+
+* 实现了 mv, cp 两个 repl 命令
+* reboot 命令在执行前返回 rspn 给上位机，以免上位机等待超时
+* repl 短参数可以合并
+* ls 命令增加 -t --depth 参数用于递归列出文件树
+* fs.cwd(), fs.setCwd()
+
 # v1.0.15 2026/6/7
 
-Fix:
+## Fix:
 
 * REPLCDC TX 缓冲区从 256 增大到 512
 
 # v1.0.14 2026/6/7
 
-Fix:
+## Fix:
 
 * I2C 层增加 FreeRTOS 互斥锁，保护 devices map / bus_handle / Arduino API 缓冲区，防止多任务并发访问竞态
 * 修复 InDevPointer::read() ring buffer use-after-free：先拷贝数据再 vRingbufferReturnItem()，防止 daemon task 覆写
@@ -18,7 +34,7 @@ Fix:
 
 # v1.0.13 2026/5/31
 
-New Feature:
+## New Feature:
 
 * + JSEngine::FLAG_EXPORT_TO_GLOBAL — evalScript() 支持将 module export 自动导出到 global scope
 * + InDevPointer
@@ -28,7 +44,7 @@ New Feature:
 
 # v1.0.11 2026/5/11
 
-New Feature:
+## New Feature:
 
 * example 可从 CMakeLists.private.txt 文件中加载 components 目录
 * 完善了 JSDoc 文档
@@ -36,30 +52,30 @@ New Feature:
 
 # v1.0.10 
 
-New Feature:
+## New Feature:
 
 * + ModuleLoader::addModuleSource()
 
-Fix:
+## Fix:
 
 * js-to-c.js 生成的 *.c 文件，字符数组由 static 类型改为 const
 
 # v1.0.9 2026/3/4
 
-Fix:
+## Fix:
 
 * repl cdc not work
 * gpio adc/pwm issue
 
 # v1.0.8 2026/3/3
 
-Fix:
+## Fix:
 
 * 其他 beshell-xxx 下游components的依赖问题
 
 # v1.0.7 2026/2/8
 
-New Feature:
+## New Feature:
 
 * + FS::unmount()/FS::remount()
 * + BeShell::evalMain()
@@ -73,28 +89,28 @@ Reflect:
 
 # v1.0.6 2026/2/3
 
-New Feature:
+## New Feature:
 
 * + serial.uart.unsetup()
 * + telnet sync, ping, pong 协议
 * + ota.start() 参数 opt.downloader
 * 支持在 sdkconfig 中取消 CONFIG_ESP_WIFI_SOFTAP_SUPPORT 以节省 sram
 
-Fix:
+## Fix:
 
 * mg.download() catch the exceptions of the callback function
 * fixed bug for bt.central.connect()
-* fixed: js-to-c.js 路径
-* fixed: telnet cdc delay
-* fixed: "bt queue full" 刷屏
-* fixed: telnet cdc output
+* ## Fix: js-to-c.js 路径
+* ## Fix: telnet cdc delay
+* ## Fix: "bt queue full" 刷屏
+* ## Fix: telnet cdc output
 * uart.unsetup() 清除所有资源
 * quickjs/VERSION 文件中多余的换行符会造成项目生成错误
 
 
 # v1.0.5 2025-11-25
 
-Fix:
+## Fix:
 
 * vscode 环境下从 exmaples/beshell-app 自动创建工程，第一次编译会因为找不到 mklittlefs 导致失败
 
@@ -113,7 +129,7 @@ Add:
 * examples
 * gpio.adcReadChannel()
 
-Fix:
+## Fix:
 
 * build issues on ESP32
 
@@ -123,13 +139,13 @@ Refact:
 * 移除了 mg、lvgl、sqlite 等依赖第三方库的代码，作为独立的 component 发布
 * 移除了大量驱动代码、ota 等非基础功能，作为独立的 component 发布
 
-New Feature:
+## New Feature:
 
 * + sync, ping, pong 协议
 * + telnet MQTT 协议
 * + ota.start() 参数 opt.downloader
 
-Fixed: 
+## Fix: 
 
 * telnet cdc delay
 * "bt queue full" 刷屏
@@ -137,14 +153,14 @@ Fixed:
 
 # v0.3.10   2025-12-29
 
-New Feature:
+## New Feature:
 
 * add serial.uart.unsetup()
 
 
 # v0.3.9   2025-09-30
 
-New Feature:
+## New Feature:
 
 * mg.addDNSCache()
 * mg.removeDNSCache()
@@ -153,7 +169,7 @@ New Feature:
 * gpio adc functions
 
 
-Fixed:
+## Fix:
 
 * mg.download() catch the exceptions of the callback function
 
@@ -199,9 +215,9 @@ Fix issure:
 * 解决了在 setInterval 的 callback 中调用 clearTimeout() 导致事件循环错乱
 * gpio.watch() 打印 callback 抛出的异常
 
-## v0.3.7   2025-04-26
+# v0.3.7   2025-04-26
 
-Added: 
+## New Feature: 
 
 * bt module
 * wifi.startStaDeamon()
@@ -227,15 +243,15 @@ Added:
 * console.block()
 * flash module
 
-Fixed:
+## Fix:
 
 * i2c read() leaks memory
 
-Removed:
+## Removed:
 
 * wifi.autoReconnect()
 
-Refactored:
+## Refactored:
 
 * BeShell::main() 如果发生崩溃，等待30秒后再执行 main 脚本
 * wifi.conenct()  auto call startStaDeamon() when retry==-1
@@ -244,9 +260,9 @@ Refactored:
 * rename process.delay() to process.sleep()
 * 升级 mongoose 库到 7.17
 
-## v0.3.6   2024-11-27
+# v0.3.6   2024-11-27
 
-Added:
+## New Feature:
 
 * EventEmitter 新的 native事件触发机制:  emitNativeEvent()/onNativeEvent()
 * AudioPlayer stop 事件
@@ -259,15 +275,15 @@ Added:
 * add process.delay(ms)
 * + EventModule
 
-Refactored:
+## Refactored:
 
 * 后台任务方式读取 pointer input dev, 避免低帧率状态下丢失事件
 * dt.load() 可以接收对象参数
 
 
-## v0.3.5   2024-10-05
+# v0.3.5   2024-10-05
 
-Added:
+## New Feature:
 
 * uart.unsetup()
 * uart.isInstalled()
@@ -287,9 +303,9 @@ Added:
 * 增加了 JS 写设备驱动的机制
 * add lv.Obj.show()/hide()/setVisble()
 
-Fixed:
+## Fix:
 
-Refactored:
+## Refactored:
 
 * uart.write() 可以接受数组参数
 * ArrayBuffer.prototype.toArray() 增加参数 signed
@@ -301,32 +317,32 @@ Refactored:
 * 重构了 JSEngine 的循环机制
 * 重构了 I2C 的读/写接口
 
-## v0.3.4   2024-6-4
+# v0.3.4   2024-6-4
 
-Added:
+## New Feature:
 
 * 完善 WiFi 模块的 API
 * 完善 Mg 模块的 API
 
-Fixed:
+## Fix:
 
 * 低于 idf 5.2 无法正确创建串口对象
 
-Refactored:
+## Refactored:
 
 * EventEmitter 的主要方法不再返回 this
 
-## v0.3.2   2024-5-26
+# v0.3.2   2024-5-26
 
-Refactored:
+## Refactored:
 
 * 预设的 partitions.cvs 文件中分区名称由 fshome 改为 fsroot
 * JSEngine::evalScript() 增加参数指定是否输出异常
 
 
-## v0.3.1   2024-5-25
+# v0.3.1   2024-5-25
 
-Added:
+## New Feature:
 * driver WH4530A
 * driver DS1307
 * driver TM1650
@@ -335,9 +351,9 @@ Added:
 * process.readEFUSE()
 * process.setTimezoneOffset()
 
-Fixed:
+## Fix:
 
-Refactored:
+## Refactored:
 
 * 全面重构了 BeShell 的接口
 * I2CDevice::begin() rename to I2CDevice::setup()
@@ -345,4 +361,4 @@ Refactored:
 * 加入了 be::driver:input 名称空间
 * lv.Animation 从 EventEmitter 继承，增加了 stop 事件
 
-### v0.3.0   2024-4-22
+## v0.3.0   2024-4-22

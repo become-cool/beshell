@@ -14,6 +14,7 @@
 #include <hal/adc_types.h>
 #include <soc/gpio_num.h>
 #include <soc/soc_caps.h>
+#include <soc/adc_periph.h>
 #include <map>
 #include <set>
 #include <vector>
@@ -109,19 +110,20 @@ namespace be {
     void GPIO::adcReflectPins() {
         map_gpio_adc_info.clear() ;
         map_unit_channel_to_pin.clear() ;
-        for(int pin = 0; pin < GPIO_NUM_MAX; ++pin) {
-            gpio_num_t gpio = static_cast<gpio_num_t>(pin) ;
-            adc_unit_t unit ;
-            adc_channel_t channel ;
-            if(adc_oneshot_io_to_channel(gpio, &unit, &channel) == ESP_OK) {
-                adc_channel_info_t info ;
-                info.unit = unit ;
-                info.channel = channel ;
-                info.configured = false ;
-                info.pin = gpio ;
+        // 直接遍历 adc_channel_io_map 表，只包含有效的 ADC 引脚，避免对非 ADC GPIO 调用 API 产生错误日志
+        for(int unit = 0; unit < SOC_ADC_PERIPH_NUM; ++unit) {
+            for(int ch = 0; ch < SOC_ADC_MAX_CHANNEL_NUM; ++ch) {
+                int gpio = adc_channel_io_map[unit][ch] ;
+                if(gpio < 0) continue ;  // 跳过不支持的通道
 
-                map_gpio_adc_info[gpio] = info ;
-                map_unit_channel_to_pin[_make_uc_key(unit, channel)] = gpio ;
+                adc_channel_info_t info ;
+                info.unit = (adc_unit_t)unit ;
+                info.channel = (adc_channel_t)ch ;
+                info.configured = false ;
+                info.pin = (gpio_num_t)gpio ;
+
+                map_gpio_adc_info[(gpio_num_t)gpio] = info ;
+                map_unit_channel_to_pin[_make_uc_key((adc_unit_t)unit, (adc_channel_t)ch)] = (gpio_num_t)gpio ;
             }
         }
     }

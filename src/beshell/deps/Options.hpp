@@ -110,8 +110,26 @@ parse_option:
                 option = find_option_by_name(key);
                 if (option) {
                     option->is_given = true;
+                } else if (key.length() > 1 && key[0] != '-') {
+                    // 合并短选项：-lh → -l -h
+                    // 仅处理无参数 flag 选项，遇到有参数选项时退出
+                    bool combined = true ;
+                    for (char ch : key) {
+                        std::string single(1, ch);
+                        Option *opt = find_option_by_name(single);
+                        if (opt && opt->num_args == 0) {
+                            opt->is_given = true;
+                        } else {
+                            combined = false;
+                            break ;
+                        }
+                    }
+                    if(!combined) {
+                        continue ;
+                    }
+                    // 合并成功，跳到下一个参数（无需处理 option 参数值）
+                    continue ;
                 } else {
-                    // invalid_option(argv[0], key);
                     continue ;
                 }
                 unsigned int n = 0;

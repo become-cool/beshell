@@ -6,11 +6,14 @@
 #include "../module/NVS.hpp"
 #include "debug.h"
 #include "mallocf.h"
+#include <algorithm>
 #include <cassert>
 #include <iomanip>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <iostream>
+#include <functional>
+#include <set>
 #include <iomanip>
 #include <sstream>
 #include <utime.h>
@@ -72,7 +75,7 @@ namespace be {
         else if(size>1024) {
             output << std::fixed << std::setprecision(1) << (double)size/1024 << "K" ;
         }
-        else if(size>1024) {
+        else {
             output << size ;
         }
     }
@@ -85,10 +88,14 @@ namespace be {
                 "Options:\n"
                 "  -(l|-list)                   output list\n"
                 "  -(h)                         with -l, print human readable sizes\n"
+                "  -(t|-tree)                   tree view (implies -l)\n"
+                "  --depth <n>                  max tree depth, default 5 (only with -t)\n"
                 "  -(?|-help)                   print this message and exit\n"
-            , [](BeShell * beshell, REPLChannel * ch, Options & args){
-                
+            , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
+
                 string path = FS::resolve(args[0]) ;
+                // 保存 VFS 转换前的显示名
+                string rootName = args[0].empty() ? "/" : path_basename(path.c_str()) ;
                 FS::toVFSPath(path) ;
 
                 if( !FS::exist(path.c_str()) ){
@@ -96,9 +103,11 @@ namespace be {
                     return ;
                 }
 
-                bool bList = args.has("l") ;
+                bool bTree = args.has("t") ;
+                bool bList = bTree || args.has("l") ;
                 bool bReadable = args.has("h") ;
-                
+                int maxDepth = bTree ? args.get("-depth", 0, 5) : 0 ;
+
                 struct dirent *dirEnt ;
                 struct stat statbuf ;
                 bool fisrt = true ;
@@ -107,16 +116,74 @@ namespace be {
 
                 if( FS::isFile(path.c_str()) ){
                     stat(path.c_str(),&statbuf) ;
+                    filesBuff << std::setw(8) ;
                     if(bReadable) {
                         printFileSize(statbuf.st_size, filesBuff) ;
                     } else {
                         filesBuff << statbuf.st_size ;
                     }
-
+                    filesBuff << "   " << rootName << endl ;
                     ch->send(filesBuff.str()) ;
                     return ;
                 }
 
+                if(bTree) {
+                    // 树形模式：递归遍历目录
+                    std::ostringstream output ;
+                    output << std::setw(8) << "<dir>" << "   " << (rootName == "/" ? "/" : rootName + "/") << endl ;
+
+                    std::set<std::string> visited ;
+
+                    std::function<void(const string&, const string&, int)> treeList = [&](const string& dirPath, const string& prefix, int depth) {
+                        if(depth >= maxDepth) return ;
+
+                        if(!visited.insert(dirPath).second) return ;
+
+                        DIR* dir = opendir(dirPath.c_str()) ;
+                        if(!dir) return ;
+
+                        struct dirent *ent ;
+                        std::vector<std::string> names ;
+                        while((ent = readdir(dir))) {
+                            if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0) continue ;
+                            if(ent->d_name[0] == '\0') continue ;
+                            names.push_back(ent->d_name) ;
+                        }
+                        closedir(dir) ;
+                        std::sort(names.begin(), names.end()) ;
+
+                        struct stat st ;
+                        for(size_t i = 0; i < names.size(); i++) {
+                            bool isLast = (i == names.size() - 1) ;
+                            string branch = isLast ? "└ " : "├ " ;
+                            string childPrefix = prefix + (isLast ? "  " : "│ ") ;
+
+                            string childpath = dirPath + "/" + names[i] ;
+                            if(stat(childpath.c_str(), &st) < 0) continue ;
+                            if(!S_ISDIR(st.st_mode) && !S_ISREG(st.st_mode)) continue ;
+
+                            if(S_ISDIR(st.st_mode)) {
+                                if(names[i] == "fs") continue ;
+                                output << std::setw(8) << "<dir>" << "   " << prefix << branch << names[i] << "/" << endl ;
+                                treeList(childpath, childPrefix, depth + 1) ;
+                            } else {
+                                output << std::setw(8) ;
+                                if(bReadable) {
+                                    printFileSize(st.st_size, output) ;
+                                } else {
+                                    output << st.st_size ;
+                                }
+                                output << "   " << prefix << branch << names[i] << endl ;
+                            }
+                        }
+                    } ;
+
+                    treeList(path, "", 0) ;
+                    ch->send(output.str()) ;
+                    return ;
+                }
+
+                // 非树形模式：原有逻辑
                 DIR* dir = opendir(path.c_str());
                 if(!dir) {
                     ch->send("Count not open dir") ;
@@ -150,7 +217,7 @@ namespace be {
                     }
                     fisrt = false ;
                 }
-                
+
                 closedir(dir);
 
 #ifdef ESP_PLATFORM
@@ -183,14 +250,14 @@ namespace be {
             }
         ) ;
         
-        registerCommand("pwd", nullptr, [](BeShell * beshell, REPLChannel * ch, Options & args){
+        registerCommand("pwd", nullptr, [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
                 ch->send(FS::cwd()+"\n") ;
             }
         ) ;
 
         registerCommand("cd",
             "Usage: cd <path>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
                 ARGS_TO_DIR(0, path)
                 FS::setCwd(path) ;
             }
@@ -198,7 +265,7 @@ namespace be {
         
         registerCommand("cat",
             "Usage: cat <filepath>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
                 ARGS_TO_FILE(0, path)
                 int readed = 0 ;
                 unique_ptr<char> content = FS::readFileSync(path.c_str(), &readed) ;
@@ -208,7 +275,7 @@ namespace be {
 
         registerCommand("source", 
             "Usage: source <filepath> <arg?> ..."
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
                 ARGS_TO_FILE(0, path)
 
                 JSValue argv = JS_NewArray(beshell->engine->ctx) ;
@@ -228,7 +295,7 @@ namespace be {
 
         registerCommand("touch", 
             "Usage: touch <filepath>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1){
                 ch->send("Miss filename") ;
                 return ;
@@ -242,7 +309,7 @@ namespace be {
             "Usage: rm <filepath>"
             "Options:\n"
             "  -(r)                   recursive\n"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1) {
                 ch->send("missing path") ;
             }
@@ -256,7 +323,7 @@ namespace be {
             "Usage: mkdir <filepath>"
             "Options:\n"
             "  -(r)                   recursive\n"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1) {
                 ch->send("missing path") ;
             }
@@ -267,9 +334,9 @@ namespace be {
         }) ;
 
 #ifdef ESP_PLATFORM
-        registerCommand("reboot", 
+        registerCommand("reboot",
             "Usage: reboot <path?>"
-        , [this](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [this](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()>0) {
                 string path = FS::resolve(args[0]) ;
                 if( !FS::exist(path.c_str()) ){
@@ -279,39 +346,153 @@ namespace be {
                 NVS::writeString("main-run", path.c_str()) ;
             }
 
+            ch->send(nullptr, 0, rspnId, RSPN) ;
             esp_restart() ;
         }) ;
         alias("run","reboot") ;
 #endif
 
-        registerCommand("cp", 
-            "Usage: cp <source> <dest>"
+        registerCommand("cp",
+            "Usage: cp <source> <dest>\n"
             "Options:\n"
             "  -r                   recursive\n"
             "  -f                   force copy (override exsits file)\n"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<2) {
-                ch->send("missing source or dest path") ;
+                ch->send("missing source or dest path\n") ;
+                return ;
             }
             string source = FS::resolve(args[0]) ;
             string dest = FS::resolve(args[1]) ;
-            ch->send("command not implements.") ;
+            FS::toVFSPath(source) ;
+            FS::toVFSPath(dest) ;
+            bool recursive = args.has("r") ;
+            bool force = args.has("f") ;
+
+            struct stat src_stat ;
+            if(stat(source.c_str(), &src_stat) < 0) {
+                ch->send("source not exists\n") ;
+                return ;
+            }
+
+            // 目标已存在
+            struct stat dst_stat ;
+            bool dest_exists = (stat(dest.c_str(), &dst_stat) == 0) ;
+
+            if(dest_exists && !force) {
+                ch->send("dest already exists, use -f to force overwrite\n") ;
+                return ;
+            }
+
+            if(S_ISREG(src_stat.st_mode)) {
+                int readed = 0 ;
+                std::unique_ptr<char> content = FS::readFileSync(source.c_str(), &readed) ;
+                if(!content || readed < 0) {
+                    ch->send("read source file failed\n") ;
+                    return ;
+                }
+                if(!FS::writeFileSync(dest.c_str(), content.get(), readed, false)) {
+                    ch->send("write dest file failed\n") ;
+                    return ;
+                }
+                ch->send("copied\n") ;
+            }
+            else if(S_ISDIR(src_stat.st_mode)) {
+                if(!recursive) {
+                    ch->send("source is a directory, use -r to copy recursively\n") ;
+                    return ;
+                }
+                // 递归复制目录
+                std::function<void(const string&, const string&)> copyDir = [&](const string& src, const string& dst) {
+                    FS::mkdir(dst.c_str(), false) ;
+                    DIR* dir = opendir(src.c_str()) ;
+                    if(!dir) return ;
+                    struct dirent *ent ;
+                    while((ent = readdir(dir))) {
+                        if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0) continue ;
+                        string src_child = src + "/" + ent->d_name ;
+                        string dst_child = dst + "/" + ent->d_name ;
+                        struct stat child_stat ;
+                        if(stat(src_child.c_str(), &child_stat) < 0) continue ;
+                        if(S_ISREG(child_stat.st_mode)) {
+                            int readed = 0 ;
+                            std::unique_ptr<char> content = FS::readFileSync(src_child.c_str(), &readed) ;
+                            if(content && readed >= 0) {
+                                FS::writeFileSync(dst_child.c_str(), content.get(), readed, false) ;
+                            }
+                        }
+                        else if(S_ISDIR(child_stat.st_mode)) {
+                            copyDir(src_child, dst_child) ;
+                        }
+                    }
+                    closedir(dir) ;
+                } ;
+                copyDir(source, dest) ;
+                ch->send("copied\n") ;
+            }
+            else {
+                ch->send("unsupported file type\n") ;
+            }
         }) ;
 
-        registerCommand("mv", 
+        registerCommand("mv",
             "Usage: mv <from> <to>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<2) {
-                ch->send("missing from or to path") ;
+                ch->send("missing from or to path\n") ;
+                return ;
             }
             string source = FS::resolve(args[0]) ;
             string dest = FS::resolve(args[1]) ;
-            ch->send("command not implements.") ;
+            FS::toVFSPath(source) ;
+            FS::toVFSPath(dest) ;
+
+            if( !FS::exist(source.c_str()) ) {
+                ch->send("source not exists\n") ;
+                return ;
+            }
+
+            // 尝试 rename（同分区高效移动）
+            if(rename(source.c_str(), dest.c_str()) == 0) {
+                ch->send("moved\n") ;
+                return ;
+            }
+
+            // rename 失败（跨分区），回退到 copy + delete
+            struct stat src_stat ;
+            if(stat(source.c_str(), &src_stat) < 0) {
+                ch->send("stat source failed\n") ;
+                return ;
+            }
+
+            if(S_ISREG(src_stat.st_mode)) {
+                int readed = 0 ;
+                std::unique_ptr<char> content = FS::readFileSync(source.c_str(), &readed) ;
+                if(!content || readed < 0) {
+                    ch->send("read source file failed\n") ;
+                    return ;
+                }
+                if(!FS::writeFileSync(dest.c_str(), content.get(), readed, false)) {
+                    ch->send("write dest file failed\n") ;
+                    return ;
+                }
+                if(unlink(source.c_str()) < 0) {
+                    ch->send("remove source file failed\n") ;
+                    return ;
+                }
+                ch->send("moved\n") ;
+            }
+            else if(S_ISDIR(src_stat.st_mode)) {
+                ch->send("moving directories across partitions is not supported, use cp -r then rm -r instead\n") ;
+            }
+            else {
+                ch->send("unsupported file type\n") ;
+            }
         }) ;
 
         registerCommand("free", 
             "Usage: free"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
 
             int heap_total = 0 ;
             int heap_used = 0 ;
@@ -350,7 +531,7 @@ namespace be {
         
         registerCommand("top", 
             "Usage: top"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
 
             string buff ;
 #ifdef ESP_PLATFORM
@@ -422,7 +603,7 @@ namespace be {
 
         registerCommand("import", 
             "Usage: import <module>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1) {
                 ch->send("missing module name") ;
                 return ;
@@ -446,7 +627,7 @@ namespace be {
 
         registerCommand("login", 
             "Usage: login <password>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1) {
                 return ;
             }
@@ -458,14 +639,14 @@ namespace be {
         
         registerCommand("logout", 
             "Usage: logout"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             ch->send("bye\n") ;
             beshell->cammonds->logined = false ;
         }) ;
 
         registerCommand("compile", 
             "Usage: compile <path>"
-        , [](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             if(args.length()<1) {
                 ch->send("missing path") ;
             }
@@ -501,7 +682,7 @@ namespace be {
 
         registerCommand("help", 
             "Usage: help"
-        , [this](BeShell * beshell, REPLChannel * ch, Options & args){
+        , [this](BeShell * beshell, REPLChannel * ch, int rspnId, Options & args){
             string buff ;
             bool first = true ;
             for(const auto & pair: commands) {
@@ -548,7 +729,7 @@ namespace be {
             return ;
         }
 
-        if(execCommand(ch, (const char *)pkg.body(), pkg.body_len)) {            
+        if(execCommand(ch, rspnId, (const char *)pkg.body(), pkg.body_len)) {
             ch->send(nullptr,0, rspnId, RSPN) ;
         }
 
@@ -619,7 +800,7 @@ namespace be {
         return 0 ;
     }
 
-    bool Cammonds::execCommand(REPLChannel * ch, const char * input, int iptLen) {
+    bool Cammonds::execCommand(REPLChannel * ch, int rspnId, const char * input, int iptLen) {
         if(iptLen<0) {
             iptLen = strlen(input) ;
         }
@@ -652,7 +833,7 @@ namespace be {
             ch->send("quote is not closed\n") ;
             return true ;
         }
-        
+
         cmd->args->parse(argv) ;
 
         if( cmd->args->has("?") ) {
@@ -662,7 +843,7 @@ namespace be {
             return true ;
         }
 
-        cmd->handler(beshell, ch, * cmd->args) ;
+        cmd->handler(beshell, ch, rspnId, * cmd->args) ;
 
         return true ;
     }
