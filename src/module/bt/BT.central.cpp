@@ -408,46 +408,93 @@ namespace be {
 
     JSValue BT::setScanParam(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
 #if (BLE_42_FEATURE_SUPPORT == TRUE)
-    
+
         CHECK_ARGC(1)
 
-        bool active = false ;
-        int own_addr_type = BLE_ADDR_TYPE_RANDOM ;
-        int scan_filter_policy = BLE_ADDR_TYPE_RANDOM ;
+        int32_t scan_type, own_addr_type, scan_filter_policy, scan_duplicate;
+        int16_t scan_interval, scan_window;
+        GET_INT32_PROP_OPT( argv[0], "scan_type",            scan_type,              BLE_SCAN_TYPE_PASSIVE )
+        GET_INT32_PROP_OPT( argv[0], "own_addr_type",        own_addr_type,          BLE_ADDR_TYPE_PUBLIC )
+        GET_INT32_PROP_OPT( argv[0], "scan_filter_policy",   scan_filter_policy,     BLE_SCAN_FILTER_ALLOW_ALL )
+        GET_INT16_PROP_OPT( argv[0], "scan_interval",        scan_interval,          0x50 )
+        GET_INT16_PROP_OPT( argv[0], "scan_window",          scan_window,            0x40 )
+        GET_INT32_PROP_OPT( argv[0], "scan_duplicate",       scan_duplicate,         BLE_SCAN_DUPLICATE_DISABLE )
 
-        esp_ble_scan_params_t ble_scan_params ;
-        GET_INT32_PROP_OPT( argv[0], "scan_type",            ble_scan_params.scan_type,              BLE_SCAN_TYPE_PASSIVE )
-        GET_INT32_PROP_OPT( argv[0], "own_addr_type",        ble_scan_params.own_addr_type,          BLE_ADDR_TYPE_PUBLIC )
-        GET_INT32_PROP_OPT( argv[0], "scan_filter_policy",   ble_scan_params.scan_filter_policy,     BLE_SCAN_FILTER_ALLOW_ALL )
-        GET_INT16_PROP_OPT( argv[0], "scan_interval",        ble_scan_params.scan_interval,          0x50 )
-        GET_INT16_PROP_OPT( argv[0], "scan_window",          ble_scan_params.scan_window,            0x40 )
-        GET_INT32_PROP_OPT( argv[0], "scan_duplicate",       ble_scan_params.scan_duplicate,         BLE_SCAN_DUPLICATE_DISABLE )
+        esp_ble_scan_params_t ble_scan_params;
+        ble_scan_params.scan_type          = static_cast<esp_ble_scan_type_t>(scan_type);
+        ble_scan_params.own_addr_type      = static_cast<esp_ble_addr_type_t>(own_addr_type);
+        ble_scan_params.scan_filter_policy = static_cast<esp_ble_scan_filter_t>(scan_filter_policy);
+        ble_scan_params.scan_duplicate     = static_cast<esp_ble_scan_duplicate_t>(scan_duplicate);
+        ble_scan_params.scan_interval      = scan_interval;
+        ble_scan_params.scan_window        = scan_window;
 
-        // esp_ble_scan_params_t ble_scan_params = {
-        //     .scan_type = BLE_SCAN_TYPE_PASSIVE,
-        //     .own_addr_type = BLE_ADDR_TYPE_PUBLIC,  //BLE_ADDR_TYPE_PUBLIC, //BLE_ADDR_TYPE_RANDOM,
-        //     .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
-        //     .scan_interval = 0x50,
-        //     .scan_window = 0x40,
-        //     .scan_duplicate = BLE_SCAN_DUPLICATE_ENABLE,
-        // };
-        
-        // dn(ble_scan_params.scan_type)
-        // dn(ble_scan_params.own_addr_type)
-        // dn(ble_scan_params.scan_filter_policy)
-        // dn(ble_scan_params.scan_interval)
-        // dn(ble_scan_params.scan_window)
-        // dn(ble_scan_params.scan_duplicate)
-
-        // 开始扫描BLE设备
         esp_err_t ret = esp_ble_gap_set_scan_params(&ble_scan_params);
         if (ret != ESP_OK) {
             JSTHROW("Failed to set scan params: %s", esp_err_to_name(ret));
         }
 
         return JS_UNDEFINED ;
+#elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+        CHECK_ARGC(1)
+
+        // 公共参数
+        int32_t scan_type, own_addr_type, scan_filter_policy, scan_duplicate;
+        int16_t scan_interval, scan_window;
+        GET_INT32_PROP_OPT( argv[0], "scan_type",            scan_type,              BLE_SCAN_TYPE_PASSIVE )
+        GET_INT32_PROP_OPT( argv[0], "own_addr_type",        own_addr_type,          BLE_ADDR_TYPE_PUBLIC )
+        GET_INT32_PROP_OPT( argv[0], "scan_filter_policy",   scan_filter_policy,     BLE_SCAN_FILTER_ALLOW_ALL )
+        GET_INT16_PROP_OPT( argv[0], "scan_interval",        scan_interval,          0x50 )
+        GET_INT16_PROP_OPT( argv[0], "scan_window",          scan_window,            0x40 )
+        GET_INT32_PROP_OPT( argv[0], "scan_duplicate",       scan_duplicate,         BLE_SCAN_DUPLICATE_DISABLE )
+
+        int32_t cfg_mask;
+        GET_INT32_PROP_OPT( argv[0], "cfg_mask", cfg_mask, ESP_BLE_GAP_EXT_SCAN_CFG_UNCODE_MASK )
+
+        // uncoded 默认继承顶层 flat 属性（兼容旧版），coded 独立默认值
+        int32_t uncoded_scan_type     = scan_type;
+        int16_t uncoded_scan_interval = scan_interval;
+        int16_t uncoded_scan_window   = scan_window;
+        int32_t coded_scan_type       = BLE_SCAN_TYPE_PASSIVE;
+        int16_t coded_scan_interval   = 0x80;
+        int16_t coded_scan_window     = 0x80;
+
+        // uncoded 子对象覆盖
+        JSValue uncodedObj = JS_GetPropertyStr(ctx, argv[0], "uncoded");
+        if (JS_IsObject(uncodedObj)) {
+            GET_INT32_PROP_OPT( uncodedObj, "scan_type",    uncoded_scan_type,     uncoded_scan_type )
+            GET_INT16_PROP_OPT( uncodedObj, "scan_interval", uncoded_scan_interval, uncoded_scan_interval )
+            GET_INT16_PROP_OPT( uncodedObj, "scan_window",   uncoded_scan_window,   uncoded_scan_window )
+        }
+        JS_FreeValue(ctx, uncodedObj);
+
+        // coded 子对象覆盖
+        JSValue codedObj = JS_GetPropertyStr(ctx, argv[0], "coded");
+        if (JS_IsObject(codedObj)) {
+            GET_INT32_PROP_OPT( codedObj, "scan_type",    coded_scan_type,     coded_scan_type )
+            GET_INT16_PROP_OPT( codedObj, "scan_interval", coded_scan_interval, coded_scan_interval )
+            GET_INT16_PROP_OPT( codedObj, "scan_window",   coded_scan_window,   coded_scan_window )
+        }
+        JS_FreeValue(ctx, codedObj);
+
+        esp_ble_ext_scan_params_t scan_params = {};
+        scan_params.own_addr_type             = static_cast<esp_ble_addr_type_t>(own_addr_type);
+        scan_params.filter_policy             = static_cast<esp_ble_scan_filter_t>(scan_filter_policy);
+        scan_params.scan_duplicate            = static_cast<esp_ble_scan_duplicate_t>(scan_duplicate);
+        scan_params.cfg_mask                  = static_cast<uint8_t>(cfg_mask);
+        scan_params.uncoded_cfg.scan_type     = static_cast<esp_ble_scan_type_t>(uncoded_scan_type);
+        scan_params.uncoded_cfg.scan_interval  = uncoded_scan_interval;
+        scan_params.uncoded_cfg.scan_window   = uncoded_scan_window;
+        scan_params.coded_cfg.scan_type       = static_cast<esp_ble_scan_type_t>(coded_scan_type);
+        scan_params.coded_cfg.scan_interval   = coded_scan_interval;
+        scan_params.coded_cfg.scan_window     = coded_scan_window;
+        esp_err_t ret = esp_ble_gap_set_ext_scan_params(&scan_params);
+        if (ret != ESP_OK) {
+            JSTHROW("Failed to set scan params: %s", esp_err_to_name(ret));
+        }
+
+        return JS_UNDEFINED ;
 #else
-        JSTHROW("BLE 4.2 is not supported") ;
+        JSTHROW("BLE is not supported") ;
 #endif
     }
             
@@ -456,27 +503,41 @@ namespace be {
                 // if(bScanning) {
                 //     JSTHROW("already scanning")
                 // }
-        
-                ARGV_TO_UINT32_OPT(0,dur,UINT32_MAX)
-        
+
+                ARGV_TO_UINT32_OPT(0,dur,0)
+
                 esp_err_t ret = esp_ble_gap_start_scanning(dur) ;
                 if (ret != ESP_OK) {
                     JSTHROW("Failed to start scanning: %s", esp_err_to_name(ret));
                 }
                 bScanning = true ;
-        
+
+                return JS_UNDEFINED ;
+        #elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+                ARGV_TO_UINT32_OPT(0,dur,0)
+                ARGV_TO_UINT16_OPT(1, period, 0)
+
+                esp_err_t ret = esp_ble_gap_start_ext_scan(dur, period) ;
+                if (ret != ESP_OK) {
+                    JSTHROW("Failed to start scanning: %s", esp_err_to_name(ret));
+                }
+                bScanning = true ;
+
                 return JS_UNDEFINED ;
         #else
-                JSTHROW("BLE 4.2 is not supported") ;
+                JSTHROW("BLE is not supported") ;
         #endif
             }
-        
+
             JSValue BT::stopScan(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         #if (BLE_42_FEATURE_SUPPORT == TRUE)
                 bScanning = false ;
                 return esp_ble_gap_stop_scanning()==ESP_OK? JS_TRUE: JS_FALSE ;
+        #elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+                bScanning = false ;
+                return esp_ble_gap_stop_ext_scan()==ESP_OK? JS_TRUE: JS_FALSE ;
         #else
-                JSTHROW("BLE 4.2 is not supported") ;
+                JSTHROW("BLE is not supported") ;
         #endif
             }
             JSValue BT::isScanning(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {

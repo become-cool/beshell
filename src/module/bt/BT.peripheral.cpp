@@ -380,7 +380,13 @@ namespace be {
         CHECK_GATTS_IF
         CHECK_ARGC(1)
         ARGV_TO_ARRAYBUFFER(0, data, datalen)
+#if (BLE_42_FEATURE_SUPPORT == TRUE)
         esp_err_t err = esp_ble_gap_config_adv_data_raw(data, datalen);
+#elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+        esp_err_t err = esp_ble_gap_config_ext_adv_data_raw(0, datalen, data);
+#else
+        JSTHROW("BLE is not supported")
+#endif
         if(err!=ESP_OK) {
             JSTHROW("esp_ble_gap_config_adv_data_raw failed, err = %d", err)
         }
@@ -389,35 +395,108 @@ namespace be {
 
     JSValue BT::startAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_GATTS_IF
-        esp_ble_adv_params_t adv_params = {
-            .adv_int_min       = 0xA0,
-            .adv_int_max       = 0xB0,
-            .adv_type          = ADV_TYPE_IND,
-            .own_addr_type     = BLE_ADDR_TYPE_PUBLIC,
-            .channel_map       = ADV_CHNL_ALL,
-            .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
-        };
-        if(argc>0) {
-            GET_INT16_PROP_OPT  ( argv[0], "min",                 adv_params.adv_int_min,         0xA0 )
-            GET_INT16_PROP_OPT  ( argv[0], "max",                 adv_params.adv_int_max,         0xB0 )
-            GET_INTEGER_PROP_OPT( argv[0], "type",                adv_params.adv_type,            esp_ble_adv_type_t,       int32_t, JS_ToInt32, ADV_TYPE_IND )
-            GET_INTEGER_PROP_OPT( argv[0], "own_addr_type",       adv_params.own_addr_type,       esp_ble_addr_type_t,      int32_t, JS_ToInt32, BLE_ADDR_TYPE_PUBLIC )
-            GET_INTEGER_PROP_OPT( argv[0], "channel_map",         adv_params.channel_map,         esp_ble_adv_channel_t,    int32_t, JS_ToInt32, ADV_CHNL_ALL )
-            GET_INTEGER_PROP_OPT( argv[0], "adv_filter_policy",   adv_params.adv_filter_policy,   esp_ble_adv_filter_t,     int32_t, JS_ToInt32, ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY )
+
+        // 公共参数
+        int32_t own_addr_type     = BLE_ADDR_TYPE_PUBLIC;
+        int32_t channel_map       = ADV_CHNL_ALL;
+        int32_t adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY;
+        uint16_t adv_int_min      = 0xA0;
+        uint16_t adv_int_max      = 0xB0;
+
+        if(argc > 0) {
+            GET_UINT16_PROP_OPT( argv[0], "min",                adv_int_min,       0xA0 )
+            GET_UINT16_PROP_OPT( argv[0], "max",                adv_int_max,       0xB0 )
+            GET_INT32_PROP_OPT( argv[0], "own_addr_type",      own_addr_type,     BLE_ADDR_TYPE_PUBLIC )
+            GET_INT32_PROP_OPT( argv[0], "channel_map",        channel_map,       ADV_CHNL_ALL )
+            GET_INT32_PROP_OPT( argv[0], "adv_filter_policy",  adv_filter_policy, ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY )
         }
 
+#if (BLE_42_FEATURE_SUPPORT == TRUE)
+        esp_ble_adv_params_t adv_params = {
+            .adv_int_min       = adv_int_min,
+            .adv_int_max       = adv_int_max,
+            .adv_type          = ADV_TYPE_IND,
+            .own_addr_type     = static_cast<esp_ble_addr_type_t>(own_addr_type),
+            .channel_map       = static_cast<esp_ble_adv_channel_t>(channel_map),
+            .adv_filter_policy = static_cast<esp_ble_adv_filter_t>(adv_filter_policy),
+        };
+        if(argc > 0) {
+            int32_t adv_type = ADV_TYPE_IND;
+            GET_INT32_PROP_OPT( argv[0], "type", adv_type, ADV_TYPE_IND )
+            adv_params.adv_type = static_cast<esp_ble_adv_type_t>(adv_type);
+        }
         esp_err_t err = esp_ble_gap_start_advertising(&adv_params);
         if(err!=ESP_OK) {
             JSTHROW("esp_ble_gap_start_advertising failed, err = %d", err)
         }
+#elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+        int32_t adv_type      = ADV_TYPE_IND;
+        int32_t primary_phy   = ESP_BLE_GAP_PHY_1M;
+        int32_t secondary_phy = ESP_BLE_GAP_PHY_1M;
+        int32_t tx_power      = EXT_ADV_TX_PWR_NO_PREFERENCE;
+        if(argc > 0) {
+            GET_INT32_PROP_OPT( argv[0], "type",          adv_type,      ADV_TYPE_IND )
+            GET_INT32_PROP_OPT( argv[0], "primary_phy",   primary_phy,   ESP_BLE_GAP_PHY_1M )
+            GET_INT32_PROP_OPT( argv[0], "secondary_phy", secondary_phy, ESP_BLE_GAP_PHY_1M )
+            GET_INT32_PROP_OPT( argv[0], "tx_power",      tx_power,      EXT_ADV_TX_PWR_NO_PREFERENCE )
+        }
+
+        esp_ble_gap_ext_adv_params_t adv_params = {};
+        adv_params.interval_min      = adv_int_min;
+        adv_params.interval_max      = adv_int_max;
+        adv_params.own_addr_type     = static_cast<esp_ble_addr_type_t>(own_addr_type);
+        adv_params.channel_map       = static_cast<esp_ble_adv_channel_t>(channel_map);
+        adv_params.filter_policy     = static_cast<esp_ble_adv_filter_t>(adv_filter_policy);
+        adv_params.primary_phy       = static_cast<esp_ble_gap_phy_t>(primary_phy);
+        adv_params.secondary_phy     = static_cast<esp_ble_gap_phy_t>(secondary_phy);
+        adv_params.tx_power          = static_cast<int8_t>(tx_power);
+        adv_params.peer_addr_type    = BLE_ADDR_TYPE_PUBLIC;
+        adv_params.max_skip          = 0;
+        adv_params.sid               = 0;
+        adv_params.scan_req_notif    = false;
+
+        // type 映射：0-4 legacy（兼容 4.2），5=125K NONCONN（值为 0），其他直接作为 bitmask
+        switch(adv_type) {
+            case 0:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_LEGACY_IND; break;
+            case 1:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_LEGACY_HD_DIR; break;
+            case 2:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_LEGACY_SCAN; break;
+            case 3:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_LEGACY_NONCONN; break;
+            case 4:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_LEGACY_LD_DIR; break;
+            case 5:  adv_params.type = ESP_BLE_GAP_SET_EXT_ADV_PROP_NONCONN_NONSCANNABLE_UNDIRECTED; break;
+            default: adv_params.type = static_cast<uint16_t>(adv_type); break;
+        }
+
+        esp_err_t err = esp_ble_gap_ext_adv_set_params(0, &adv_params);
+        if(err!=ESP_OK) {
+            JSTHROW("esp_ble_gap_ext_adv_set_params failed, err = %d", err)
+        }
+        esp_ble_gap_ext_adv_t ext_adv = {
+            .instance   = 0,
+            .duration   = 0,
+            .max_events = 0,
+        };
+        err = esp_ble_gap_ext_adv_start(1, &ext_adv);
+        if(err!=ESP_OK) {
+            JSTHROW("esp_ble_gap_ext_adv_start failed, err = %d", err)
+        }
+#else
+        JSTHROW("BLE is not supported")
+#endif
         return JS_UNDEFINED ;
     }
     
     JSValue BT::stopAdv(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_GATTS_IF
+#if (BLE_42_FEATURE_SUPPORT == TRUE)
         esp_err_t err = esp_ble_gap_stop_advertising();
+#elif CONFIG_BT_BLE_50_FEATURES_SUPPORTED
+        uint8_t adv_inst = 0;
+        esp_err_t err = esp_ble_gap_ext_adv_stop(1, &adv_inst);
+#else
+        JSTHROW("BLE is not supported")
+#endif
         if(err!=ESP_OK) {
-            JSTHROW("esp_ble_gap_start_advertising failed, err = %d", err)
+            JSTHROW("esp_ble_gap_stop_advertising failed, err = %d", err)
         }
         return JS_UNDEFINED ;
     }

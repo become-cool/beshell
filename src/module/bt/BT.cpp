@@ -215,7 +215,7 @@ namespace be{
                 break;
         }
 
-        // 名称过滤: 仅当有 filter 时才进行
+        // 名称过滤: 仅当有 filter 时才进行（传统扫描）
         if(!BT::filterNames.empty()
            && event == ESP_GAP_BLE_SCAN_RESULT_EVT
            && param->scan_rst.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {
@@ -225,7 +225,6 @@ namespace be{
             std::string devName ;
             uint8_t pos = 0 ;
 
-            // 遍历 AD 结构，提取设备名称
             while(pos < adv_data_len) {
                 uint8_t length = adv_data[pos] ;
                 if(length == 0 || pos + length + 1 > adv_data_len) {
@@ -236,18 +235,16 @@ namespace be{
                 const uint8_t *data = &adv_data[pos + 2] ;
 
                 if(type == 0x09 || type == 0x08) {
-                    // 完整名称 (0x09) 或短名称 (0x08)
                     devName.assign((const char *)data, data_len) ;
-                    break ;  // 优先使用先出现的名称
+                    break ;
                 }
                 pos += length + 1 ;
             }
 
             if(devName.empty()) {
-                return ;  // 无名称，跳过此设备
+                return ;
             }
 
-            // 检查是否匹配任一 filter
             bool matched = false ;
             for(const auto& f : BT::filterNames) {
                 if(f.exact) {
@@ -263,7 +260,55 @@ namespace be{
                 }
             }
             if(!matched) {
-                return ;  // 不匹配任何 filter，丢弃
+                return ;
+            }
+        }
+
+        // 名称过滤: 扩展扫描报告 (BLE 5.0)
+        if(!BT::filterNames.empty()
+           && event == ESP_GAP_BLE_EXT_ADV_REPORT_EVT) {
+
+            const uint8_t *adv_data = param->ext_adv_report.params.adv_data ;
+            uint8_t adv_data_len = param->ext_adv_report.params.adv_data_len ;
+            std::string devName ;
+            uint8_t pos = 0 ;
+
+            while(pos < adv_data_len) {
+                uint8_t length = adv_data[pos] ;
+                if(length == 0 || pos + length + 1 > adv_data_len) {
+                    break ;
+                }
+                uint8_t type = adv_data[pos + 1] ;
+                uint8_t data_len = length - 1 ;
+                const uint8_t *data = &adv_data[pos + 2] ;
+
+                if(type == 0x09 || type == 0x08) {
+                    devName.assign((const char *)data, data_len) ;
+                    break ;
+                }
+                pos += length + 1 ;
+            }
+
+            if(devName.empty()) {
+                return ;
+            }
+
+            bool matched = false ;
+            for(const auto& f : BT::filterNames) {
+                if(f.exact) {
+                    if(devName == f.name) {
+                        matched = true ;
+                        break ;
+                    }
+                } else {
+                    if(devName.find(f.name) != std::string::npos) {
+                        matched = true ;
+                        break ;
+                    }
+                }
+            }
+            if(!matched) {
+                return ;
             }
         }
 
@@ -326,7 +371,7 @@ namespace be{
                                 break ;
                             }
                             uint8_t addr[18] ;
-                            sprintf((char *)addr, "%02X:%02X:%02X:%02X:%02X:%02X", 
+                            sprintf((char *)addr, "%02X:%02X:%02X:%02X:%02X:%02X",
                                 msg->gap.scan_rst.bda[0] ,
                                 msg->gap.scan_rst.bda[1] ,
                                 msg->gap.scan_rst.bda[2] ,
@@ -362,6 +407,60 @@ namespace be{
                             // dn(msg->gap.scan_rst.search_evt)
                             break;
                     }
+                    break ;
+                }
+                case ESP_GAP_BLE_EXT_ADV_REPORT_EVT: {
+                    if(!hookedScanRes) {
+                        break ;
+                    }
+                    uint8_t addr[18] ;
+                    sprintf((char *)addr, "%02X:%02X:%02X:%02X:%02X:%02X",
+                        msg->gap.ext_adv_report.params.addr[0],
+                        msg->gap.ext_adv_report.params.addr[1],
+                        msg->gap.ext_adv_report.params.addr[2],
+                        msg->gap.ext_adv_report.params.addr[3],
+                        msg->gap.ext_adv_report.params.addr[4],
+                        msg->gap.ext_adv_report.params.addr[5]
+                    );
+                    JSValue obj = JS_NewObject(ctx) ;
+                    JS_SetPropertyStr(ctx, obj, "searchEvt", JS_NewUint32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "evt", JS_NewUint32(ctx, msg->gap.ext_adv_report.params.event_type)) ;
+                    JS_SetPropertyStr(ctx, obj, "devType", JS_NewUint32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "addrType", JS_NewUint32(ctx, msg->gap.ext_adv_report.params.addr_type)) ;
+                    JS_SetPropertyStr(ctx, obj, "addr", JS_NewString(ctx, (const char *)addr)) ;
+                    JS_SetPropertyStr(ctx, obj, "rssi", JS_NewInt32(ctx, msg->gap.ext_adv_report.params.rssi)) ;
+                    JS_SetPropertyStr(ctx, obj, "flag", JS_NewInt32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "num_resps", JS_NewInt32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "scan_rsp_len", JS_NewUint32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "num_dis", JS_NewUint32(ctx, 0)) ;
+                    JS_SetPropertyStr(ctx, obj, "primary_phy", JS_NewUint32(ctx, msg->gap.ext_adv_report.params.primary_phy)) ;
+                    JS_SetPropertyStr(ctx, obj, "secondary_phy", JS_NewUint32(ctx, msg->gap.ext_adv_report.params.secondly_phy)) ;
+                    JS_SetPropertyStr(ctx, obj, "tx_power", JS_NewInt32(ctx, msg->gap.ext_adv_report.params.tx_power)) ;
+                    JS_SetPropertyStr(ctx, obj, "adv_sid", JS_NewUint32(ctx, msg->gap.ext_adv_report.params.sid)) ;
+                    JS_SetPropertyStr(ctx, obj, "adv_raw", JS_NewArrayBufferCopy(ctx,
+                        msg->gap.ext_adv_report.params.adv_data,
+                        msg->gap.ext_adv_report.params.adv_data_len)) ;
+                    emitSyncFree("scan-res", {obj}) ;
+                    break ;
+                }
+                case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
+                    JSValue obj = JS_NewObject(ctx) ;
+                    JS_SetPropertyStr(ctx, obj, "status", JS_NewInt32(ctx, msg->gap.scan_param_cmpl.status)) ;
+                    emitSyncFree("scan-params-set", {obj}) ;
+                    break ;
+                }
+                case ESP_GAP_BLE_SET_EXT_SCAN_PARAMS_COMPLETE_EVT: {
+                    JSValue obj = JS_NewObject(ctx) ;
+                    JS_SetPropertyStr(ctx, obj, "status", JS_NewInt32(ctx, msg->gap.set_ext_scan_params.status)) ;
+                    emitSyncFree("scan-params-set", {obj}) ;
+                    break ;
+                }
+                case ESP_GAP_BLE_SCAN_TIMEOUT_EVT: {
+                    BT::bScanning = false ;
+                    if(!hookedScanCmpl) {
+                        break;
+                    }
+                    emitSyncFree("scan-cmpl", {}) ;
                     break ;
                 }
                 default:
