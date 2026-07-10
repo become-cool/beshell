@@ -513,19 +513,15 @@ namespace be {
         if(max_samples == 0) {
             return true ;
         }
-        std::vector<adc_continuous_data_t> parsed(max_samples) ;
-        uint32_t num_samples = 0 ;
-        esp_err_t err = adc_continuous_parse_data(ctx->handle, data, size, parsed.data(), &num_samples) ;
-        if(err != ESP_OK) {
-            return false ;
-        }
+        const adc_digi_output_data_t *parsed = reinterpret_cast<const adc_digi_output_data_t *>(data) ;
+        uint32_t num_samples = max_samples ;
         for(uint32_t i = 0; i < num_samples; ++i) {
-            const adc_continuous_data_t &sample = parsed[i] ;
-            if(!sample.valid) {
+            const adc_digi_output_data_t &sample = parsed[i] ;
+            if(sample.type2.channel >= SOC_ADC_MAX_CHANNEL_NUM) {
                 continue ;
             }
             if(filter_pin) {
-                uint16_t key = _make_uc_key(sample.unit, sample.channel) ;
+                uint16_t key = _make_uc_key(static_cast<adc_unit_t>(sample.type2.unit), static_cast<adc_channel_t>(sample.type2.channel)) ;
                 auto it = map_unit_channel_to_pin.find(key) ;
                 if(it == map_unit_channel_to_pin.end()) {
                     continue ;
@@ -534,11 +530,11 @@ namespace be {
                     continue ;
                 }
             } else {
-                if(sample.unit != target_unit || sample.channel != target_channel) {
+                if(static_cast<adc_unit_t>(sample.type2.unit) != target_unit || static_cast<adc_channel_t>(sample.type2.channel) != target_channel) {
                     continue ;
                 }
             }
-            out_values.push_back(static_cast<int>(sample.raw_data)) ;
+            out_values.push_back(static_cast<int>(sample.type2.data)) ;
         }
         return true ;
     }
@@ -554,19 +550,15 @@ namespace be {
         if(max_samples == 0) {
             return ;
         }
-        std::vector<adc_continuous_data_t> parsed(max_samples) ;
-        uint32_t num_samples = 0 ;
-        esp_err_t err = adc_continuous_parse_data(handle_ctx->handle, frame.data, frame.size, parsed.data(), &num_samples) ;
-        if(err != ESP_OK) {
-            return ;
-        }
+        const adc_digi_output_data_t *parsed = reinterpret_cast<const adc_digi_output_data_t *>(frame.data) ;
+        uint32_t num_samples = max_samples ;
         std::map<gpio_num_t, std::vector<int>> pin_values ;
         for(uint32_t i = 0; i < num_samples; ++i) {
-            const adc_continuous_data_t &sample = parsed[i] ;
-            if(!sample.valid) {
+            const adc_digi_output_data_t &sample = parsed[i] ;
+            if(sample.type2.channel >= SOC_ADC_MAX_CHANNEL_NUM) {
                 continue ;
             }
-            uint16_t key = _make_uc_key(sample.unit, sample.channel) ;
+            uint16_t key = _make_uc_key(static_cast<adc_unit_t>(sample.type2.unit), static_cast<adc_channel_t>(sample.type2.channel)) ;
             auto it = map_unit_channel_to_pin.find(key) ;
             if(it == map_unit_channel_to_pin.end()) {
                 continue ;
@@ -575,7 +567,7 @@ namespace be {
             if(handle_ctx->pin_set.count(pin) == 0) {
                 continue ;
             }
-            pin_values[pin].push_back(static_cast<int>(sample.raw_data)) ;
+            pin_values[pin].push_back(static_cast<int>(sample.type2.data)) ;
         }
         for(auto &entry : pin_values) {
             gpio_num_t pin = entry.first ;

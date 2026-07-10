@@ -1,3 +1,9 @@
+# v1.0.17 2026/07/08
+
+## Refact:
+
+* ADC 连续采样数据解析重构：移除 `adc_continuous_parse_data` + `std::vector` 堆分配，直接 `reinterpret_cast` 原始数据为 `adc_digi_output_data_t` 数组，消除每次回调的堆内存开销
+
 # v1.0.16 2026/6/8
 
 ## Fix:
