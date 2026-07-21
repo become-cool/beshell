@@ -148,8 +148,13 @@ namespace be {
             }
             break;
 
-        default: 
-            ch->sendError(pkg->head.fields.pkgid, "cmd %d not implements", pkg->head.fields.cmd) ;
+        default:
+            if(unknownPkgHook) {
+                unknownPkgHook(ch, std::move(pkg)) ;
+            }
+            else {
+                ch->sendError(pkg->head.fields.pkgid, "cmd %d not implements", pkg->head.fields.cmd) ;
+            }
             break;
         }
     }

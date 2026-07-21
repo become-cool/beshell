@@ -18,6 +18,7 @@
 namespace be {
 
     typedef void (*REPLDecryptFunc)(Package & pkg) ;
+    typedef void (*REPLUnknownPkgHook)(REPLChannel * ch, std::unique_ptr<Package> pkg) ;
 
     class BeShell ;
     // class REPLModule ;
@@ -46,6 +47,8 @@ namespace be {
         unsigned char cryptoVI[16] = {0} ;
 
     public:
+        REPLUnknownPkgHook unknownPkgHook = nullptr ;
+
         REPL(BeShell * beshell) ;
 
         void setup() ;
@@ -55,7 +58,7 @@ namespace be {
             if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
                 pkg.reset(ptr) ;
                 // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
-                onReceived(pkg->channle,move(pkg)) ;
+                onReceived(pkg->channle,std::move(pkg)) ;
             }
 #ifdef LINUX_PLATFORM
             channelStdIO.loop() ;
