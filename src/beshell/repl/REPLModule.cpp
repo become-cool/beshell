@@ -117,6 +117,9 @@ namespace be{
     }
 
     void REPLModule::exports(JSContext *ctx) {
+
+        EventModule::exports(ctx) ;
+
         for(auto func : exportors) {
             func(ctx, this) ;
         }

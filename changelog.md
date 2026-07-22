@@ -1,3 +1,10 @@
+# v1.0.18
+
+## New Feature:
+
+* telnet.enableUnknownPkgEvent() / telnet.disableUnknownPkgEvent() — 监听 pkg.unknown 事件
+
+
 # v1.0.17 2026/07/08
 
 ## Refact:
