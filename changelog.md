@@ -4,6 +4,10 @@
 
 * telnet.enableUnknownPkgEvent() / telnet.disableUnknownPkgEvent() — 监听 pkg.unknown 事件
 
+## Fix:
+
+* UART 事件循环中 `chunk.len` 判断改为 `> 0`，防止负值被当作有效数据导致内存错误
+
 
 # v1.0.17 2026/07/08
 

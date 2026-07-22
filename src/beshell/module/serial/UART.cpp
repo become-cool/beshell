@@ -335,7 +335,7 @@ namespace be{
         uart_chunk_t chunk ;
         while(1) {
             chunk.len = uart_read_bytes(to_uart_port(uart->uartNum()), buff, sizeof(buff), 1);
-            if(chunk.len) {
+            if(chunk.len>0) {
                 chunk.data = (uint8_t *)malloc(chunk.len) ;
                 memcpy(chunk.data, buff, chunk.len) ;
                 if( xQueueSend(uart->data_queue, &chunk, 0)!=pdPASS ){
