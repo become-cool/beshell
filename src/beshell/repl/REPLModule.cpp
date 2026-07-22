@@ -60,6 +60,35 @@ namespace be{
      * @module repl
      */
     char const * const REPLModule::name = "repl" ;
+    REPLModule * REPLModule::singleton = nullptr ;
+
+    // C++ relay function: bridges REPL::unknownPkgHook → EventModule::emitSyncFree("pkg.unknown")
+    void REPLModule::unknownPkgRelay(REPLChannel * ch, std::unique_ptr<Package> pkg) {
+        if (!singleton) {
+            return ;
+        }
+
+        JSContext *ctx = singleton->ctx ;
+
+        // Build head fields as JS object
+        JSValue headObj = JS_NewObject(ctx) ;
+        JS_SetPropertyStr(ctx, headObj, "h1", JS_NewInt32(ctx, pkg->head.fields.h1)) ;
+        JS_SetPropertyStr(ctx, headObj, "h2", JS_NewInt32(ctx, pkg->head.fields.h2)) ;
+        JS_SetPropertyStr(ctx, headObj, "pkgid", JS_NewInt32(ctx, pkg->head.fields.pkgid)) ;
+        JS_SetPropertyStr(ctx, headObj, "cmd", JS_NewInt32(ctx, pkg->head.fields.cmd)) ;
+        JS_SetPropertyStr(ctx, headObj, "len1", JS_NewInt32(ctx, pkg->head.fields.len1)) ;
+        JS_SetPropertyStr(ctx, headObj, "len2", JS_NewInt32(ctx, pkg->head.fields.len2)) ;
+
+        // Build body ArrayBuffer — no copy needed, emitSyncFree is synchronous
+        JSValue bodyBuf ;
+        if (pkg->body() && pkg->body_len > 0) {
+            bodyBuf = JS_NewArrayBuffer(ctx, pkg->body(), pkg->body_len, nofreeArrayBuffer, NULL, false) ;
+        } else {
+            bodyBuf = JS_NewArrayBuffer(ctx, nullptr, 0, nofreeArrayBuffer, NULL, false) ;
+        }
+
+        singleton->emitSyncFree("pkg.unknown", {headObj, bodyBuf}) ;
+    }
 
     std::vector<NativeModuleExportorFunc> REPLModule::exportors ;
 
@@ -77,6 +106,10 @@ namespace be{
         EXPORT_FUNCTION(disableCrypto) ;
         EXPORT_FUNCTION(setCryptoKey) ;
         EXPORT_FUNCTION(setPassword) ;
+        EXPORT_FUNCTION(enableUnknownPkgEvent) ;
+        EXPORT_FUNCTION(disableUnknownPkgEvent) ;
+
+        singleton = this ;
     }
 
     void REPLModule::registerExportor(NativeModuleExportorFunc func) {
@@ -228,6 +261,16 @@ namespace be{
         const char * pwd = JS_ToCString(ctx, argv[0]) ;
         JSEngine::fromJSContext(ctx)->beshell->cammonds->setPassword(pwd) ;
         JS_FreeCString(ctx, pwd) ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue REPLModule::enableUnknownPkgEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        JSEngine::fromJSContext(ctx)->beshell->repl->unknownPkgHook = unknownPkgRelay ;
+        return JS_UNDEFINED ;
+    }
+
+    JSValue REPLModule::disableUnknownPkgEvent(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        JSEngine::fromJSContext(ctx)->beshell->repl->unknownPkgHook = nullptr ;
         return JS_UNDEFINED ;
     }
 }
