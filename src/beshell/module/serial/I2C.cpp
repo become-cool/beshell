@@ -696,7 +696,7 @@ namespace be {
             .scl_speed_hz = 100000,
             .scl_wait_us = 1000,
             .flags = {
-                .disable_ack_check = true,
+                .disable_ack_check = false,  // 启用 ACK 检查，防止向不响应的设备写入假成功
             }
         };
         i2c_master_dev_handle_t dev_handle = nullptr;
@@ -732,15 +732,28 @@ namespace be {
         if(mode!=I2C_MODE_MASTER) {
             return false ;
         }
-        int probe_timeout = (timeout_ms > static_cast<uint32_t>(INT_MAX)) ? INT_MAX : static_cast<int>(timeout_ms) ;
-        
-        esp_log_level_t loglevel = esp_log_level_get("i2c.master");
-        esp_log_level_set("i2c.master", ESP_LOG_WARN);
+        // 始终从驱动获取最新的 bus_handle，防止使用已被外部删除的悬空指针
+        // 同时也兼容总线由外部代码（非 BeShell setup()）初始化的情况
+        i2c_master_bus_handle_t handle = nullptr;
+        esp_err_t res = i2c_master_get_bus_handle(busnum, &handle);
+        if (res != ESP_OK || handle == nullptr) {
+            return false;
+        }
+        // 同步更新本地缓存
+        bus_handle = handle;
 
-        esp_err_t ret = i2c_master_probe(bus_handle, addr, probe_timeout) ;
+        int probe_timeout = (timeout_ms > static_cast<uint32_t>(INT_MAX)) ? INT_MAX : static_cast<int>(timeout_ms) ;
+
+        // 完全抑制 i2c.master 驱动日志（包括 ERROR 级别的 timeout 消息），
+        // i2c_master_probe 内部已通过 bypass_nack_log 处理 NACK 日志，
+        // 此处确保扫描输出干净，不被驱动错误信息打断
+        esp_log_level_t loglevel = esp_log_level_get("i2c.master");
+        esp_log_level_set("i2c.master", ESP_LOG_NONE);
+
+        esp_err_t ret = i2c_master_probe(handle, addr, probe_timeout) ;
 
         esp_log_level_set("i2c.master", loglevel);
-        
+
         return ret==ESP_OK ;
     }
 

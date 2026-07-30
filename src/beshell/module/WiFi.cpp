@@ -68,6 +68,13 @@ bool WiFi::hasInited() {
         JSTHROW("wifi not init, please call wifi.start() first")\
     }
 
+#ifndef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
+#define CHECK_SOFTAP_SUPPORT()                                  \
+    JSTHROW("SoftAP is not supported, please enable CONFIG_ESP_WIFI_SOFTAP_SUPPORT in sdkconfig")
+#else
+#define CHECK_SOFTAP_SUPPORT()
+#endif
+
 static bool _started = false ;
 static bool _sta_started = false ;
 static bool _sta_connected = false ;
@@ -364,6 +371,7 @@ namespace be {
         exportFunction("apStarted",apStarted,0) ;
         exportFunction("setMAC",setMAC,0) ;
         exportFunction("getMAC",getMAC,0) ;
+        exportFunction("isSoftAPSupported",isSoftAPSupported,0) ;
 
         enableNativeEvent(ctx, sizeof(wifi_nevent_t), 5) ;
     }
@@ -401,6 +409,11 @@ namespace be {
 
         ESP_API(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_any_id))
         ESP_API(esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID, &esp32_wifi_eventHandler, (void *)NULL, &instance_got_ip))
+
+        res = esp_wifi_set_mode(WIFI_MODE_NULL) ;
+        if(res!=ESP_OK) {
+            printf("esp_wifi_set_mode failed, return error code:%d\n", res) ;
+        }
 
         wifi_inited = true ;
     }
@@ -695,6 +708,9 @@ namespace be {
     JSValue WiFi::setMode(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
         ARGV_TO_INT8(0, mode)
+        if(mode==WIFI_MODE_AP || mode==WIFI_MODE_APSTA) {
+            CHECK_SOFTAP_SUPPORT()
+        }
         return JS_NewInt32(ctx, esp_wifi_set_mode((wifi_mode_t)mode));
     }
 
@@ -815,6 +831,7 @@ namespace be {
      */
     JSValue WiFi::setAPConfig(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
+        CHECK_SOFTAP_SUPPORT()
         ASSERT_ARGC(1)
         if(!JS_IsObject(argv[0])) {
             JSTHROW("missing options arg")
@@ -940,6 +957,7 @@ namespace be {
             JS_SetPropertyStr(ctx, jsconf, "btm_enabled", JS_NewInt32(ctx, conf.sta.btm_enabled)) ;
         }
         else if(netif==WIFI_MODE_AP) {
+            CHECK_SOFTAP_SUPPORT()
             esp_err_t err = esp_wifi_get_config(WIFI_IF_AP, &conf) ;
             if(err!=ESP_OK) {
                 JSTHROW("esp_wifi_get_config() failed: %d", err)
@@ -1137,6 +1155,10 @@ namespace be {
         else if(type==WIFI_MODE_AP) {
             esp_netif_get_ip_info(netif_ap, &ipinfo);
         }
+#else
+        else if(type==WIFI_MODE_AP) {
+            JSTHROW("SoftAP is not supported, please enable CONFIG_ESP_WIFI_SOFTAP_SUPPORT in sdkconfig")
+        }
 #endif
         else{
             JSTHROW("unknow netif type: %d", type)
@@ -1219,6 +1241,7 @@ namespace be {
      */
     JSValue WiFi::allSta(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_WIFI_INITED
+        CHECK_SOFTAP_SUPPORT()
         wifi_sta_list_t clients;
         if(esp_wifi_ap_get_sta_list(&clients) != ESP_OK) {
             JSTHROW("esp_wifi_ap_get_sta_list() failed")
@@ -1452,6 +1475,24 @@ namespace be {
     }
 
     /**
+     * 检查是否支持 SoftAP (WiFi 热点) 功能
+     *
+     * 返回 `true` 表示支持 SoftAP，`false` 表示不支持。
+     * 如果返回 `false`，则所有 AP 相关的 API（如 `startAP`、`setAPConfig`、`allSta` 等）都会抛出异常。
+     *
+     * @module wifi
+     * @function isSoftAPSupported
+     * @return boolean 返回 true 表示支持 SoftAP，false 表示不支持
+     */
+    JSValue WiFi::isSoftAPSupported(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+#ifdef CONFIG_ESP_WIFI_SOFTAP_SUPPORT
+        return JS_TRUE ;
+#else
+        return JS_FALSE ;
+#endif
+    }
+
+    /**
      * 设置 WiFi 接口的 MAC 地址
      *
      * 必须在 WiFi 启动前设置 MAC 地址。
@@ -1481,6 +1522,7 @@ namespace be {
             ifac = WIFI_IF_STA ;
         }
         else if(ifname=="ap") {
+            CHECK_SOFTAP_SUPPORT()
             ifac = WIFI_IF_AP ;
         }
         else if(ifname=="nan") {
@@ -1493,11 +1535,11 @@ namespace be {
         if(mac.length()<17) {
             JSTHROW("mac address must be a string like '12:34:56:78:9a:bc'") ;
         }
-        
+
         uint8_t custom_mac[7] = {0xcc,0x1b,0xe0,0xe3,0xc0,0xfc};
-        
-        if (sscanf(mac.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x", 
-            &custom_mac[0], &custom_mac[1], &custom_mac[2], 
+
+        if (sscanf(mac.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x",
+            &custom_mac[0], &custom_mac[1], &custom_mac[2],
             &custom_mac[3], &custom_mac[4], &custom_mac[5]) != 6)
         {
             JSTHROW("mac address must be a string like '12:34:56:78:9a:bc'") ;
@@ -1530,6 +1572,7 @@ namespace be {
             ifac = WIFI_IF_STA ;
         }
         else if(ifname=="ap") {
+            CHECK_SOFTAP_SUPPORT()
             ifac = WIFI_IF_AP ;
         }
         else if(ifname=="nan") {

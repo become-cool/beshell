@@ -1,3 +1,20 @@
+# v1.0.19 2026/07/30
+
+## New Feature:
+
+* + wifi.isSoftAPSupported() — JS 可调用 API，检查是否启用 SoftAP 支持
+* wifi 所有 AP 相关 API (startAP/stopAP/setAPConfig/config/allSta/getIpInfo/setMAC/getMAC/setMode) 增加 `CONFIG_ESP_WIFI_SOFTAP_SUPPORT` 运行时检查，未启用时抛出明确异常（而非崩溃或静默失败）
+
+## Fix:
+
+* QuickJS `Array.from()` 对字符串使用快速索引路径替代迭代器协议，修复 ESP32-S3 PSRAM 高负载时 `js_string_iterator_next` 内存损坏导致的崩溃
+* I2C `probe()` 从驱动实时获取 `bus_handle`，防止使用已被外部删除的悬空指针；兼容总线由外部代码初始化的情况
+* I2C 启用 ACK 检查 (`disable_ack_check = false`)，防止向不响应的设备写入时返回假成功
+* I2C `probe()` 扫描时将驱动日志级别设为 `ESP_LOG_NONE`，确保扫描输出不被 `i2c.master` 超时错误信息打断
+
+## Refact:
+
+* BeShell::main() evalScript 移除 `FLAG_EXPORT_TO_GLOBAL` 标志
 # v1.0.18 2026/07/22
 
 ## New Feature:

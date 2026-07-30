@@ -37740,7 +37740,40 @@ static JSValue js_array_from(JSContext *ctx, JSValueConst this_val,
     iter = JS_GetProperty(ctx, items, JS_ATOM_Symbol_iterator);
     if (JS_IsException(iter))
         goto exception;
-    if (!JS_IsUndefined(iter)) {
+
+    /* Fast path for strings: use indexed access instead of the iterator
+       protocol to avoid an ESP32-S3 PSRAM memory corruption bug in the
+       string iterator (js_string_iterator_next). The iterator writes to
+       JSArrayIteratorData via a js_malloc'd pointer which can become
+       stale when PSRAM heap pressure is high. */
+    if (JS_IsString(items)) {
+        JS_FreeValue(ctx, iter);
+        const JSString *str = JS_VALUE_GET_STRING(items);
+        len = str->len;
+        if (JS_IsConstructor(ctx, this_val))
+            r = JS_CallConstructor(ctx, this_val, 0, NULL);
+        else
+            r = JS_NewArray(ctx);
+        if (JS_IsException(r))
+            goto exception;
+        for (k = 0; k < len; k++) {
+            v = JS_GetPropertyUint32(ctx, items, (uint32_t)k);
+            if (JS_IsException(v))
+                goto exception;
+            if (mapping) {
+                args[0] = v;
+                args[1] = JS_NewInt64(ctx, k);
+                v2 = JS_Call(ctx, mapfn, this_arg, 2, args);
+                JS_FreeValue(ctx, v);
+                v = v2;
+                if (JS_IsException(v))
+                    goto exception;
+            }
+            if (JS_DefinePropertyValueInt64(ctx, r, k, v,
+                                            JS_PROP_C_W_E | JS_PROP_THROW) < 0)
+                goto exception;
+        }
+    } else if (!JS_IsUndefined(iter)) {
         JS_FreeValue(ctx, iter);
         if (JS_IsConstructor(ctx, this_val))
             r = JS_CallConstructor(ctx, this_val, 0, NULL);

@@ -5,7 +5,12 @@ const pwd = "12345678"
 
 async function main(){
 
-    console.log("")
+    console.log("Starting WiFi AP...")
+
+    if (!wifi.isSoftAPSupported()) {
+        console.log("SoftAP is not supported, please enable CONFIG_ESP_WIFI_SOFTAP_SUPPORT in sdkconfig")
+        return
+    }
 
     // start WiFi AP
     if( ! await wifi.startAP(ssid, pwd) ){

@@ -1,2 +1,2 @@
 dependencies:
-  become-cool/beshell: '>=1.0.16'
+  become-cool/beshell: '>=1.0.19'

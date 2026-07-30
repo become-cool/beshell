@@ -50,6 +50,7 @@ namespace be {
         static JSValue apStarted(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue setMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue getMAC(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue isSoftAPSupported(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
     } ;
 }

@@ -194,6 +194,9 @@ function isStaDeamonRunning() {
 
 function startAP(ssid, password) {
   return new Promise(resolve => {
+    if (!wifi.isSoftAPSupported()) {
+      resolve(false)
+    }
     wifi.stopAP().then(ret => {
       if (!ret) {
         resolve(false)
@@ -208,6 +211,9 @@ function startAP(ssid, password) {
 
 }
 function stopAP() {
+  if (!wifi.isSoftAPSupported()) {
+    throw new Error("SoftAP is not supported, please enable CONFIG_ESP_WIFI_SOFTAP_SUPPORT in sdkconfig")
+  }
   return new Promise(resolve => {
     if (!wifi.apStarted()) {
       resolve(true)
@@ -220,10 +226,13 @@ function stopAP() {
 
 function status(netif) {
   if (!netif || netif == "apsta") {
-    return {
-      sta: wifi.status("sta"),
-      ap: wifi.status("ap")
+    let result = {
+      sta: wifi.status("sta")
     }
+    if (wifi.isSoftAPSupported()) {
+      result.ap = wifi.status("ap")
+    }
+    return result
   }
   else if (netif == 'sta') {
     let sta = wifi.getIpInfo(MODE_STA)
@@ -238,6 +247,10 @@ function status(netif) {
     return sta
   }
   else if (netif == 'ap') {
+
+    if (!wifi.isSoftAPSupported()) {
+      throw new Error("SoftAP is not supported, please enable CONFIG_ESP_WIFI_SOFTAP_SUPPORT in sdkconfig")
+    }
 
     let ap = wifi.getIpInfo(MODE_AP)
     ap.started = wifi.apStarted()
@@ -254,13 +267,13 @@ function status(netif) {
 }
 
 function scan() {
-  return new Promise(function (resolve) {
+  return new Promise(function (resolve, reject) {
     if (!(wifi.mode() & MODE_STA)) {
       wifi.setMode(wifi.mode() | MODE_STA)
     }
     if (!wifi.isScanning()) {
       if (!wifi.scanStart()) {
-        reject()
+        reject(new Error("scan start failed"))
         return
       }
     }
