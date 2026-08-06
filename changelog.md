@@ -1,3 +1,16 @@
+# v1.0.20 2026/08/06
+
+## Fix:
+
+* UART `loop()` 每次调用只消费 1 个 chunk，高波特率下 JS loop 频率远低于 UART 生产速率导致队列满并丢数据。改为每次 drain 最多 64 个 chunk
+* UART `task_listen()` 无条件 `vTaskDelay(1)` 导致吞吐上限过低。改为仅无数据时让出 CPU
+* UART `DATA_QUEUE_LEN` 从 10 增大到 128，减少高吞吐下的队列溢出
+* UART `loop()` 遗漏 `JS_FreeValue(ctx, ret)`，导致每次回调泄漏一个 JSValue
+
+## Refact:
+
+* UART `task_listen()` 移除未使用的 `uart_event_t event` 局部变量
+
 # v1.0.19 2026/07/30
 
 ## New Feature:

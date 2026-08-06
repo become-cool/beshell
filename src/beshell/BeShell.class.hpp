@@ -8,7 +8,7 @@
 #include "./driver/DriverModule.hpp"
 #include "./deps/quickjs/quickjs.h"
 
-#define BESHELL_VERSION "1.0.19"
+#define BESHELL_VERSION "1.0.20"
 #define ESPIDF_VERSION IDF_VER
 
 namespace be {

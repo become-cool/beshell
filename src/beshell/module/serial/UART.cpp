@@ -329,7 +329,6 @@ namespace be{
     } uart_chunk_t ;
 
     void UART::task_listen(void * arg) {
-        uart_event_t event;
         UART * uart = (UART *) arg ;
         uint8_t buff [32];
         uart_chunk_t chunk ;
@@ -343,26 +342,37 @@ namespace be{
                 }
             }
 
-            vTaskDelay(1);
+            // 关键：仅在无数据时让出 CPU，避免吞吐上限过低
+            if(!chunk.len) {
+                vTaskDelay(1);
+            }
         }
     }
 
     void UART::loop(JSContext * ctx, void * opaque) {
         UART * uart = (UART *) opaque ;
         uart_chunk_t chunk ;
-        if(xQueueReceive(uart->data_queue, &chunk, 0)) {
+        // 关键：旧实现每次 loop 只消费 1 个 chunk。
+        // 在高波特率下 JS loop 的调用频率远小于 UART 生产速率，会导致队列迅速满并丢数据。
+        // 这里改为每次 loop 尽量 drain 多个 chunk（带上限，避免一次占用太久）。
+        int drained = 0;
+        const int maxDrain = 64;
+        while (drained < maxDrain && xQueueReceive(uart->data_queue, &chunk, 0)) {
+            drained++;
             if(chunk.data) {
                 JSValue ab = JS_NewArrayBuffer(ctx, chunk.data, chunk.len, freeArrayBuffer, NULL, false) ;
                 JSValue ret = JS_Call(ctx, uart->listener, JS_UNDEFINED, 1, &ab);
                 if( JS_IsException(ret) ) {
                     JSEngine::fromJSContext(ctx)->dumpError() ;
                 }
+                JS_FreeValue(ctx, ret);
                 JS_FreeValue(ctx, ab) ;
             }
         }
     }
 
-    #define DATA_QUEUE_LEN 10
+    // listen 队列：旧值 10 在大吞吐下太容易满导致丢数据
+    #define DATA_QUEUE_LEN 128
     /**
      * 监听 UART 接收到的数据
      * 
