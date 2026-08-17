@@ -1,3 +1,14 @@
+# v1.0.21 2026/08/17
+
+## Fix:
+
+* I2S（新版驱动）适配 ESP-IDF 5.5：`i2s_channel_preload_data()` 移除多余的超时参数（该函数在 IDF 5.x 各正式版均为 4 个参数），修复编译错误
+* I2S（新版驱动）`zeroTxBuffer()` 不再使用不存在的 `i2s_channel_zero_tx_buffer()`，改为 setup 时估算 DMA 缓冲区总大小、preload 全零数据实现清零，兼容 IDF 5.1 ~ 5.5
+* I2S（legacy 驱动）修复 `i2s_config_t.sample_rate` 的 narrowing 转换编译错误（IDF 5.5 起 `-Werror=narrowing`）
+
+
+
+
 # v1.0.20 2026/08/06
 
 ## Fix:

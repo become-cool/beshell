@@ -27,6 +27,19 @@ menu "BeShell Configuration"
             help
                 Enable the SPI interface in the BeShell serial module.
 
+        config BESHELL_SERIAL_USE_I2S
+            bool "Use I2S"
+            default y
+            help
+                Enable the I2S interface in the BeShell serial module.
+
+        config BESHELL_SERIAL_I2S_USE_LEGACY
+            bool "Use ESP-IDF Legacy I2S Implementation"
+            depends on BESHELL_SERIAL_USE_I2S
+            default n
+            help
+                Use ESP-IDF legacy I2S implementation in BeShell.
+
     endmenu
 
     config BESHELL_LOGGER_ENABLE_WRAP

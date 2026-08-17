@@ -17,6 +17,9 @@
  * 
  * // 访问 SPI2
  * serial.spi2.setup({ mosi: 23, miso: 19, sck: 18 })
+ * 
+ * // 访问 I2S0
+ * serial.i2s0.setup({ bck: 26, ws: 25, dout: 22 })
  * ```
  * 
  * ## 硬件资源差异
@@ -104,6 +107,13 @@
  * - [spi2](SPI.html) - SPI2，通常对应 SPI3_HOST
  * - spi3 - SPI3，仅 ESP32-P4 支持
  * 
+ * ### I2S 对象
+ * - [i2s0](I2S.html) - I2S0，音频播放/录音（STD 模式）
+ * - i2s1 - I2S1（部分型号没有）
+ * 
+ * > I2S 导出数量由芯片的 `SOC_I2S_NUM` 决定：ESP32/S3/P4 有 i2s0、i2s1，
+ * > S2/C3/C6/H2 只有 i2s0，C2 无 I2S 外设。
+ * 
  * ## 使用建议
  * 
  * 1. **UART0**：保留给调试和程序下载使用，应用程序建议使用 uart1/uart2
@@ -165,11 +175,13 @@
 #include "UART.hpp"
 #include "I2C.hpp"
 #include "SPI.hpp"
+#include "I2S.hpp"
+#include "I2S-legacy.hpp"
 #include <driver/uart.h>
 #include <driver/spi_master.h>
 
 
-using namespace std ;
+using namespace std ;  
 
 namespace be {
 
@@ -232,6 +244,17 @@ namespace be {
 
         #if SOC_SPI_PERIPH_NUM>3
         exportName("spi3") ;
+        #endif
+#endif
+
+        // I2S ---------------
+#if CONFIG_BESHELL_SERIAL_USE_I2S
+        #if SOC_I2S_NUM>0
+        exportName("i2s0") ;
+        #endif
+
+        #if SOC_I2S_NUM>1
+        exportName("i2s1") ;
         #endif
 #endif
 
@@ -333,6 +356,23 @@ namespace be {
         SPI * spi3 = SPI::flyweight(ctx, SPI4_HOST) ;
         if(spi3) {
             exportValue("spi3", spi3->jsobj) ;
+        }
+        #endif
+#endif
+
+        // I2S ---------------
+#if CONFIG_BESHELL_SERIAL_USE_I2S
+        #if SOC_I2S_NUM > 0
+        I2S * i2s0 = I2S::flyweight(ctx, I2S_NUM_0) ;
+        if(i2s0) {
+            exportValue("i2s0", JS_DupValue(ctx,i2s0->jsobj)) ;
+        }
+        #endif
+
+        #if SOC_I2S_NUM > 1
+        I2S * i2s1 = I2S::flyweight(ctx, I2S_NUM_1) ;
+        if(i2s1) {
+            exportValue("i2s1", JS_DupValue(ctx,i2s1->jsobj)) ;
         }
         #endif
 #endif
