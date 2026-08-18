@@ -51,6 +51,8 @@ namespace be {
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
 
         static I2S * flyweight(JSContext *, i2s_port_t) ;
+        // 返回已创建的 flyweight 实例（不会创建新实例），供 C 代码桥接使用
+        static I2S * sharedInstance(i2s_port_t busnum) ;
 
         i2s_port_t number() const ;
         i2s_chan_handle_t txHandle() const ;

@@ -147,6 +147,21 @@ namespace be {
         return result ;
     }
 
+    I2S * I2S::sharedInstance(i2s_port_t busnum) {
+        I2S * result = nullptr;
+        s_take();
+        if(busnum==I2S_NUM_0) {
+            result = i2s0 ;
+        }
+        #if SOC_I2S_NUM > 1
+        else if(busnum==I2S_NUM_1) {
+            result = i2s1 ;
+        }
+        #endif
+        s_give();
+        return result ;
+    }
+
     i2s_port_t I2S::number() const {
         return busnum ;
     }
@@ -682,6 +697,12 @@ namespace be {
         return res==ESP_OK ? JS_TRUE : JS_FALSE ;
     }
 
+}
+
+// 供其他组件的 C 代码（如 beshell-AudioPlayer 的 el_i2s）获取 TX 通道句柄
+extern "C" void * beshell_i2s_std_tx_handle(i2s_port_t busnum) {
+    be::I2S * obj = be::I2S::sharedInstance(busnum) ;
+    return obj? (void*)obj->txHandle(): nullptr ;
 }
 
 #endif
