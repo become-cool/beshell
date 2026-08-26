@@ -351,16 +351,49 @@ namespace be {
     /**
      * 系统睡眠模块, 提供 ESP32 的 light/deep/modem 睡眠以及各种唤醒源的设置
      *
-     * 唤醒信息由函数返回值携带:
-     * - `light()` / `modem()` 唤醒后返回唤醒源字符串, 如 `"timer"` `"ext0"` `"ext1"` `"gpio"` `"uart"` `"wifi.data"` `"wifi.disconnected"` `"wifi.beacon-timeout"` 等
-     * - deep sleep 唤醒后系统重启, 无法恢复 JS 运行环境, 可在重启后用 `wakeupCause()` 查询唤醒原因
+     * 三种睡眠方式在调用逻辑上有本质区别:
+     * - `light()` / `modem()`: **同步阻塞函数**。调用后当前 JS 线程挂起
+     *   (事件循环停止, 定时器/网络回调等不再执行), 直到唤醒源触发才返回,
+     *   返回值为唤醒源字符串, 之后的代码继续执行, JS 运行环境完全保留
+     * - `deep()`: **调用后不会返回**。唤醒时设备整体重启, 脚本从头重新执行,
+     *   JS 运行环境无法恢复, 唤醒原因需在重启后用 `wakeupCause()` 查询
+     *
+     * 唤醒源字符串: `"timer"` `"ext0"` `"ext1"` `"gpio"` `"uart"` `"touch"` `"wifi.data"` `"wifi.disconnected"` `"wifi.beacon-timeout"` 等
      *
      * 示例：
      * ```javascript
      * import * as sleep from "sleep"
      *
-     * let source = sleep.light(5000)   // light sleep 5 秒, 或由其他唤醒源提前唤醒
-     * console.log("wakeup source:", source)
+     * // 1. 最简单的 light sleep: 睡 5 秒 (同步阻塞, 5 秒后才执行下一行)
+     * let source = sleep.light(5000)
+     * console.log("wakeup source:", source)   // "timer"
+     *
+     * // 2. light sleep + 按钮唤醒: 定时与 GPIO 唤醒源叠加, 任一触发即返回
+     * import * as gpio from "gpio"
+     * gpio.setMode(4, "input")
+     * gpio.pull(4, "up")
+     * sleep.enableLightGPIOWakeup(4, 0)        // GPIO 4 接地时唤醒
+     * source = sleep.light(60000)              // 最多睡 60 秒, 按钮可提前唤醒
+     * console.log("wakeup source:", source)   // "gpio" 或 "timer"
+     *
+     * // 3. deep sleep: 睡 1 小时后重启 (此行之后的代码不会执行)
+     * //    需要跨睡眠保存的数据先写入 NVS
+     * sleep.deep(3600_000)
+     * console.log("这行永远不会执行")
+     *
+     * // 4. deep sleep + 按钮唤醒, 重启后判断唤醒原因
+     * //    (脚本开头)
+     * if(sleep.wakeupCause() == "ext0") {
+     *     console.log("被按钮唤醒")
+     * }
+     * //    ... 正常工作逻辑 ...
+     * sleep.enableExt0Wakeup(33, 1)            // GPIO 33 高电平唤醒
+     * sleep.deep()                             // 不返回, 唤醒即重启
+     *
+     * // 5. modem sleep: 保持 WiFi 连接的睡眠, 有下行数据时唤醒
+     * //    (要求 WiFi STA 已连接)
+     * source = sleep.modem(10000)              // 有下行数据或 10 秒超时返回
+     * console.log("wakeup source:", source)   // "wifi.data" / "timer" / ...
      * ```
      *
      * @module sleep
@@ -390,8 +423,11 @@ namespace be {
     /**
      * 进入 light sleep (轻睡眠)
      *
-     * CPU 暂停执行, SRAM/PSRAM 数据保持, 唤醒后从下一条语句继续运行,
-     * beshell/QuickJS 以及 mongoose 等网络库的状态完全保留。
+     * **这是一个同步阻塞函数**: 调用后 CPU 暂停执行, 当前 JS 线程挂起,
+     * 事件循环停止运转 (setTimeout/Promise 回调/网络事件等都不会执行)。
+     * 唤醒源触发后函数才返回唤醒源字符串, 其后的语句继续执行;
+     * SRAM/PSRAM 数据保持, beshell/QuickJS 以及 mongoose 等网络库的状态完全保留。
+     * 请勿用 `sleep.light(ms).then(...)` 之类的异步方式调用。
      *
      * 传入 `ms` 参数等价于先调用 `enableTimerWakeup(ms)` 再进入睡眠;
      * 不传参数则一直睡眠, 直到已配置的唤醒源触发。
@@ -468,8 +504,9 @@ namespace be {
     /**
      * 进入 deep sleep (深度睡眠)
      *
-     * CPU、SRAM、PSRAM 全部断电, 仅 RTC 域保持供电。唤醒后设备重启,
-     * 从入口函数重新运行, **无法恢复 JS 运行环境**。
+     * **此函数不会返回, 调用即意味着重启**: CPU、SRAM、PSRAM 全部断电,
+     * 仅 RTC 域保持供电。唤醒后设备从入口函数整体重启, 脚本从头开始执行,
+     * **JS 运行环境无法恢复**, 写在 `deep()` 调用之后的代码永远不会执行到。
      * 重启后可用 `wakeupCause()` 或 `process.resetReason()` 查询唤醒原因。
      *
      * 需要跨睡眠保存的数据请使用 NVS (nvs 模块)。
