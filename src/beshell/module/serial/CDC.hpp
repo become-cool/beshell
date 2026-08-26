@@ -1,8 +1,9 @@
 #pragma once
 
 #include "sdkconfig.h"
+#include "soc/soc_caps.h"
 
-#if CONFIG_USB_OTG_SUPPORTED
+#if SOC_USB_SERIAL_JTAG_SUPPORTED
 
 #include "../../NativeModule.hpp"
 

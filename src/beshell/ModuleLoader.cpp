@@ -1,6 +1,7 @@
 #include "ModuleLoader.hpp"
 #include "module/gpio/GPIO.hpp"
 #include "module/Process.hpp"
+#include "module/Sleep.hpp"
 #include "module/Path.hpp"
 #include "driver/DriverModule.hpp"
 #include "quickjs.h"
@@ -382,6 +383,7 @@ namespace be {
     ModuleLoader::ModuleLoader(BeShell * beshell) {
         add<JSLoader>(beshell, "loader") ;
         add<Process>(beshell, "process") ;
+        add<Sleep>(beshell, "sleep") ;
         add<REPLModule>(beshell, "repl") ;
 #ifdef ESP_PLATFORM
         add<driver::DriverModule>(beshell, "driver") ;

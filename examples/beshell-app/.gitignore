@@ -6,6 +6,7 @@ dist
 dependencies.lock
 CMakeLists.update_example.txt
 CMakeLists.private.txt
+managed_components
 .cache
 .devcontainer
 img/js.bin

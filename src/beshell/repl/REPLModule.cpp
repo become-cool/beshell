@@ -333,17 +333,17 @@ namespace be{
  * 
  * ## 前置条件
  * 
- * 1. **芯片支持**: 需要 ESP32-S2/S3/C3/C6 等支持 USB OTG 的芯片
- * 2. **SDK 配置**: sdkconfig 中需要开启 `CONFIG_USB_OTG_SUPPORTED`
+ * 1. **芯片支持**: 需要 ESP32-S2/S3/C3/C6 等支持 USB Serial/JTAG 的芯片
+ * 2. **编译条件**: 代码以 `SOC_USB_SERIAL_JTAG_SUPPORTED` 宏保护，芯片不支持时自动禁用
  * 3. **C++ 启用**: 在 C++ 代码中调用 `beshell.use<REPLCDC>()`
  * 
  * ## C++ 启用示例
  * 
  * ```cpp
- * #include "sdkconfig.h"
+ * #include "soc/soc_caps.h"
  * 
- * // 需要检查 SDK 配置
- * #if CONFIG_USB_OTG_SUPPORTED
+ * // 需要检查芯片是否支持 USB Serial/JTAG
+ * #if SOC_USB_SERIAL_JTAG_SUPPORTED
  *     beshell.use<REPLCDC>() ;
  * #endif
  * ```
@@ -375,7 +375,7 @@ namespace be{
  * 
  * 必须在 C++ 侧先启用 REPLCDC：
  * ```cpp
- * #if CONFIG_USB_OTG_SUPPORTED
+ * #if SOC_USB_SERIAL_JTAG_SUPPORTED
  *     beshell.use<REPLCDC>() ;
  * #endif
  * ```

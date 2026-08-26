@@ -125,6 +125,21 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -fdata-sections)
 target_compile_options(${COMPONENT_LIB} PRIVATE -fstrict-volatile-bitfields)
 
 
+# USJ (USB Serial/JTAG) 不支持 light sleep 保活的芯片 (S3/C3/C6 等):
+# 通过 --wrap 拦截 IDF 睡眠路径的时钟切换, 使 sleep 模块主动进入 light sleep 期间
+# 保持 BBPLL (USB PHY 48MHz 时钟源) 开启, 避免唤醒后 USB PHY 无法恢复、host 枚举失败。
+# 对应的 __wrap_ 实现见 src/beshell/module/Sleep.cpp
+if(CONFIG_SOC_USB_SERIAL_JTAG_SUPPORTED AND NOT CONFIG_SOC_USB_SERIAL_JTAG_SUPPORT_LIGHT_SLEEP)
+    target_link_options(${COMPONENT_TARGET} PUBLIC
+        "-Wl,--wrap=rtc_clk_cpu_freq_set_xtal"
+        "-Wl,--wrap=rtc_clk_cpu_freq_set_xtal_for_sleep"
+        "-Wl,--wrap=sleep_console_usj_pad_backup_and_disable"
+        "-Wl,--wrap=sleep_console_usj_pad_restore"
+    )
+    message(STATUS "USJ light-sleep keep-alive wrap enabled")
+endif()
+
+
 # for Logger
 if(CONFIG_BESHELL_LOGGER_ENABLE_WRAP)
     target_link_options(${COMPONENT_TARGET} PUBLIC

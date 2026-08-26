@@ -8,9 +8,6 @@
 #include <sys/fcntl.h>
 #include <sys/types.h>
 #include "Protocal.hpp"
-#include "driver/usb_serial_jtag.h"
-#include "driver/uart.h"
-#include "soc/usb_serial_jtag_struct.h"
 #include "sdkconfig.h"
 
 #define UART_NUM        UART_NUM_0
@@ -22,7 +19,11 @@
 
 using namespace std ;
 
-#if CONFIG_USB_OTG_SUPPORTED
+#if SOC_USB_SERIAL_JTAG_SUPPORTED
+
+#include "driver/usb_serial_jtag.h"
+#include "driver/uart.h"
+#include "soc/usb_serial_jtag_struct.h"
 
 extern "C" {
     bool usb_serial_jtag_write_ready(void) ;

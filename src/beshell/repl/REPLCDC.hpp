@@ -1,11 +1,14 @@
 #pragma once
 
+#include "sdkconfig.h"
+#include "soc/soc_caps.h"
+
 #include "REPLChannel.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
-#if CONFIG_USB_OTG_SUPPORTED
+#if SOC_USB_SERIAL_JTAG_SUPPORTED
 namespace be {
     class REPLCDC: public REPLChannel {
     private:

@@ -79,57 +79,67 @@ namespace be {
         }
         uint64_t now = gettime() ;
 
-        for(auto it = events.begin(); it != events.end();) {
-            auto event = *it ;
-
+        // 先清理标记为删除的任务, 并收集本轮到期的任务
+        // 注意: 回调中可能调用 setTimeout/setInterval 向 events push_back (导致 vector 重新分配内存),
+        // 所以不能边迭代 events 边执行回调。这里只收集事件指针, 事件对象在回调中只会被标记 removing,
+        // 不会被释放 (jsClearTimeout 仅标记), 因此指针在回调执行期间保持有效。
+        std::vector<JSTimerEvent*> due ;
+        for(size_t i=0; i<events.size();) {
+            JSTimerEvent * event = events[i] ;
             if(!event||event->removing) {
-                events.erase(it);
+                events.erase(events.begin()+i);
                 if(event) {
                     event->destroy(ctx) ;
                     delete event ;
                 }
-                continue ; // 此处不使用 it++，因为它已经被删除了
+                continue ;
             }
-
             if(event->deadline <= now) {
-                if(!JS_IsFunction(ctx, event->func)) {
-                    printf("timer callback is not a function, event:%p, total event: %d\n",events,events.size()) ;
-                    if( !removeTimer(ctx, event) ){
-                        // 如果删除成功，不会执行 it++
-                        it ++ ; 
-                    }
-                    continue ;
-                }
-
-                JSValue ret = JS_Call(ctx, event->func, event->thisobj, event->argc, event->argv) ;
-                if( JS_IsException(ret) ) {
-                    JSEngine::getExceptionStr(ctx, ret) ;
-                }
-                JS_FreeValue(ctx, ret) ;
-
-                // 一次性任务
-                if(!event->repeat) {
-                    if( !removeTimer(ctx, event->id) ){
-                        // 如果删除成功，不会执行 it++
-                        it ++ ; 
-                    }
-                    continue ;
-                }
-
-                // 连续重复任务
-                if(event->interval==0) {
-                    event->deadline = now ;
-                }
-                // 间隔重复
-                else {
-                    event->deadline+= event->interval ;
-                }
+                due.push_back(event) ;
             }
-            
-            it ++ ;
+            i++ ;
         }
-        
+
         give(false) ;
+
+        for(auto event: due) {
+            // 之前的回调可能已经把这个任务标记为删除
+            if(event->removing) {
+                continue ;
+            }
+
+            if(!JS_IsFunction(ctx, event->func)) {
+                printf("timer callback is not a function, event:%p, total event: %d\n", event, (int)events.size()) ;
+                removeTimer(ctx, event) ;
+                continue ;
+            }
+
+            JSValue ret = JS_Call(ctx, event->func, event->thisobj, event->argc, event->argv) ;
+            if( JS_IsException(ret) ) {
+                JSEngine::getExceptionStr(ctx, ret) ;
+            }
+            JS_FreeValue(ctx, ret) ;
+
+            // 回调中调用了 clearTimeout/clearInterval 清除自己, 留待下次 loop 清理
+            if(event->removing) {
+                continue ;
+            }
+
+            // 一次性任务
+            if(!event->repeat) {
+                removeTimer(ctx, event) ;
+                continue ;
+            }
+
+            // 连续重复任务
+            if(event->interval==0) {
+                event->deadline = now ;
+            }
+            // 间隔重复
+            else {
+                event->deadline+= event->interval ;
+            }
+        }
     }
 
     #define CHECK_ENGINE                                     \
