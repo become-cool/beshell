@@ -21,6 +21,28 @@ namespace be {
 
     protected:
         JSContext * ctx ;
+
+        /**
+         * self 代表本对象所有 C++ 侧的引用（C++ 侧计数器）。
+         *
+         * 计数模型：C++ 对象在两个计数都归 0 时才销毁——
+         *   - JS 侧计数：jsobj 的 QuickJS 引用计数，归 0 时触发 finalizer()，
+         *     finalizer() 将 self 成员（锚点）置空，表示 JS 侧不再持有；
+         *   - C++ 侧计数：self 的 shared_ptr 控制块计数。
+         *     constructor() 调 shared() 建立锚点(=1)；任何需要延长 C++ 对象生命的
+         *     C++ 持有方（如注册进主循环、异步任务）应保存 shared() 返回的拷贝(+1)，
+         *     持有结束时释放拷贝(-1)。参考 Timeline::loopRef：play/resume 时
+         *     loopRef = shared()，pause/stop 时 loopRef = nullptr。
+         *
+         * 注意：不要直接把 self 成员交给某个持有方使用——各持有方的释放时机相互独立
+         * （finalizer 由 GC 触发，其他持有方由各自业务触发），一个成员只能表达一个
+         * 释放事件；持有方必须保存自己的 shared_ptr 拷贝。
+         *
+         * 若 C++ 持有期间仍需经 jsobj 投递事件（fire-and-forget 场景），持有方还必须
+         * 同时强持有 jsobj（如 Timeline::loopObjRef = JS_DupValue(jsobj)，与 loopRef
+         * 配对进出）——jsobj 成员本身是弱持有（其唯一计数随 constructor 返回给 JS 侧），
+         * JS 侧丢引用后 GC 会回收 jsobj 及 _handlers/闭包，事件将静默丢失。
+         */
         std::shared_ptr<NativeClass> self ;
 
         static std::vector<JSCFunctionListEntry> methods ;

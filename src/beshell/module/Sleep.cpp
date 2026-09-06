@@ -21,12 +21,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <stdio.h>
+#include <atomic>
 
 // 置位期间, light sleep 保持 BBPLL 开启 (见下方 __wrap_rtc_clk_cpu_freq_set_xtal)
 static volatile bool s_keep_bbpll_in_sleep = false ;
 // (诊断) wrap 命中计数: 验证 --wrap 是否真的拦截了睡眠路径的时钟切换
-static volatile int s_wrap_hit_keep = 0 ;
-static volatile int s_wrap_hit_pass = 0 ;
+static std::atomic<int> s_wrap_hit_keep{0} ;
+static std::atomic<int> s_wrap_hit_pass{0} ;
 
 extern "C" {
 
@@ -110,7 +111,7 @@ static void usj_diag_dump(const char * tag) {
         (unsigned long)USB_SERIAL_JTAG.int_st.val,
         (unsigned long)USB_SERIAL_JTAG.ep1_conf.val,
         (int)usb_serial_jtag_is_connected(),
-        (int)s_wrap_hit_keep, (int)s_wrap_hit_pass) ;
+        s_wrap_hit_keep.load(), s_wrap_hit_pass.load()) ;
 }
 
 // (诊断) 探测 host 是否在线: 清 SOF 原始位后采样, host 在线时每 1ms 发送一次 SOF

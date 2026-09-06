@@ -33,6 +33,7 @@
 #include "./module/WiFi.hpp"
 #include "./module/Flash.hpp"
 #include "./module/logger/Logger.hpp"
+#include "./module/animator/Animator.hpp"
 // serial
 #include "./module/serial/Serial.hpp"
 #include "./module/serial/UART.hpp"

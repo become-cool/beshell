@@ -1,3 +1,19 @@
+# 1.0.23 2026/9/6
+
+## New Feature:
+
+* Timeline 增加只读访问接口 `getFps()/getTotalFrames()/getRepeat()/allTracks()`，供序列化/导出场景使用
+
+## Refact:
+
+* `module/animator/Ease` 重构为 NativeModule `Animator` (模块名 `animator`), 缓动函数移至 `be::animator::tween` 命名空间, JS 侧由 animator 模块导出 `tween` 对象
+
+## New Feature:
+
+* animator 模块新增 `Timeline` 类: 主循环驱动的等间隔帧节拍, `play/pause/resume/stop`, `nextFrame()` 帧同步 Promise, 事件: "frame"(每帧)/"change"(值实际变更的帧, 无变更时跳过属性写入)/"stop"/"pause", C++ 侧可 `on/off(EventType, func, opaque)` 订阅同名事件(先于 JS 回调)
+* Timeline 关键帧插补: `set/add/unset` 按帧号设置 对象.属性=值, 跨关键帧自动插值, 支持缓动、批量输入、C 变量指针绑定
+* animator 模块导出 `morph(startValue, endValue, durTime, callback, ease, easeS, fps)` 一次性动画: 基于 Timeline 关键帧插补, 每帧回调新值, 播完自动停止
+
 # 1.0.22
 
 ## New Feature:

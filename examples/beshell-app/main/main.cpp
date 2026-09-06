@@ -18,6 +18,7 @@ void app_main(void)
     beshell.use<Serial>() ;
     beshell.use<NVS>() ;
     beshell.use<WiFi>() ;
+    beshell.use<animator::Animator>() ;
 #if CONFIG_BT_BLUEDROID_ENABLED
     beshell.use<BT>() ;
 #endif

@@ -194,21 +194,22 @@ namespace be {
         
         inLooping = false ;
 
-        // 执行添加/移除 loopable 对象的异步操作请求
-        // for(auto op : waitingLoopingOps) {
-        //     if(op.op==LOOPING_ADD) {
-        //         if( op.target.add.looping.type==LOOPTYPE_FUNC ) {
-        //             addLoopFunction(op.target.add.looping.exec.func.function, op.target.add.looping.exec.func.opaque, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
-        //         }
-        //         else if( op.target.add.looping.type==LOOPTYPE_OBJ ) {
-        //             addLoopObject(op.target.add.looping.exec.obj, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
-        //         }
-        //     }
-        //     else if(op.op==LOOPING_REMOVE) {
-        //         removeLooping(op.target.remove) ;
-        //     }
-        // }
-        // waitingLoopingOps.clear() ;
+        // 执行 loop 期间累积的 添加/移除 looping 请求
+        // （遍历/timer/promise 回调中不直接增删 lstLoopings，避免迭代器失效或悬垂指针）
+        for(auto & op : waitingLoopingOps) {
+            if(op.op==LOOPING_ADD) {
+                if( op.target.add.looping.type==LOOPTYPE_FUNC ) {
+                    addLoopFunction(op.target.add.looping.exec.func.function, op.target.add.looping.exec.func.opaque, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+                }
+                else if( op.target.add.looping.type==LOOPTYPE_OBJ ) {
+                    addLoopObject(op.target.add.looping.exec.obj, op.target.add.ignoreRepeat, op.target.add.looping.priority) ;
+                }
+            }
+            else if(op.op==LOOPING_REMOVE) {
+                removeLooping(op.target.remove) ;
+            }
+        }
+        waitingLoopingOps.clear() ;
 
         give() ;
     }
@@ -395,14 +396,15 @@ namespace be {
             0
         } ;
 
-        
-        // if(inLooping) {
-        //     waitingLoopingOps.push_back({
-        //         .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
-        //     }) ;
-        // } else {
+        if(inLooping) {
+            struct LoopingOp op ;
+            op.op = LOOPING_ADD ;
+            op.target.add.ignoreRepeat = ignoreRepeat ;
+            op.target.add.looping = looping ;
+            waitingLoopingOps.push_back(op) ;
+        } else {
             lstLoopings.push_back(looping) ;
-        // }
+        }
 
         return looping.id ;
     }
@@ -425,14 +427,16 @@ namespace be {
             priority,
             0
         } ;
-        
-        // if(inLooping) {
-        //     waitingLoopingOps.push_back({
-        //         .op=LOOPING_ADD, .target={ .add={ .ignoreRepeat=ignoreRepeat, .looping=looping} }
-        //     }) ;
-        // } else {
+
+        if(inLooping) {
+            struct LoopingOp op ;
+            op.op = LOOPING_ADD ;
+            op.target.add.ignoreRepeat = ignoreRepeat ;
+            op.target.add.looping = looping ;
+            waitingLoopingOps.push_back(op) ;
+        } else {
             lstLoopings.push_back(looping) ;
-        // }
+        }
 
         return looping.id ;
     }
@@ -442,19 +446,26 @@ namespace be {
             return ;
         }
 
-        // if(inLooping) {
-        //     waitingLoopingOps.push_back({
-        //         .op=LOOPING_REMOVE, .target={ .remove=(uint16_t)id }
-        //     }) ;
-        // }
-        // else {
-            auto it = std::find_if(lstLoopings.begin(), lstLoopings.end(), [id](struct Looping& looping) {
-                return looping.id==id ;
-            }) ;
-            if(it!=lstLoopings.end()) {
-                lstLoopings.erase(it) ;
-            }
-        // }
+        auto it = std::find_if(lstLoopings.begin(), lstLoopings.end(), [id](struct Looping& looping) {
+            return looping.id==id ;
+        }) ;
+        if(it==lstLoopings.end()) {
+            return ;
+        }
+
+        if(inLooping) {
+            // loop 遍历/timer/promise 回调期间：先将条目标记失效（遍历 switch 的 default 分支跳过），
+            // 实际移除延迟到本轮结束，避免遍历中修改 vector 导致迭代器失效；
+            // 同时失效标记保证该条目即使后续被遍历到也不会再执行（回调中对象可能已析构）
+            it->type = 0 ;
+            struct LoopingOp op ;
+            op.op = LOOPING_REMOVE ;
+            op.target.remove = (uint16_t)id ;
+            waitingLoopingOps.push_back(op) ;
+        }
+        else {
+            lstLoopings.erase(it) ;
+        }
     }
     
     void JSEngine::removeLooping(EngineLoopFunction func, void * opaque) {
