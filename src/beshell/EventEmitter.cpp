@@ -21,6 +21,7 @@ namespace be {
 
     EventEmitter::~EventEmitter() {
 
+#ifdef ESP_PLATFORM
         if(nevent_queue) {
             JSEngine::fromJSContext(ctx)->removeLooping((EngineLoopFunction)nativeEventLoop, this) ;
             vQueueDelete(nevent_queue) ;
@@ -29,6 +30,7 @@ namespace be {
             free(native_param) ;
             native_param = nullptr ;
         }
+#endif
     }
 
     JSValue EventEmitter::constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -231,17 +233,20 @@ namespace be {
     }
 
     void EventEmitter::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
+#ifdef ESP_PLATFORM
         if(nevent_queue) {
             return ;
         }
         native_param = malloc(param_size) ;
         nevent_queue = xQueueCreate(queue_size, param_size);
         JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
+#endif
     }
 
     // 注意，该函数可能返回 false ，
     // 消息没有实际进入到队列中，因为队列满了或队列尚未创建
     // 如果消息中有由接收方负责释放的指针，此时需要由发送方负责释放回收
+#ifdef ESP_PLATFORM
     bool IRAM_ATTR EventEmitter::emitNativeEvent(void * param, bool fromISR) {
         if(!nevent_queue) {
             return false ;
@@ -258,11 +263,19 @@ namespace be {
             return xQueueSend(nevent_queue, param, 0) == pdTRUE ;
         }
     }
+#else
+    // PC 平台暂无异步事件源，no-op 实现
+    bool EventEmitter::emitNativeEvent(void * param, bool fromISR) {
+        return false ;
+    }
+#endif
     
     void EventEmitter::nativeEventLoop(JSContext * ctx, EventEmitter * ee) {
+#ifdef ESP_PLATFORM
         while(xQueueReceive(ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
             ee->onNativeEvent(ctx, ee->native_param) ;
         }
+#endif
     }
 
     void EventEmitter::onNativeEvent(JSContext *ctx, void * param) {}

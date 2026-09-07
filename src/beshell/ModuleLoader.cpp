@@ -63,8 +63,6 @@ namespace be {
      */
     class JSLoader: public NativeModule {
     public:
-        using NativeModule::NativeModule;
-        
         JSLoader(JSContext * ctx, const char * name,uint8_t flagGlobal=1)
             : NativeModule(ctx, name, flagGlobal)
         {
@@ -520,7 +518,8 @@ namespace be {
 
         // 相对路径
         else if(module_base_name && (strncmp(module_name,"./",2)==0 || strncmp(module_name,"../",3)==0) ) {
-            char * base_dir = strdup(module_base_name) ;
+            char * base_dir = (char *)malloc(strlen(module_base_name)+1) ;
+            strcpy(base_dir, module_base_name) ;   // 与 strdup 语义一致（path_dirname 在 n==0 时不写缓冲区）
             path_dirname(module_base_name, base_dir) ;
             fullpath = resovleFS(module_name, base_dir) ;
             free(base_dir) ;

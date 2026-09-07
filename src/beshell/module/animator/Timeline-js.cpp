@@ -268,7 +268,7 @@ namespace be::animator {
      * @module animator
      * @class Timeline
      * @method nextFrame
-     * @return Promise<number> 当前帧序号
+     * @return Promise\<number\> 当前帧序号
      */
     JSValue Timeline::nextFrame(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Timeline, that)
@@ -342,8 +342,8 @@ namespace be::animator {
      * @class Timeline
      * @method unset
      * @param frame:number 帧号
-     * @param obj:object= 目标对象（可选）
-     * @param prop:string= 属性名（可选）
+     * @param obj:object 目标对象（可选，与 prop 一起提供时仅移除该属性）
+     * @param prop:string 属性名（可选）
      */
     JSValue Timeline::unset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Timeline, that)

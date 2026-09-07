@@ -1,10 +1,10 @@
 #include <BeShell.hpp>
 #include <JSEngine.hpp>
 #include "module/Sleep.hpp"
-#include "esp_err.h"
 
 #ifdef ESP_PLATFORM
 #include "sdkconfig.h"
+#include "esp_err.h"
 #include "esp_idf_version.h"
 #include "esp_sleep.h"
 #include "esp_wifi.h"

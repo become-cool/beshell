@@ -164,7 +164,4 @@ endif ()
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_link_options(${COMPONENT_TARGET} PRIVATE -D__STDC_NO_ATOMICS__=1)
 endif ()
-message("Operating System: ${CMAKE_SYSTEM_NAME}")
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    add_subdirectory(pc)
-endif ()
+

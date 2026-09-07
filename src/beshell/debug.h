@@ -7,7 +7,11 @@
 #define pf(...) printf(__VA_ARGS__) ;printf("\n") ;
 #define dd printf("%d@%s()\n", __LINE__, __FUNCTION__) ;
 #define df(msg) printf("@%d %s\n", __LINE__, msg) ;
+#ifdef ESP_PLATFORM
 #define dm(msg) printf("%s: %dKB\n", msg, esp_get_free_heap_size()/1024);
+#else
+#define dm(msg) ;
+#endif
 #define dp(p)   printf(#p"@%p (%d)\n", p, __LINE__) ;
 #define ds(s)   printf(#s"=%s @%d\n", s, __LINE__) ;
 #define dstr(s)   printf(#s"=%s @%d\n", s.c_str(), __LINE__) ;
@@ -58,12 +62,16 @@
 #define nechof_time(msg, codes, ...)  codes
 
 
+#ifdef ESP_PLATFORM
 #define echo_alloc(msg, codes)                                  \
     {                                                           \
         size_t __m = heap_caps_get_free_size(MALLOC_CAP_DMA) ;  \
         codes                                                   \
         printf(msg" alloc: %d\n", __m - heap_caps_get_free_size(MALLOC_CAP_DMA)) ; \
     }
+#else
+#define echo_alloc(msg, codes)  codes
+#endif
 #define necho_alloc(msg, codes, ...)  codes
 
 #ifdef __cplusplus

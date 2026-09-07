@@ -95,8 +95,8 @@ namespace be {
     void NativeModule::use(BeShell * beshell) {}
 
 
-#ifdef ESP_PLATFORM
     void NativeModule::enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size) {
+#ifdef ESP_PLATFORM
         if(nevent_queue) {
             return ;
         }
@@ -113,12 +113,14 @@ namespace be {
             return ;
         }
         JSEngine::fromJSContext(ctx)->addLoopFunction((EngineLoopFunction)nativeEventLoop, this, true) ;
+#endif
     }
 
     // 注意，该函数可能返回 false ，
     // 消息没有实际进入到队列中，因为队列满了或队列尚未创建
     // 如果消息中有由接收方负责释放的指针，此时需要由发送方负责释放回收
     bool NativeModule::emitNativeEvent(void * param) {
+#ifdef ESP_PLATFORM
         if(!nevent_queue) {
             return false ;
         }
@@ -129,17 +131,22 @@ namespace be {
         // }
 
         return xQueueSend((QueueHandle_t)nevent_queue, param, 0)==pdTRUE ;
+#else
+        // PC 平台暂无异步事件源，no-op
+        return false ;
+#endif
     }
     
     void NativeModule::nativeEventLoop(JSContext * ctx, NativeModule * ee) {
+#ifdef ESP_PLATFORM
         // dp(ee)
         while(xQueueReceive((QueueHandle_t)ee->nevent_queue, ee->native_param, 0)==pdTRUE) {
             ee->onNativeEvent(ctx, ee->native_param) ;
         }
+#endif
     }
 
     void NativeModule::onNativeEvent(JSContext *ctx, void * param) {}
-#endif
 
 
     EventModule::EventModule(JSContext * ctx, const char * name, uint8_t flagGlobal)
@@ -169,8 +176,6 @@ namespace be {
 
         JS_FreeValue(ctx, proto) ;
     }
-
-#ifdef ESP_PLATFORM
 
     void EventModule::emitSync(const JSValue & eventName, std::initializer_list<JSValue> args) {
         
@@ -203,7 +208,6 @@ namespace be {
 
         delete[] jsargv ;
     }
-#endif
 
 
 

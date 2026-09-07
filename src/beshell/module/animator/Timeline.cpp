@@ -28,15 +28,19 @@ namespace be::animator {
      * tl.play()
      * ```
      *
+     * 继承自 [EventEmitter](../event-emitter.html)，提供 `on()`/`off()` 等事件监听方法。
+     *
+     * ## 事件
+     *
+     * | 事件名 | 回调参数 | 说明 |
+     * |--------|----------|------|
+     * | frame | frame:number 当前帧序号 | 每帧属性更新后触发（无论值是否变化，无监听时不触发） |
+     * | change | frame:number 当前帧序号 | 仅在有属性值实际变更的帧触发（先于 frame 事件） |
+     * | stop | frame:number 固定为 0 | 停止时触发（手动 stop() 与播完自动停止均触发） |
+     * | pause | frame:number 当前帧序号 | 暂停时触发 |
+     *
      * @module animator
      * @class Timeline
-     * @extends EventEmitter
-     * @event frame 每帧属性更新后触发(无论值是否变化, 无监听时不触发)
-     * @param frame:number 当前帧序号
-     * @event change 仅在有属性值实际变更的帧触发(先于 frame 事件)
-     * @param frame:number 当前帧序号
-     * @event stop 停止时触发(手动 stop() 与播完自动停止均触发)
-     * @event pause 暂停时触发
      */
     DEFINE_NCLASS_META(Timeline, EventEmitter)
 

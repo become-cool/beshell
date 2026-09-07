@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <sys/stat.h>
 #include <string.h>
+#include <algorithm>
 
 #ifdef ESP_PLATFORM
 #include "malloc_funcs.h"
@@ -479,9 +480,15 @@ namespace be {
     }
 
     bool JSEngine::take(int timeout) {
-        return xSemaphoreTake(xSemaphore, timeout) == pdTRUE ;
+#ifdef ESP_PLATFORM
+        return xSemaphoreTake(xSemaphore, timeout<0? portMAX_DELAY: timeout) == pdTRUE ;
+#else
+        return true ;
+#endif
     }
     void JSEngine::give() {
+#ifdef ESP_PLATFORM
         xSemaphoreGive(xSemaphore);
+#endif
     }
 }

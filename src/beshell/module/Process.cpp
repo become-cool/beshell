@@ -1,13 +1,22 @@
 #include <BeShell.hpp>
 #include <JSEngine.hpp>
 #include "module/Process.hpp"
-#include "esp_err.h"
+#include "../platform.hpp"
+
+#ifndef ESP_PLATFORM
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <thread>
+#endif
+#endif
 
 #ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "esp_err.h"
 #include "soc/soc.h"
 #include "esp_efuse.h"
 #include "esp_mac.h"
@@ -78,11 +87,10 @@ namespace be {
         exportValue("argv", JS_NewArray(ctx)) ;
         exportValue("versions", versions) ;
 
-#ifdef ESP_PLATFORM
+#if defined(ESP_PLATFORM)
         exportValue("platform", JS_NewString(ctx, "esp32")) ;
-#endif
-#ifdef LiNUX_PLATFORM
-        exportValue("platform", JS_NewString(ctx, "linux")) ;
+#elif defined(BESHELL_PLATFORM_PC)
+        exportValue("platform", JS_NewString(ctx, "pc")) ;
 #endif
 
     JSValue DEF_JS_FUNC(jsTop, R"(
@@ -199,6 +207,7 @@ function top(detail=false) {
      */
     JSValue Process::getMac(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         
+#ifdef ESP_PLATFORM
         uint8_t mac[8] ;
 
         esp_mac_type_t mac_type = ESP_MAC_WIFI_STA;
@@ -254,6 +263,9 @@ function top(detail=false) {
             sprintf(macstr,"%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
             return JS_NewString(ctx, macstr) ;
         }
+#else
+        JSTHROW("process.getMac() is not supported on this platform") ;
+#endif
     }
     
     /**
@@ -364,11 +376,15 @@ function top(detail=false) {
         }
         
         // 设置 MAC 地址
+#ifdef ESP_PLATFORM
         esp_err_t ret = esp_base_mac_addr_set(mac_addr);
         if( ret != ESP_OK ) {
             JSTHROW("Failed to set MAC address: %s", esp_err_to_name(ret))
         }
         return JS_UNDEFINED ;
+#else
+        JSTHROW("process.setMac() is not supported on this platform")
+#endif
     }
 
     /**
@@ -541,7 +557,7 @@ function top(detail=false) {
     JSValue Process::sleep(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         CHECK_ARGC(1)
         ARGV_TO_UINT32(0, ms)
-        vTaskDelay(ms/portTICK_PERIOD_MS) ;
+        platform::sleepMs(ms) ;
         return JS_UNDEFINED ;
     }
 
@@ -690,7 +706,11 @@ function top(detail=false) {
      * @return number 系统运行时间（毫秒）
      */
     JSValue Process::getRunningTime(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+#ifdef ESP_PLATFORM
         int64_t boot_time_us = esp_timer_get_time();
+#else
+        int64_t boot_time_us = gettime_us() ;
+#endif
         return JS_NewUint32(ctx, boot_time_us / 1000); // 返回毫秒
     }
 
@@ -722,7 +742,7 @@ function top(detail=false) {
      * @throws 温度传感器不支持
      */
     JSValue Process::getChipTemperature(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-#if SOC_TEMP_SENSOR_SUPPORTED
+#if defined(ESP_PLATFORM) && SOC_TEMP_SENSOR_SUPPORTED
         esp_err_t err ;
         static bool temp_sensor_initialized = false;
         static temperature_sensor_handle_t temp_handle = NULL;
@@ -798,6 +818,7 @@ function top(detail=false) {
      */
     JSValue Process::resetReason(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         
+#ifdef ESP_PLATFORM
         // 获取重启原因
         esp_reset_reason_t reason = esp_reset_reason();
 
@@ -857,6 +878,9 @@ function top(detail=false) {
         }
 
         return JS_NewString(ctx, reason_str);
+#else
+        return JS_NewString(ctx, "unknown");
+#endif
     }
 
     
@@ -922,7 +946,15 @@ function top(detail=false) {
      * @return number CPU 核心数
      */
     JSValue Process::cpuCount(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+#ifdef ESP_PLATFORM
         return JS_NewInt32(ctx, configNUMBER_OF_CORES) ;
+#elif defined(_WIN32)
+        SYSTEM_INFO sysinfo ;
+        GetSystemInfo(&sysinfo) ;
+        return JS_NewInt32(ctx, (int32_t)sysinfo.dwNumberOfProcessors) ;
+#else
+        return JS_NewInt32(ctx, (int32_t)std::thread::hardware_concurrency()) ;
+#endif
     }
     
     /**
@@ -954,10 +986,10 @@ function top(detail=false) {
     JSValue Process::tasks(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         ARGV_TO_UINT8_OPT(0, core, 0) ;
         JSValue list = JS_NewArray(ctx) ;
+#ifdef ESP_PLATFORM
         if(core>configNUMBER_OF_CORES-1) {
             JSTHROW("arg core id invalid", configNUMBER_OF_CORES) ;
         }
-#ifdef ESP_PLATFORM
 #ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
         TaskStatus_t *pxTaskStatusArray;
         UBaseType_t uxArraySize = uxTaskGetNumberOfTasks();

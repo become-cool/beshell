@@ -65,4 +65,83 @@
 
 ---
 
-## 2. （后续修改记录在此追加）
+## 2. quickjs.c: Windows 下禁用 CONFIG_ATOMICS
+
+### 位置
+
+`deps/quickjs/quickjs.c` 约 L71-78（`CONFIG_ATOMICS` 定义处）。
+
+### 修改内容
+
+原代码：
+
+```c
+/* define to include Atomics.* operations which depend on the OS
+   threads */
+#if !defined(EMSCRIPTEN)
+#define CONFIG_ATOMICS
+#endif
+```
+
+修改为：
+
+```c
+#if !defined(EMSCRIPTEN) && !defined(_WIN32)
+#define CONFIG_ATOMICS
+#endif
+```
+
+### 原因
+
+`CONFIG_ATOMICS` 会引入 `#include <pthread.h>` 与 `stdatomic.h`。Windows 原生工具链
+（MinGW.org / MSVC）没有 pthread.h；且 BeShell 为单线程事件循环模型，
+JS 侧不会创建 Worker 线程，`Atomics.*` / `SharedArrayBuffer` 无使用场景，
+禁用影响为零（与 Emscripten 单线程构建的上游处理一致）。
+
+### 还原方法
+
+把 `#if !defined(EMSCRIPTEN) && !defined(_WIN32)` 恢复为 `#if !defined(EMSCRIPTEN)`。
+
+---
+
+## 3. quickjs.c: _WIN32 下补充 #include <malloc.h>
+
+### 位置
+
+`deps/quickjs/quickjs.c` 约 L36-40（头部 include 区）。
+
+### 修改内容
+
+原代码：
+
+```c
+#if defined(__APPLE__)
+#include <malloc/malloc.h>
+#elif defined(__linux__)
+#include <malloc.h>
+#endif
+```
+
+修改为：
+
+```c
+#if defined(__APPLE__)
+#include <malloc/malloc.h>
+#elif defined(__linux__) || defined(_WIN32)
+#include <malloc.h>
+#endif
+```
+
+### 原因
+
+`_WIN32` 分支使用 `_msize`（js_def_malloc_usable_size，约 L1744），其声明位于
+`<malloc.h>`，但上游仅在 `__linux__` 下包含该头文件，Windows 编译报
+`'_msize' undeclared`。
+
+### 还原方法
+
+把 `#elif defined(__linux__) || defined(_WIN32)` 恢复为 `#elif defined(__linux__)`。
+
+---
+
+## 4. （后续修改记录在此追加）

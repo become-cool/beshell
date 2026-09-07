@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ESP_PLATFORM
+
 #include "hal/i2s_types.h"
 
 #ifdef __cplusplus
@@ -15,6 +17,8 @@ extern "C" {
  * 通道由 serial.i2sX.setup() 创建，未初始化时返回 NULL。
  */
 void * beshell_i2s_std_tx_handle(i2s_port_t busnum) __attribute__((weak)) ;
+
+#endif // ESP_PLATFORM
 
 #ifdef __cplusplus
 }

@@ -35,7 +35,8 @@
 #include <math.h>
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
-#elif defined(__linux__)
+/* [beshell-modify] _WIN32 也需要 <malloc.h>（_msize 的声明），上游仅 __linux__ 包含 */
+#elif defined(__linux__) || defined(_WIN32)
 #include <malloc.h>
 #endif
 
@@ -70,7 +71,9 @@
 
 /* define to include Atomics.* operations which depend on the OS
    threads */
-#if !defined(EMSCRIPTEN)
+/* [beshell-modify] _WIN32 下无 pthread.h，且 BeShell 为单线程模型，
+   在 Windows 上禁用 Atomics（与 EMSCRIPTEN 相同处理） */
+#if !defined(EMSCRIPTEN) && !defined(_WIN32)
 #define CONFIG_ATOMICS
 #endif
 

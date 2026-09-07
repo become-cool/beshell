@@ -9,6 +9,11 @@
 #include "debug.h"
 #include "path.hpp"
 #include <unistd.h>
+#include <time.h>
+
+#ifndef ACCESSPERMS
+#define ACCESSPERMS 0777
+#endif
 
 #ifdef ESP_PLATFORM
 #include "RawFS.hpp"
@@ -17,12 +22,7 @@ extern const uint8_t fs_root_img_end[] asm("_binary_fs_root_img_end");
 #endif
 
 
-#ifdef LINUX_PLATFORM
-#include <utime.h>
-#endif
-
-
-#ifdef LINUX_PLATFORM
+#ifdef BESHELL_PLATFORM_PC
 #include <utime.h>
 #include <sys/types.h>
 #endif
@@ -32,8 +32,10 @@ using namespace std ;
 
 namespace be {
     
+#ifdef ESP_PLATFORM
     map<std::string, FSPartition *> FS::partitions;
     std::string FS::pwd = "/" ;
+#endif
     std::string FS::prefix = "/fs";
     char const * const FS::name = "fs" ;
 
@@ -59,7 +61,7 @@ namespace be {
         char* p = strchr((char *)(file_path + 1), '/') ;
         while (p!=NULL) {
             *p = '\0';
-#ifdef WIN32
+#ifdef _WIN32
             if (mkdir(file_path) == -1) {
 #else
             if (mkdir(file_path, ACCESSPERMS) == -1) {
@@ -74,7 +76,7 @@ namespace be {
         }
 
         if( !isDir(file_path) ) {
-#ifdef WIN32
+#ifdef _WIN32
             return mkdir(file_path) ;
 #else
             return mkdir(file_path, ACCESSPERMS) ;
@@ -243,7 +245,11 @@ namespace be {
         if(recursive) {
             return mkdir_p(path.c_str())==0 ;
         } else {
+#ifdef _WIN32
+            return mkdir(path.c_str()) ;
+#else
             return mkdir(path.c_str(), ACCESSPERMS) ;
+#endif
         }
     }
     
@@ -327,7 +333,7 @@ namespace be {
         }
         fclose(file);
 
-#ifdef LINUX_PLATFORM
+#ifdef BESHELL_PLATFORM_PC
         struct utimbuf new_times;
         new_times.actime = time(NULL);
         new_times.modtime = time(NULL);

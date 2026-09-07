@@ -1,7 +1,12 @@
 #include "platform.hpp"
 
+#ifdef ESP_PLATFORM
+
 #include "esp_netif.h"
 #include <esp_event.h>
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 
 namespace be::platform {
@@ -43,4 +48,14 @@ namespace be::platform {
         return true ;
     }
 
+    void sleepMs(uint32_t ms) {
+        vTaskDelay(ms/portTICK_PERIOD_MS) ;
+    }
+
+    uint64_t uptimeMs() {
+        return esp_timer_get_time() / 1000 ;
+    }
+
 }
+
+#endif // ESP_PLATFORM

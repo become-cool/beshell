@@ -49,7 +49,7 @@ using namespace std ;
 
 #endif
 
-#ifdef LINUX_PLATFORM
+#ifndef ESP_PLATFORM
 #define NVS_INT_GETTER(name,type,ctype)                             \
         bool NVS::read##name(const char * key, ctype & value, const char * ns) { \
             return false ;                                            \
@@ -142,6 +142,7 @@ namespace be {
     NVS_INT_SETTER(Uint32, u32, uint32_t)
     
     int NVS::erase(const char * key, const char * ns) {
+#ifdef ESP_PLATFORM
         nvs_handle_t handle;
         esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
         if(err!=ESP_OK) {
@@ -150,6 +151,9 @@ namespace be {
         err = nvs_erase_key(handle, key) ;
         nvs_close(handle) ;
         return (int)err ;
+#else
+        return -1 ;
+#endif
     }
 
     bool NVS::readFloat(const char * key, float & value, const char * ns) {
@@ -190,6 +194,7 @@ namespace be {
 
     
     int NVS::readString(const char * key, char * buff, size_t buffsize, const char * ns) {
+#ifdef ESP_PLATFORM
         nvs_handle_t handle;
         esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
         if(err!=ESP_OK) {
@@ -198,8 +203,12 @@ namespace be {
         err = nvs_get_str(handle, key, buff, & buffsize);
         nvs_close(handle) ;
         return (int)err ;
+#else
+        return -1 ;
+#endif
     }
     int NVS::writeString(const char * key, const char * value, const char * ns) {
+#ifdef ESP_PLATFORM
         nvs_handle_t handle;
         esp_err_t err = nvs_open(ns, NVS_READWRITE, &handle);
         if(err!=ESP_OK) {
@@ -208,6 +217,9 @@ namespace be {
         err = nvs_set_str(handle, key, value);
         nvs_close(handle) ;
         return (int)err ;
+#else
+        return -1 ;
+#endif
     }
 
     // js api
@@ -493,9 +505,7 @@ namespace be {
     ret:
         JS_FreeCString(ctx, key) ;
         return result ;
-#endif
-
-#ifdef LINUX_PLATFORM
+#else
         return JS_FALSE ;
 #endif
 

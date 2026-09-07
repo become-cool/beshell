@@ -16,7 +16,6 @@
 #include <set>
 #include <iomanip>
 #include <sstream>
-#include <utime.h>
 #ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -42,6 +41,7 @@ using namespace std ;
     }
 
 
+#ifdef ESP_PLATFORM
 void __attribute__((weak)) vTaskList(char *pcWriteBuffer) {
     printf("[ERROR] vTaskList is not available!\n");
     printf("[SOLUTION] Enable CONFIG_FREERTOS_USE_TRACE_FACILITY and CONFIG_FREERTOS_USE_STATS_FORMATTING_FUNCTIONS in sdkconfig.\n");
@@ -61,6 +61,7 @@ void __attribute__((weak)) vTaskGetRunTimeStats(char *pcWriteBuffer) {
     printf("[ERROR] vTaskGetRunTimeStats is not available!\n");
     printf("[SOLUTION] Enable CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS in sdkconfig.\n");
 }
+#endif
 
 namespace be {
 

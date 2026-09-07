@@ -11,6 +11,31 @@
 #include "esp_heap_caps.h"
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+
+// 1601-01-01 (FILETIME 纪元) 到 1970-01-01 (UNIX 纪元) 的 100 纳秒间隔数
+#define WIN_EPOCH_DIFF_100NS 116444736000000000ULL
+static uint64_t win_epoch_100ns() {
+    FILETIME ft ;
+    GetSystemTimeAsFileTime(&ft) ;
+    uint64_t t = ((uint64_t)ft.dwHighDateTime<<32) | ft.dwLowDateTime ;
+    return t - WIN_EPOCH_DIFF_100NS ;
+}
+
+uint64_t gettime() {
+	return win_epoch_100ns()/10000 ;
+}
+
+uint64_t gettime_us() {
+	return win_epoch_100ns()/10 ;
+}
+uint64_t gettime_ns() {
+	return win_epoch_100ns()*100 ;
+}
+
+#else
+
 uint64_t gettime() {
 	struct timespec tm = {0, 0};
 	clock_gettime(CLOCK_REALTIME, &tm);
@@ -27,6 +52,8 @@ uint64_t gettime_ns() {
 	clock_gettime(CLOCK_REALTIME, &tm);
 	return tm.tv_nsec + tm.tv_sec*1000*1000*1000 ;
 }
+
+#endif
 
 inline void * mallocDMA(size_t size) {
 #ifdef ESP_PLATFORM

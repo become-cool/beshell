@@ -99,6 +99,409 @@ namespace be::animator {
      * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
      * @return number 缓动后的值
      */
+    /**
+     * 线性(匀速)，等价于 tween.ease("linear", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function linear
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 正弦缓入(加速)，等价于 tween.ease("inSine", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inSine
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 正弦缓出(减速)，等价于 tween.ease("outSine", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outSine
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 正弦缓入缓出，等价于 tween.ease("inOutSine", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutSine
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 二次方缓入(加速)，等价于 tween.ease("inQuad", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inQuad
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 二次方缓出(减速)，等价于 tween.ease("outQuad", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outQuad
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 二次方缓入缓出，等价于 tween.ease("inOutQuad", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutQuad
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 三次方缓入(加速)，等价于 tween.ease("inCubic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inCubic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 三次方缓出(减速)，等价于 tween.ease("outCubic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outCubic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 三次方缓入缓出，等价于 tween.ease("inOutCubic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutCubic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 四次方缓入(加速)，等价于 tween.ease("inQuart", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inQuart
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 四次方缓出(减速)，等价于 tween.ease("outQuart", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outQuart
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 四次方缓入缓出，等价于 tween.ease("inOutQuart", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutQuart
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 五次方缓入(加速)，等价于 tween.ease("inQuint", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inQuint
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 五次方缓出(减速)，等价于 tween.ease("outQuint", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outQuint
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 五次方缓入缓出，等价于 tween.ease("inOutQuint", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutQuint
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 指数缓入(加速)，等价于 tween.ease("inExpo", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inExpo
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 指数缓出(减速)，等价于 tween.ease("outExpo", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outExpo
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 指数缓入缓出，等价于 tween.ease("inOutExpo", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutExpo
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 圆形缓入(加速)，等价于 tween.ease("inCirc", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inCirc
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 圆形缓出(减速)，等价于 tween.ease("outCirc", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outCirc
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 圆形缓入缓出，等价于 tween.ease("inOutCirc", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutCirc
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹跳缓入(加速)，等价于 tween.ease("inBounce", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inBounce
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹跳缓出(减速)，等价于 tween.ease("outBounce", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outBounce
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹跳缓入缓出，等价于 tween.ease("inOutBounce", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutBounce
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 回弹缓入(过冲加速)，等价于 tween.ease("inBack", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inBack
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 回弹缓出(过冲减速)，等价于 tween.ease("outBack", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outBack
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 回弹缓入缓出(过冲)，等价于 tween.ease("inOutBack", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutBack
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹性振荡缓入，等价于 tween.ease("inElastic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inElastic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹性振荡缓出，等价于 tween.ease("outElastic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function outElastic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
+    /**
+     * 弹性振荡缓入缓出，等价于 tween.ease("inOutElastic", ...)
+     *
+     * @module animator
+     * @object tween
+     * @function inOutElastic
+     * @param t:number 当前时间/进度
+     * @param b:number=0 起始值
+     * @param c:number=1 变化量(目标值-起始值)
+     * @param d:number=1 总时长
+     * @param s:number=1.70158 回弹系数(仅 Back/Elastic 有效)
+     * @return number 缓动后的值
+     */
     void Animator::exports(JSContext *ctx) {
 
         JSValue api = JS_NewCFunction(ctx, Animator::apiEase, "apiEase", 6) ;

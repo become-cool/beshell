@@ -9,7 +9,11 @@
 #include "./deps/quickjs/quickjs.h"
 
 #define BESHELL_VERSION "1.0.22"
+#ifdef ESP_PLATFORM
 #define ESPIDF_VERSION IDF_VER
+#else
+#define ESPIDF_VERSION "-"
+#endif
 
 namespace be {
     

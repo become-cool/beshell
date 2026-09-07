@@ -117,7 +117,7 @@ static inline std::string demangle(const std::string &name)
 template <class T>
 std::string readable_typename()
 {
-#ifdef LINUX_PLATFORM
+#ifdef BESHELL_PLATFORM_PC
   return demangle(typeid(T).name());
 #else
   std::string tpname = "unknown" ;

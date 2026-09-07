@@ -102,10 +102,12 @@ extern "C" {
 #define ARGV_TO_INT64(i,var)    ARGV_TO_INT(i, var, int64_t,  int64_t,   JS_ToInt64)
 #define ARGV_TO_DOUBLE(i,var)   ARGV_TO_INT(i, var, double,    double,   JS_ToFloat64)
 
+#ifdef ESP_PLATFORM
 #define ARGV_TO_GPIO(i,var)     ARGV_TO_INT(i, var, gpio_num_t,uint32_t, JS_ToUint32) \
     if(var>=GPIO_NUM_MAX) {                             \
         JSTHROW("Invalid GPIO pin")                     \
     }
+#endif
 
 
 #define ARGV_TO_INT_OPT(i, var, ctype, tmp_type, api, def)  \
@@ -199,6 +201,7 @@ extern "C" {
     }
 
 
+#ifdef ESP_PLATFORM
 #define CALL_IDF_API(func_invoke, excep_msg)\
     {                                       \
         esp_err_t res = func_invoke ;       \
@@ -206,6 +209,7 @@ extern "C" {
             JSTHROW(excep_msg " failed, err: %d", res)   \
         }                                   \
     }
+#endif
 
 
 void printUncatchException(JSContext *ctx) ;
@@ -330,7 +334,9 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define GET_UINT16_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, excp)
 #define GET_UINT32_PROP(obj, propName, cvar, excp)      GET_INTEGER_PROP(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, excp)
 #define GET_BOOL_PROP(obj, propName, cvar, excp)        GET_INT_PROP(obj, propName, cvar, bool, excp)
+#ifdef ESP_PLATFORM
 #define GET_GPIO_PROP(obj, propName, cvar, excp)        GET_INT_PROP(obj, propName, cvar, gpio_num_t, excp)
+#endif
 
 
 
@@ -360,7 +366,9 @@ void nofreeArrayBuffer(JSRuntime *rt, void *opaque, void *ptr) ;
 #define GET_UINT8_PROP_OPT(obj, propName, cvar, default)        GET_INTEGER_PROP_OPT(obj, propName, cvar, uint8_t, uint32_t, JS_ToUint32, default)
 #define GET_UINT16_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint16_t, uint32_t, JS_ToUint32, default)
 #define GET_UINT32_PROP_OPT(obj, propName, cvar, default)       GET_INTEGER_PROP_OPT(obj, propName, cvar, uint32_t, uint32_t, JS_ToUint32, default)
+#ifdef ESP_PLATFORM
 #define GET_GPIO_PROP_OPT(obj, propName, cvar, default)         GET_INT_PROP_OPT(obj, propName, cvar, gpio_num_t, default)
+#endif
 
 
 #define GET_FLOAT_PROP_OPT(obj, propName, cvar, default)                                \

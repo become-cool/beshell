@@ -3,9 +3,15 @@
 #include "BeShell.hpp"
 #include "../module/Process.hpp"
 #include <cassert>
+#include <algorithm>
 #include <string.h>
 #include <sys/stat.h>
+
+// REPL 加密依赖 mbedtls：ESP-IDF 内置；PC 构建如需加密，提供 mbedtls 并定义 BESHELL_REPL_CRYPTO
+#if defined(ESP_PLATFORM) || defined(BESHELL_REPL_CRYPTO)
 #include "mbedtls/aes.h"
+#define BESHELL_REPL_CRYPTO_ENABLED 1
+#endif
 
 #ifdef ESP_PLATFORM
 #include "REPLModule.hpp"
@@ -23,31 +29,39 @@ namespace be {
 #ifdef ESP_PLATFORM
         , channelSeiral(this)
 #endif
-#ifdef LINUX_PLATFORM
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
         , channelStdIO(this)
 #endif
     {
 #ifdef ESP_PLATFORM
         addChannel(&channelSeiral) ;
 #endif
-#ifdef LINUX_PLATFORM
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
         addChannel(&channelStdIO) ;
 #endif
     }
 
     void REPL::setup() {
+#ifdef ESP_PLATFORM
         pkg_queue = xQueueCreate(PKG_QUEUE_LEN, sizeof(Package *));
+#endif
         for(auto ch: channels) {
             ch->setup() ;
         }
     }
 
     void REPL::execPackage(std::unique_ptr<Package> & pkg) {
+#ifdef ESP_PLATFORM
         Package * ptr = pkg.release() ;
         xQueueSend(pkg_queue, &ptr, 0) ;
+#else
+        // PC 单线程模型无通道线程，直接在当前（主循环）上下文分发
+        onReceived(pkg->channle, std::move(pkg)) ;
+#endif
     }
 
     void REPL::defaultREPLDecryptFunc(Package & pkg) {
+#ifdef BESHELL_REPL_CRYPTO_ENABLED
 
         if(!pkg.body_len) {
             return ;
@@ -80,6 +94,7 @@ namespace be {
         mbedtls_aes_free(&aes_ctx);
 
         memcpy(pkg.body(), decrypted_data, datalen) ;
+#endif
     }
 
     void REPL::onReceived(REPLChannel * ch, std::unique_ptr<Package> pkg){
@@ -188,7 +203,7 @@ namespace be {
             return channelBLE ;
         }
 #endif
-#ifdef LINUX_PLATFORM
+#ifdef BESHELL_PLATFORM_PC
         if(strcmp(name,"stdio")==0){
             return & channelStdIO ;
         }
@@ -196,6 +211,7 @@ namespace be {
         return nullptr ;
     }
     void REPL::setBLEChannel(REPLChannel * ch) {
+#ifdef ESP_PLATFORM
         if(channelBLE) {
             removeChannel(channelBLE) ;
         }
@@ -203,6 +219,7 @@ namespace be {
         if(channelBLE) {
             addChannel(channelBLE) ;
         }
+#endif
     }
     void REPL::openFile(REPLChannel * ch, std::unique_ptr<Package> & pkg, bool append) {
         

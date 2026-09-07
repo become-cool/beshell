@@ -69,18 +69,15 @@ namespace be {
 
         inline static NativeModule * fromJSModuleDef(JSModuleDef *) ;
         
-#ifdef ESP_PLATFORM
         void enableNativeEvent(JSContext *ctx, size_t param_size, size_t queue_size=5) ;
         static void nativeEventLoop(JSContext * ctx, NativeModule * opaque) ;
         virtual void onNativeEvent(JSContext *ctx, void * param) ;
         bool emitNativeEvent(void * param) ;
-#endif
     private:
-    
-#ifdef ESP_PLATFORM
+
+        // ESP 上为 FreeRTOS 队列（QueueHandle_t）；PC 平台暂无异步事件源，保持 nullptr（no-op）
         void * nevent_queue = nullptr;
         void * native_param = nullptr ;
-#endif
 
         friend class ModuleLoader ;
     } ;

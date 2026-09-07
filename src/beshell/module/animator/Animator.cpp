@@ -11,6 +11,8 @@ namespace be::animator {
      * - `Timeline` : 关键帧动画时间线类（帧节拍、跨关键帧插值、事件）
      * - `morph()` : 一次性值过渡动画（基于 Timeline 实现）
      *
+     * 缓动函数曲线效果预览：[缓动函数速查表](https://www.xuanfengge.com/easeing/easeing/)
+     *
      * 示例：
      * ```javascript
      * import { tween, Timeline, morph } from "animator"

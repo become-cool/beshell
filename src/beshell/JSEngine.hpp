@@ -7,8 +7,10 @@
 #include "./basic/Console.hpp"
 #include "./fs/FS.hpp"
 
+#ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#endif
 
 namespace be {
     class BeShell ;
@@ -55,7 +57,9 @@ namespace be {
 
         Console * console = nullptr ;
 
+#ifdef ESP_PLATFORM
         SemaphoreHandle_t xSemaphore;
+#endif
         bool inLooping = false ;
 
         uint16_t loopingAssignedId = 0 ;
@@ -104,7 +108,7 @@ namespace be {
         void removeLooping(EngineLoopFunction func) ;
         void removeLooping(ILoopable* obj) ;
 
-        bool take(int timeout=portMAX_DELAY) ;
+        bool take(int timeout=-1) ;
         void give() ;
     } ;
 }

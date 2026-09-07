@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string.h>
 #include "qjs_utils.h"
+#include "platform.hpp"
 
 
 using namespace std ;
@@ -56,12 +57,16 @@ namespace be {
 )" ;
         cout    << "version BeShell: " << BESHELL_VERSION 
                 << "; quickjs: " << CONFIG_QUICKJS_VERSION
+#ifdef ESP_PLATFORM
                 << " ; esp-idf: " << ESPIDF_VERSION 
+#endif
                 << "\r\n" ;
         cout    << "build: " << __DATE__ << " " << __TIME__ << "\r\n" ;
         cout    << "type JavaScript code to run, or 'help' for more information\r\n\r\n" ;
 
+#ifdef ESP_PLATFORM
         vTaskPrioritySet(NULL, 10) ;
+#endif
     }
 
     void BeShell::run() {
@@ -73,6 +78,8 @@ namespace be {
 
 #ifdef ESP_PLATFORM
             vTaskDelay( (lastLoopTime++%10)==0? 0: 1 ) ;
+#else
+            platform::sleepMs(1) ;
 #endif
         }
     }

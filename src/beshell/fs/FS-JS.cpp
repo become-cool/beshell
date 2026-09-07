@@ -141,7 +141,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../deps/littlefs/src/esp_littlefs.h"
+
+#ifdef _WIN32
+#include <io.h>
+#define fileno _fileno
+#define fsync _commit
+#endif
 
 using namespace std ;
 
@@ -953,6 +958,7 @@ namespace be {
         ASSERT_ARGC(1)
         string ARGV_TO_PATH(0, path)
 
+#ifdef ESP_PLATFORM
         if( partitions.count(path) < 1 ){
             JSTHROW("path is not a partition mount point: %s", path.c_str()) ;
         }
@@ -973,6 +979,9 @@ namespace be {
         JS_SetPropertyStr(ctx, obj, "free", JS_NewUint32(ctx, free_));
 
         return obj ;
+#else
+        JSTHROW("fs.usage() is not supported on this platform") ;
+#endif
     }
 
     

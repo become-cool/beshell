@@ -10,7 +10,8 @@
 
 #include "REPLSerial.hpp"
 #endif 
-#ifdef LINUX_PLATFORM
+// WASM 下无标准输入通道，REPLStdIO 不实例化（JS 侧通过 beshell_eval() 桥接）
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
 #include "REPLStdIO.hpp"
 #endif 
 
@@ -31,14 +32,16 @@ namespace be {
         REPLSerial channelSeiral ;
         REPLChannel * channelBLE = nullptr ;
 #endif
-#ifdef LINUX_PLATFORM
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
         REPLStdIO channelStdIO ;
 #endif
 
         std::vector<REPLChannel *> channels ;
 
         uint8_t autoIncreasePkgId = 0 ;
+#ifdef ESP_PLATFORM
         QueueHandle_t pkg_queue;
+#endif
 
         REPLDecryptFunc decryptFunc = nullptr ;
 
@@ -53,6 +56,7 @@ namespace be {
 
         void setup() ;
         inline void loop() {
+#ifdef ESP_PLATFORM
             Package * ptr ;
             std::unique_ptr<Package> pkg ;
             if(xQueueReceive(pkg_queue, (void*)&ptr, 0)){
@@ -60,7 +64,8 @@ namespace be {
                 // dn3(pkg->head.fields.cmd, pkg->body_len, pkg->chunk_len)
                 onReceived(pkg->channle,std::move(pkg)) ;
             }
-#ifdef LINUX_PLATFORM
+#endif
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
             channelStdIO.loop() ;
 #endif
         }
