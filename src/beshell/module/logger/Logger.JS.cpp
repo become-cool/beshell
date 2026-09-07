@@ -1,3 +1,48 @@
+/**
+ * 日志模块：将系统输出捕获并以循环日志形式持久化到 flash 分区
+ *
+ * logger 模块把 `console.log`/`printf`/`write` 等输出自动捕获，写入指定的 flash
+ * 分区（循环覆盖，写满后回绕覆盖最旧数据），设备重启后仍可读取历史日志，
+ * 适用于现场问题追踪与远程诊断。
+ *
+ * ## 使用前准备
+ *
+ * 1. **分区表**：需要一个专用于日志的 data 分区，例如：
+ *    ```csv
+ *    log,  data, nvs, , 0x10000
+ *    ```
+ * 2. **捕获 printf/write 输出**（可选）：在 menuconfig 中启用
+ *    `CONFIG_BESHELL_LOGGER_ENABLE_WRAP`（BeShell Configuration → Logger）。
+ *    启用后通过链接器 `--wrap` 拦截 `write`/`printf`/`vprintf`。
+ *    不启用时仅捕获 BeConsole 协议通道的输出（console.log 产生的 OUTPUT/EXCEPTION 包）。
+ *
+ * ## 特性
+ *
+ * - 异步写入：日志经队列交由独立后台任务写 flash，不阻塞业务逻辑
+ * - 循环覆盖：写满分区后自动回绕，覆盖最旧数据
+ * - 时间戳：每条日志自动添加 `[YYYY-mm-dd HH:MM:SS] ` 前缀（基于开机时间）
+ *
+ * ## 示例
+ *
+ * ```javascript
+ * import * as logger from "logger"
+ *
+ * // 启动日志功能（分区名需与分区表一致）
+ * logger.setup({ partition: "log" })
+ *
+ * console.log("这条输出会被写入日志分区")
+ *
+ * // 主动写入一条日志
+ * logger.write("custom log entry")
+ *
+ * // 读取日志
+ * console.log("日志长度:", logger.length())
+ * logger.tail()   // 在控制台显示最后 20 行
+ * ```
+ *
+ * @module logger
+ */
+
 #include "./Logger.hpp"
 #include "../../BeShell.hpp"
 #include <stdlib.h>  // 为 malloc/free
@@ -47,26 +92,35 @@ namespace be {
         EXPORT_FUNCTION(flush)
         EXPORT_FUNCTION(top)
         EXPORT_FUNCTION(tail)
+        EXPORT_FUNCTION(setWriteOffset)
+        EXPORT_FUNCTION(getWriteOffset)
+        EXPORT_FUNCTION(fill)
     }
 
     /**
      * 启动日志功能
-     * 
-     * 需要传入一个配置对象，指定日志分区名称。成功启动后，所有的 printf 和 write 输出都会被自动捕获并写入到指定的分区中。
-     * 日志会先写入SRAM缓冲区，当缓冲区满时自动刷新到flash分区，可以显著减少flash写入次数，提高性能和flash寿命。
-     * 
+     *
+     * 传入配置对象指定日志分区名称。成功启动后，`printf`/`write` 输出（需启用
+     * `CONFIG_BESHELL_LOGGER_ENABLE_WRAP`）与 `console.log` 输出都会被自动捕获，
+     * 以循环日志形式写入该分区：写满后自动回绕覆盖最旧数据，每条日志自动添加
+     * 时间戳前缀。写入由独立后台任务异步完成，不阻塞业务逻辑。
+     *
+     * 只能启动一次，重复调用直接返回成功（不会重新初始化）。
+     *
      * 配置对象格式：
      * ```js
      * {
-     *     partition: string       // 日志分区名称
-     *     bufferSize: number      // 可选，SRAM缓冲区大小（字节），默认为1024
+     *     partition: string       // 日志分区名称（必需，需与分区表一致）
+     *     bufferSize: number      // 可选，保留参数，当前版本未生效
      * }
      * ```
-     * 
+     *
      * @module logger
      * @function setup
      * @param options:object 配置选项
      * @return undefined
+     * @throws 分区不存在或名称非法
+     * @throws 内存分配失败
      */
     JSValue Logger::setup(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         if (argc < 1) {
@@ -160,10 +214,12 @@ namespace be {
     }
     
     /**
-     * 清空日志数据
-     * 
-     * 清除分区中的所有日志数据，重置写入位置到起始状态。此操作不可逆。
-     * 
+     * 逻辑清空日志数据
+     *
+     * 将写入位置重置到分区起始状态，此后 length() 返回 0、从新位置开始记录。
+     * 旧数据物理上仍留在 flash 中，会被后续写入逐渐覆盖；操作由后台任务异步执行。
+     * 如需物理擦除整个分区，请使用 erase()。
+     *
      * @module logger
      * @function clear
      * @return undefined
@@ -217,7 +273,7 @@ namespace be {
      * @module logger
      * @function read
      * @param start_pos:number=0 读取起始位置（相对于日志数据区）
-     * @param length number=1024 读取长度（字节数）
+     * @param length:number=1024 读取长度（字节数）
      * @return ArrayBuffer 读取到的原始数据
      */
     JSValue Logger::read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -290,7 +346,7 @@ namespace be {
      * @module logger
      * @function write
      * @param data:string|ArrayBuffer 要写入的数据
-     * @param timestampPrefix boolean=true 是否添加时间戳前缀
+     * @param timestampPrefix:boolean=true 是否添加时间戳前缀
      * @return number 实际写入的字节数
      */
     JSValue Logger::write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -383,10 +439,10 @@ namespace be {
     
     /**
      * 将缓冲区中的数据立即写入到flash分区
-     * 
-     * 调用此函数将强制把当前缓冲区中的所有数据写入到flash分区中，无论缓冲区是否已满。
-     * 这在需要确保日志立即持久化的情况下非常有用，如在关键操作前后或系统即将重启时。
-     * 
+     *
+     * 当前版本的日志写入由后台任务自动完成，此函数为占位接口（调用后立即返回，
+     * 不执行实际操作），保留供将来使用。
+     *
      * @module logger
      * @function flush
      * @return number 实际写入的字节数
@@ -396,11 +452,12 @@ namespace be {
         return JS_NewInt32(ctx, written);
     }
     /**
-     * 清除日志分区中的所有数据
-     * 
-     * 调用此函数将清除日志分区中的所有数据，并重置写入位置到起始状态。
-     * 注意，此操作不可逆，所有日志数据将被永久删除。
-     * 
+     * 物理擦除日志分区
+     *
+     * 擦除整个日志分区（整片 flash 擦除，耗时较长、会消耗 flash 寿命），
+     * 并将写入位置重置到起始状态。此操作不可逆，所有日志数据将被永久删除。
+     * 操作由后台任务异步执行。如只需逻辑清空（不擦除 flash），请使用 clear()。
+     *
      * @module logger
      * @function erase
      * @return undefined
@@ -443,7 +500,7 @@ namespace be {
      * @module logger
      * @function top
      * @param page:number=0 页码（从0开始）
-     * @param linesPerPage number=20 每页显示的行数
+     * @param linesPerPage:number=20 每页显示的行数
      * @return undefined
      */
     JSValue Logger::top(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -581,7 +638,7 @@ namespace be {
      * @module logger
      * @function tail
      * @param page:number=0 页码（从0开始，0表示最后一页）
-     * @param linesPerPage number=20 每页显示的行数
+     * @param linesPerPage:number=20 每页显示的行数
      * @return undefined
      */
     JSValue Logger::tail(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
@@ -743,20 +800,25 @@ namespace be {
 
     
     /**
-     * 设置日志分区的写入偏移位置
-     * 
-     * 设置日志数据在分区中的写入位置偏移。这可以用于从指定位置开始写入日志数据。
-     * 注意：不当的偏移设置可能会覆盖现有的日志数据或破坏日志格式。
-     * 
+     * 设置日志分区的写入偏移位置（危险调试接口）
+     *
+     * **⚠️ 警告：此函数直接改写元数据中的写入偏移，不移动、不校验任何实际日志数据，
+     * 属危险调试接口，仅供开发调试/测试使用。**
+     *
+     * 不当的偏移设置会破坏日志结构：
+     * - 偏移指向已有数据中间时，后续写入会从中间覆盖有效日志
+     * - 偏移大于实际数据长度时，read()/top()/tail() 会读到未写入的脏数据
+     * - 日志发生回绕后偏移语义更加复杂，随意修改将导致读取混乱
+     *
      * 使用示例：
      * ```js
      * // 设置写入偏移到1024字节位置
      * logger.setWriteOffset(1024);
-     * 
-     * // 从头开始写入
+     *
+     * // 从头开始写入（等效于逻辑清空）
      * logger.setWriteOffset(0);
      * ```
-     * 
+     *
      * @module logger
      * @function setWriteOffset
      * @param offset:number 写入偏移位置（字节数）
