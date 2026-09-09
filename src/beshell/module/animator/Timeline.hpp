@@ -4,6 +4,8 @@
 #include "../../JSEngine.hpp"
 #include "Tween.hpp"
 #include <string>
+#include <map>
+#include <set>
 
 namespace be::animator {
 
@@ -46,6 +48,9 @@ namespace be::animator {
         size_t cursor = 0 ;                 // 求值段缓存
         double lastValue = 0 ;              // 上次实际写入目标的值
         bool hasValue = false ;             // 是否已写入过（首帧必写入）
+        double originValue = 0 ;            // 轨道创建时捕获的目标原值（ensureOrigin 用；
+                                            // 创建时即捕获而非首个 >0 帧关键帧时读当前值，
+                                            // 防止 playAt 预览改写当前值后污染 0 帧原点）
 
         Track(JSContext * ctx) : ctx(ctx) {}
         ~Track() ;
@@ -59,7 +64,7 @@ namespace be::animator {
         // 移除指定帧的关键帧，返回是否移除成功
         bool removeKeyframeAt(uint32_t frame) ;
         // 首次向 frame>0 插入关键帧前调用：若尚无 0 帧关键帧，
-        // 以目标当前值自动捕获一个 0 帧关键帧（防止首次突变，使孤立关键帧可插补）
+        // 以创建时捕获的 originValue 补一个 0 帧关键帧（防止首次突变，使孤立关键帧可插补）
         void ensureOrigin() ;
         // 读取目标当前值
         double readCurrentValue() ;
@@ -78,11 +83,18 @@ namespace be::animator {
     } ;
 
     // 时间线，由 BeShell 主循环驱动，提供严格等间隔的帧节拍
+    // 支持区间播放与倒放：play(fromFrame, toFrame)，toFrame<fromFrame 时倒放
     // 继承 EventEmitter，事件（均携带帧序号参数）：
     //   "frame"  每帧属性更新后触发（无论值是否变化）
     //   "change" 仅在有轨道值实际变更的帧触发（先于 "frame"）；
     //            轨道值未变化的帧跳过属性写入（不触发 JS setter 副作用）
     //   "stop"/"pause" 停止/暂停时触发
+    //   "arrive:<帧号>" 播放头到达/途经指定帧时触发（含 jumpTo 落点；起始帧不触发）
+    //
+    // 帧动作（set/add 的 options 参数设置）：
+    //   jumpTo   到达该帧时立即跳转到目标帧（当 tick 链式触发目标帧动作）
+    //   playTo   到达该帧时改向目标帧播放（支持倒放），到达后恢复原方向与终点
+    //   动作带触发次数：每次触发 -1，0 不再触发，-1 不限次数（不递减）；play() 时恢复初始值
     class Timeline: public be::EventEmitter, public be::ILoopable {
         DECLARE_NCLASS_META
         static std::vector<JSCFunctionListEntry> methods ;
@@ -95,13 +107,30 @@ namespace be::animator {
             PAUSED  = 2,
         } State ;
 
-        // 事件类型（与 JS 事件名一一对应：frame/change/stop/pause）
+        // 事件类型（与 JS 事件名一一对应：frame/change/stop/pause/arrive:<帧号>）
         typedef enum {
             EVENT_FRAME = 0,    // 每帧属性更新后
             EVENT_CHANGE,       // 有轨道值实际变更的帧
             EVENT_STOP,         // 停止（手动 stop 与播完自动停止）
             EVENT_PAUSE,        // 暂停
+            EVENT_ARRIVE,       // 到达/途经监听帧（配合 watchArrive 或 JS "arrive:<帧号>"）
         } EventType ;
+
+        // 帧动作：播放头到达某帧时的跳转/改向（次数每次触发 -1，0 不触发，-1 不限且不递减）
+        typedef struct {
+            int64_t jumpTo = -1 ;           // 目标帧，<0 = 无
+            int jumpCount = 0 ;             // 剩余触发次数
+            int jumpCountInit = 0 ;         // 初始次数（play() 时恢复）
+            int64_t playTo = -1 ;
+            int playCount = 0 ;
+            int playCountInit = 0 ;
+        } FrameAction ;
+
+        // setFrameAction 的字段更新掩码
+        typedef enum {
+            ACTION_JUMP = 1,                // 更新 jumpTo/jumpCount
+            ACTION_PLAY = 2,                // 更新 playTo/playCount
+        } ActionMask ;
 
         // C++ 事件回调：frame 为当前帧序号（stop 时为 0）
         typedef void (*EventCallback)(Timeline * tl, EventType event, uint32_t frame, void * opaque) ;
@@ -114,8 +143,21 @@ namespace be::animator {
         bool repeat = false ;               // true: 播完总帧数后重新计数，不自动停止
 
         uint64_t next_frame_us = 0 ;        // 下一帧截止时刻
-        uint32_t frame = 0 ;                // 已播放帧数
+        uint32_t frame = 0 ;                // 当前帧号
         State state = STOPPED ;
+
+        uint32_t cursorFrame = 0 ;          // 游标帧号（evalAt() 缺省求值帧，供编辑器等 scrub 场景使用）
+
+        // 播放会话状态（play() 时确定）
+        uint32_t fromFrame = 0 ;            // 起始帧
+        uint32_t endFrame = 0 ;             // 终点帧（UINT32_MAX = 不限）
+        int dir = 1 ;                       // 播放方向：+1 顺放 / -1 倒放
+        bool playToActive = false ;         // playTo 改向进行中
+        uint32_t savedEnd = 0 ;             // playTo 进入前的终点（到达后恢复）
+        int savedDir = 1 ;                  // playTo 进入前的方向（到达后恢复）
+
+        std::map<uint32_t, FrameAction> frameActions ;  // 帧动作表（帧号 -> jumpTo/playTo）
+        std::set<uint32_t> arriveFrames ;               // arrive 事件监听帧集合（JS "arrive:<帧号>" 与 C++ watchArrive 共用）
 
         std::shared_ptr<NativeClass> loopRef = nullptr ;    // 在 loop 期间的自引用（C++ 侧引用计数+1）
         JSValue loopObjRef = JS_UNDEFINED ;                 // 在 loop 期间对 jsobj 的强引用（JS_DupValue），
@@ -187,6 +229,8 @@ namespace be::animator {
         void unset(uint32_t frame) ;
         void unset(uint32_t frame, JSValue obj, const char * prop) ;
         void unset(uint32_t frame, void * cptr) ;
+        // 移除某 C 变量的整条轨道（全部关键帧）
+        void unset(void * cptr) ;
 
         /**
          * C++ 侧事件订阅（与 JS 侧 tl.on("frame", cb) 同名同语义，重载签名区分两侧）
@@ -210,20 +254,40 @@ namespace be::animator {
         bool getRepeat() const { return repeat ; }
         const std::vector<Track*> & allTracks() const { return tracks ; }
 
+        // 游标帧号（evalAt 缺省求值帧，纯记录，不影响播放）
+        uint32_t getCursor() const { return cursorFrame ; }
+        void setCursor(uint32_t frame) { cursorFrame = frame ; }
+
         // 播放控制（JS 同名方法转调；stop 内最后才 leaveLoop——可能析构本对象）
-        void play() ;
+        // play(from, to)：从 from 播到 to；to<0 时播到 totalFrames（0=不限）；to<from 时倒放
+        void play(uint32_t from=0, int64_t to=-1) ;
         void stop() ;
         void pause() ;
         void resume() ;
+
+        // 游标预览：把各轨道在指定帧的插补值写入目标（不推进播放、不改播放状态），
+        // 并把游标移动到该帧；有实际变更时触发 change 事件（不触发 frame/arrive/帧动作）。
+        // 轨道关键帧与 0 帧原点（创建时捕获）均不受其影响，供编辑器等 scrub 场景使用
+        void playAt(uint32_t frame) ;
+
+        // 设置帧动作（mask 选择更新哪些字段；次数每次触发 -1，0 不触发，-1 不限）
+        void setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount) ;
+        // C++ 侧 arrive 事件监听帧登记/注销（与 JS "arrive:<帧号>" 共用帧集合，配合 on(EVENT_ARRIVE) 使用）
+        void watchArrive(uint32_t frame) ;
+        void unwatchArrive(uint32_t frame) ;
 
         static JSValue constructor(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue play(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue stop(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue pause(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue resume(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue playAt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue nextFrame(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue set(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue add(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
         static JSValue unset(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue evalAt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) ;
+        static JSValue getCursor(JSContext *ctx, JSValueConst this_val) ;
+        static JSValue setCursor(JSContext *ctx, JSValueConst this_val, JSValueConst val) ;
     } ;
 }

@@ -162,7 +162,7 @@ namespace be {
         take() ;
 
         inLooping = true ;
-        
+
         for(struct Looping& looping : lstLoopings) {
             if(looping.priorityCount) {
                 looping.priorityCount -- ;

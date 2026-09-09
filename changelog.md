@@ -1,3 +1,17 @@
+# 1.0.24
+
+## New Feature:
+
+* Timeline 播放控制增强：`play(fromFrame, toFrame)` 支持区间播放与倒放（toFrame<fromFrame）；帧级动作 `jumpTo`/`playTo`（set/add 的 options 参数，含触发次数，每次触发 -1、0 不再触发、-1 不限且不递减，`play()` 时恢复初始值；playTo 支持倒放，到达后恢复原方向与终点）；新增 `arrive:<帧号>` 到达事件（on/off 机制）与 C++ 侧 `watchArrive`/`unwatchArrive`/`EVENT_ARRIVE`
+* Timeline 新增游标：`cursor` 属性（游标帧号）与 `evalAt(frame?)` 方法，只计算不写入地返回各轨道在指定帧（缺省游标帧）上的插补值 `[{obj, prop, value}, ...]`；`playAt(frame)` 游标预览——写入各轨道该帧插补值、移动游标、有变更时触发 change（不推进播放状态、不影响关键帧），供编辑器等 scrub 场景使用；新增 C++ 侧 `unset(void * cptr)` 整轨删除
+* Track 原点值改为轨道创建时捕获（`ensureOrigin` 不再读目标当前值），防止 playAt 预览改写当前值后污染后续新建关键帧的 0 帧原点
+* 新增 PC 平台移植：`pc/` 独立 CMake 工程（不经由 ESP-IDF 构建），核心框架（JS 引擎、模块系统、REPL、fs、process、NVS(stub)、animator 等）可编译运行于 Windows(MinGW)/Linux/macOS；REPL 新增 StdIO 通道（Windows 支持控制台与管道输入）；WASM(Emscripten) 构建分支已就绪（待验证）
+* PC 工程注册 animator 模块，新增 PC 侧 animator 单元测试脚本 `pc/fs/tests/animator.js`（tween/Timeline 求值/游标/播放控制/事件，37 项断言）
+
+## Refact:
+
+* 平台相关代码整理：新增 `be::platform` 抽象（`sleepMs()/uptimeMs()`）；ESP 专属代码（FreeRTOS 信号量/事件队列、IDF API、mbedtls REPL 加密等）统一以 `ESP_PLATFORM`/`BESHELL_PLATFORM_PC` 守卫隔离，ESP 平台功能与行为不变；quickjs 增加 `_WIN32` 兼容补丁（详见 quickjs-modify.md）
+
 # 1.0.23 2026/9/6
 
 ## New Feature:

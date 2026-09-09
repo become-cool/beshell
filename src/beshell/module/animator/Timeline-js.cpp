@@ -1,18 +1,36 @@
 #include "Timeline.hpp"
 #include "../../qjs_utils.h"
+#include <cstring>
 
 namespace be::animator {
 
-    std::vector<JSCFunctionListEntry> Timeline::methods = {
-        JS_CFUNC_DEF("play", 0, Timeline::play),
-        JS_CFUNC_DEF("stop", 0, Timeline::stop),
-        JS_CFUNC_DEF("pause", 0, Timeline::pause),
-        JS_CFUNC_DEF("resume", 0, Timeline::resume),
-        JS_CFUNC_DEF("nextFrame", 0, Timeline::nextFrame),
-        JS_CFUNC_DEF("set", 0, Timeline::set),
-        JS_CFUNC_DEF("add", 0, Timeline::add),
-        JS_CFUNC_DEF("unset", 0, Timeline::unset),
-    } ;
+    // MinGW GCC 6.3 对含 union 的 JSCFunctionListEntry 聚合初始化会 ICE（reshape_init_class），
+    // cursor 的 getset 条目改为运行时逐字段赋值后 push_back
+    static std::vector<JSCFunctionListEntry> buildMethods() {
+        std::vector<JSCFunctionListEntry> m = {
+            JS_CFUNC_DEF("play", 0, Timeline::play),
+            JS_CFUNC_DEF("stop", 0, Timeline::stop),
+            JS_CFUNC_DEF("pause", 0, Timeline::pause),
+            JS_CFUNC_DEF("resume", 0, Timeline::resume),
+            JS_CFUNC_DEF("playAt", 0, Timeline::playAt),
+            JS_CFUNC_DEF("nextFrame", 0, Timeline::nextFrame),
+            JS_CFUNC_DEF("set", 0, Timeline::set),
+            JS_CFUNC_DEF("add", 0, Timeline::add),
+            JS_CFUNC_DEF("unset", 0, Timeline::unset),
+            JS_CFUNC_DEF("evalAt", 0, Timeline::evalAt),
+        } ;
+        JSCFunctionListEntry e ;
+        memset(&e, 0, sizeof(e)) ;
+        e.name = "cursor" ;
+        e.prop_flags = JS_PROP_CONFIGURABLE ;
+        e.def_type = JS_DEF_CGETSET ;
+        e.u.getset.get.getter = Timeline::getCursor ;
+        e.u.getset.set.setter = Timeline::setCursor ;
+        m.push_back(e) ;
+        return m ;
+    }
+
+    std::vector<JSCFunctionListEntry> Timeline::methods = buildMethods() ;
 
     // 解析 easeName/easeParams：ease 省略时返回 TWEEN_EASE_UNKNOWN（表示"未提供"）
     static bool parseEase(JSContext *ctx, JSValueConst jsEase, JSValueConst jsParams, tween::TweenEaseType & ease, double & easeS) {
@@ -102,15 +120,72 @@ namespace be::animator {
         return ret ;
     }
 
+    // 解析帧动作 options：{ jumpTo, jumpCount, playTo, playCount }
+    // 未提供的字段不更新；提供了 jumpTo/playTo 而未提供次数时缺省 1；负数 = 不限次数
+    // 出错返回 -1（已抛出异常），否则返回更新掩码（0 = 无有效字段）
+    static int parseFrameAction(JSContext *ctx, JSValueConst jsOpt, uint32_t frame, Timeline * that) {
+        if(!JS_IsObject(jsOpt) || JS_IsArray(ctx, jsOpt)) {
+            return 0 ;
+        }
+        int64_t jumpTo = -1, playTo = -1 ;
+        int jumpCount = 1, playCount = 1 ;
+        uint8_t mask = 0 ;
+        JSValue jv ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "jumpTo") ;
+        if(JS_IsNumber(jv)) {
+            if(JS_ToInt64(ctx, &jumpTo, jv)!=0 || jumpTo<0) {
+                JS_FreeValue(ctx, jv) ;
+                JS_ThrowReferenceError(ctx, "jumpTo must be a frame number >= 0") ;
+                return -1 ;
+            }
+            mask |= Timeline::ACTION_JUMP ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "jumpCount") ;
+        if(JS_IsNumber(jv)) {
+            int32_t c = 1 ;
+            JS_ToInt32(ctx, &c, jv) ;
+            jumpCount = c ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "playTo") ;
+        if(JS_IsNumber(jv)) {
+            if(JS_ToInt64(ctx, &playTo, jv)!=0 || playTo<0) {
+                JS_FreeValue(ctx, jv) ;
+                JS_ThrowReferenceError(ctx, "playTo must be a frame number >= 0") ;
+                return -1 ;
+            }
+            mask |= Timeline::ACTION_PLAY ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "playCount") ;
+        if(JS_IsNumber(jv)) {
+            int32_t c = 1 ;
+            JS_ToInt32(ctx, &c, jv) ;
+            playCount = c ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        if(mask) {
+            that->setFrameAction(frame, mask, jumpTo, jumpCount, playTo, playCount) ;
+        }
+        return 0 ;
+    }
+
     /**
      * set/add 关键帧，支持三种输入形式：
-     *   ① 单属性：set(frm, obj, prop, value [, easeName [, easeParams]])
-     *   ② 属性表：set(frm, obj, {prop1: value, prop2: [value, easeName, easeParams], ...})
+     *   ① 单属性：set(frm, obj, prop, value [, easeName [, easeParams [, options]]])
+     *   ② 属性表：set(frm, obj, {prop1: value, prop2: [value, easeName, easeParams], ...} [, options])
      *   ③ 多对象：set(frm, [obj1, {prop表}, obj2, {prop表}, ...])
      *
      * set 为替换语义（同帧同属性覆盖，ease 省略重置为 linear），
      * add 为合并语义（同帧同属性值累加，ease 省略保留原设置）。
      * ease 设在目标关键帧上，表示如何到达该值。
+     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount }，未提供的字段保持原设置。
      */
     static JSValue setAddCommon(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, bool merge) {
         THIS_NCLASS(Timeline, that)
@@ -122,7 +197,7 @@ namespace be::animator {
 
         int ret = 0 ;
         if(JS_IsArray(ctx, argv[1])) {
-            // 形式③ 多对象：[obj, propMap, obj, propMap, ...]
+            // 形式③ 多对象：[obj, propMap, obj, propMap, ...]（不支持 options）
             uint32_t len = 0 ;
             JSValue jslen = JS_GetPropertyStr(ctx, argv[1], "length") ;
             JS_ToUint32(ctx, &len, jslen) ;
@@ -153,10 +228,16 @@ namespace be::animator {
                     , argc>5 ? argv[5] : JS_UNDEFINED
                     , merge) ;
                 JS_FreeCString(ctx, prop) ;
+                if(ret==0 && argc>6) {
+                    ret = parseFrameAction(ctx, argv[6], (uint32_t)frame, that) ;
+                }
             }
             else if(argc>2 && JS_IsObject(argv[2]) && !JS_IsArray(ctx, argv[2])) {
                 // 形式② 属性表
                 ret = handlePropMap(ctx, that, (uint32_t)frame, argv[1], argv[2], merge) ;
+                if(ret==0 && argc>3) {
+                    ret = parseFrameAction(ctx, argv[3], (uint32_t)frame, that) ;
+                }
             }
             else {
                 JSTHROW("invalid arguments")
@@ -197,17 +278,38 @@ namespace be::animator {
     }
 
     /**
-     * 从 stopped 态开始播放：帧计数归零，加入主循环，帧数达到总帧数时自动停止
-     * （repeat=true 时重新计数继续播放）。播放期间对象被主循环持有，
-     * JS 侧丢失引用也会播完才销毁（fire-and-forget）
+     * 从 stopped 态开始播放：恢复全部帧动作次数，加入主循环。
+     * 播放期间对象被主循环持有，JS 侧丢失引用也会播完才销毁（fire-and-forget）
+     *
+     * ```javascript
+     * tl.play()           // 从第 0 帧播到总帧数
+     * tl.play(30)         // 从第 30 帧播到总帧数
+     * tl.play(90, 0)      // 从第 90 帧倒放到第 0 帧（toFrame < fromFrame）
+     * ```
      *
      * @module animator
      * @class Timeline
      * @method play
+     * @param fromFrame:number=0 起始帧
+     * @param toFrame:number= 终点帧（缺省为总帧数，0=不限；小于 fromFrame 时倒放）
      */
     JSValue Timeline::play(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         THIS_NCLASS(Timeline, that)
-        that->play() ;
+        int64_t from = 0 ;
+        int64_t to = -1 ;
+        if(argc>0 && JS_IsNumber(argv[0])) {
+            JS_ToInt64(ctx, &from, argv[0]) ;
+            if(from<0) {
+                JSTHROW("fromFrame must be >= 0")
+            }
+        }
+        if(argc>1 && JS_IsNumber(argv[1])) {
+            JS_ToInt64(ctx, &to, argv[1]) ;
+            if(to<0) {
+                JSTHROW("toFrame must be >= 0")
+            }
+        }
+        that->play((uint32_t)from, to) ;
         return JS_UNDEFINED ;
     }
 
@@ -253,6 +355,33 @@ namespace be::animator {
     }
 
     /**
+     * 游标预览：把各轨道在指定帧的插补值写入目标（不推进播放、不改变播放状态）
+     *
+     * 同时把游标（cursor）移动到该帧；有轨道值实际变更时触发 change 事件
+     * （不触发 frame/arrive 事件与帧动作）。轨道上的关键帧与 0 帧原点均不受影响，
+     * 供编辑器等 scrub（拖动进度条）场景实时预览：
+     * ```javascript
+     * tl.playAt(45)       // 预览第 45 帧
+     * ```
+     *
+     * @module animator
+     * @class Timeline
+     * @method playAt
+     * @param frame:number 预览帧号
+     * @fires change 有轨道值实际变更时触发
+     */
+    JSValue Timeline::playAt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Timeline, that)
+        CHECK_ARGC(1) ;
+        uint32_t frame = 0 ;
+        if(JS_ToUint32(ctx, &frame, argv[0])!=0) {
+            JSTHROW("frame must be a frame number >= 0")
+        }
+        that->playAt(frame) ;
+        return JS_UNDEFINED ;
+    }
+
+    /**
      * 等待下一帧：返回 Promise，在下一个帧 tick 时以当前帧序号解决
      *
      * 配合 await 实现帧率受控、严格等间隔的动画循环：
@@ -293,8 +422,12 @@ namespace be::animator {
      * tl.set(30, obj, { x: 100, y: [200, "inOutBounce"] })
      * // 多对象
      * tl.set(30, [obj1, {x: 100}, obj2, {y: 50}])
+     * // 帧动作：到达第 90 帧时跳回第 0 帧（3 次）
+     * tl.set(90, obj, { x: 0 }, { jumpTo: 0, jumpCount: 3 })
      * ```
      * 缓动设在目标关键帧上，表示"如何到达该值"。
+     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount }，仅单属性/属性表形式可用；
+     * 未提供的字段保持原设置，次数缺省 1，负数 = 不限次数，play() 时恢复初始值。
      *
      * @module animator
      * @class Timeline
@@ -305,6 +438,7 @@ namespace be::animator {
      * @param value:number 目标值（单属性形式）
      * @param ease:string="linear" 缓动类型名称（同 tween 函数名）
      * @param easeS:number=1.70158 缓动参数（仅 Back/Elastic 有效）
+     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount }
      */
     JSValue Timeline::set(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return setAddCommon(ctx, this_val, argc, argv, false) ;
@@ -324,6 +458,7 @@ namespace be::animator {
      * @param value:number 累加值（单属性形式）
      * @param ease:string 缓动类型名称（省略时保留原设置）
      * @param easeS:number 缓动参数
+     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount }
      */
     JSValue Timeline::add(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return setAddCommon(ctx, this_val, argc, argv, true) ;
@@ -333,7 +468,7 @@ namespace be::animator {
      * 移除关键帧
      *
      * ```javascript
-     * tl.unset(frm)              // 移除该帧上的全部对象属性（该帧失去关键帧地位）
+     * tl.unset(frm)              // 移除该帧上的全部对象属性（该帧失去关键帧地位），并删除该帧的 jumpTo/playTo 动作
      * tl.unset(frm, obj, "x")    // 仅移除该帧上的某个对象属性
      * ```
      * 轨道变空时销毁并释放 JS 对象引用。
@@ -363,5 +498,76 @@ namespace be::animator {
             that->unset((uint32_t)frame) ;
         }
         return JS_UNDEFINED ;
+    }
+
+    /**
+     * 游标帧号
+     *
+     * 纯记录的帧号标记（不影响播放），作为 evalAt() 的缺省求值帧，
+     * 供编辑器等 scrub（拖动进度条）场景使用：
+     * ```javascript
+     * tl.cursor = 45
+     * const values = tl.evalAt()      // 求值第 45 帧
+     * ```
+     *
+     * @module animator
+     * @class Timeline
+     * @property cursor:number 游标帧号（默认 0）
+     */
+    JSValue Timeline::getCursor(JSContext *ctx, JSValueConst this_val) {
+        THIS_NCLASS(Timeline, that)
+        return JS_NewUint32(ctx, that->getCursor()) ;
+    }
+
+    JSValue Timeline::setCursor(JSContext *ctx, JSValueConst this_val, JSValueConst val) {
+        THIS_NCLASS(Timeline, that)
+        uint32_t frame = 0 ;
+        if(JS_ToUint32(ctx, &frame, val)!=0) {
+            JSTHROW("cursor must be a frame number >= 0")
+        }
+        that->setCursor(frame) ;
+        return JS_UNDEFINED ;
+    }
+
+    /**
+     * 计算各轨道在指定帧（缺省为游标帧）上的插补值
+     *
+     * 只计算不写目标，返回与轨道一一对应的数组：
+     * ```javascript
+     * const values = tl.evalAt(45)
+     * // => [ { obj, prop: "x", value: 50 }, ... ]
+     * ```
+     * JS 属性轨道的条目含 obj（目标对象）与 prop（属性名）；
+     * C 指针轨道无 prop 字段，obj 为创建轨道时的守卫对象（可能无 obj 字段）。
+     *
+     * @module animator
+     * @class Timeline
+     * @method evalAt
+     * @param frame:number= 求值帧号，缺省为 cursor（游标帧号）
+     * @return array 各轨道的计算值 [{ obj?, prop?, value }, ...]
+     */
+    JSValue Timeline::evalAt(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+        THIS_NCLASS(Timeline, that)
+        uint32_t frame = that->getCursor() ;
+        if(argc>0 && !JS_IsUndefined(argv[0])) {
+            if(JS_ToUint32(ctx, &frame, argv[0])!=0) {
+                JSTHROW("frame must be a frame number >= 0")
+            }
+        }
+        JSValue arr = JS_NewArray(ctx) ;
+        uint32_t i = 0 ;
+        for(auto track : that->allTracks()) {
+            JSValue entry = JS_NewObject(ctx) ;
+            if(track->type==Track::JS_PROP) {
+                JS_SetPropertyStr(ctx, entry, "obj", JS_DupValue(ctx, track->obj)) ;
+                JS_SetPropertyStr(ctx, entry, "prop", JS_NewString(ctx, track->prop.c_str())) ;
+            }
+            else if(!JS_IsUndefined(track->obj)) {
+                JS_SetPropertyStr(ctx, entry, "obj", JS_DupValue(ctx, track->obj)) ;  // 守卫对象
+            }
+            JS_SetPropertyStr(ctx, entry, "value", JS_NewFloat64(ctx, track->eval(frame))) ;
+            JS_SetPropertyUint32(ctx, arr, i++, entry) ;
+        }
+        return arr ;
     }
 }

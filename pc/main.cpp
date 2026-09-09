@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <beshell/BeShell.hpp>
 #include <beshell/fs/FS.hpp>
+#include <beshell/module/animator/Animator.hpp>
 
 #ifdef BESHELL_PLATFORM_PC_WASM
 #include <emscripten.h>
@@ -57,6 +58,9 @@ int main(int argc, char * argv[]) {
 
     // 启用 FS 模块（PC 侧经由标准 C 文件 API 访问本地文件）
     beshell.use<FS>() ;
+
+    // 启用 animator 模块（Timeline/Tween，无硬件依赖，可供 PC 侧测试与开发）
+    beshell.use<animator::Animator>() ;
 
     // PC 上使用本地目录作为 VFS 根："/xxx" 映射到 "./fs/xxx"
     FS::setPrefix("./fs") ;

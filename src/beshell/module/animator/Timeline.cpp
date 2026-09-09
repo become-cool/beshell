@@ -1,6 +1,8 @@
 #include "Timeline.hpp"
 #include "../../qjs_utils.h"
 #include <algorithm>
+#include <cstdio>
+#include <cstdlib>
 
 namespace be::animator {
 
@@ -28,6 +30,26 @@ namespace be::animator {
      * tl.play()
      * ```
      *
+     * ## 区间播放与倒放
+     *
+     * `play(fromFrame, toFrame)` 从指定帧播到指定帧，`toFrame < fromFrame` 时倒放：
+     * ```javascript
+     * tl.play(90, 0)      // 倒放
+     * tl.play(30)         // 从第 30 帧播到总帧数
+     * ```
+     *
+     * ## 帧动作 jumpTo / playTo
+     *
+     * set/add 的 options 参数可为帧设置动作，播放头到达该帧时触发：
+     * ```javascript
+     * // 到达第 90 帧时跳回第 0 帧（最多触发 3 次）
+     * tl.set(90, obj, { x: 0 }, { jumpTo: 0, jumpCount: 3 })
+     * // 到达第 60 帧时倒放到第 30 帧，到达后恢复原方向继续播放
+     * tl.set(60, obj, { x: 50 }, { playTo: 30, playCount: -1 })   // 次数 -1 = 不限
+     * ```
+     * 次数每次触发 -1，0 不再触发，-1 不限（不递减）；每次 play() 恢复为初始值。
+     * jumpTo 为当 tick 立即传送（目标帧动作可链式触发），playTo 为改向播放（支持倒放）。
+     *
      * 继承自 [EventEmitter](../event-emitter.html)，提供 `on()`/`off()` 等事件监听方法。
      *
      * ## 事件
@@ -38,6 +60,7 @@ namespace be::animator {
      * | change | frame:number 当前帧序号 | 仅在有属性值实际变更的帧触发（先于 frame 事件） |
      * | stop | frame:number 固定为 0 | 停止时触发（手动 stop() 与播完自动停止均触发） |
      * | pause | frame:number 当前帧序号 | 暂停时触发 |
+     * | arrive:<帧号> | frame:number 当前帧序号 | 播放头到达/途经指定帧时触发（含 jumpTo 落点；起始帧不触发） |
      *
      * @module animator
      * @class Timeline
@@ -51,6 +74,12 @@ namespace be::animator {
         else if(strcmp(eventName, "change")==0) {
             changeListening = true ;
         }
+        else if(strncmp(eventName, "arrive:", 7)==0) {
+            long f = atol(eventName+7) ;
+            if(f>=0) {
+                arriveFrames.insert((uint32_t)f) ;
+            }
+        }
     }
 
     void Timeline::eventRemoved(const char * eventName) {
@@ -59,6 +88,12 @@ namespace be::animator {
         }
         else if(strcmp(eventName, "change")==0) {
             changeListening = false ;
+        }
+        else if(strncmp(eventName, "arrive:", 7)==0) {
+            long f = atol(eventName+7) ;
+            if(f>=0) {
+                arriveFrames.erase((uint32_t)f) ;
+            }
         }
     }
 
@@ -109,7 +144,8 @@ namespace be::animator {
 
     void Track::ensureOrigin() {
         if(keyframes.empty() || keyframes.front().frame>0) {
-            addKeyframe(0, readCurrentValue(), tween::TWEEN_LINEAR, 1.70158, false) ;
+            // 用创建时捕获的 originValue（而非读当前值——playAt 预览可能已改写当前值）
+            addKeyframe(0, originValue, tween::TWEEN_LINEAR, 1.70158, false) ;
         }
     }
 
@@ -273,6 +309,7 @@ namespace be::animator {
         if(JS_IsObject(guard)) {
             track->obj = JS_DupValue(ctx, guard) ;    // 守卫对象 引用计数+1
         }
+        track->originValue = track->readCurrentValue() ;    // 创建时捕获原值（防 playAt 预览污染）
         tracks.push_back(track) ;
         return track ;
     }
@@ -287,6 +324,7 @@ namespace be::animator {
             track->type = Track::JS_PROP ;
             track->obj = JS_DupValue(ctx, obj) ;    // 目标对象 引用计数+1
             track->prop = prop ;
+            track->originValue = track->readCurrentValue() ;  // 创建时捕获原值
             tracks.push_back(track) ;
         }
         if(frame>0) {
@@ -305,6 +343,7 @@ namespace be::animator {
             track->type = Track::JS_PROP ;
             track->obj = JS_DupValue(ctx, obj) ;
             track->prop = prop ;
+            track->originValue = track->readCurrentValue() ;  // 创建时捕获原值
             tracks.push_back(track) ;
         }
         if(frame>0) {
@@ -333,6 +372,7 @@ namespace be::animator {
     TIMELINE_DEF_PTR_SET_ADD(double,  Track::C_DOUBLE)
 
     void Timeline::unset(uint32_t frame) {
+        frameActions.erase(frame) ;     // 连同删除该帧的 jumpTo/playTo 动作
         // 倒序遍历，删除空轨道
         for(size_t i=tracks.size(); i>0; i--) {
             Track * track = tracks[i-1] ;
@@ -367,6 +407,17 @@ namespace be::animator {
                     delete track ;
                     tracks.erase(tracks.begin()+i-1) ;
                 }
+                return ;
+            }
+        }
+    }
+
+    void Timeline::unset(void * cptr) {
+        for(size_t i=tracks.size(); i>0; i--) {
+            Track * track = tracks[i-1] ;
+            if(track->match(cptr)) {
+                delete track ;
+                tracks.erase(tracks.begin()+i-1) ;
                 return ;
             }
         }
@@ -446,21 +497,72 @@ namespace be::animator {
             case EVENT_PAUSE:
                 emitSync("pause") ;
                 break ;
+            case EVENT_ARRIVE: {
+                char name[24] ;
+                snprintf(name, sizeof(name), "arrive:%u", (unsigned)frame) ;
+                emitSyncFree(name, {JS_NewUint32(ctx, frame)}) ;
+                break ;
+            }
+        }
+    }
+
+    void Timeline::watchArrive(uint32_t frame) {
+        arriveFrames.insert(frame) ;
+    }
+
+    void Timeline::unwatchArrive(uint32_t frame) {
+        arriveFrames.erase(frame) ;
+    }
+
+    // 设置帧动作：mask 选择更新哪些字段，未提供的字段保持原设置；
+    // 次数同时写入当前值与初始值（play() 时以初始值恢复）；两个动作均无效时删除该帧条目
+    void Timeline::setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount) {
+        FrameAction act ;
+        auto it = frameActions.find(frame) ;
+        if(it!=frameActions.end()) {
+            act = it->second ;
+        }
+        if(mask & ACTION_JUMP) {
+            act.jumpTo = jumpTo ;
+            act.jumpCountInit = act.jumpCount = jumpCount ;
+        }
+        if(mask & ACTION_PLAY) {
+            act.playTo = playTo ;
+            act.playCountInit = act.playCount = playCount ;
+        }
+        if(act.jumpTo<0 && act.playTo<0) {
+            frameActions.erase(frame) ;
+        } else {
+            frameActions[frame] = act ;
         }
     }
 
     // ---------- 播放控制（JS 同名方法转调） ----------
 
-    void Timeline::play() {
+    void Timeline::play(uint32_t from, int64_t to) {
         if(state!=STOPPED) {
             return ;
         }
-        frame = 0 ;
+        // 恢复全部帧动作的触发次数
+        for(auto & kv : frameActions) {
+            kv.second.jumpCount = kv.second.jumpCountInit ;
+            kv.second.playCount = kv.second.playCountInit ;
+        }
+        playToActive = false ;
+        fromFrame = from ;
+        if(to<0) {
+            dir = 1 ;
+            endFrame = totalFrames>0 ? (uint32_t)totalFrames : UINT32_MAX ;
+        } else {
+            dir = ((uint64_t)to>=(uint64_t)from) ? 1 : -1 ;
+            endFrame = (uint32_t)to ;
+        }
+        frame = from ;
         state = PLAYING ;
         enterLoop() ;
-        // 应用 0 帧值（原始值/首关键帧），有实际变更时触发 change（帧号 0）
-        if(applyTracks(0) && (changeListening || hasCppChange)) {
-            emitEvent(EVENT_CHANGE, 0) ;
+        // 应用起始帧值（原始值/首关键帧），有实际变更时触发 change（起始帧不触发 arrive/帧动作）
+        if(applyTracks(frame) && (changeListening || hasCppChange)) {
+            emitEvent(EVENT_CHANGE, frame) ;
         }
     }
 
@@ -499,6 +601,14 @@ namespace be::animator {
         enterLoop() ;
     }
 
+    // 游标预览：写入各轨道在该帧的插补值，有实际变更时触发 change（不推进播放状态）
+    void Timeline::playAt(uint32_t f) {
+        cursorFrame = f ;
+        if(applyTracks(f) && (changeListening || hasCppChange)) {
+            emitEvent(EVENT_CHANGE, f) ;
+        }
+    }
+
     // 加入 BeShell 主循环，并增加自身引用计数（C++ 侧 loopRef + JS 侧 loopObjRef 配对）
     void Timeline::enterLoop() {
         next_frame_us = gettime_us() + interval_us ;
@@ -521,6 +631,8 @@ namespace be::animator {
     }
 
     // 帧 tick：严格等间隔节拍，每轮 loop 最多推进一帧（不补帧）
+    // 推进顺序：按 dir 推进一帧 → 插值应用与事件 → 帧动作（jumpTo 当 tick 链式传送，
+    // playTo 改向）→ nextFrame Promise → 终点判定（repeat 回绕 / stop）
     void Timeline::loop(JSContext * ctx) {
         if(state!=PLAYING) {
             return ;
@@ -530,24 +642,70 @@ namespace be::animator {
             return ;
         }
 
-        frame++ ;
+        frame += dir ;
         next_frame_us += interval_us ;
         if(next_frame_us <= now) {
             // 严重滞后（loop 被长时间阻塞），重置节拍，不突发连发
             next_frame_us = now + interval_us ;
         }
 
-        // 关键帧插补：计算并应用本帧全部轨道值（值未变化的轨道跳过写入）
-        bool changed = applyTracks(frame) ;
+        // 应用当前帧并检查帧动作；jumpTo 传送后在同一 tick 内对目标帧链式重复该过程
+        int chainDepth = 0 ;
+        while(true) {
+            // 关键帧插补：计算并应用本帧全部轨道值（值未变化的轨道跳过写入）
+            bool changed = applyTracks(frame) ;
 
-        // change 事件（仅在有轨道值实际变更的帧触发；先于 frame 事件；C++ 订阅先于 JS 监听）
-        if(changed && (changeListening || hasCppChange)) {
-            emitEvent(EVENT_CHANGE, frame) ;
-        }
+            // change 事件（仅在有轨道值实际变更的帧触发；先于 frame 事件；C++ 订阅先于 JS 监听）
+            if(changed && (changeListening || hasCppChange)) {
+                emitEvent(EVENT_CHANGE, frame) ;
+            }
 
-        // frame 事件（在属性值更新之后触发；无监听时跳过，避免每帧空转）
-        if(frameListening || hasCppFrame) {
-            emitEvent(EVENT_FRAME, frame) ;
+            // frame 事件（在属性值更新之后触发；无监听时跳过，避免每帧空转）
+            if(frameListening || hasCppFrame) {
+                emitEvent(EVENT_FRAME, frame) ;
+            }
+
+            // arrive 事件（播放头到达/途经监听帧时触发，含 jumpTo 落点）
+            if(!arriveFrames.empty() && arriveFrames.count(frame)) {
+                emitEvent(EVENT_ARRIVE, frame) ;
+            }
+
+            // 事件回调中可能 stop()，此后不得再访问成员
+            if(state!=PLAYING) {
+                return ;
+            }
+
+            // 帧动作（find 需在事件之后：回调中可能 set/unset 改动帧动作表）
+            auto it = frameActions.find(frame) ;
+            if(it==frameActions.end()) {
+                break ;
+            }
+            FrameAction & act = it->second ;
+            if(act.jumpTo>=0 && act.jumpCount!=0) {
+                if(act.jumpCount>0) {
+                    act.jumpCount-- ;       // -1 不限次数，不递减避免向下溢出
+                }
+                frame = (uint32_t)act.jumpTo ;
+                if(++chainDepth>64) {
+                    printf("Timeline: jumpTo chain too deep, stopped\n") ;
+                    stop() ;                // stop 后 this 可能已析构，禁止再访问成员
+                    return ;
+                }
+                continue ;                  // 链式触发目标帧的 arrive/帧动作
+            }
+            if(act.playTo>=0 && act.playCount!=0 && act.playTo!=(int64_t)frame) {
+                if(act.playCount>0) {
+                    act.playCount-- ;
+                }
+                if(!playToActive) {
+                    savedDir = dir ;        // 记录进入前方向与终点，到达后恢复
+                    savedEnd = endFrame ;
+                }
+                dir = act.playTo>(int64_t)frame ? 1 : -1 ;
+                endFrame = (uint32_t)act.playTo ;
+                playToActive = true ;
+            }
+            break ;
         }
 
         // 解决等待本帧的 Promise（resolve 当前帧序号，同样在属性值更新之后）
@@ -567,10 +725,18 @@ namespace be::animator {
         }
         JS_FreeValue(ctx, (JSValue)argv[0]) ;
 
-        // 达到总帧数（"frame"/"change" 事件回调中可能已改变 state，需重新确认仍在播放）
-        if(state==PLAYING && totalFrames>0 && frame>=totalFrames) {
+        // playTo 到达目标帧：恢复原方向与终点，继续顺序播放
+        if(playToActive && frame==endFrame) {
+            playToActive = false ;
+            dir = savedDir ;
+            endFrame = savedEnd ;
+        }
+
+        // 达到终点（"frame"/"change" 事件回调中可能已改变 state，需重新确认仍在播放）
+        if(state==PLAYING && !playToActive && endFrame!=UINT32_MAX
+            && (dir>0 ? frame>=endFrame : frame<=endFrame)) {
             if(repeat) {
-                frame = 0 ;
+                frame = fromFrame ;
             } else {
                 // 与手动 stop() 同路径；stop() 后 this 可能已析构，禁止再访问成员
                 stop() ;

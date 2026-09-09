@@ -8,7 +8,7 @@
 #include "./driver/DriverModule.hpp"
 #include "./deps/quickjs/quickjs.h"
 
-#define BESHELL_VERSION "1.0.22"
+#define BESHELL_VERSION "1.0.24"
 #ifdef ESP_PLATFORM
 #define ESPIDF_VERSION IDF_VER
 #else
