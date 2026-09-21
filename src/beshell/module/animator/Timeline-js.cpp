@@ -120,7 +120,7 @@ namespace be::animator {
         return ret ;
     }
 
-    // 解析帧动作 options：{ jumpTo, jumpCount, playTo, playCount }
+    // 解析帧动作 options：{ jumpTo, jumpCount, playTo, playCount, stop, resume, label }
     // 未提供的字段不更新；提供了 jumpTo/playTo 而未提供次数时缺省 1；负数 = 不限次数
     // 出错返回 -1（已抛出异常），否则返回更新掩码（0 = 无有效字段）
     static int parseFrameAction(JSContext *ctx, JSValueConst jsOpt, uint32_t frame, Timeline * that) {
@@ -129,6 +129,9 @@ namespace be::animator {
         }
         int64_t jumpTo = -1, playTo = -1 ;
         int jumpCount = 1, playCount = 1 ;
+        bool stop = false ;
+        bool resume = false ;
+        std::string label ;
         uint8_t mask = 0 ;
         JSValue jv ;
 
@@ -170,8 +173,33 @@ namespace be::animator {
         }
         JS_FreeValue(ctx, jv) ;
 
+        jv = JS_GetPropertyStr(ctx, jsOpt, "stop") ;
+        if(JS_IsBool(jv)) {
+            stop = JS_ToBool(ctx, jv) != 0 ;
+            mask |= Timeline::ACTION_STOP ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "resume") ;
+        if(JS_IsBool(jv)) {
+            resume = JS_ToBool(ctx, jv) != 0 ;
+            mask |= Timeline::ACTION_RESUME ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
+        jv = JS_GetPropertyStr(ctx, jsOpt, "label") ;
+        if(JS_IsString(jv)) {
+            const char * s = JS_ToCString(ctx, jv) ;
+            if(s) {
+                label = s ;
+                JS_FreeCString(ctx, s) ;
+            }
+            mask |= Timeline::ACTION_LABEL ;
+        }
+        JS_FreeValue(ctx, jv) ;
+
         if(mask) {
-            that->setFrameAction(frame, mask, jumpTo, jumpCount, playTo, playCount) ;
+            that->setFrameAction(frame, mask, jumpTo, jumpCount, playTo, playCount, stop, resume, label.c_str()) ;
         }
         return 0 ;
     }
@@ -185,7 +213,7 @@ namespace be::animator {
      * set 为替换语义（同帧同属性覆盖，ease 省略重置为 linear），
      * add 为合并语义（同帧同属性值累加，ease 省略保留原设置）。
      * ease 设在目标关键帧上，表示如何到达该值。
-     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount }，未提供的字段保持原设置。
+     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount, stop, resume, label }，未提供的字段保持原设置。
      */
     static JSValue setAddCommon(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, bool merge) {
         THIS_NCLASS(Timeline, that)
@@ -426,7 +454,7 @@ namespace be::animator {
      * tl.set(90, obj, { x: 0 }, { jumpTo: 0, jumpCount: 3 })
      * ```
      * 缓动设在目标关键帧上，表示"如何到达该值"。
-     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount }，仅单属性/属性表形式可用；
+     * options 为帧动作：{ jumpTo, jumpCount, playTo, playCount, stop, resume, label }，仅单属性/属性表形式可用；
      * 未提供的字段保持原设置，次数缺省 1，负数 = 不限次数，play() 时恢复初始值。
      *
      * @module animator
@@ -438,7 +466,7 @@ namespace be::animator {
      * @param value:number 目标值（单属性形式）
      * @param ease:string="linear" 缓动类型名称（同 tween 函数名）
      * @param easeS:number=1.70158 缓动参数（仅 Back/Elastic 有效）
-     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount }
+     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount, stop, resume, label }
      */
     JSValue Timeline::set(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return setAddCommon(ctx, this_val, argc, argv, false) ;
@@ -458,7 +486,7 @@ namespace be::animator {
      * @param value:number 累加值（单属性形式）
      * @param ease:string 缓动类型名称（省略时保留原设置）
      * @param easeS:number 缓动参数
-     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount }
+     * @param options:object= 帧动作 { jumpTo, jumpCount, playTo, playCount, stop, resume, label }
      */
     JSValue Timeline::add(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
         return setAddCommon(ctx, this_val, argc, argv, true) ;

@@ -144,4 +144,56 @@ JS 侧不会创建 Worker 线程，`Atomics.*` / `SharedArrayBuffer` 无使用�
 
 ---
 
-## 4. （后续修改记录在此追加）
+## 4. quickjs-libc.c: `atomic_add_int` 改用 `_Atomic(uint32_t *)` 强转
+
+### 位置
+
+`deps/quickjs/quickjs-libc.c` 约 L3029（`atomic_add_int` 函数）。
+
+### 修改内容
+
+原代码（`#ifndef __STDC_NO_ATOMICS__` 两分支，分别对非原子的 `uint32_t *` 做
+`atomic_fetch_add`）：
+
+```c
+static int atomic_add_int(int *ptr, int v)
+{
+#ifndef __STDC_NO_ATOMICS__
+    return atomic_fetch_add((_Atomic(uint32_t) *)ptr, v) + v;
+#else
+    /* fallback when stdatomic.h is unavailable */
+    ...
+#endif
+}
+```
+
+修改为（与上游 QuickJS 2025-09-13 参考实现一致）：
+
+```c
+static int atomic_add_int(int *ptr, int v)
+{
+    return atomic_fetch_add((_Atomic(uint32_t) *)ptr, v) + v;
+}
+```
+
+### 原因
+
+Emscripten 4.0.9（clang 21）严格校验 C11 `_Atomic` 类型：`atomic_fetch_add` 的第一个参数
+必须是「指向 `_Atomic` 类型的指针」。旧实现把 `int *` 隐式/显式强转成非原子的
+`uint32_t *`，编译报错：
+
+```
+error: address argument to atomic operation must be a pointer to _Atomic type
+```
+
+改为显式 `_Atomic(uint32_t) *` 强转后通过编译。该函数仅用于 SharedArrayBuffer /
+Worker 引用计数，BeShell PC/WASM 均为单线程事件循环、不启用 Worker，运行时无实际影响。
+
+### 还原方法
+
+无需还原——本函数即为上游较新版本的原样实现；升级 QuickJS 时直接采用上游
+`atomic_add_int` 即可覆盖此修改。
+
+---
+
+## 5. （后续修改记录在此追加）

@@ -60,6 +60,12 @@ cmake --build build-wasm
 node build-wasm/beshell-wasm.js
 ```
 
+> **binaryen 版本失配（conda-forge 打包缺陷）**：conda 的 `emscripten` 4.0.9
+> 依赖约束为 `binaryen >=117,<118`，但 emcc 4.0.9 实际需要 binaryen 123（旧 117 在
+> 链接期 `wasm-opt` 会因不识别 `--no-stack-ir` / `--enable-call-indirect-overlong`
+> 而失败）。临时解法：从镜像手动下载 binaryen 121 的 `.conda` 包解压到本地目录，
+> 构建时设置环境变量 `BINARYEN=/path/to/binaryen121/Library` 覆盖默认路径。
+
 ## 运行说明
 
 ### PC 本机
@@ -77,7 +83,10 @@ beshell-pc [脚本路径]
 ### WASM
 
 - `main.js` 在构建时通过 `--preload-file` 打包进 MEMFS 根（`/`），启动时自动执行。
-- 无 stdin 控制台，REPLStdIO 不参与实例化；JS 侧通过导出的 C 接口执行代码：
+- 无 stdin 控制台，REPLStdIO 不参与实例化；JS 侧通过导出的 C 接口执行代码。
+- **已注册模块**（`main.cpp` 中 `beshell.use<...>()`）：`fs`、`nvs`、`animator`，以及
+  内建 `loader`/`process`/`repl`/`sleep`。`import animator` / `import nvs` 均可用
+  （`nvs` 在 PC/WASM 侧为存根，读/写返回 `false`/`null`）：
 
 ```javascript
 // 浏览器 console 或 Node 中
@@ -85,6 +94,28 @@ Module.ccall('beshell_eval', null, ['string'], ['console.log(1+1)'])
 ```
 
 - C 侧 `printf`/`std::cout` 输出由 Emscripten 自动映射到 `console.log`。
+
+### 网页测试页
+
+`pc/web/index.html` 是一个终端风格的浏览器 REPL 测试页，加载 `build-wasm/` 产物后在
+页面上输入 JS 表达式，由 WASM 里的 QuickJS 引擎执行并回显结果/异常：
+
+```bash
+# 把 WASM 产物拷贝到 web/ 目录（index.html 与 beshell-wasm.js 同目录引用）
+cp build-wasm/beshell-wasm.js build-wasm/beshell-wasm.wasm build-wasm/beshell-wasm.data web/
+
+# 起一个静态服务器（file:// 协议下 Emscripten 无法加载 .wasm/.data）
+cd web && python -m http.server 8123
+# 浏览器打开 http://127.0.0.1:8123/index.html
+```
+
+页面通过 `createBeShell({ print, printErr, onRuntimeInitialized })` 工厂函数（由
+`-sMODULARIZE=1 -sEXPORT_NAME=createBeShell` 生成）实例化模块，把 WASM 的 stdout/stderr
+转发到输出区，再经 `ccall('beshell_eval', ...)` 执行输入框中的代码。
+
+`beshell_eval` 与原生 REPL 走同一条路径（`Cammonds::input`）：先匹配 shell 命令
+（`ls`/`cd`/`pwd`/`help` 等），否则作为 JS 求值；输出经一个 WASM 专用 `REPLChannel`
+（`WasmChannel`，见 `main.cpp`）转发到 stdout。
 
 ## 构建配置细节
 
@@ -114,6 +145,7 @@ pc/
 ├── CMakeLists.txt        # 构建脚本
 ├── main.cpp              # 入口：PC 交互式 REPL / WASM emscripten 主循环
 ├── fs/main.js            # 冒烟测试脚本（banner、Promise、setTimeout 验证）
+├── web/index.html        # 浏览器 REPL 测试页（加载 build-wasm 产物）
 ├── doc/
 │   ├── build.md          # 本文档
 │   └── pc-port-audit.md  # 移植审计报告（源码排除清单、宏体系设计）

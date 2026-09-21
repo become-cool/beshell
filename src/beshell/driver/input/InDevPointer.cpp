@@ -5,7 +5,7 @@ using namespace std ;
 
     namespace be::driver::input {
 
-    DEFINE_NCLASS_META(InDevPointer, EventEmitter)
+    DEFINE_NCLASS_META(InDevPointer, DriverClass)
     
     std::vector<JSCFunctionListEntry> InDevPointer::methods = {
         JS_CFUNC_DEF("setup", 0, InDevPointer::setup),
@@ -19,7 +19,7 @@ using namespace std ;
     } ;
 
     InDevPointer::InDevPointer(JSContext * ctx, JSValue jsobj, uint8_t psize)
-        : EventEmitter(ctx,jsobj)
+        : DriverClass(ctx,jsobj)
     {
         if(psize>INDEVPOINTER_MAX_NUM) {
             psize = INDEVPOINTER_MAX_NUM ;

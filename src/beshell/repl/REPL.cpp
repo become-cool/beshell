@@ -203,7 +203,7 @@ namespace be {
             return channelBLE ;
         }
 #endif
-#ifdef BESHELL_PLATFORM_PC
+#if defined(BESHELL_PLATFORM_PC) && !defined(BESHELL_PLATFORM_PC_WASM)
         if(strcmp(name,"stdio")==0){
             return & channelStdIO ;
         }

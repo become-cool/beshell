@@ -38,17 +38,20 @@ namespace be::animator {
      * tl.play(30)         // 从第 30 帧播到总帧数
      * ```
      *
-     * ## 帧动作 jumpTo / playTo
+     * ## 帧动作 jumpTo / playTo / stop
      *
      * set/add 的 options 参数可为帧设置动作，播放头到达该帧时触发：
      * ```javascript
      * // 到达第 90 帧时跳回第 0 帧（最多触发 3 次）
      * tl.set(90, obj, { x: 0 }, { jumpTo: 0, jumpCount: 3 })
-     * // 到达第 60 帧时倒放到第 30 帧，到达后恢复原方向继续播放
+     * // 到达第 60 帧时倒放到第 30 帧，到达后停止（resume: true 则恢复原方向与终点继续播放）
      * tl.set(60, obj, { x: 50 }, { playTo: 30, playCount: -1 })   // 次数 -1 = 不限
+     * // 到达第 60 帧时停止播放；label 为帧标记名
+     * tl.set(60, obj, { x: 50 }, { stop: true, label: "end" })
      * ```
      * 次数每次触发 -1，0 不再触发，-1 不限（不递减）；每次 play() 恢复为初始值。
      * jumpTo 为当 tick 立即传送（目标帧动作可链式触发），playTo 为改向播放（支持倒放）。
+     * stop 优先于 jumpTo/playTo；playTo 途中途经 jumpTo 帧时放弃 playTo 目标、恢复原方向与终点。
      *
      * 继承自 [EventEmitter](../event-emitter.html)，提供 `on()`/`off()` 等事件监听方法。
      *
@@ -249,12 +252,14 @@ namespace be::animator {
 
     // ---------- Timeline ----------
 
-    Timeline::Timeline(JSContext * ctx, JSValue _jsobj, double _fps, uint64_t frames, bool _repeat)
+    Timeline::Timeline(JSContext * ctx, JSValue _jsobj, double _fps, uint64_t frames, bool _repeat, int64_t _repeatCount)
         : EventEmitter(ctx, build(ctx, _jsobj))
         , fps(_fps)
         , interval_us((uint64_t)(1000000.0/_fps))
         , totalFrames(frames)
         , repeat(_repeat)
+        , repeatCount(_repeatCount)
+        , repeatCountInit(_repeatCount)
     {
         if(interval_us<1) {
             interval_us = 1 ;
@@ -515,8 +520,8 @@ namespace be::animator {
     }
 
     // 设置帧动作：mask 选择更新哪些字段，未提供的字段保持原设置；
-    // 次数同时写入当前值与初始值（play() 时以初始值恢复）；两个动作均无效时删除该帧条目
-    void Timeline::setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount) {
+    // 次数同时写入当前值与初始值（play() 时以初始值恢复）；全部动作均无效时删除该帧条目
+    void Timeline::setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount, bool stop, bool resume, const char * label) {
         FrameAction act ;
         auto it = frameActions.find(frame) ;
         if(it!=frameActions.end()) {
@@ -530,7 +535,16 @@ namespace be::animator {
             act.playTo = playTo ;
             act.playCountInit = act.playCount = playCount ;
         }
-        if(act.jumpTo<0 && act.playTo<0) {
+        if(mask & ACTION_STOP) {
+            act.stop = stop ;
+        }
+        if(mask & ACTION_RESUME) {
+            act.resume = resume ;
+        }
+        if(mask & ACTION_LABEL) {
+            act.label = label ? label : "" ;
+        }
+        if(act.jumpTo<0 && act.playTo<0 && !act.stop && !act.resume && act.label.empty()) {
             frameActions.erase(frame) ;
         } else {
             frameActions[frame] = act ;
@@ -548,7 +562,9 @@ namespace be::animator {
             kv.second.jumpCount = kv.second.jumpCountInit ;
             kv.second.playCount = kv.second.playCountInit ;
         }
+        repeatCount = repeatCountInit ;      // 恢复有限重播次数
         playToActive = false ;
+        playToResume = false ;
         fromFrame = from ;
         if(to<0) {
             dir = 1 ;
@@ -681,9 +697,19 @@ namespace be::animator {
                 break ;
             }
             FrameAction & act = it->second ;
+            if(act.stop) {
+                stop() ;                // 到达本帧即停止；stop 后 this 可能已析构，禁止再访问成员
+                return ;
+            }
             if(act.jumpTo>=0 && act.jumpCount!=0) {
                 if(act.jumpCount>0) {
                     act.jumpCount-- ;       // -1 不限次数，不递减避免向下溢出
+                }
+                if(playToActive) {          // 中途遇到跳转：放弃 playTo 目标，恢复原方向/终点
+                    playToActive = false ;
+                    playToResume = false ;
+                    dir = savedDir ;
+                    endFrame = savedEnd ;
                 }
                 frame = (uint32_t)act.jumpTo ;
                 if(++chainDepth>64) {
@@ -704,6 +730,7 @@ namespace be::animator {
                 dir = act.playTo>(int64_t)frame ? 1 : -1 ;
                 endFrame = (uint32_t)act.playTo ;
                 playToActive = true ;
+                playToResume = act.resume ;   // 到达后是否继续（否则停止）
             }
             break ;
         }
@@ -725,17 +752,26 @@ namespace be::animator {
         }
         JS_FreeValue(ctx, (JSValue)argv[0]) ;
 
-        // playTo 到达目标帧：恢复原方向与终点，继续顺序播放
+        // playTo 到达目标帧：勾选「然后继续」则恢复原方向/终点继续，否则停止
         if(playToActive && frame==endFrame) {
-            playToActive = false ;
-            dir = savedDir ;
-            endFrame = savedEnd ;
+            if(playToResume) {
+                playToActive = false ;
+                playToResume = false ;
+                dir = savedDir ;
+                endFrame = savedEnd ;
+            } else {
+                stop() ;            // stop 后 this 可能已析构，禁止再访问成员
+                return ;
+            }
         }
 
         // 达到终点（"frame"/"change" 事件回调中可能已改变 state，需重新确认仍在播放）
         if(state==PLAYING && !playToActive && endFrame!=UINT32_MAX
             && (dir>0 ? frame>=endFrame : frame<=endFrame)) {
-            if(repeat) {
+            if(repeat && repeatCount!=0) {
+                if(repeatCount>0) {
+                    repeatCount-- ;         // 额外重播次数 -1（-1=无限，不递减）
+                }
                 frame = fromFrame ;
             } else {
                 // 与手动 stop() 同路径；stop() 后 this 可能已析构，禁止再访问成员

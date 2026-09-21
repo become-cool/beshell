@@ -1,3 +1,8 @@
 # CMake 构建产物目录（build/、build-*/ 等）
 build/
 build-*/
+
+# web/ 下的 WASM 产物拷贝（从 build-wasm/ 拷入，见 doc/build.md）
+web/beshell-wasm.js
+web/beshell-wasm.wasm
+web/beshell-wasm.data

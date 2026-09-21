@@ -124,12 +124,18 @@ namespace be::animator {
             int64_t playTo = -1 ;
             int playCount = 0 ;
             int playCountInit = 0 ;
+            bool stop = false ;             // 到达本帧即停止播放（优先于 jump/play）
+            bool resume = false ;           // playTo 到达后继续原顺序播放（否则停止）
+            std::string label ;             // 帧标记名（空 = 无）
         } FrameAction ;
 
         // setFrameAction 的字段更新掩码
         typedef enum {
             ACTION_JUMP = 1,                // 更新 jumpTo/jumpCount
             ACTION_PLAY = 2,                // 更新 playTo/playCount
+            ACTION_STOP = 4,                // 更新 stop
+            ACTION_LABEL = 8,               // 更新 label
+            ACTION_RESUME = 16,             // 更新 resume
         } ActionMask ;
 
         // C++ 事件回调：frame 为当前帧序号（stop 时为 0）
@@ -141,6 +147,8 @@ namespace be::animator {
         uint64_t totalFrames = 0 ;          // 总帧数，0 = 不限（播放到 stop()）
                                             // set/add 的 frame 超过总帧数时自动扩展为该帧号（不收缩）
         bool repeat = false ;               // true: 播完总帧数后重新计数，不自动停止
+        int64_t repeatCount = -1 ;          // 额外重播次数（-1=无限；0=只播一次）；每次回绕 -1
+        int64_t repeatCountInit = -1 ;      // play() 时恢复的初始重播次数
 
         uint64_t next_frame_us = 0 ;        // 下一帧截止时刻
         uint32_t frame = 0 ;                // 当前帧号
@@ -153,6 +161,7 @@ namespace be::animator {
         uint32_t endFrame = 0 ;             // 终点帧（UINT32_MAX = 不限）
         int dir = 1 ;                       // 播放方向：+1 顺放 / -1 倒放
         bool playToActive = false ;         // playTo 改向进行中
+        bool playToResume = false ;         // playTo 到达后是否继续原顺序播放（否则停止）
         uint32_t savedEnd = 0 ;             // playTo 进入前的终点（到达后恢复）
         int savedDir = 1 ;                  // playTo 进入前的方向（到达后恢复）
 
@@ -194,7 +203,7 @@ namespace be::animator {
         Track * findOrCreatePtrTrack(void * cptr, Track::TargetType type, JSValue guard) ;
 
     public:
-        Timeline(JSContext * ctx, JSValue _jsobj=JS_NULL, double fps=60, uint64_t frames=0, bool repeat=false) ;
+        Timeline(JSContext * ctx, JSValue _jsobj=JS_NULL, double fps=60, uint64_t frames=0, bool repeat=false, int64_t repeatCount=-1) ;
         ~Timeline() ;
 
         // ILoopable，帧 tick
@@ -252,7 +261,10 @@ namespace be::animator {
         double getFps() const { return fps ; }
         uint64_t getTotalFrames() const { return totalFrames ; }
         bool getRepeat() const { return repeat ; }
+        int64_t getRepeatCount() const { return repeatCountInit ; }
         const std::vector<Track*> & allTracks() const { return tracks ; }
+        // 帧动作表（帧号 -> 帧动作），供导出/序列化场景枚举
+        const std::map<uint32_t, FrameAction> & getFrameActions() const { return frameActions ; }
 
         // 游标帧号（evalAt 缺省求值帧，纯记录，不影响播放）
         uint32_t getCursor() const { return cursorFrame ; }
@@ -271,7 +283,7 @@ namespace be::animator {
         void playAt(uint32_t frame) ;
 
         // 设置帧动作（mask 选择更新哪些字段；次数每次触发 -1，0 不触发，-1 不限）
-        void setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount) ;
+        void setFrameAction(uint32_t frame, uint8_t mask, int64_t jumpTo, int jumpCount, int64_t playTo, int playCount, bool stop, bool resume, const char * label) ;
         // C++ 侧 arrive 事件监听帧登记/注销（与 JS "arrive:<帧号>" 共用帧集合，配合 on(EVENT_ARRIVE) 使用）
         void watchArrive(uint32_t frame) ;
         void unwatchArrive(uint32_t frame) ;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../EventEmitter.hpp"
+#include "../DriverClass.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/ringbuf.h"
@@ -15,7 +15,7 @@ namespace be::driver::input {
         int16_t y[INDEVPOINTER_MAX_NUM] = {0} ;
     } PointsData ;
 
-    class InDevPointer: public be::EventEmitter {
+    class InDevPointer: public be::driver::DriverClass {
         DECLARE_NCLASS_META
     private:
         static std::vector<JSCFunctionListEntry> methods ;

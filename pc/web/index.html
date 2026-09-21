@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BeShell WASM 测试</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #161a24;
+    --border: #262c3b;
+    --text: #d7dbe6;
+    --dim: #6b7280;
+    --accent: #4ea1ff;
+    --ok: #3ecf8e;
+    --err: #ff6b6b;
+    --mono: "Cascadia Code", "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .3px; }
+  header .sub { font-size: 12px; color: var(--dim); }
+  #status {
+    margin-left: auto;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  #status.ready { color: var(--ok); border-color: var(--ok); }
+  #status.error { color: var(--err); border-color: var(--err); }
+  #output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  #output .line { margin: 0; }
+  #output .out   { color: var(--text); }
+  #output .err   { color: var(--err); }
+  #output .info  { color: var(--dim); }
+  #output .ok    { color: var(--ok); }
+  #output .in    { color: var(--accent); }
+  .snippets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .snippets button {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .snippets button:hover { background: #1f2635; }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .input-row .prompt { color: var(--accent); font-weight: 600; }
+  #code {
+    flex: 1;
+    background: #0b0e14;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    outline: none;
+  }
+  #code:focus { border-color: var(--accent); }
+  #run {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f1117;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+  }
+  #run:disabled { opacity: .4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>BeShell WASM</h1>
+    <span class="sub">QuickJS · ES2020 · 浏览器内运行 JavaScript</span>
+    <span id="status">加载中…</span>
+  </header>
+
+  <div id="output"></div>
+
+  <div class="snippets">
+    <button data-code="help">help</button>
+    <button data-code="ls -l">ls -l</button>
+    <button data-code="pwd">pwd</button>
+    <button data-code="1+1">1+1</button>
+    <button data-code="'hello '.toUpperCase() + 'BeShell'">字符串</button>
+    <button data-code="JSON.stringify({a:1,b:[2,3]})">对象</button>
+    <button data-code="console.log('hello from console.log')">console.log</button>
+    <button data-code="setTimeout(()=>console.log('timer fired'),500)">setTimeout</button>
+    <button data-code="Promise.resolve(42).then(v=>console.log('promise ->',v))">Promise</button>
+    <button data-code="Array.from({length:5},(_,i)=>i*i)">Array.from</button>
+    <button data-code="throw new Error('boom')">抛异常</button>
+    <button data-code="process.platform">process.platform</button>
+  </div>
+
+  <div class="input-row">
+    <span class="prompt">›</span>
+    <input id="code" type="text" autocomplete="off" spellcheck="false"
+           placeholder="输入 JavaScript 表达式，回车执行（Shift+Enter 换行）" />
+    <button id="run" disabled>运行</button>
+  </div>
+
+  <script src="beshell-wasm.js"></script>
+
+  <script>
+    (function () {
+      var outEl = document.getElementById('output');
+      var statusEl = document.getElementById('status');
+      var codeEl = document.getElementById('code');
+      var runBtn = document.getElementById('run');
+      var Module = null;
+      var history = [];
+      var historyIdx = -1;
+
+      function write(text, cls) {
+        var line = document.createElement('div');
+        line.className = 'line ' + (cls || 'out');
+        line.textContent = text;
+        outEl.appendChild(line);
+        outEl.scrollTop = outEl.scrollHeight;
+      }
+
+      function setStatus(text, cls) {
+        statusEl.textContent = text;
+        statusEl.className = cls || '';
+      }
+
+      function run(code) {
+        code = (code || '').trim();
+        if (!code) return;
+        write('› ' + code, 'in');
+        if (history[history.length - 1] !== code) history.push(code);
+        historyIdx = history.length;
+        try {
+          Module.ccall('beshell_eval', null, ['string'], [code]);
+        } catch (e) {
+          write('调用失败: ' + e, 'err');
+        }
+      }
+
+      function enable() {
+        runBtn.disabled = false;
+        codeEl.disabled = false;
+        codeEl.focus();
+        setStatus('就绪', 'ready');
+      }
+
+      // 启动：加载 WASM 模块（main() 会自动执行 /main.js 冒烟脚本）
+      createBeShell({
+        print: function (t) { write(t, 'out'); },
+        printErr: function (t) { write(t, 'err'); },
+        onRuntimeInitialized: function () { write('[runtime] WASM 运行时初始化完成', 'info'); }
+      }).then(function (m) {
+        Module = m;
+        // readyPromise 在 main() 之前 resolve，但 .then 回调在 main() 同步跑完后才执行，
+        // 此时 beshell.setup()/evalMain() 已完成，可安全调用 beshell_eval。
+        write('[ready] BeShell 已就绪，可输入 JS 代码', 'ok');
+        enable();
+      }).catch(function (e) {
+        write('[FATAL] WASM 加载失败: ' + e, 'err');
+        setStatus('加载失败', 'error');
+      });
+
+      // 事件绑定
+      runBtn.addEventListener('click', function () { run(codeEl.value); codeEl.value = ''; });
+      codeEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          var v = codeEl.value;
+          codeEl.value = '';
+          run(v);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (historyIdx > 0) { historyIdx--; codeEl.value = history[historyIdx]; }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (historyIdx < history.length - 1) { historyIdx++; codeEl.value = history[historyIdx]; }
+          else { historyIdx = history.length; codeEl.value = ''; }
+        }
+      });
+
+      document.querySelectorAll('.snippets button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var code = btn.getAttribute('data-code');
+          codeEl.value = code;
+          run(code);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

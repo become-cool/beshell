@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../NativeModule.hpp"
+#include "DriverClass.hpp"
 #include <vector>
 
 namespace be::driver {
@@ -31,13 +32,13 @@ namespace be::driver {
     public:
         DriverModule(JSContext * ctx, const char * name) ;
 
-        // NativeClass 类
-        template <typename D, typename std::enable_if<std::is_base_of<NativeClass, D>::value, int>::type = 0>
+        // DriverClass 类（驱动类）
+        template <typename D, typename std::enable_if<std::is_base_of<DriverClass, D>::value, int>::type = 0>
         static void useDriver() {
             providers.push_back(nclassProvider<D>);
         }
 
-        template <typename D, typename std::enable_if<!std::is_base_of<NativeClass, D>::value, int>::type = 0>
+        template <typename D, typename std::enable_if<!std::is_base_of<DriverClass, D>::value, int>::type = 0>
         static void useDriver() {
             extProviders[D::name] = extProvider<D>;
         }

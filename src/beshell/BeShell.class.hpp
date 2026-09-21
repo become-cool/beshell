@@ -60,8 +60,8 @@ namespace be {
             engine->mloader.add<CLASS>(this, nullptr) ;
         }
 
-        // driver (NativeClass 类)
-        template <typename CLASS, typename std::enable_if<std::is_base_of<NativeClass, CLASS>::value, int>::type = 0>
+        // driver (DriverClass 类)
+        template <typename CLASS, typename std::enable_if<std::is_base_of<be::driver::DriverClass, CLASS>::value, int>::type = 0>
         void use() {
             be::driver::DriverModule::useDriver<CLASS>() ;
         }

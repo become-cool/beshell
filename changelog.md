@@ -1,15 +1,24 @@
-# 1.0.24
+# 1.0.24 2026/9/21
 
 ## New Feature:
 
-* Timeline 播放控制增强：`play(fromFrame, toFrame)` 支持区间播放与倒放（toFrame<fromFrame）；帧级动作 `jumpTo`/`playTo`（set/add 的 options 参数，含触发次数，每次触发 -1、0 不再触发、-1 不限且不递减，`play()` 时恢复初始值；playTo 支持倒放，到达后恢复原方向与终点）；新增 `arrive:<帧号>` 到达事件（on/off 机制）与 C++ 侧 `watchArrive`/`unwatchArrive`/`EVENT_ARRIVE`
+* Timeline 播放控制增强：`play(fromFrame, toFrame)` 支持区间播放与倒放（toFrame<fromFrame）；帧级动作（set/add 的 options 参数）新增 `stop`/`resume`/`label` 三个字段：stop 到达本帧即停止，playTo 缺省到达后停止、`resume:true` 才恢复原方向与终点，label 为帧标记名；playTo 中途遇 jumpTo 放弃 playTo 目标、恢复原方向与终点；新增 `arrive:<帧号>` 到达事件（on/off 机制）与 C++ 侧 `watchArrive`/`unwatchArrive`/`EVENT_ARRIVE`
+* Timeline 帧级动作支持触发次数（jumpCount/playCount）：每次触发 -1、0 不再触发、-1 不限且不递减，`play()` 时恢复初始值
 * Timeline 新增游标：`cursor` 属性（游标帧号）与 `evalAt(frame?)` 方法，只计算不写入地返回各轨道在指定帧（缺省游标帧）上的插补值 `[{obj, prop, value}, ...]`；`playAt(frame)` 游标预览——写入各轨道该帧插补值、移动游标、有变更时触发 change（不推进播放状态、不影响关键帧），供编辑器等 scrub 场景使用；新增 C++ 侧 `unset(void * cptr)` 整轨删除
 * Track 原点值改为轨道创建时捕获（`ensureOrigin` 不再读目标当前值），防止 playAt 预览改写当前值后污染后续新建关键帧的 0 帧原点
-* 新增 PC 平台移植：`pc/` 独立 CMake 工程（不经由 ESP-IDF 构建），核心框架（JS 引擎、模块系统、REPL、fs、process、NVS(stub)、animator 等）可编译运行于 Windows(MinGW)/Linux/macOS；REPL 新增 StdIO 通道（Windows 支持控制台与管道输入）；WASM(Emscripten) 构建分支已就绪（待验证）
-* PC 工程注册 animator 模块，新增 PC 侧 animator 单元测试脚本 `pc/fs/tests/animator.js`（tween/Timeline 求值/游标/播放控制/事件，37 项断言）
+* Timeline C++ 侧新增有限重播次数 `repeatCount`（构造参数，每回绕一次 -1，-1 = 不限，`play()` 时恢复初始值）与只读访问 `getRepeatCount()`/`getFrameActions()`
+* 新增 PC 平台移植：`pc/` 独立 CMake 工程（不经由 ESP-IDF 构建），核心框架（JS 引擎、模块系统、REPL、fs、process、NVS(stub)、animator 等）可编译运行于 Windows(MinGW)/Linux/macOS；REPL 新增 StdIO 通道（Windows 支持控制台与管道输入）；WASM(Emscripten) 构建分支已验证，新增浏览器 REPL 测试页 `pc/web/index.html`
+* PC 工程注册 animator/NVS 模块，新增 PC 侧 animator 单元测试脚本 `pc/fs/tests/animator.js`（tween/Timeline 求值/游标/播放控制/事件，44 项断言）
+
+## Fix:
+
+* quickjs-libc.c `atomic_add_int()` 改用 `_Atomic(uint32_t)*` 强转，修复 Emscripten(clang 21) 下 "address argument to atomic operation must be a pointer to _Atomic type" 编译错误（记录于 quickjs-modify.md）
 
 ## Refact:
 
+* 驱动类基类统一为 `be::driver::DriverClass`（新增，继承 EventEmitter 的类型标记基类）：`beshell.use<T>()`/`DriverModule::useDriver<T>()` 的驱动类判定由 NativeClass 改为 DriverClass，`InDevPointer` 随之迁移
+* PC/WASM 完善：`beshell_eval` 改走 `Cammonds::input`（shell 命令与 JS 求值同一路径，与原生 REPL 一致）、新增 WASM 专用 REPL 通道、console 输出转发到 stdout、WASM 下不注册 stdio 通道；WASM 产物改为 `-sMODULARIZE=1 -sEXPORT_NAME=createBeShell`
+* PC 构建脚本的公共部分抽取为 `pc/beshell-pc-common.cmake`（`beshell_pc_setup(target)`），供核心与各延伸组件的 pc/ 工程复用
 * 平台相关代码整理：新增 `be::platform` 抽象（`sleepMs()/uptimeMs()`）；ESP 专属代码（FreeRTOS 信号量/事件队列、IDF API、mbedtls REPL 加密等）统一以 `ESP_PLATFORM`/`BESHELL_PLATFORM_PC` 守卫隔离，ESP 平台功能与行为不变；quickjs 增加 `_WIN32` 兼容补丁（详见 quickjs-modify.md）
 
 # 1.0.23 2026/9/6

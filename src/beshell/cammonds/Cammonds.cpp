@@ -10,6 +10,7 @@
 #include <cassert>
 #include <iomanip>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <dirent.h>
 #include <iostream>
 #include <functional>
